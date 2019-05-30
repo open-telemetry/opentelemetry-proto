@@ -7,7 +7,7 @@ apply plugin: 'maven'
 apply plugin: "signing"
 
 group = "io.opentelemetry"
-version = "0.1.0-SNAPSHOT" // CURRENT_OPENCENSUS_PROTO_VERSION
+version = "0.1.0-SNAPSHOT" // CURRENT_OPENTELEMETRY_PROTO_VERSION
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
