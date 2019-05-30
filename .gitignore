@@ -1,0 +1,24 @@
+# Gradle
+build
+gradle.properties
+.gradle
+local.properties
+out/
+
+# IntelliJ IDEA
+.idea
+*.iml
+.editorconfig
+
+# VS Code
+.vscode
+
+# OS X
+.DS_Store
+
+# Emacs
+*~
+\#*\#
+
+# Vim
+.swp
