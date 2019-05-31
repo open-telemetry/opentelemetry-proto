@@ -16,9 +16,9 @@ syntax = "proto3";
 
 package opentelemetry.proto.agent.metrics.v1;
 
-import "agent/common/v1/common.proto";
-import "metrics/v1/metrics.proto";
-import "resource/v1/resource.proto";
+import "opentelemetry/proto/agent/common/v1/common.proto";
+import "opentelemetry/proto/metrics/v1/metrics.proto";
+import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.agent.metrics.v1";
