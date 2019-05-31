@@ -32,7 +32,7 @@ option java_outer_classname = "TraceProto";
 // multiple root spans, or none at all. Spans do not need to be
 // contiguous - there may be gaps or overlaps between spans in a trace.
 //
-// The next id is 16.
+// The next id is 15.
 message Span {
   // A unique identifier for a trace. All spans from the same trace share
   // the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes
