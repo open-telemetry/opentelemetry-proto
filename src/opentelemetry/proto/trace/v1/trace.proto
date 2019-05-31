@@ -148,7 +148,7 @@ message Span {
   // A set of attributes, each with a key and a value.
   message Attributes {
     // The set of attributes. The value can be a string, an integer, a double
-    // or the Boolean values `true` or `false`. Note, global attributes like 
+    // or the Boolean values `true` or `false`. Note, global attributes like
     // server name can be set as tags using resource API. Examples of attributes:
     //
     //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
@@ -204,7 +204,7 @@ message Span {
   // where a single batch handler processes multiple requests from different
   // traces or when the handler receives a request from a different project.
   message Link {
-    // A unique identifier of a trace that this linked span is part of. The ID is a 
+    // A unique identifier of a trace that this linked span is part of. The ID is a
     // 16-byte array.
     bytes trace_id = 1;
 
@@ -237,16 +237,9 @@ message Span {
   // Status.Ok (code = 0).
   Status status = 13;
 
-  // A highly recommended but not required flag that identifies when a
-  // trace crosses a process boundary. True when the parent_span belongs
-  // to the same process as the current span. This flag is most commonly
-  // used to indicate the need to adjust time as clocks in different
-  // processes may not be synchronized.
-  google.protobuf.BoolValue same_process_as_parent_span = 14;
-
   // An optional number of child spans that were generated while this span
   // was active. If set, allows an implementation to detect missing child spans.
-  google.protobuf.UInt32Value child_span_count = 15;
+  google.protobuf.UInt32Value child_span_count = 14;
 }
 
 // The `Status` type defines a logical error model that is suitable for different
