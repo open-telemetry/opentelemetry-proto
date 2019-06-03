@@ -106,6 +106,7 @@ message Span {
   // in addition to a parent/child relationship.
   enum SpanKind {
     // Unspecified. Do NOT use as default.
+    // Implementations MAY assume SpanKind to be INTERNAL when receiving UNSPECIFIED.
     SPAN_KIND_UNSPECIFIED = 0;
 
     // Indicates that the span is used internally. Default value.
