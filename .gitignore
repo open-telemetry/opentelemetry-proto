@@ -12,6 +12,9 @@ out/
 
 # VS Code
 .vscode
+.classpath
+.project
+.settings/
 
 # OS X
 .DS_Store
