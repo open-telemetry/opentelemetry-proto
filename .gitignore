@@ -1,3 +1,5 @@
+bin/
+
 # Gradle
 build
 gradle.properties
@@ -8,7 +10,6 @@ out/
 # IntelliJ IDEA
 .idea
 *.iml
-.editorconfig
 
 # VS Code
 .vscode
