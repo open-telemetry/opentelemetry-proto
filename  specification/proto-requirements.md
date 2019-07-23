@@ -38,15 +38,17 @@ The protocol must support traces and metrics as data types.
 
 #### Reliability of Delivery
 
-The protocol must ensure reliable data delivery and clear visibility when the data cannot delivered. This should be achieved by sending data acknowledgements from the Server to the Client. 
+The protocol must ensure reliable data delivery and clear visibility when the data cannot be delivered. This should be achieved by sending data acknowledgements from the Server to the Client. 
 
 Note that acknowledgements alone are not sufficient to guarantee that: a) no data will be lost and b) no data will be duplicated. Acknowledgements can help to guarantee a) but not b). Guaranteeing both at the same is difficult. Because it is usually preferable for telemetry data to be duplicated than to lose it, we choose to guarantee that there are no data losses while potentially allowing duplicate data.
 
 Duplicates can typically happen in edge cases (e.g. on reconnections, network interruptions, etc) when the client has no way of knowing if last sent data was delivered. In these cases the client will usually choose to re-send the data to guarantee the delivery which in turn may result in duplicate data on the server side.
 
-_To avoid having duplicates the client and the server could each track sent and delivered items using uniquely identifying ids. For this approach to be possible the client should be able to request the id of the last received data from the server and be able to resume sending from that item. Such request may be impossible to support on the server efficiently as it requires the server to have a consistent view of its data which may not be possible to do in a partitioned state, or it requires sticky sessions/connections which can be detrimental to load balancing and availability of servers._
+_To avoid having duplicates the client and the server could track sent and delivered items using uniquely identifying ids. The exact mechanism for tracking the ids and performing data de-duplication may be defined at the layer above the protocol layer and is outside the scope of this document._
 
 For this reason we have slightly relaxed requirements and consider duplicate data acceptable in rare cases.
+
+Note: this protocol is concerned with reliability of delivery between one pair of client/server nodes and aims to ensure that no data is lost in-transit between the client and the server. Many telemetry collection systems have multiple nodes that the data must travel across until reaching the final destination (e.g. application -> agent -> collector -> backend). End-to-end delivery guarantees in such systems is outside of the scope for this document. The acknowledgements described in this protocol happen between a single client/server pair and do not span multiple nodes in multi-hop delivery paths.
 
 #### Throughput
 
