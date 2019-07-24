@@ -74,6 +74,7 @@ message LibraryInfo {
     PHP = 7;
     PYTHON = 8;
     RUBY = 9;
+    WEB_JS = 10;
   }
 
   // Language of OpenTelemetry Library.
