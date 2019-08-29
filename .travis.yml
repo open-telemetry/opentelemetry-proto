@@ -1,20 +1,9 @@
 sudo: required
 dist: xenial
+language: go
 
-matrix:
-  include:
-  - language: java
-    jdk: openjdk8
+install:
+  -  ./install-proto.sh
 
 script:
-  - ./gradlew clean assemble --stacktrace
-  - ./gradlew check --stacktrace
-
-before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-
-cache:
-  directories:
-    - $HOME/.gradle
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+  - ./java_build.sh
