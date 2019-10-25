@@ -122,32 +122,51 @@ message LabelValue {
   bool has_value = 2;
 }
 
-// A timestamped measurement.
+// Point is a timestamped measurement.
 message Point {
-  // Must be present for counter/cumulative metrics. The time when the
-  // cumulative value was reset to zero. The cumulative value is over the time
-  // interval (start_timestamp, timestamp]. If not specified, the backend can
-  // use the previous recorded value.
-  google.protobuf.Timestamp start_timestamp = 1;
+  // start_time_unixnano is the time when the cumulative value was reset to zero.
+  // Must be present for counter/cumulative metrics. The cumulative value is over the time
+  // interval (start_time_unixnano, timestamp_unixnano].
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  int64 start_time_unixnano = 1;
 
-  // The moment when this point was recorded.
-  // If not specified, the timestamp will be decided by the backend.
-  google.protobuf.Timestamp timestamp = 2;
+  // timestamp_unixnano is the moment when this point was recorded.
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  int64 timestamp_unixnano = 2;
 
-  // The actual point value.
-  oneof value {
-    // A 64-bit integer.
-    int64 int64_value = 3;
+  // start_time_unspecified must be set to true if start_time_unixnano value is unspecified.
+  // In that case the backend can use the previous recorded value for start_time_unixnano.
+  bool start_time_unspecified = 3;
 
-    // A 64-bit double-precision floating-point number.
-    double double_value = 4;
+  // timestamp_unspecified must be set to true if timestamp_unixnano value is unspecified.
+  // In that case timestamp_unixnano value will be decided by the backend.
+  bool timestamp_unspecified = 4;
 
-    // A histogram value.
-    HistogramValue histogram_value = 5;
+  // ValueType is the enumeration of possible types that Point's value can have.
+  enum ValueType {
+    INT64      = 0;
+    DOUBLE     = 1;
+    HISTOGRAM  = 2;
+    SUMMARY    = 3;
+  };
 
-    // A summary value. This is not recommended, since it cannot be aggregated.
-    SummaryValue summary_value = 6;
-  }
+  // type of the value.
+  ValueType type = 5;
+
+  // Only one of the following fields is supposed to contain data (determined by `type` field value).
+  // This is deliberately not using Protobuf `oneof` for performance reasons (verified by benchmarks).
+
+  // A 64-bit integer.
+  int64 int64_value = 6;
+
+  // A 64-bit double-precision floating-point number.
+  double double_value = 7;
+
+  // A histogram value.
+  HistogramValue histogram_value = 8;
+
+  // A summary value. This is not recommended, since it cannot be aggregated.
+  SummaryValue summary_value = 9;
 }
 
 // Histogram contains summary statistics for a population of values. It may
