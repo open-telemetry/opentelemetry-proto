@@ -127,7 +127,7 @@ message Point {
   // This is used for Counter type only. For Gauge the value is not specified and
   // defaults to 0.
   //
-  // The cumulative value is over the time interval [start_time_unixnano, timestamp_unixnano].
+  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // Value of 0 indicates that the start_time is the same as that of the previous
