@@ -124,15 +124,24 @@ message LabelValue {
 
 // A timestamped measurement.
 message Point {
-  // Must be present for counter/cumulative metrics. The time when the
-  // cumulative value was reset to zero. The cumulative value is over the time
-  // interval (start_timestamp, timestamp]. If not specified, the backend can
-  // use the previous recorded value.
-  google.protobuf.Timestamp start_timestamp = 1;
+  // start_time_unixnano is the time when the cumulative value was reset to zero.
+  // This is used for Counter type only. For Gauge the value is not specified and
+  // defaults to 0.
+  //
+  // The cumulative value is over the time interval [start_time_unixnano, timestamp_unixnano].
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // Value of 0 indicates that the start_time is the same as that of the previous
+  // data point in this timeseries. When creating timeseries of this type it is recommended
+  // to omit this value if the start_time does not change, since it results in more
+  // compact encoding on the wire.
+  // If the value of 0 occurs for the first data point in the timeseries it means that
+  // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
+  int64 start_time_unixnano = 1;
 
-  // The moment when this point was recorded.
-  // If not specified, the timestamp will be decided by the backend.
-  google.protobuf.Timestamp timestamp = 2;
+  // timestamp_unixnano is the moment when this value was recorded.
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  sfixed64 timestamp_unixnano = 2;
 
   // The actual point value.
   oneof value {
@@ -204,8 +213,9 @@ message HistogramValue {
       // belongs to.
       double value = 1;
 
-      // The observation (sampling) time of the above value.
-      google.protobuf.Timestamp timestamp = 2;
+      // timestamp_unixnano is the moment when this exemplar was recorded.
+      // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+      sfixed64 timestamp_unixnano = 2;
 
       // Contextual information about the example value.
       map<string, string> attachments = 3;
