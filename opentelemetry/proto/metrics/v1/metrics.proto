@@ -35,12 +35,10 @@ message Metric {
   // data is a list of one or more TimeSeries for a single metric, where each timeseries has
   // one or more points. Only one of the following fields is used for the data, depending on
   // the type of the metric defined by MetricDescriptor.type field.
-  oneof data {
-    Int64TimeSeriesList int64_data = 3;
-    DoubleTimeSeriesList double_data = 4;
-    HistogramTimeSeriesList histogram_data = 5;
-    SummaryTimeSeriesList summary_data = 6;
-  }
+  repeated Int64TimeSeries int64_timeseries = 3;
+  repeated DoubleTimeSeries double_timeseries = 4;
+  repeated HistogramTimeSeries histogram_timeseries = 5;
+  repeated SummaryTimeSeries summary_timeseries = 6;
 }
 
 // Defines a metric type and its schema.
@@ -106,26 +104,6 @@ message MetricDescriptor {
   repeated string label_keys = 5;
 }
 
-// Int64TimeSeriesList is a list of timeseries of int64 values.
-message Int64TimeSeriesList {
-  repeated Int64TimeSeries list = 1;
-}
-
-// DoubleTimeSeriesList is a list of timeseries of double values.
-message DoubleTimeSeriesList {
-  repeated DoubleTimeSeries list = 1;
-}
-
-// HistogramTimeSeriesList is a list of timeseries of Histogram.
-message HistogramTimeSeriesList {
-  repeated HistogramTimeSeries list = 1;
-}
-
-// SummaryTimeSeriesList is a list of timeseries of Summary.
-message SummaryTimeSeriesList {
-  repeated SummaryTimeSeries list = 1;
-}
-
 // Int64TimeSeries is a list of data points that describes the time-varying values
 // of a int64 metric.
 message Int64TimeSeries {
@@ -138,7 +116,7 @@ message Int64TimeSeries {
   repeated Int64Value points = 2;
 }
 
-// DoubleTimeSeries is a list of data points that describes the time-varying values
+// eDoubleTimeSeries is a list of data points that describes the time-varying values
 // of a double metric.
 message DoubleTimeSeries {
   // The set of label values that uniquely identify this timeseries. Applies to
