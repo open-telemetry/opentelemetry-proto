@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package opentelemetry.proto.metrics.v1;
 
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
 
@@ -137,7 +136,7 @@ message Point {
   // compact encoding on the wire.
   // If the value of 0 occurs for the first data point in the timeseries it means that
   // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
-  int64 start_time_unixnano = 1;
+  sfixed64 start_time_unixnano = 1;
 
   // timestamp_unixnano is the moment when this value was recorded.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
