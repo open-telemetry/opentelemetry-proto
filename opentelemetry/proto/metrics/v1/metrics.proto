@@ -28,13 +28,17 @@ message Metric {
   // The descriptor of the Metric.
   MetricDescriptor metric_descriptor = 1;
 
-  // One or more timeseries for a single metric, where each timeseries has
-  // one or more points.
-  repeated TimeSeries timeseries = 2;
-
   // The resource for the metric. If unset, it may be set to a default value
   // provided for a sequence of messages in an RPC stream.
-  opentelemetry.proto.resource.v1.Resource resource = 3;
+  opentelemetry.proto.resource.v1.Resource resource = 2;
+
+  // data is a list of one or more TimeSeries for a single metric, where each timeseries has
+  // one or more points. Only one of the following fields is used for the data, depending on
+  // the type of the metric defined by MetricDescriptor.type field.
+  repeated Int64TimeSeries int64_timeseries = 3;
+  repeated DoubleTimeSeries double_timeseries = 4;
+  repeated HistogramTimeSeries histogram_timeseries = 5;
+  repeated SummaryTimeSeries summary_timeseries = 6;
 }
 
 // Defines a metric type and its schema.
@@ -100,17 +104,52 @@ message MetricDescriptor {
   repeated string label_keys = 5;
 }
 
-// A collection of data points that describes the time-varying values
-// of a metric.
-message TimeSeries {
+// Int64TimeSeries is a list of data points that describes the time-varying values
+// of a int64 metric.
+message Int64TimeSeries {
   // The set of label values that uniquely identify this timeseries. Applies to
   // all points. The order of label values must match that of label keys in the
   // metric descriptor.
   repeated LabelValue label_values = 1;
 
-  // The data points of this timeseries. Point.value type MUST match the
-  // MetricDescriptor.type.
-  repeated Point points = 2;
+  // The data points of this timeseries.
+  repeated Int64Value points = 2;
+}
+
+// eDoubleTimeSeries is a list of data points that describes the time-varying values
+// of a double metric.
+message DoubleTimeSeries {
+  // The set of label values that uniquely identify this timeseries. Applies to
+  // all points. The order of label values must match that of label keys in the
+  // metric descriptor.
+  repeated LabelValue label_values = 1;
+
+  // The data points of this timeseries.
+  repeated DoubleValue points = 2;
+}
+
+// HistogramTimeSeries is a list of data points that describes the time-varying values
+// of a Histogram.
+message HistogramTimeSeries {
+  // The set of label values that uniquely identify this timeseries. Applies to
+  // all points. The order of label values must match that of label keys in the
+  // metric descriptor.
+  repeated LabelValue label_values = 1;
+
+  // The data points of this timeseries.
+  repeated HistogramValue points = 2;
+}
+
+// SummaryTimeSeries is a list of data points that describes the time-varying values
+// of a Summary metric.
+message SummaryTimeSeries {
+  // The set of label values that uniquely identify this timeseries. Applies to
+  // all points. The order of label values must match that of label keys in the
+  // metric descriptor.
+  repeated LabelValue label_values = 1;
+
+  // The data points of this timeseries.
+  repeated SummaryValue points = 2;
 }
 
 message LabelValue {
@@ -121,8 +160,8 @@ message LabelValue {
   bool has_value = 2;
 }
 
-// A timestamped measurement.
-message Point {
+// Int64Value is a timestamped measurement of int64 value.
+message Int64Value {
   // start_time_unixnano is the time when the cumulative value was reset to zero.
   // This is used for Counter type only. For Gauge the value is not specified and
   // defaults to 0.
@@ -142,33 +181,65 @@ message Point {
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   sfixed64 timestamp_unixnano = 2;
 
-  // The actual point value.
-  oneof value {
-    // A 64-bit integer.
-    int64 int64_value = 3;
+  // value itself.
+  int64 value = 3;
+}
 
-    // A 64-bit double-precision floating-point number.
-    double double_value = 4;
+// DoubleValue is a timestamped measurement of double value.
+message DoubleValue {
+  // start_time_unixnano is the time when the cumulative value was reset to zero.
+  // This is used for Counter type only. For Gauge the value is not specified and
+  // defaults to 0.
+  //
+  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // Value of 0 indicates that the start_time is the same as that of the previous
+  // data point in this timeseries. When creating timeseries of this type it is recommended
+  // to omit this value if the start_time does not change, since it results in more
+  // compact encoding on the wire.
+  // If the value of 0 occurs for the first data point in the timeseries it means that
+  // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
+  sfixed64 start_time_unixnano = 1;
 
-    // A histogram value.
-    HistogramValue histogram_value = 5;
+  // timestamp_unixnano is the moment when this value was recorded.
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  sfixed64 timestamp_unixnano = 2;
 
-    // A summary value. This is not recommended, since it cannot be aggregated.
-    SummaryValue summary_value = 6;
-  }
+  // value itself.
+  double value = 3;
 }
 
 // Histogram contains summary statistics for a population of values. It may
 // optionally contain the distribution of those values across a set of buckets.
 message HistogramValue {
+  // start_time_unixnano is the time when the cumulative value was reset to zero.
+  // This is used for Counter type only. For Gauge the value is not specified and
+  // defaults to 0.
+  //
+  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // Value of 0 indicates that the start_time is the same as that of the previous
+  // data point in this timeseries. When creating timeseries of this type it is recommended
+  // to omit this value if the start_time does not change, since it results in more
+  // compact encoding on the wire.
+  // If the value of 0 occurs for the first data point in the timeseries it means that
+  // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
+  sfixed64 start_time_unixnano = 1;
+
+  // timestamp_unixnano is the moment when this value was recorded.
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  sfixed64 timestamp_unixnano = 2;
+
   // The number of values in the population. Must be non-negative. This value
   // must equal the sum of the values in bucket_counts if a histogram is
   // provided.
-  int64 count = 1;
+  int64 count = 3;
 
   // The sum of the values in the population. If count is zero then this field
   // must be zero.
-  double sum = 2;
+  double sum = 4;
 
   // A Histogram may optionally contain the distribution of the values in the
   // population. The bucket boundaries are described by BucketOptions.
@@ -197,7 +268,7 @@ message HistogramValue {
 
   // Don't change bucket boundaries within a TimeSeries if your backend doesn't
   // support this.
-  BucketOptions bucket_options = 3;
+  BucketOptions bucket_options = 5;
 
   message Bucket {
     // The number of values in each bucket of the histogram, as described in
@@ -227,19 +298,38 @@ message HistogramValue {
 
   // The sum of the values in the Bucket counts must equal the value in the
   // count field of the histogram.
-  repeated Bucket buckets = 4;
+  repeated Bucket buckets = 6;
 }
 
 // The start_timestamp only applies to the count and sum in the SummaryValue.
 message SummaryValue {
+  // start_time_unixnano is the time when the cumulative value was reset to zero.
+  // This is used for Counter type only. For Gauge the value is not specified and
+  // defaults to 0.
+  //
+  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // Value of 0 indicates that the start_time is the same as that of the previous
+  // data point in this timeseries. When creating timeseries of this type it is recommended
+  // to omit this value if the start_time does not change, since it results in more
+  // compact encoding on the wire.
+  // If the value of 0 occurs for the first data point in the timeseries it means that
+  // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
+  sfixed64 start_time_unixnano = 1;
+
+  // timestamp_unixnano is the moment when this value was recorded.
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  sfixed64 timestamp_unixnano = 2;
+
   // The total number of recorded values since start_time. Optional since
   // some systems don't expose this.
-  google.protobuf.Int64Value count = 1;
+  google.protobuf.Int64Value count = 3;
 
   // The total sum of recorded values since start_time. Optional since some
   // systems don't expose this. If count is zero then this field must be zero.
   // This field must be unset if the sum is not available.
-  google.protobuf.DoubleValue sum = 2;
+  google.protobuf.DoubleValue sum = 4;
 
   // The values in this message can be reset at arbitrary unknown times, with
   // the requirement that all of them are reset at the same time.
@@ -269,6 +359,5 @@ message SummaryValue {
   }
 
   // Values calculated over an arbitrary time window.
-  Snapshot snapshot = 3;
+  Snapshot snapshot = 5;
 }
-
