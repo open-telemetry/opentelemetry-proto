@@ -158,21 +158,17 @@ message HistogramTimeSeries {
   }
 
   // A histogram may optionally contain the distribution of the values in the population.
-  // In that case "bucket_options" field below and "buckets" field in HistogramValue
-  // both must be defined. Otherwise both fields must be omitted in which case the
-  // distribution of values in the histogram is unknown and only the total count and sum
-  // are known.
+  // In that case one of the option fields below and "buckets" field in HistogramValue
+  // both must be defined. Otherwise all option fields and "buckets" field must be omitted
+  // in which case the distribution of values in the histogram is unknown and only the
+  // total count and sum are known.
   //
-  // bucket_options apply to all points in this HistogramTimeSeries. To define
-  // different bucket_options for different points create separate instances of
-  // HistogramTimeSeries each with its own bucket_options.
-  oneof bucket_options {
-    // explicit_bounds is the only supported option currently.
-    ExplicitBounds explicit_bounds = 3;
+  // Bucket options apply to all points in this HistogramTimeSeries. To define
+  // different bucket options for different points create separate instances of
+  // HistogramTimeSeries each with its own bucket options.
 
-    // Other options such linear buckets or exponential buckets may be added below
-    // in the future.
-  }
+  // explicit_bounds is the only supported bucket option currently.
+  ExplicitBounds explicit_bounds = 3;
 }
 
 // SummaryTimeSeries is a list of data points that describes the time-varying values
