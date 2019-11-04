@@ -314,6 +314,7 @@ message HistogramValue {
 }
 
 // StringKeyValuePair is a pair of key/value strings.
+// TODO: consider unifying this with Resource and Span Attribute key/value pairs.
 message StringKeyValuePair {
   string key = 1;
   string value = 2;
