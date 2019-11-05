@@ -74,8 +74,7 @@ option java_outer_classname = "MetricsProto";
 //
 // TimeSeries are strongly typed: the element of a TimeSeries array has
 // a specific Protobuf message depending on the value type of the metric and thus
-// there are currently 4 TimeSeriesList and 4 TimeSeries messages, which
-// correspond to the types of metric values.
+// there are currently 4 TimeSeries messages, which correspond to the types of metric values.
 message Metric {
   // The descriptor of the Metric.
   MetricDescriptor metric_descriptor = 1;
