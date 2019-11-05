@@ -138,6 +138,37 @@ message HistogramTimeSeries {
 
   // The data points of this timeseries.
   repeated HistogramValue points = 2;
+
+  // ExplicitBounds specifies buckets with explicitly defined bounds for values.
+  message ExplicitBounds {
+    // The bucket boundaries are described by "bounds" field.
+    //
+    // This defines size(bounds) + 1 (= N) buckets. The boundaries for bucket
+    // at index i are:
+    //
+    // [0, bounds[i]) for i == 0
+    // [bounds[i-1], bounds[i]) for 0 < i < N-1
+    // [bounds[i], +infinity) for i == N-1
+    // The values in bounds array must be strictly increasing and > 0.
+    //
+    // Note: only [a, b) intervals are currently supported for each bucket. If we decides
+    // to also support (a, b] intervals we should add support for these by defining a boolean
+    // value which decides what type of intervals to use.
+    repeated double bounds = 1;
+  }
+
+  // A histogram may optionally contain the distribution of the values in the population.
+  // In that case one of the option fields below and "buckets" field in HistogramValue
+  // both must be defined. Otherwise all option fields and "buckets" field must be omitted
+  // in which case the distribution of values in the histogram is unknown and only the
+  // total count and sum are known.
+  //
+  // Bucket options apply to all points in this HistogramTimeSeries. To define
+  // different bucket options for different points create separate instances of
+  // HistogramTimeSeries each with its own bucket options.
+
+  // explicit_bounds is the only supported bucket option currently.
+  ExplicitBounds explicit_bounds = 3;
 }
 
 // SummaryTimeSeries is a list of data points that describes the time-varying values
@@ -152,6 +183,7 @@ message SummaryTimeSeries {
   repeated SummaryValue points = 2;
 }
 
+// Label value or indication that the value is missing
 message LabelValue {
   // The value for the label.
   string value = 1;
@@ -210,14 +242,11 @@ message DoubleValue {
   double value = 3;
 }
 
-// Histogram contains summary statistics for a population of values. It may
+// HistogramValue contains summary statistics for a population of values. It may
 // optionally contain the distribution of those values across a set of buckets.
 message HistogramValue {
   // start_time_unixnano is the time when the cumulative value was reset to zero.
-  // This is used for Counter type only. For Gauge the value is not specified and
-  // defaults to 0.
-  //
-  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
+  // The cumulative value is over the time interval [start_time_unixnano, timestamp_unixnano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // Value of 0 indicates that the start_time is the same as that of the previous
@@ -226,79 +255,70 @@ message HistogramValue {
   // compact encoding on the wire.
   // If the value of 0 occurs for the first data point in the timeseries it means that
   // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
+  // Note: this field is always unspecified and ignored if MetricDescriptor.type==GAUGE_HISTOGRAM.
   sfixed64 start_time_unixnano = 1;
 
   // timestamp_unixnano is the moment when this value was recorded.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   sfixed64 timestamp_unixnano = 2;
 
-  // The number of values in the population. Must be non-negative. This value
-  // must equal the sum of the values in bucket_counts if a histogram is
+  // count is the number of values in the population. Must be non-negative. This value
+  // must be equal to the sum of the "count" fields in buckets if a histogram is
   // provided.
   int64 count = 3;
 
-  // The sum of the values in the population. If count is zero then this field
-  // must be zero.
+  // sum of the values in the population. If count is zero then this field
+  // must be zero. This value must be equal to the sum of the "sum" fields in buckets if
+  // a histogram is provided.
   double sum = 4;
 
-  // A Histogram may optionally contain the distribution of the values in the
-  // population. The bucket boundaries are described by BucketOptions.
-  message BucketOptions {
-    oneof type {
-      // Bucket with explicit bounds.
-      Explicit explicit = 1;
-    }
-
-    // Specifies a set of buckets with arbitrary upper-bounds.
-    // This defines size(bounds) + 1 (= N) buckets. The boundaries for bucket
-    // index i are:
-    //
-    // [0, bucket_bounds[i]) for i == 0
-    // [bucket_bounds[i-1], bucket_bounds[i]) for 0 < i < N-1
-    // [bucket_bounds[i], +infinity) for i == N-1
-    message Explicit {
-      // The values must be strictly increasing and > 0.
-      repeated double bounds = 1;
-    }
-
-    // TODO: If OpenMetrics decides to support (a, b] intervals we should add
-    // support for these by defining a boolean value here which decides what
-    // type of intervals to use.
-  }
-
-  // Don't change bucket boundaries within a TimeSeries if your backend doesn't
-  // support this.
-  BucketOptions bucket_options = 5;
-
+  // Bucket contains values for a bucket.
   message Bucket {
-    // The number of values in each bucket of the histogram, as described in
-    // bucket_bounds.
+    // The number of values in each bucket of the histogram, as described by
+    // bucket_options.
     int64 count = 1;
 
     // Exemplars are example points that may be used to annotate aggregated
     // Histogram values. They are metadata that gives information about a
     // particular value added to a Histogram bucket.
     message Exemplar {
-      // Value of the exemplar point. It determines which bucket the exemplar
-      // belongs to.
+      // Value of the exemplar point. It determines which bucket the exemplar belongs to.
+      // If bucket_options define bounds for this bucket then this value must be within
+      // the defined bounds.
       double value = 1;
 
       // timestamp_unixnano is the moment when this exemplar was recorded.
       // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
       sfixed64 timestamp_unixnano = 2;
 
-      // Contextual information about the example value.
-      map<string, string> attachments = 3;
+      // exemplar_attachments are contextual information about the example value.
+      // Keys in this list must be unique.
+      repeated StringKeyValuePair attachments = 3;
     }
 
-    // Exemplars are example points that may be used to annotate aggregated
-    // Histogram values.
+    // exemplar is an optional representative value of the bucket.
     Exemplar exemplar = 2;
   }
 
-  // The sum of the values in the Bucket counts must equal the value in the
-  // count field of the histogram.
-  repeated Bucket buckets = 6;
+  // buckets is an optional field contains the values of histogram for each bucket.
+  //
+  // The sum of the values in the buckets "count" field must equal the value in the
+  // count field of HistogramValue.
+  //
+  // The number of elements in buckets array must be by one greater than the
+  // number of elements in bucket_bounds array.
+  //
+  // Note: if HistogramTimeSeries.bucket_options defines bucket bounds then this field
+  // must also be present and number of elements in this field must be equal to the
+  // number of buckets defined by bucket_options.
+  repeated Bucket buckets = 5;
+}
+
+// StringKeyValuePair is a pair of key/value strings.
+// TODO: consider unifying this with Resource and Span Attribute key/value pairs.
+message StringKeyValuePair {
+  string key = 1;
+  string value = 2;
 }
 
 // The start_timestamp only applies to the count and sum in the SummaryValue.
