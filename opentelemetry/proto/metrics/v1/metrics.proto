@@ -183,6 +183,7 @@ message SummaryTimeSeries {
   repeated SummaryValue points = 2;
 }
 
+// Label value or indication that the value is missing
 message LabelValue {
   // The value for the label.
   string value = 1;
