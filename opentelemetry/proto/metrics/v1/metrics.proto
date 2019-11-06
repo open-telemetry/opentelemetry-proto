@@ -24,6 +24,57 @@ option java_package = "io.opentelemetry.proto.metrics.v1";
 option java_outer_classname = "MetricsProto";
 
 // Defines a Metric which has one or more timeseries.
+//
+// The data model and relation between entities is shown in the diagram below.
+//
+// - Metric is composed of a Resource, a MetricDescriptor and a TimeSeriesList data.
+// - MetricDescriptor contains a list of label keys (shown horizontally).
+// - TimeSeriesList is composed of a list of TimeSeries (shown vertically).
+// - TimeSeries contains a list of label values and a list of metric values (shown
+//   horizontally).
+//
+//     Metric
+//  +----------+         +--------+
+//  |  resource|-------->|Resource|
+//  |          |         +--------+
+//  |          |
+//  |          |         +------------------------+
+//  |descriptor|-------->| MetricDescriptor       |
+//  |          |         |+-----+-----+   +-----+ |
+//  |          |         ||label|label|...|label| |
+//  |      data|--+      ||key1 |key2 |   |keyN | |
+//  +----------+  |      |+-----+-----+   +-----+ |
+//                |      +------------------------+
+//                |
+//                |      +------------------------------+
+//                |      |TimeSeries 1                  |
+//                v      |+-----+-----+   +-----+       |
+//             +-----+   ||label|label|...|label|       |
+//             |  1  |-->|+-----+-----+   +-----+       |
+//             +-----+   |+-----+-----+-----+   +-----+ |
+//             |  .  |   ||value|value|value|...|value| |
+//             |  .  |   |+-----+-----+-----+   +-----+ |
+//             |  .  |   +------------------------------+
+//             |  .  |                   .
+//             |  .  |                   .
+//             |  .  |                   .
+//             |  .  |   +-----------------------------------+
+//             |  .  |   |TimeSeries N                       |
+//             +-----+   |+-----+-----+   +-----+            |
+//             |  N  |-->||label|label|...|label|            |
+//             +-----+   |+-----+-----+   +-----+            |
+//                       |+-----+-----+-----+-----+   +-----+|
+//                       ||value|value|value|value|...|value||
+//                       |+-----+-----+-----+-----+   +-----+|
+//                       +-----------------------------------+
+//
+//-----------------------------------------------------------------------
+// TimeSeries contain an array of values, each value corresponding to a given moment in
+// time. Each element of TimeSeries array is timestamped.
+//
+// TimeSeries are strongly typed: the element of a TimeSeries array has
+// a specific Protobuf message depending on the value type of the metric and thus
+// there are currently 4 TimeSeries messages, which correspond to the types of metric values.
 message Metric {
   // The descriptor of the Metric.
   MetricDescriptor metric_descriptor = 1;
