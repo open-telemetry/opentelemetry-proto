@@ -66,7 +66,7 @@ message LibraryInfo {
   enum Language {
     LANGUAGE_UNSPECIFIED = 0;
     CPP = 1;
-    C_SHARP = 2;
+    DOTNET = 2;
     ERLANG = 3;
     GO_LANG = 4;
     JAVA = 5;
