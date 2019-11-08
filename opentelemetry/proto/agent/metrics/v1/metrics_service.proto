@@ -30,7 +30,7 @@ option java_outer_classname = "MetricsServiceProto";
 service MetricsService {
   // For performance reasons, it is recommended to keep this RPC
   // alive for the entire life of the application.
-  rpc Export(stream ExportMetricsServiceRequest) returns (stream ExportMetricsServiceResponse) {}
+  rpc Export(ExportMetricsServiceRequest) returns (ExportMetricsServiceResponse) {}
 }
 
 message ExportMetricsServiceRequest {
