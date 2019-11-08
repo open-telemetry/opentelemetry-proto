@@ -402,33 +402,17 @@ message SummaryValue {
   // This field must be unset if the sum is not available.
   google.protobuf.DoubleValue sum = 4;
 
-  // The values in this message can be reset at arbitrary unknown times, with
-  // the requirement that all of them are reset at the same time.
-  message Snapshot {
-    // The number of values in the snapshot. Optional since some systems don't
-    // expose this.
-    google.protobuf.Int64Value count = 1;
+  // Represents the value at a given percentile of a distribution.
+  message ValueAtPercentile {
+    // The percentile of a distribution. Must be in the interval
+    // (0.0, 100.0].
+    double percentile = 1;
 
-    // The sum of values in the snapshot. Optional since some systems don't
-    // expose this. If count is zero then this field must be zero or not set
-    // (if not supported).
-    google.protobuf.DoubleValue sum = 2;
-
-    // Represents the value at a given percentile of a distribution.
-    message ValueAtPercentile {
-      // The percentile of a distribution. Must be in the interval
-      // (0.0, 100.0].
-      double percentile = 1;
-
-      // The value at the given percentile of a distribution.
-      double value = 2;
-    }
-
-    // A list of values at different percentiles of the distribution calculated
-    // from the current snapshot. The percentiles must be strictly increasing.
-    repeated ValueAtPercentile percentile_values = 3;
+    // The value at the given percentile of a distribution.
+    double value = 2;
   }
 
-  // Values calculated over an arbitrary time window.
-  Snapshot snapshot = 5;
+  // A list of values at different percentiles of the distribution calculated
+  // from the current snapshot. The percentiles must be strictly increasing.
+  repeated ValueAtPercentile percentile_values = 5;
 }
