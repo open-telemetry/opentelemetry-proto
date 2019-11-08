@@ -256,17 +256,37 @@ message Span {
   google.protobuf.UInt32Value child_span_count = 14;
 }
 
-// The `Status` type defines a logical error model that is suitable for different
-// programming environments, including REST APIs and RPC APIs. This proto's fields
-// are a subset of those of
-// [google.rpc.Status](https://github.com/googleapis/googleapis/blob/master/google/rpc/status.proto),
-// which is used by [gRPC](https://github.com/grpc).
+// The Status type defines a logical error model that is suitable for different
+// programming environments, including REST APIs and RPC APIs.
 message Status {
+
+  // StatusCode mirrors the codes defined at
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#statuscanonicalcode
+  enum StatusCode {
+    Ok                 = 0;
+    Cancelled          = 1;
+    UnknownError       = 2;
+    InvalidArgument    = 3;
+    DeadlineExceeded   = 4;
+    NotFound           = 5;
+    AlreadyExists      = 6;
+    PermissionDenied   = 7;
+    ResourceExhausted  = 8;
+    FailedPrecondition = 9;
+    Aborted            = 10;
+    OutOfRange         = 11;
+    Unimplemented      = 12;
+    InternalError      = 13;
+    Unavailable        = 14;
+    DataLoss           = 15;
+    Unauthenticated    = 16;
+  };
+
   // The status code. This is optional field. It is safe to assume 0 (OK)
   // when not set.
-  int32 code = 1;
+  StatusCode code = 1;
 
-  // A developer-facing error message, which should be in English.
+  // A developer-facing human readable error message.
   string message = 2;
 }
 
