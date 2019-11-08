@@ -159,27 +159,20 @@ message Span {
   // This field is required.
   google.protobuf.Timestamp end_time = 9;
 
-  // A set of attributes, each with a key and a value.
-  message Attributes {
-    // The set of attributes. The value can be a string, an integer, a double
-    // or the Boolean values `true` or `false`. Note, global attributes like
-    // server name can be set as tags using resource API. Examples of attributes:
-    //
-    //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
-    //     "/http/server_latency": 300
-    //     "abc.com/myattribute": true
-    //     "abc.com/score": 10.239
-    map<string, AttributeValue> attribute_map = 1;
+  // attributes is a collection of key/value pairs. The value can be a string,
+  // an integer, a double or the Boolean values `true` or `false`. Note, global attributes
+  // like server name can be set using the resource API. Examples of attributes:
+  //
+  //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+  //     "/http/server_latency": 300
+  //     "abc.com/myattribute": true
+  //     "abc.com/score": 10.239
+  repeated AttributeKeyValue attributes = 10;
 
-    // The number of attributes that were discarded. Attributes can be discarded
-    // because their keys are too long or because there are too many attributes.
-    // If this value is 0, then no attributes were dropped.
-    int32 dropped_attributes_count = 2;
-  }
-
-  // A set of attributes on the span.
-  Attributes attributes = 10;
-
+  // dropped_attributes_count is the number of attributes that were discarded. Attributes
+  // can be discarded because their keys are too long or because there are too many
+  // attributes. If this value is 0, then no attributes were dropped.
+  int32 dropped_attributes_count = 11;
 
   // A time-stamped event in the Span.
   message TimedEvent {
@@ -191,8 +184,12 @@ message Span {
       // A user-supplied name describing the event.
       string name = 1;
 
-      // A set of attributes on the event.
-      Attributes attributes = 2;
+      // attributes is a collection of attribute key/value pairs on the event.
+      repeated AttributeKeyValue attributes = 2;
+
+      // dropped_attributes_count is the number of dropped attributes. If the value is 0,
+      // then no attributes were dropped.
+      int32 dropped_attributes_count = 3;
     }
 
     // The event.
@@ -211,7 +208,7 @@ message Span {
   }
 
   // The included timed events.
-  TimedEvents time_events = 11;
+  TimedEvents time_events = 12;
 
   // A pointer from the current span to another span in the same trace or in a
   // different trace. For example, this can be used in batching operations,
@@ -228,8 +225,12 @@ message Span {
     // The Tracestate associated with the link.
     Tracestate tracestate = 3;
 
-    // A set of attributes on the link.
-    Attributes attributes = 4;
+    // attributes is a collection of attribute key/value pairs on the link.
+    repeated AttributeKeyValue attributes = 4;
+
+    // dropped_attributes_count is the number of dropped attributes. If the value is 0,
+    // then no attributes were dropped.
+    int32 dropped_attributes_count = 5;
   }
 
   // A collection of links, which are references from this span to a span
@@ -244,16 +245,42 @@ message Span {
   }
 
   // The included links.
-  Links links = 12;
+  Links links = 13;
 
   // An optional final status for this span. Semantically when Status
   // wasn't set it is means span ended without errors and assume
   // Status.Ok (code = 0).
-  Status status = 13;
+  Status status = 14;
 
   // An optional number of child spans that were generated while this span
   // was active. If set, allows an implementation to detect missing child spans.
-  google.protobuf.UInt32Value child_span_count = 14;
+  google.protobuf.UInt32Value child_span_count = 15;
+}
+
+// AttributeKeyValue is a key-value pair that is used to store Span attributes, Link
+// attributes, etc.
+message AttributeKeyValue {
+  // ValueType is the enumeration of possible types that value can have.
+  enum ValueType {
+    STRING  = 0;
+    INT   = 1;
+    DOUBLE  = 2;
+    BOOL    = 3;
+  };
+
+  // key part of the key-value pair.
+  string key = 1;
+
+  // type of the value.
+  ValueType type = 2;
+
+  // Only one of the following fields is supposed to contain data (determined by `type` field).
+  // This is deliberately not using Protobuf `oneof` for performance reasons (verified by benchmarks).
+
+  string string_value = 3;
+  int64 int_value = 4;
+  double double_value = 5;
+  bool bool_value = 6;
 }
 
 // The Status type defines a logical error model that is suitable for different
@@ -289,19 +316,3 @@ message Status {
   // A developer-facing human readable error message.
   string message = 2;
 }
-
-// The value of an Attribute.
-message AttributeValue {
-  // The type of the value.
-  oneof value {
-    // A string up to 256 bytes long.
-    string string_value = 1;
-    // A 64-bit signed integer.
-    int64 int_value = 2;
-    // A Boolean value represented by `true` or `false`.
-    bool bool_value = 3;
-    // A double value.
-    double double_value = 4;
-  }
-}
-
