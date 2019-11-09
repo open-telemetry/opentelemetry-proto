@@ -160,20 +160,24 @@ message MetricDescriptor {
 message Int64TimeSeries {
   // The set of label values that uniquely identify this timeseries. Applies to
   // all points. The order of label values must match that of label keys in the
-  // metric descriptor.
-  repeated LabelValue label_values = 1;
+  // metric descriptor. Each element in this array is the value of the key defined at the
+  // corresponding index of MetricDescriptor.label_keys array. The number of elements
+  // in this array and MetricDescriptor.label_keys array must be the same.
+  repeated string label_values = 1;
 
   // The data points of this timeseries.
   repeated Int64Value points = 2;
 }
 
-// eDoubleTimeSeries is a list of data points that describes the time-varying values
+// DoubleTimeSeries is a list of data points that describes the time-varying values
 // of a double metric.
 message DoubleTimeSeries {
   // The set of label values that uniquely identify this timeseries. Applies to
   // all points. The order of label values must match that of label keys in the
-  // metric descriptor.
-  repeated LabelValue label_values = 1;
+  // metric descriptor. Each element in this array is the value of the key defined at the
+  // corresponding index of MetricDescriptor.label_keys array. The number of elements
+  // in this array and MetricDescriptor.label_keys array must be the same.
+  repeated string label_values = 1;
 
   // The data points of this timeseries.
   repeated DoubleValue points = 2;
@@ -184,8 +188,10 @@ message DoubleTimeSeries {
 message HistogramTimeSeries {
   // The set of label values that uniquely identify this timeseries. Applies to
   // all points. The order of label values must match that of label keys in the
-  // metric descriptor.
-  repeated LabelValue label_values = 1;
+  // metric descriptor. Each element in this array is the value of the key defined at the
+  // corresponding index of MetricDescriptor.label_keys array. The number of elements
+  // in this array and MetricDescriptor.label_keys array must be the same.
+  repeated string label_values = 1;
 
   // The data points of this timeseries.
   repeated HistogramValue points = 2;
@@ -227,20 +233,13 @@ message HistogramTimeSeries {
 message SummaryTimeSeries {
   // The set of label values that uniquely identify this timeseries. Applies to
   // all points. The order of label values must match that of label keys in the
-  // metric descriptor.
-  repeated LabelValue label_values = 1;
+  // metric descriptor. Each element in this array is the value of the key defined at the
+  // corresponding index of MetricDescriptor.label_keys array. The number of elements
+  // in this array and MetricDescriptor.label_keys array must be the same.
+  repeated string label_values = 1;
 
   // The data points of this timeseries.
   repeated SummaryValue points = 2;
-}
-
-// Label value or indication that the value is missing
-message LabelValue {
-  // The value for the label.
-  string value = 1;
-  // If false the value field is ignored and considered not set.
-  // This is used to differentiate a missing label from an empty string.
-  bool has_value = 2;
 }
 
 // Int64Value is a timestamped measurement of int64 value.
