@@ -51,4 +51,6 @@ message ExportMetricsServiceRequest {
 }
 
 message ExportMetricsServiceResponse {
+  // result_code indicates the result of processing the export request.
+  opentelemetry.proto.agent.common.v1.ExportResultCode result_code = 1;
 }

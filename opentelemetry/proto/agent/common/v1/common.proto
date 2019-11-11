@@ -95,3 +95,20 @@ message ServiceInfo {
 
   // TODO(songya): add more fields as needed.
 }
+
+// ExportResultCode is the result code returned in the export responses.
+enum ExportResultCode {
+  // Telemetry data is successfully processed by the server.
+  Success = 0;
+
+  // processing of telemetry data failed. The client MUST NOT retry
+  // sending the same telemetry data. The telemetry data MUST be dropped.
+  // This for example can happen when the request contains bad data and
+  // cannot be deserialized or otherwise processed by the server.
+  FailedNotRetryable = 1;
+
+  // Processing of telemetry data failed. The client SHOULD record the
+  // error and may retry exporting the same data after some time. This
+  // for example can happen when the server is overloaded.
+  FailedRetryable = 2;
+}
