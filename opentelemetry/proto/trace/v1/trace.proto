@@ -141,7 +141,7 @@ message Span {
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // This field is semantically required and it is expected that end_time >= start_time.
-  sfixed64 start_time_unixnano = 8;
+  fixed64 start_time_unixnano = 8;
 
   // end_time_unixnano is the end time of the span. On the client side, this is the time
   // kept by the local machine where the span execution ends. On the server side, this
@@ -149,7 +149,7 @@ message Span {
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // This field is semantically required and it is expected that end_time >= start_time.
-  sfixed64 end_time_unixnano = 9;
+  fixed64 end_time_unixnano = 9;
 
   // attributes is a collection of key/value pairs. The value can be a string,
   // an integer, a double or the Boolean values `true` or `false`. Note, global attributes
@@ -170,7 +170,7 @@ message Span {
   message TimedEvent {
     // time_unixnano is the time the event occurred.
     // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-    sfixed64 time_unixnano = 1;
+    fixed64 time_unixnano = 1;
 
     // A text annotation with a set of attributes.
     message Event {
