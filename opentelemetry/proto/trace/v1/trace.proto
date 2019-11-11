@@ -245,9 +245,9 @@ message Span {
   // Status.Ok (code = 0).
   Status status = 14;
 
-  // An optional number of child spans that were generated while this span
-  // was active. If set, allows an implementation to detect missing child spans.
-  google.protobuf.UInt32Value child_span_count = 15;
+  // child_span_count is an optional number of local child spans that were generated while this
+  // span was active. If set, allows an implementation to detect missing child spans.
+  uint32 child_span_count = 15;
 }
 
 // AttributeKeyValue is a key-value pair that is used to store Span attributes, Link
