@@ -17,6 +17,7 @@ syntax = "proto3";
 package opentelemetry.proto.trace.v1;
 
 import "google/protobuf/wrappers.proto";
+import "opentelemetry/proto/common/v1/common.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
@@ -159,7 +160,7 @@ message Span {
   //     "/http/server_latency": 300
   //     "abc.com/myattribute": true
   //     "abc.com/score": 10.239
-  repeated AttributeKeyValue attributes = 10;
+  repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 10;
 
   // dropped_attributes_count is the number of attributes that were discarded. Attributes
   // can be discarded because their keys are too long or because there are too many
@@ -178,7 +179,7 @@ message Span {
       string name = 1;
 
       // attributes is a collection of attribute key/value pairs on the event.
-      repeated AttributeKeyValue attributes = 2;
+      repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 2;
 
       // dropped_attributes_count is the number of dropped attributes. If the value is 0,
       // then no attributes were dropped.
@@ -219,7 +220,7 @@ message Span {
     Tracestate tracestate = 3;
 
     // attributes is a collection of attribute key/value pairs on the link.
-    repeated AttributeKeyValue attributes = 4;
+    repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 4;
 
     // dropped_attributes_count is the number of dropped attributes. If the value is 0,
     // then no attributes were dropped.
@@ -248,32 +249,6 @@ message Span {
   // An optional number of child spans that were generated while this span
   // was active. If set, allows an implementation to detect missing child spans.
   google.protobuf.UInt32Value child_span_count = 15;
-}
-
-// AttributeKeyValue is a key-value pair that is used to store Span attributes, Link
-// attributes, etc.
-message AttributeKeyValue {
-  // ValueType is the enumeration of possible types that value can have.
-  enum ValueType {
-    STRING  = 0;
-    INT   = 1;
-    DOUBLE  = 2;
-    BOOL    = 3;
-  };
-
-  // key part of the key-value pair.
-  string key = 1;
-
-  // type of the value.
-  ValueType type = 2;
-
-  // Only one of the following fields is supposed to contain data (determined by `type` field).
-  // This is deliberately not using Protobuf `oneof` for performance reasons (verified by benchmarks).
-
-  string string_value = 3;
-  int64 int_value = 4;
-  double double_value = 5;
-  bool bool_value = 6;
 }
 
 // The Status type defines a logical error model that is suitable for different
