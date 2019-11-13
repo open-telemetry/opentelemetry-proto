@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package opentelemetry.proto.agent.metrics.v1;
 
-import "opentelemetry/proto/agent/common/v1/common.proto";
 import "opentelemetry/proto/metrics/v1/metrics.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
 
@@ -34,21 +33,25 @@ service MetricsService {
 }
 
 message ExportMetricsServiceRequest {
-  // This is required only in the first message on the stream or if the
-  // previous sent ExportMetricsServiceRequest message has a different Node (e.g.
-  // when the same RPC is used to send Metrics from multiple Applications).
-  opentelemetry.proto.agent.common.v1.Node node = 1;
+  // Metric data. An array of ResourceMetrics.
+  // For data coming from a single resource this array will typically contain one
+  // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
+  // data from multiple origins typically batch the data before forwarding further and
+  // in that case this array will contain multiple elements.
+  repeated ResourceMetrics resource_metrics = 1;
+}
 
-  // A list of metrics that belong to the last received Node.
-  repeated opentelemetry.proto.metrics.v1.Metric metrics = 2;
+// A collection of metrics from a Resource.
+message ResourceMetrics {
+  // A list of metrics that originate from a resource.
+  repeated opentelemetry.proto.metrics.v1.Metric metrics = 1;
 
   // The resource for the metrics in this message that do not have an explicit
-  // resource set.
-  // If unset, the most recently set resource in the RPC stream applies. It is
-  // valid to never be set within a stream, e.g. when no resource info is known
-  // at all or when all sent metrics have an explicit resource set.
-  opentelemetry.proto.resource.v1.Resource resource = 3;
+  // Metric.resource field set. If neither this field nor Metric.resource are set then no
+  // resource info is known.
+  opentelemetry.proto.resource.v1.Resource resource = 2;
 }
+
 
 message ExportMetricsServiceResponse {
 }

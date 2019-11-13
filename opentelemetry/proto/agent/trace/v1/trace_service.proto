@@ -64,19 +64,23 @@ message UpdatedLibraryConfig {
 }
 
 message ExportTraceServiceRequest {
-  // This is required only in the first message on the stream or if the
-  // previous sent ExportTraceServiceRequest message has a different Node (e.g.
-  // when the same RPC is used to send Spans from multiple Applications).
-  opentelemetry.proto.agent.common.v1.Node node = 1;
+  // Span data. An array of ResourceSpans.
+  // For data coming from a single resource this array will typically contain one
+  // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
+  // data from multiple origins typically batch the data before forwarding further and
+  // in that case this array will contain multiple elements.
+  repeated ResourceSpans resource_spans = 1;
+}
 
-  // A list of Spans that belong to the last received Node.
-  repeated opentelemetry.proto.trace.v1.Span spans = 2;
+// A collection of spans from a Resource.
+message ResourceSpans {
+  // A list of Spans that originate from a resource.
+  repeated opentelemetry.proto.trace.v1.Span spans = 1;
 
   // The resource for the spans in this message that do not have an explicit
-  // resource set.
-  // If unset, the most recently set resource in the RPC stream applies. It is
-  // valid to never be set within a stream, e.g. when no resource info is known.
-  opentelemetry.proto.resource.v1.Resource resource = 3;
+  // Span.resource field set. If neither this field nor Span.resource are set then no
+  // resource info is known.
+  opentelemetry.proto.resource.v1.Resource resource = 2;
 }
 
 message ExportTraceServiceResponse {
