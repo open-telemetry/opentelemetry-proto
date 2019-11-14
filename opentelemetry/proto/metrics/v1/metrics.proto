@@ -17,6 +17,7 @@ syntax = "proto3";
 package opentelemetry.proto.metrics.v1;
 
 import "google/protobuf/wrappers.proto";
+import "opentelemetry/proto/common/v1/common.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
@@ -344,7 +345,7 @@ message HistogramValue {
 
       // exemplar_attachments are contextual information about the example value.
       // Keys in this list must be unique.
-      repeated StringKeyValuePair attachments = 3;
+      repeated opentelemetry.proto.common.v1.StringKeyValue attachments = 3;
     }
 
     // exemplar is an optional representative value of the bucket.
@@ -363,13 +364,6 @@ message HistogramValue {
   // must also be present and number of elements in this field must be equal to the
   // number of buckets defined by bucket_options.
   repeated Bucket buckets = 5;
-}
-
-// StringKeyValuePair is a pair of key/value strings.
-// TODO: consider unifying this with Resource and Span Attribute key/value pairs.
-message StringKeyValuePair {
-  string key = 1;
-  string value = 2;
 }
 
 // The start_timestamp only applies to the count and sum in the SummaryValue.
