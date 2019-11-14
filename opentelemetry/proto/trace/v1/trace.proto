@@ -82,8 +82,8 @@ message Span {
   bytes parent_span_id = 4;
 
   // An optional resource that is associated with this span. If not set, this span
-  // should be part of a batch that does include the resource information, unless resource
-  // information is unknown.
+  // should be part of a ResourceSpans that does include the resource information, unless
+  // resource information is unknown.
   opentelemetry.proto.resource.v1.Resource resource = 5;
 
   // A description of the span's operation.
