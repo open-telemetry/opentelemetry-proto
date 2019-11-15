@@ -32,7 +32,7 @@ option java_outer_classname = "TraceProto";
 // multiple root spans, or none at all. Spans do not need to be
 // contiguous - there may be gaps or overlaps between spans in a trace.
 //
-// The next id is 15.
+// The next id is 17.
 message Span {
   // A unique identifier for a trace. All spans from the same trace share
   // the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes
@@ -167,42 +167,29 @@ message Span {
   // attributes. If this value is 0, then no attributes were dropped.
   int32 dropped_attributes_count = 11;
 
-  // A time-stamped event in the Span.
+  // TimedEvent is a time-stamped annotation of the span, consisting of user-supplied
+  // text description and key-value pairs.
   message TimedEvent {
     // time_unixnano is the time the event occurred.
-    // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
     fixed64 time_unixnano = 1;
 
-    // A text annotation with a set of attributes.
-    message Event {
-      // A user-supplied name describing the event.
-      string name = 1;
+    // description is a user-supplied text.
+    string description = 2;
 
-      // attributes is a collection of attribute key/value pairs on the event.
-      repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 2;
+    // attributes is a collection of attribute key/value pairs on the event.
+    repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 3;
 
-      // dropped_attributes_count is the number of dropped attributes. If the value is 0,
-      // then no attributes were dropped.
-      int32 dropped_attributes_count = 3;
-    }
-
-    // The event.
-    Event event = 2;
+    // dropped_attributes_count is the number of dropped attributes. If the value is 0,
+    // then no attributes were dropped.
+    int32 dropped_attributes_count = 4;
   }
 
-  // A collection of `TimeEvent`s. A `TimeEvent` is a time-stamped annotation
-  // on the span, consisting of either user-supplied key-value pairs, or
-  // details of a message sent/received between Spans.
-  message TimedEvents {
-    // A collection of `TimedEvent`s.
-    repeated TimedEvent timed_event = 1;
+  // timed_events is a collection of TimedEvent items.
+  repeated TimedEvent timed_events = 12;
 
-    // The number of dropped timed events. If the value is 0, then no events were dropped.
-    int32 dropped_timed_events_count = 2;
-  }
-
-  // The included timed events.
-  TimedEvents time_events = 12;
+  // dropped_timed_events_count is the number of dropped timed events. If the value is 0,
+  // then no events were dropped.
+  uint32 dropped_timed_events_count = 13;
 
   // A pointer from the current span to another span in the same trace or in a
   // different trace. For example, this can be used in batching operations,
@@ -239,16 +226,16 @@ message Span {
   }
 
   // The included links.
-  Links links = 13;
+  Links links = 14;
 
   // An optional final status for this span. Semantically when Status
   // wasn't set it is means span ended without errors and assume
   // Status.Ok (code = 0).
-  Status status = 14;
+  Status status = 15;
 
   // An optional number of child spans that were generated while this span
   // was active. If set, allows an implementation to detect missing child spans.
-  google.protobuf.UInt32Value child_span_count = 15;
+  google.protobuf.UInt32Value child_span_count = 16;
 }
 
 // The Status type defines a logical error model that is suitable for different
