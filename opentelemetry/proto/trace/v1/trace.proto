@@ -54,29 +54,10 @@ message Span {
   // This field is required.
   bytes span_id = 2;
 
-  // This field conveys information about request position in multiple distributed tracing graphs.
-  // It is a list of Tracestate.Entry with a maximum of 32 members in the list.
-  //
-  // See the https://github.com/w3c/distributed-tracing for more details about this field.
-  message Tracestate {
-    message Entry {
-      // The key must begin with a lowercase letter, and can only contain
-      // lowercase letters 'a'-'z', digits '0'-'9', underscores '_', dashes
-      // '-', asterisks '*', and forward slashes '/'.
-      string key = 1;
-
-      // The value is opaque string up to 256 characters printable ASCII
-      // RFC0020 characters (i.e., the range 0x20 to 0x7E) except ',' and '='.
-      // Note that this also excludes tabs, newlines, carriage returns, etc.
-      string value = 2;
-    }
-
-    // A list of entries that represent the Tracestate.
-    repeated Entry entries = 1;
-  }
-
-  // The Tracestate on the span.
-  Tracestate tracestate = 3;
+  // tracestate conveys information about request position in multiple distributed tracing graphs.
+  // It is a tracestate in w3c-trace-context format: https://www.w3.org/TR/trace-context/#tracestate-header
+  // See also https://github.com/w3c/distributed-tracing for more details about this field.
+  string tracestate = 3;
 
   // The `span_id` of this span's parent span. If this is a root span, then this
   // field must be empty. The ID is an 8-byte array.
@@ -203,8 +184,8 @@ message Span {
     // A unique identifier for the linked span. The ID is an 8-byte array.
     bytes span_id = 2;
 
-    // The Tracestate associated with the link.
-    Tracestate tracestate = 3;
+    // The tracestate associated with the link.
+    string tracestate = 3;
 
     // attributes is a collection of attribute key/value pairs on the link.
     repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 4;
