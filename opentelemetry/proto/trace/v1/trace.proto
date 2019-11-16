@@ -187,9 +187,9 @@ message Span {
   // events is a collection of Event items.
   repeated Event events = 12;
 
-  // dropped_timed_events_count is the number of dropped timed events. If the value is 0,
-  // then no events were dropped.
-  uint32 dropped_timed_events_count = 13;
+  // dropped_events_count is the number of dropped events. If the value is 0, then no
+  // events were dropped.
+  uint32 dropped_events_count = 13;
 
   // A pointer from the current span to another span in the same trace or in a
   // different trace. For example, this can be used in batching operations,
