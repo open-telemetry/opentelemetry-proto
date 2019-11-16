@@ -167,9 +167,9 @@ message Span {
   // attributes. If this value is 0, then no attributes were dropped.
   int32 dropped_attributes_count = 11;
 
-  // TimedEvent is a time-stamped annotation of the span, consisting of user-supplied
+  // Event is a time-stamped annotation of the span, consisting of user-supplied
   // text description and key-value pairs.
-  message TimedEvent {
+  message Event {
     // time_unixnano is the time the event occurred.
     fixed64 time_unixnano = 1;
 
@@ -184,12 +184,12 @@ message Span {
     int32 dropped_attributes_count = 4;
   }
 
-  // timed_events is a collection of TimedEvent items.
-  repeated TimedEvent timed_events = 12;
+  // events is a collection of Event items.
+  repeated Event events = 12;
 
-  // dropped_timed_events_count is the number of dropped timed events. If the value is 0,
-  // then no events were dropped.
-  uint32 dropped_timed_events_count = 13;
+  // dropped_events_count is the number of dropped events. If the value is 0, then no
+  // events were dropped.
+  uint32 dropped_events_count = 13;
 
   // A pointer from the current span to another span in the same trace or in a
   // different trace. For example, this can be used in batching operations,
