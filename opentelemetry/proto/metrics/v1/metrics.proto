@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package opentelemetry.proto.metrics.v1;
 
-import "google/protobuf/wrappers.proto";
 import "opentelemetry/proto/common/v1/common.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
 
@@ -389,12 +388,11 @@ message SummaryValue {
 
   // The total number of recorded values since start_time. Optional since
   // some systems don't expose this.
-  google.protobuf.Int64Value count = 3;
+  fixed64 count = 3;
 
   // The total sum of recorded values since start_time. Optional since some
   // systems don't expose this. If count is zero then this field must be zero.
-  // This field must be unset if the sum is not available.
-  google.protobuf.DoubleValue sum = 4;
+  double sum = 4;
 
   // Represents the value at a given percentile of a distribution.
   message ValueAtPercentile {
