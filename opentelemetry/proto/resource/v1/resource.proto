@@ -29,5 +29,5 @@ message Resource {
 
   // dropped_labels_count is the number of dropped labels. If the value is 0, then
   // no labels were dropped.
-  int32 dropped_labels_count = 2;
+  uint32 dropped_labels_count = 2;
 }
