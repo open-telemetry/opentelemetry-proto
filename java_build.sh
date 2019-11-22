@@ -7,7 +7,6 @@ rm -rf $OUTDIR
 mkdir -p $OUTDIR
 
 protoc --java_out=${OUTDIR} opentelemetry/proto/resource/v1/resource.proto \
-    && protoc --java_out=${OUTDIR} opentelemetry/proto/trace/v1/trace_config.proto \
     && protoc --proto_path=./ --java_out=${OUTDIR} opentelemetry/proto/trace/v1/trace.proto \
     && protoc --proto_path=./ --java_out=${OUTDIR} opentelemetry/proto/metrics/v1/metrics.proto \
     && protoc --proto_path=./ --java_out=${OUTDIR} opentelemetry/proto/agent/common/v1/common.proto \
