@@ -25,9 +25,9 @@ option java_outer_classname = "ResourceProto";
 // Resource information.
 message Resource {
   // Set of labels that describe the resource.
-  repeated opentelemetry.proto.common.v1.AttributeKeyValue labels = 1;
+  repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 1;
 
-  // dropped_labels_count is the number of dropped labels. If the value is 0, then
-  // no labels were dropped.
-  uint32 dropped_labels_count = 2;
+  // dropped_attributes_count is the number of dropped attributes. If the value is 0, then
+  // no attributes were dropped.
+  uint32 dropped_attributes_count = 2;
 }
