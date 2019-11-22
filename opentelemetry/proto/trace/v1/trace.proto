@@ -162,7 +162,7 @@ message Span {
   // dropped_attributes_count is the number of attributes that were discarded. Attributes
   // can be discarded because their keys are too long or because there are too many
   // attributes. If this value is 0, then no attributes were dropped.
-  int32 dropped_attributes_count = 12;
+  uint32 dropped_attributes_count = 12;
 
   // Event is a time-stamped annotation of the span, consisting of user-supplied
   // text description and key-value pairs.
@@ -178,7 +178,7 @@ message Span {
 
     // dropped_attributes_count is the number of dropped attributes. If the value is 0,
     // then no attributes were dropped.
-    int32 dropped_attributes_count = 4;
+    uint32 dropped_attributes_count = 4;
   }
 
   // events is a collection of Event items.
@@ -210,7 +210,7 @@ message Span {
 
     // dropped_attributes_count is the number of dropped attributes. If the value is 0,
     // then no attributes were dropped.
-    int32 dropped_attributes_count = 6;
+    uint32 dropped_attributes_count = 6;
   }
 
   // links is a collection of Links, which are references from this span to a span
@@ -219,7 +219,7 @@ message Span {
 
   // dropped_links_count is the number of dropped links after the maximum size was
   // enforced. If this value is 0, then no links were dropped.
-  int32 dropped_links_count = 16;
+  uint32 dropped_links_count = 16;
 
   // An optional final status for this span. Semantically when Status
   // wasn't set it is means span ended without errors and assume
