@@ -33,12 +33,6 @@ message Node {
   // Identifier that uniquely identifies a process within a VM/container.
   ProcessIdentifier identifier = 1;
 
-  // Information on the OpenTelemetry Library that initiates the stream.
-  LibraryInfo library_info = 2;
-
-  // Additional information on service.
-  ServiceInfo service_info = 3;
-
   // Additional attributes.
   map<string, string> attributes = 4;
 
@@ -49,49 +43,9 @@ message Node {
 // Identifier that uniquely identifies a process within a VM/container.
 message ProcessIdentifier {
 
-  // The host name. Usually refers to the machine/container name.
-  // For example: os.Hostname() in Go, socket.gethostname() in Python.
-  string host_name = 1;
-
   // Process id.
   uint32 pid = 2;
 
   // Start time of this ProcessIdentifier. Represented in epoch time.
   google.protobuf.Timestamp start_timestamp = 3;
-}
-
-// Information on OpenTelemetry Library.
-message LibraryInfo {
-
-  enum Language {
-    LANGUAGE_UNSPECIFIED = 0;
-    CPP = 1;
-    DOTNET = 2;
-    ERLANG = 3;
-    GO_LANG = 4;
-    JAVA = 5;
-    NODE_JS = 6;
-    PHP = 7;
-    PYTHON = 8;
-    RUBY = 9;
-    WEB_JS = 10;
-  }
-
-  // Language of OpenTelemetry Library.
-  Language language = 1;
-
-  // Version of Agent exporter of Library.
-  string exporter_version = 2;
-
-  // Version of OpenTelemetry Library.
-  string core_library_version = 3;
-}
-
-// Additional service information.
-message ServiceInfo {
-
-  // Name of the service.
-  string name = 1;
-
-  // TODO(songya): add more fields as needed.
 }
