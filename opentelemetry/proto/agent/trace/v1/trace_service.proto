@@ -19,48 +19,20 @@ syntax = "proto3";
 
 package opentelemetry.proto.agent.trace.v1;
 
-import "opentelemetry/proto/agent/common/v1/common.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
 import "opentelemetry/proto/trace/v1/trace.proto";
-import "opentelemetry/proto/trace/v1/trace_config.proto";
 
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.agent.trace.v1";
 option java_outer_classname = "TraceServiceProto";
 
-// Service that can be used to push spans and configs between one Application
-// instrumented with OpenTelemetry and an agent, or between an agent and a
-// central collector or config service (in this case spans and configs are
-// sent/received to/from multiple Applications).
+// Service that can be used to push spans between one Application instrumented with
+// OpenTelemetry and an agent, or between an agent and a central collector (in this
+// case spans are sent/received to/from multiple Applications).
 service TraceService {
-  // After initialization, this RPC must be kept alive for the entire life of
-  // the application. The agent pushes configs down to applications via a
-  // stream.
-  rpc Config(stream CurrentLibraryConfig) returns (stream UpdatedLibraryConfig) {}
-
   // For performance reasons, it is recommended to keep this RPC
   // alive for the entire life of the application.
   rpc Export(ExportTraceServiceRequest) returns (ExportTraceServiceResponse) {}
-}
-
-message CurrentLibraryConfig {
-  // This is required only in the first message on the stream or if the
-  // previous sent CurrentLibraryConfig message has a different Node (e.g.
-  // when the same RPC is used to configure multiple Applications).
-  opentelemetry.proto.agent.common.v1.Node node = 1;
-
-  // Current configuration.
-  opentelemetry.proto.trace.v1.TraceConfig config = 2;
-}
-
-message UpdatedLibraryConfig {
-  // This field is ignored when the RPC is used to configure only one Application.
-  // This is required only in the first message on the stream or if the
-  // previous sent UpdatedLibraryConfig message has a different Node.
-  opentelemetry.proto.agent.common.v1.Node node = 1;
-
-  // Requested updated configuration.
-  opentelemetry.proto.trace.v1.TraceConfig config = 2;
 }
 
 message ExportTraceServiceRequest {
