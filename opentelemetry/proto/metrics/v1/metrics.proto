@@ -17,7 +17,6 @@ syntax = "proto3";
 package opentelemetry.proto.metrics.v1;
 
 import "opentelemetry/proto/common/v1/common.proto";
-import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.metrics.v1";
@@ -79,18 +78,13 @@ message Metric {
   // The descriptor of the Metric.
   MetricDescriptor metric_descriptor = 1;
 
-  // An optional resource that is associated with this metric. If not set, this metric
-  // should be part of a ResourceMetrics that does include the resource information, unless
-  // resource information is unknown.
-  opentelemetry.proto.resource.v1.Resource resource = 2;
-
   // data is a list of one or more TimeSeries for a single metric, where each timeseries has
   // one or more points. Only one of the following fields is used for the data, depending on
   // the type of the metric defined by MetricDescriptor.type field.
-  repeated Int64TimeSeries int64_timeseries = 3;
-  repeated DoubleTimeSeries double_timeseries = 4;
-  repeated HistogramTimeSeries histogram_timeseries = 5;
-  repeated SummaryTimeSeries summary_timeseries = 6;
+  repeated Int64TimeSeries int64_timeseries = 2;
+  repeated DoubleTimeSeries double_timeseries = 3;
+  repeated HistogramTimeSeries histogram_timeseries = 4;
+  repeated SummaryTimeSeries summary_timeseries = 5;
 }
 
 // Defines a metric type and its schema.
