@@ -75,7 +75,7 @@ option java_outer_classname = "MetricsProto";
 // a specific ProtoBuf message depending on the value type of the metric and thus
 // there are currently 4 TimeSeries messages, which correspond to the types of metric values.
 message Metric {
-  // The descriptor of the Metric.
+  // metric_descriptor describes the Metric.
   MetricDescriptor metric_descriptor = 1;
 
   // data is a list of one or more TimeSeries for a single metric, where each timeseries has
@@ -89,64 +89,72 @@ message Metric {
 
 // Defines a metric type and its schema.
 message MetricDescriptor {
-  // The metric type, including its DNS name prefix. It must be unique.
+  // name of the metric, including its DNS name prefix. It must be unique.
   string name = 1;
 
-  // A detailed description of the metric, which can be used in documentation.
+  // description of the metric, which can be used in documentation.
   string description = 2;
 
-  // The unit in which the metric value is reported. Follows the format
+  // unit in which the metric value is reported. Follows the format
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // The kind of metric. It describes how the data is reported.
+  // Type of the metric. It describes how the data is reported.
   //
   // A gauge is an instantaneous measurement of a value.
   //
   // A counter/cumulative measurement is a value accumulated over a time
   // interval. In a time series, cumulative measurements should have the same
-  // start time, increasing values and increasing end times, until an event
-  // resets the cumulative value to zero and sets a new start time for the
-  // following points.
+  // start time, increasing values, until an event resets the cumulative value
+  // to zero and sets a new start time for the subsequent points.
   enum Type {
     // Do not use this default value.
     UNSPECIFIED = 0;
 
-    // Integer gauge. The value can go both up and down.
+    // Integer gauge. The value can go both up and down over time.
+    // Corresponding values are stored in Int64TimeSeries.
     GAUGE_INT64 = 1;
 
-    // Floating point gauge. The value can go both up and down.
+    // Floating point gauge. The value can go both up and down over time.
+    // Corresponding values are stored in DoubleTimeSeries.
     GAUGE_DOUBLE = 2;
 
-    // Histogram gauge measurement. The count and sum can go both up and
-    // down. Recorded values are always >= 0.
-    // Used in scenarios like a snapshot of time the current items in a queue
+    // Histogram gauge measurement.
+    // Used in scenarios like a snapshot of time that current items in a queue
     // have spent there.
+    // Corresponding values are stored in HistogramTimeSeries. The count and sum of the
+    // histogram can go both up and down over time. Recorded values are always >= 0.
     GAUGE_HISTOGRAM = 3;
 
-    // Integer counter measurement. The value cannot decrease, if resets
-    // then the start_time should also be reset.
+    // Integer counter measurement. The value cannot decrease; if value is reset then
+    // CounterInt64Value.start_time_unixnano should also be reset.
+    // Corresponding values are stored in Int64TimeSeries.
     COUNTER_INT64 = 4;
 
     // Floating point counter measurement. The value cannot decrease, if
-    // resets then the start_time should also be reset. Recorded values are
-    // always >= 0.
+    // resets then the CounterDoubleValue.start_time_unixnano should also be reset.
+    // Recorded values are always >= 0.
+    // Corresponding values are stored in DoubleTimeSeries.
     COUNTER_DOUBLE = 5;
 
-    // Histogram cumulative measurement. The count and sum cannot decrease,
-    // if resets then the start_time should also be reset.
+    // Histogram cumulative measurement.
+    // Corresponding values are stored in HistogramTimeSeries. The count and sum of the
+    // histogram cannot decrease; if values are reset then HistogramValue.start_time_unixnano
+    // should also be reset to the new start timestamp.
     CUMULATIVE_HISTOGRAM = 6;
 
-    // Some frameworks implemented Histograms as a summary of observations
+    // Summary value. Some frameworks implemented Histograms as a summary of observations
     // (usually things like request durations and response sizes). While it
     // also provides a total count of observations and a sum of all observed
     // values, it calculates configurable percentiles over a sliding time
-    // window. This is not recommended, since it cannot be aggregated.
+    // window.
+    // Corresponding values are stored in SummaryTimeSeries.
     SUMMARY = 7;
   }
   Type type = 4;
 
-  // The label keys associated with the metric descriptor.
+  // The label keys associated with the metric descriptor. Keys in this list must
+  // be unique.
   repeated string label_keys = 5;
 }
 
