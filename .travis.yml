@@ -6,4 +6,4 @@ install:
   -  ./install-proto.sh
 
 script:
-  - ./java_build.sh
+  - make ci

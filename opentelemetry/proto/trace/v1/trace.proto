@@ -22,6 +22,7 @@ import "opentelemetry/proto/common/v1/common.proto";
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.trace.v1";
 option java_outer_classname = "TraceProto";
+option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/trace/v1";
 
 // Span represents a single operation within a trace. Spans can be
 // nested to form a trace tree. Spans may also be linked to other spans
