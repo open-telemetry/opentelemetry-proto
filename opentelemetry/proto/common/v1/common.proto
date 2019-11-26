@@ -27,7 +27,7 @@ message AttributeKeyValue {
   // ValueType is the enumeration of possible types that value can have.
   enum ValueType {
     STRING  = 0;
-    INT   = 1;
+    INT     = 1;
     DOUBLE  = 2;
     BOOL    = 3;
   };

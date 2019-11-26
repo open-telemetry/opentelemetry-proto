@@ -16,7 +16,6 @@ syntax = "proto3";
 
 package opentelemetry.proto.trace.v1;
 
-import "google/protobuf/wrappers.proto";
 import "opentelemetry/proto/common/v1/common.proto";
 
 option java_multiple_files = true;
@@ -221,9 +220,10 @@ message Span {
   // Status.Ok (code = 0).
   Status status = 16;
 
-  // An optional number of child spans that were generated while this span
-  // was active. If set, allows an implementation to detect missing child spans.
-  google.protobuf.UInt32Value child_span_count = 17;
+  // An optional number of local child spans that were generated while this span
+  // was active. Value of -1 indicates that the number of local child spans is unknown.
+  // If local_child_span_count>=0, allows an implementation to detect missing child spans.
+  sfixed32 local_child_span_count = 17;
 }
 
 // The Status type defines a logical error model that is suitable for different
