@@ -24,6 +24,7 @@ import "google/protobuf/timestamp.proto";
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.agent.common.v1";
 option java_outer_classname = "CommonProto";
+option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/agent/common/v1";
 
 // Identifier metadata of the Node that produces the span or tracing data.
 // Note, this is not the metadata about the Node or service that is described by associated spans.
