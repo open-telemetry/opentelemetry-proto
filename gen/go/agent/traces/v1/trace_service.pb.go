@@ -74,9 +74,8 @@ func (m *ExportTraceServiceRequest) GetResourceSpans() []*ResourceSpans {
 type ResourceSpans struct {
 	// A list of Spans that originate from a resource.
 	Spans []*v1.Span `protobuf:"bytes,1,rep,name=spans,proto3" json:"spans,omitempty"`
-	// The resource for the spans in this message that do not have an explicit
-	// Span.resource field set. If neither this field nor Span.resource are set then no
-	// resource info is known.
+	// The resource for the spans in this message.
+	// If this field is not set then no resource info is known.
 	Resource             *v11.Resource `protobuf:"bytes,2,opt,name=resource,proto3" json:"resource,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`

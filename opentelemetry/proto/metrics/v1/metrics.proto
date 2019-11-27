@@ -27,11 +27,10 @@ option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metric
 //
 // The data model and relation between entities is shown in the diagram below.
 //
-// - Metric is composed of a Resource, a MetricDescriptor and a TimeSeriesList data.
+// - Metric is composed of a Resource, a MetricDescriptor and a list of data points.
 // - MetricDescriptor contains a list of label keys (shown horizontally).
-// - TimeSeriesList is composed of a list of TimeSeries (shown vertically).
-// - TimeSeries contains a list of label values and a list of metric values (shown
-//   horizontally).
+// - Data is a list of DataPoints (shown vertically).
+// - DataPoint contains a list of label values and a value.
 //
 //     Metric
 //  +----------+         +--------+
@@ -46,46 +45,46 @@ option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metric
 //  +----------+  |      |+-----+-----+   +-----+ |
 //                |      +------------------------+
 //                |
-//                |      +------------------------------+
-//                |      |TimeSeries 1                  |
-//                v      |+-----+-----+   +-----+       |
-//             +-----+   ||label|label|...|label|       |
-//             |  1  |-->|+-----+-----+   +-----+       |
-//             +-----+   |+-----+-----+-----+   +-----+ |
-//             |  .  |   ||value|value|value|...|value| |
-//             |  .  |   |+-----+-----+-----+   +-----+ |
-//             |  .  |   +------------------------------+
+//                |      +------------------------+
+//                |      |DataPoint 1             |
+//                v      |+-----+-----+   +-----+ |
+//             +-----+   ||label|label|...|label| |
+//             |  1  |-->|+-----+-----+   +-----+ |
+//             +-----+   |+-----+                 |
+//             |  .  |   ||value|                 |
+//             |  .  |   |+-----+                 |
+//             |  .  |   +------------------------+
 //             |  .  |                   .
 //             |  .  |                   .
 //             |  .  |                   .
-//             |  .  |   +-----------------------------------+
-//             |  .  |   |TimeSeries N                       |
-//             +-----+   |+-----+-----+   +-----+            |
-//             |  N  |-->||label|label|...|label|            |
-//             +-----+   |+-----+-----+   +-----+            |
-//                       |+-----+-----+-----+-----+   +-----+|
-//                       ||value|value|value|value|...|value||
-//                       |+-----+-----+-----+-----+   +-----+|
-//                       +-----------------------------------+
+//             |  .  |   +------------------------+
+//             |  .  |   |DataPoint M             |
+//             +-----+   |+-----+-----+   +-----+ |
+//             |  M  |-->||label|label|...|label| |
+//             +-----+   |+-----+-----+   +-----+ |
+//                       |+-----+                 |
+//                       ||value|                 |
+//                       |+-----+                 |
+//                       +------------------------+
 //
 //-----------------------------------------------------------------------
-// TimeSeries contain an array of values, each value corresponding to a given moment in
-// time. Each element of TimeSeries array is timestamped.
+// DataPoint is a value of specific type corresponding to a given moment in
+// time. Each DataPoint is timestamped.
 //
-// TimeSeries are strongly typed: the element of a TimeSeries array has
-// a specific ProtoBuf message depending on the value type of the metric and thus
-// there are currently 4 TimeSeries messages, which correspond to the types of metric values.
+// DataPoint is strongly typed: each DataPoint type has a specific Protobuf message
+// depending on the value type of the metric and thus there are currently 4 DataPoint
+// messages, which correspond to the types of metric values.
 message Metric {
   // metric_descriptor describes the Metric.
   MetricDescriptor metric_descriptor = 1;
 
-  // data is a list of one or more TimeSeries for a single metric, where each timeseries has
-  // one or more points. Only one of the following fields is used for the data, depending on
-  // the type of the metric defined by MetricDescriptor.type field.
-  repeated Int64TimeSeries int64_timeseries = 2;
-  repeated DoubleTimeSeries double_timeseries = 3;
-  repeated HistogramTimeSeries histogram_timeseries = 4;
-  repeated SummaryTimeSeries summary_timeseries = 5;
+  // Data is a list of one or more DataPoints for a single metric. Only one of the
+  // following fields is used for the data, depending on the type of the metric defined
+  // by MetricDescriptor.type field.
+  repeated Int64DataPoint int64_datapoints = 2;
+  repeated DoubleDataPoint double_datapoints = 3;
+  repeated HistogramDataPoint histogram_datapoints = 4;
+  repeated SummaryDataPoint summary_datapoints = 5;
 }
 
 // Defines a metric type and its schema.
@@ -113,33 +112,33 @@ message MetricDescriptor {
     UNSPECIFIED = 0;
 
     // Integer gauge. The value can go both up and down over time.
-    // Corresponding values are stored in Int64TimeSeries.
+    // Corresponding values are stored in Int64DataPoint.
     GAUGE_INT64 = 1;
 
     // Floating point gauge. The value can go both up and down over time.
-    // Corresponding values are stored in DoubleTimeSeries.
+    // Corresponding values are stored in DoubleDataPoint.
     GAUGE_DOUBLE = 2;
 
     // Histogram gauge measurement.
     // Used in scenarios like a snapshot of time that current items in a queue
     // have spent there.
-    // Corresponding values are stored in HistogramTimeSeries. The count and sum of the
+    // Corresponding values are stored in HistogramDataPoint. The count and sum of the
     // histogram can go both up and down over time. Recorded values are always >= 0.
     GAUGE_HISTOGRAM = 3;
 
     // Integer counter measurement. The value cannot decrease; if value is reset then
     // CounterInt64Value.start_time_unixnano should also be reset.
-    // Corresponding values are stored in Int64TimeSeries.
+    // Corresponding values are stored in Int64DataPoint.
     COUNTER_INT64 = 4;
 
     // Floating point counter measurement. The value cannot decrease, if
     // resets then the CounterDoubleValue.start_time_unixnano should also be reset.
     // Recorded values are always >= 0.
-    // Corresponding values are stored in DoubleTimeSeries.
+    // Corresponding values are stored in DoubleDataPoint.
     COUNTER_DOUBLE = 5;
 
     // Histogram cumulative measurement.
-    // Corresponding values are stored in HistogramTimeSeries. The count and sum of the
+    // Corresponding values are stored in HistogramDataPoint. The count and sum of the
     // histogram cannot decrease; if values are reset then HistogramValue.start_time_unixnano
     // should also be reset to the new start timestamp.
     CUMULATIVE_HISTOGRAM = 6;
@@ -149,7 +148,7 @@ message MetricDescriptor {
     // also provides a total count of observations and a sum of all observed
     // values, it calculates configurable percentiles over a sliding time
     // window.
-    // Corresponding values are stored in SummaryTimeSeries.
+    // Corresponding values are stored in SummaryDataPoint.
     SUMMARY = 7;
   }
   Type type = 4;
@@ -159,46 +158,46 @@ message MetricDescriptor {
   repeated string label_keys = 5;
 }
 
-// Int64TimeSeries is a list of data points that describes the time-varying values
-// of a int64 metric.
-message Int64TimeSeries {
-  // The set of label values that uniquely identify this timeseries. Applies to
-  // all points. The order of label values must match that of label keys in the
-  // metric descriptor. Each element in this array is the value of the key defined at the
-  // corresponding index of MetricDescriptor.label_keys array. The number of elements
-  // in this array and MetricDescriptor.label_keys array must be the same.
+// Int64DataPoint is a single data point in a timeseries that describes the time-varying
+// values of a int64 metric.
+message Int64DataPoint {
+  // The set of label values that uniquely identify this timeseries. The order of label
+  // values must match that of label keys in the metric descriptor. Each element in this
+  // array is the value of the key defined at the corresponding index of
+  // MetricDescriptor.label_keys array. The number of elements in this array and
+  // MetricDescriptor.label_keys array must be the same.
   repeated string label_values = 1;
 
-  // The data points of this timeseries.
-  repeated Int64Value points = 2;
+  // The value of data point.
+  Int64Value value = 2;
 }
 
-// DoubleTimeSeries is a list of data points that describes the time-varying values
-// of a double metric.
-message DoubleTimeSeries {
-  // The set of label values that uniquely identify this timeseries. Applies to
-  // all points. The order of label values must match that of label keys in the
-  // metric descriptor. Each element in this array is the value of the key defined at the
-  // corresponding index of MetricDescriptor.label_keys array. The number of elements
-  // in this array and MetricDescriptor.label_keys array must be the same.
+// DoubleDataPoint is a single data point in a timeseries that describes the time-varying
+// value of a double metric.
+message DoubleDataPoint {
+  // The set of label values that uniquely identify this timeseries. The order of label
+  // values must match that of label keys in the metric descriptor. Each element in this
+  // array is the value of the key defined at the corresponding index of
+  // MetricDescriptor.label_keys array. The number of elements in this array and
+  // MetricDescriptor.label_keys array must be the same.
   repeated string label_values = 1;
 
-  // The data points of this timeseries.
-  repeated DoubleValue points = 2;
+  // The value of data point.
+  DoubleValue value = 2;
 }
 
-// HistogramTimeSeries is a list of data points that describes the time-varying values
-// of a Histogram.
-message HistogramTimeSeries {
-  // The set of label values that uniquely identify this timeseries. Applies to
-  // all points. The order of label values must match that of label keys in the
-  // metric descriptor. Each element in this array is the value of the key defined at the
-  // corresponding index of MetricDescriptor.label_keys array. The number of elements
-  // in this array and MetricDescriptor.label_keys array must be the same.
+// HistogramDataPoint is a single data point in a timeseries that describes the time-varying
+// values of a Histogram.
+message HistogramDataPoint {
+  // The set of label values that uniquely identify this timeseries. The order of label
+  // values must match that of label keys in the metric descriptor. Each element in this
+  // array is the value of the key defined at the corresponding index of
+  // MetricDescriptor.label_keys array. The number of elements in this array and
+  // MetricDescriptor.label_keys array must be the same.
   repeated string label_values = 1;
 
-  // The data points of this timeseries.
-  repeated HistogramValue points = 2;
+  // The value of data point.
+  HistogramValue value = 2;
 
   // ExplicitBounds specifies buckets with explicitly defined bounds for values.
   message ExplicitBounds {
@@ -224,26 +223,26 @@ message HistogramTimeSeries {
   // in which case the distribution of values in the histogram is unknown and only the
   // total count and sum are known.
   //
-  // Bucket options apply to all points in this HistogramTimeSeries. To define
+  // Bucket options apply to all points in this HistogramDataPoint. To define
   // different bucket options for different points create separate instances of
-  // HistogramTimeSeries each with its own bucket options.
+  // HistogramDataPoint each with its own bucket options.
 
   // explicit_bounds is the only supported bucket option currently.
   ExplicitBounds explicit_bounds = 3;
 }
 
-// SummaryTimeSeries is a list of data points that describes the time-varying values
-// of a Summary metric.
-message SummaryTimeSeries {
-  // The set of label values that uniquely identify this timeseries. Applies to
-  // all points. The order of label values must match that of label keys in the
-  // metric descriptor. Each element in this array is the value of the key defined at the
-  // corresponding index of MetricDescriptor.label_keys array. The number of elements
-  // in this array and MetricDescriptor.label_keys array must be the same.
+// SummaryDataPoint is a single data point in a timeseries that describes the time-varying
+// values of a Summary metric.
+message SummaryDataPoint {
+  // The set of label values that uniquely identify this timeseries. The order of label
+  // values must match that of label keys in the metric descriptor. Each element in this
+  // array is the value of the key defined at the corresponding index of
+  // MetricDescriptor.label_keys array. The number of elements in this array and
+  // MetricDescriptor.label_keys array must be the same.
   repeated string label_values = 1;
 
-  // The data points of this timeseries.
-  repeated SummaryValue points = 2;
+  // The value of data point.
+  SummaryValue value = 2;
 }
 
 // Int64Value is a timestamped measurement of int64 value.
@@ -255,12 +254,8 @@ message Int64Value {
   // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
-  // Value of 0 indicates that the start_time is the same as that of the previous
-  // data point in this timeseries. When creating timeseries of this type it is recommended
-  // to omit this value if the start_time does not change, since it results in more
-  // compact encoding on the wire.
-  // If the value of 0 occurs for the first data point in the timeseries it means that
-  // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
+  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
+  // may be decided by the backend.
   fixed64 start_time_unixnano = 1;
 
   // timestamp_unixnano is the moment when this value was recorded.
@@ -280,12 +275,8 @@ message DoubleValue {
   // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
-  // Value of 0 indicates that the start_time is the same as that of the previous
-  // data point in this timeseries. When creating timeseries of this type it is recommended
-  // to omit this value if the start_time does not change, since it results in more
-  // compact encoding on the wire.
-  // If the value of 0 occurs for the first data point in the timeseries it means that
-  // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
+  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
+  // may be decided by the backend.
   fixed64 start_time_unixnano = 1;
 
   // timestamp_unixnano is the moment when this value was recorded.
@@ -300,15 +291,12 @@ message DoubleValue {
 // optionally contain the distribution of those values across a set of buckets.
 message HistogramValue {
   // start_time_unixnano is the time when the cumulative value was reset to zero.
-  // The cumulative value is over the time interval [start_time_unixnano, timestamp_unixnano].
+  //
+  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
-  // Value of 0 indicates that the start_time is the same as that of the previous
-  // data point in this timeseries. When creating timeseries of this type it is recommended
-  // to omit this value if the start_time does not change, since it results in more
-  // compact encoding on the wire.
-  // If the value of 0 occurs for the first data point in the timeseries it means that
-  // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
+  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
+  // may be decided by the backend.
   // Note: this field is always unspecified and ignored if MetricDescriptor.type==GAUGE_HISTOGRAM.
   fixed64 start_time_unixnano = 1;
 
@@ -362,7 +350,7 @@ message HistogramValue {
   // The number of elements in buckets array must be by one greater than the
   // number of elements in bucket_bounds array.
   //
-  // Note: if HistogramTimeSeries.bucket_options defines bucket bounds then this field
+  // Note: if HistogramDataPoint.bucket_options defines bucket bounds then this field
   // must also be present and number of elements in this field must be equal to the
   // number of buckets defined by bucket_options.
   repeated Bucket buckets = 5;
@@ -371,18 +359,12 @@ message HistogramValue {
 // The start_timestamp only applies to the count and sum in the SummaryValue.
 message SummaryValue {
   // start_time_unixnano is the time when the cumulative value was reset to zero.
-  // This is used for Counter type only. For Gauge the value is not specified and
-  // defaults to 0.
   //
   // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
-  // Value of 0 indicates that the start_time is the same as that of the previous
-  // data point in this timeseries. When creating timeseries of this type it is recommended
-  // to omit this value if the start_time does not change, since it results in more
-  // compact encoding on the wire.
-  // If the value of 0 occurs for the first data point in the timeseries it means that
-  // the timestamp is unspecified. In that case the timestamp may be decided by the backend.
+  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
+  // may be decided by the backend.
   fixed64 start_time_unixnano = 1;
 
   // timestamp_unixnano is the moment when this value was recorded.
