@@ -25,28 +25,3 @@ option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.agent.common.v1";
 option java_outer_classname = "CommonProto";
 option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/agent/common/v1";
-
-// Identifier metadata of the Node that produces the span or tracing data.
-// Note, this is not the metadata about the Node or service that is described by associated spans.
-// In the future we plan to extend the identifier proto definition to support
-// additional information (e.g cloud id, etc.)
-message Node {
-  // Identifier that uniquely identifies a process within a VM/container.
-  ProcessIdentifier identifier = 1;
-
-  // Additional attributes.
-  map<string, string> attributes = 4;
-
-  // TODO(songya): Add more identifiers in the future as needed, like cloud
-  // identifiers.
-}
-
-// Identifier that uniquely identifies a process within a VM/container.
-message ProcessIdentifier {
-
-  // Process id.
-  uint32 pid = 2;
-
-  // Start time of this ProcessIdentifier. Represented in epoch time.
-  google.protobuf.Timestamp start_timestamp = 3;
-}
