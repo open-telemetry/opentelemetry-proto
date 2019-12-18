@@ -22,6 +22,7 @@ import "opentelemetry/proto/resource/v1/resource.proto";
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.agent.metrics.v1";
 option java_outer_classname = "MetricsServiceProto";
+option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/agent/metrics/v1";
 
 // Service that can be used to push metrics between one Application
 // instrumented with OpenTelemetry and an agent, or between an agent and a
