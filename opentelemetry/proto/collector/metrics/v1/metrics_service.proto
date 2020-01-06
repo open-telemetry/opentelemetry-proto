@@ -25,7 +25,7 @@ option java_outer_classname = "MetricsServiceProto";
 option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/collector/metrics/v1";
 
 // Service that can be used to push metrics between one Application
-// instrumented with OpenTelemetry and an collector, or between an collector and a
+// instrumented with OpenTelemetry and a collector, or between a collector and a
 // central collector.
 service MetricsService {
   // For performance reasons, it is recommended to keep this RPC
