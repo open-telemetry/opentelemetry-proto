@@ -204,9 +204,11 @@ message Span {
   Status status = 15;
 
   // An optional number of local child spans that were generated while this span
-  // was active. Value of -1 indicates that the number of local child spans is unknown.
-  // If local_child_span_count>=0, allows an implementation to detect missing child spans.
-  sfixed32 local_child_span_count = 16;
+  // was active. Value of 0 (or omitted) indicates that the number of local child spans is unknown.
+  // If local_child_span_count > 0, allows an implementation to detect missing child spans.
+  // Note, it is impossible to distinguish zero children and unknown number of
+  // children cases.
+  fixed32 local_child_span_count = 16;
 }
 
 // The Status type defines a logical error model that is suitable for different
