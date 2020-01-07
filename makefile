@@ -2,7 +2,7 @@ GENDIR := gen
 OPENAPI_OUTDIR := "./$(GENDIR)/openapi"
 
 # Find all .proto files.
-PROTO_FILES := $(wildcard opentelemetry/proto/*/v1/*.proto opentelemetry/proto/agent/*/v1/*.proto)
+PROTO_FILES := $(wildcard opentelemetry/proto/*/v1/*.proto opentelemetry/proto/collector/*/v1/*.proto)
 
 # Function to execute a command. Note the empty line before endef to make sure each command
 # gets executed separately instead of concatenated with previous one.
@@ -34,4 +34,4 @@ gen-java:
 .PHONY: gen-swagger
 gen-swagger:
 	mkdir -p $(OPENAPI_OUTDIR)
-	protoc --plugin=protoc-gen-swagger=/usr/bin/protoc-gen-swagger --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/agent/trace/v1/trace_service_http.yaml:$(OPENAPI_OUTDIR) opentelemetry/proto/agent/trace/v1/trace_service.proto
+	protoc --plugin=protoc-gen-swagger=/usr/bin/protoc-gen-swagger --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:$(OPENAPI_OUTDIR) opentelemetry/proto/collector/trace/v1/trace_service.proto

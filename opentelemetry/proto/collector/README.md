@@ -1,6 +1,6 @@
-# OpenTelemetry Agent Proto
+# OpenTelemetry Collector Proto
 
-This package describes the OpenTelemetry Agent protocol.
+This package describes the OpenTelemetry collector protocol.
 
 ## Packages
 
