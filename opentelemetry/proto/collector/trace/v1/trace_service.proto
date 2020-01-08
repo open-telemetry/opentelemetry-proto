@@ -17,18 +17,18 @@ syntax = "proto3";
 // NOTE: This proto is experimental and is subject to change at this point.
 // Please do not use it at the moment.
 
-package opentelemetry.proto.agent.trace.v1;
+package opentelemetry.proto.collector.trace.v1;
 
 import "opentelemetry/proto/resource/v1/resource.proto";
 import "opentelemetry/proto/trace/v1/trace.proto";
 
 option java_multiple_files = true;
-option java_package = "io.opentelemetry.proto.agent.trace.v1";
+option java_package = "io.opentelemetry.proto.collector.trace.v1";
 option java_outer_classname = "TraceServiceProto";
-option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/agent/traces/v1";
+option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/collector/traces/v1";
 
 // Service that can be used to push spans between one Application instrumented with
-// OpenTelemetry and an agent, or between an agent and a central collector (in this
+// OpenTelemetry and an collector, or between an collector and a central collector (in this
 // case spans are sent/received to/from multiple Applications).
 service TraceService {
   // For performance reasons, it is recommended to keep this RPC
