@@ -27,17 +27,13 @@ option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metric
 //
 // The data model and relation between entities is shown in the diagram below.
 //
-// - Metric is composed of a Resource, a MetricDescriptor and a list of data points.
+// - Metric is composed of a MetricDescriptor and a list of data points.
 // - MetricDescriptor contains a list of label keys (shown horizontally).
 // - Data is a list of DataPoints (shown vertically).
 // - DataPoint contains a list of label values and a value.
 //
 //     Metric
-//  +----------+         +--------+
-//  |  resource|-------->|Resource|
-//  |          |         +--------+
-//  |          |
-//  |          |         +------------------------+
+//  +----------+         +------------------------+
 //  |descriptor|-------->| MetricDescriptor       |
 //  |          |         |+-----+-----+   +-----+ |
 //  |          |         ||label|label|...|label| |
@@ -45,27 +41,29 @@ option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metric
 //  +----------+  |      |+-----+-----+   +-----+ |
 //                |      +------------------------+
 //                |
-//                |      +------------------------+
-//                |      |DataPoint 1             |
-//                v      |+-----+-----+   +-----+ |
-//             +-----+   ||label|label|...|label| |
-//             |  1  |-->|+-----+-----+   +-----+ |
-//             +-----+   |+-----+                 |
-//             |  .  |   ||value|                 |
-//             |  .  |   |+-----+                 |
-//             |  .  |   +------------------------+
+//                |      +---------------------------+
+//                |      |DataPoint 1                |
+//                v      |+------+------+   +------+ |
+//             +-----+   ||label |label |...|label | |
+//             |  1  |-->||value1|value2|...|valueN| |
+//             +-----+   |+------+------+   +------+ |
+//             |  .  |   |+-----+                    |
+//             |  .  |   ||value|                    |
+//             |  .  |   |+-----+                    |
+//             |  .  |   +---------------------------+
 //             |  .  |                   .
 //             |  .  |                   .
 //             |  .  |                   .
-//             |  .  |   +------------------------+
-//             |  .  |   |DataPoint M             |
-//             +-----+   |+-----+-----+   +-----+ |
-//             |  M  |-->||label|label|...|label| |
-//             +-----+   |+-----+-----+   +-----+ |
-//                       |+-----+                 |
-//                       ||value|                 |
-//                       |+-----+                 |
-//                       +------------------------+
+//             |  .  |   +---------------------------+
+//             |  .  |   |DataPoint M                |
+//             +-----+   |+------+------+   +------+ |
+//             |  M  |-->||label |label |...|label | |
+//             +-----+   ||value1|value2|...|valueN| |
+//                       |+------+------+   +------+ |
+//                       |+-----+                    |
+//                       ||value|                    |
+//                       |+-----+                    |
+//                       +---------------------------+
 //
 //-----------------------------------------------------------------------
 // DataPoint is a value of specific type corresponding to a given moment in
