@@ -17,11 +17,22 @@ syntax = "proto3";
 package opentelemetry.proto.trace.v1;
 
 import "opentelemetry/proto/common/v1/common.proto";
+import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.trace.v1";
 option java_outer_classname = "TraceProto";
 option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/trace/v1";
+
+// A collection of spans from a Resource.
+message ResourceSpans {
+  // A list of Spans that originate from a resource.
+  repeated Span spans = 1;
+
+  // The resource for the spans in this message.
+  // If this field is not set then no resource info is known.
+  opentelemetry.proto.resource.v1.Resource resource = 2;
+}
 
 // Span represents a single operation within a trace. Spans can be
 // nested to form a trace tree. Spans may also be linked to other spans
