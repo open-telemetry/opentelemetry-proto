@@ -17,11 +17,22 @@ syntax = "proto3";
 package opentelemetry.proto.metrics.v1;
 
 import "opentelemetry/proto/common/v1/common.proto";
+import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.metrics.v1";
 option java_outer_classname = "MetricsProto";
 option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metrics/v1";
+
+// A collection of metrics from a Resource.
+message ResourceMetrics {
+  // A list of metrics that originate from a resource.
+  repeated Metric metrics = 1;
+
+  // The resource for the metrics in this message.
+  // If this field is not set then no resource info is known.
+  opentelemetry.proto.resource.v1.Resource resource = 2;
+}
 
 // Defines a Metric which has one or more timeseries.
 //

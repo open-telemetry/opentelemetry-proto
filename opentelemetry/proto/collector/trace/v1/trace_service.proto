@@ -19,7 +19,6 @@ syntax = "proto3";
 
 package opentelemetry.proto.collector.trace.v1;
 
-import "opentelemetry/proto/resource/v1/resource.proto";
 import "opentelemetry/proto/trace/v1/trace.proto";
 
 option java_multiple_files = true;
@@ -37,22 +36,12 @@ service TraceService {
 }
 
 message ExportTraceServiceRequest {
-  // Span data. An array of ResourceSpans.
+  // An array of ResourceSpans.
   // For data coming from a single resource this array will typically contain one
   // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
   // data from multiple origins typically batch the data before forwarding further and
   // in that case this array will contain multiple elements.
-  repeated ResourceSpans resource_spans = 1;
-}
-
-// A collection of spans from a Resource.
-message ResourceSpans {
-  // A list of Spans that originate from a resource.
-  repeated opentelemetry.proto.trace.v1.Span spans = 1;
-
-  // The resource for the spans in this message.
-  // If this field is not set then no resource info is known.
-  opentelemetry.proto.resource.v1.Resource resource = 2;
+  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1;
 }
 
 message ExportTraceServiceResponse {
