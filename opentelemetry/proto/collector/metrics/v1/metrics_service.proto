@@ -33,7 +33,7 @@ service MetricsService {
 }
 
 message ExportMetricsServiceRequest {
-  // Metric data. An array of ResourceMetrics.
+  // An array of ResourceMetrics.
   // For data coming from a single resource this array will typically contain one
   // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
   // data from multiple origins typically batch the data before forwarding further and
