@@ -160,8 +160,9 @@ message Span {
     // time_unixnano is the time the event occurred.
     fixed64 time_unixnano = 1;
 
-    // description is a user-supplied text.
-    string description = 2;
+    // name of the event.
+    // This field is semantically required to be set to non-empty string.
+    string name = 2;
 
     // attributes is a collection of attribute key/value pairs on the event.
     repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 3;
