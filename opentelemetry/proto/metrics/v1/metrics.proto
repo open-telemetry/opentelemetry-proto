@@ -162,20 +162,16 @@ message MetricDescriptor {
   }
   Type type = 4;
 
-  // The label keys associated with the metric descriptor. Keys in this list must
-  // be unique.
-  repeated string label_keys = 5;
+  // The set of constant label associated with the metric descriptor. Labels in this list
+  // apply to all data points.
+  repeated opentelemetry.proto.common.v1.StringKeyValue constant_labels = 5;
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
 // values of a int64 metric.
 message Int64DataPoint {
-  // The set of label values that uniquely identify this timeseries. The order of label
-  // values must match that of label keys in the metric descriptor. Each element in this
-  // array is the value of the key defined at the corresponding index of
-  // MetricDescriptor.label_keys array. The number of elements in this array and
-  // MetricDescriptor.label_keys array must be the same.
-  repeated string label_values = 1;
+  // The set of labels that uniquely identify this timeseries.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // The value of data point.
   Int64Value value = 2;
@@ -184,12 +180,8 @@ message Int64DataPoint {
 // DoubleDataPoint is a single data point in a timeseries that describes the time-varying
 // value of a double metric.
 message DoubleDataPoint {
-  // The set of label values that uniquely identify this timeseries. The order of label
-  // values must match that of label keys in the metric descriptor. Each element in this
-  // array is the value of the key defined at the corresponding index of
-  // MetricDescriptor.label_keys array. The number of elements in this array and
-  // MetricDescriptor.label_keys array must be the same.
-  repeated string label_values = 1;
+  // The set of labels that uniquely identify this timeseries.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // The value of data point.
   DoubleValue value = 2;
@@ -198,12 +190,8 @@ message DoubleDataPoint {
 // HistogramDataPoint is a single data point in a timeseries that describes the time-varying
 // values of a Histogram.
 message HistogramDataPoint {
-  // The set of label values that uniquely identify this timeseries. The order of label
-  // values must match that of label keys in the metric descriptor. Each element in this
-  // array is the value of the key defined at the corresponding index of
-  // MetricDescriptor.label_keys array. The number of elements in this array and
-  // MetricDescriptor.label_keys array must be the same.
-  repeated string label_values = 1;
+  // The set of labels that uniquely identify this timeseries.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // The value of data point.
   HistogramValue value = 2;
@@ -243,12 +231,8 @@ message HistogramDataPoint {
 // SummaryDataPoint is a single data point in a timeseries that describes the time-varying
 // values of a Summary metric.
 message SummaryDataPoint {
-  // The set of label values that uniquely identify this timeseries. The order of label
-  // values must match that of label keys in the metric descriptor. Each element in this
-  // array is the value of the key defined at the corresponding index of
-  // MetricDescriptor.label_keys array. The number of elements in this array and
-  // MetricDescriptor.label_keys array must be the same.
-  repeated string label_values = 1;
+  // The set of labels that uniquely identify this timeseries.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // The value of data point.
   SummaryValue value = 2;
