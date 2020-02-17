@@ -17,7 +17,6 @@ syntax = "proto3";
 package opentelemetry.proto.collector.metrics.v1;
 
 import "opentelemetry/proto/metrics/v1/metrics.proto";
-import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.collector.metrics.v1";
@@ -34,25 +33,13 @@ service MetricsService {
 }
 
 message ExportMetricsServiceRequest {
-  // Metric data. An array of ResourceMetrics.
+  // An array of ResourceMetrics.
   // For data coming from a single resource this array will typically contain one
   // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
   // data from multiple origins typically batch the data before forwarding further and
   // in that case this array will contain multiple elements.
-  repeated ResourceMetrics resource_metrics = 1;
+  repeated opentelemetry.proto.metrics.v1.ResourceMetrics resource_metrics = 1;
 }
-
-// A collection of metrics from a Resource.
-message ResourceMetrics {
-  // A list of metrics that originate from a resource.
-  repeated opentelemetry.proto.metrics.v1.Metric metrics = 1;
-
-  // The resource for the metrics in this message that do not have an explicit
-  // Metric.resource field set. If neither this field nor Metric.resource are set then no
-  // resource info is known.
-  opentelemetry.proto.resource.v1.Resource resource = 2;
-}
-
 
 message ExportMetricsServiceResponse {
 }
