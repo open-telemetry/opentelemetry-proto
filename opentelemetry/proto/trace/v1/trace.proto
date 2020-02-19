@@ -214,11 +214,6 @@ message Span {
   // wasn't set it is means span ended without errors and assume
   // Status.Ok (code = 0).
   Status status = 15;
-
-  // An optional number of local child spans that were generated while this span
-  // was active. Value of -1 indicates that the number of local child spans is unknown.
-  // If local_child_span_count>=0, allows an implementation to detect missing child spans.
-  sfixed32 local_child_span_count = 16;
 }
 
 // The Status type defines a logical error model that is suitable for different
