@@ -375,7 +375,7 @@ message SummaryValue {
   // Represents the value at a given percentile of a distribution.
   message ValueAtPercentile {
     // The percentile of a distribution. Must be in the interval
-    // (0.0, 100.0].
+    // [0.0, 100.0].
     double percentile = 1;
 
     // The value at the given percentile of a distribution.
