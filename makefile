@@ -12,9 +12,23 @@ $(1)
 
 endef
 
+# Function to make sure that the git directory is clean.
+define check-git-status
+if [[ -n $$(git --no-pager status -s 2> /dev/null) ]] ;\
+then \
+	echo "Git tree is not clean. Did you forget to commit some files?" ;\
+	git --no-pager status ;\
+fi
+endef
+
 # CI build
 .PHONY: ci
-ci: gen-java gen-swagger
+ci: validate-go gen-java gen-swagger
+
+# Validate that generated Go files are up to date.
+.PHONY: validate-go
+validate-go: gen-go
+	$(check-git-status)
 
 # Generate ProtoBuf implementation for Go.
 .PHONY: gen-go
