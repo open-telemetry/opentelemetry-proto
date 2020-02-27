@@ -1077,7 +1077,7 @@ func (m *SummaryValue) GetPercentileValues() []*SummaryValue_ValueAtPercentile {
 // Represents the value at a given percentile of a distribution.
 type SummaryValue_ValueAtPercentile struct {
 	// The percentile of a distribution. Must be in the interval
-	// (0.0, 100.0].
+	// [0.0, 100.0].
 	Percentile float64 `protobuf:"fixed64,1,opt,name=percentile,proto3" json:"percentile,omitempty"`
 	// The value at the given percentile of a distribution.
 	Value                float64  `protobuf:"fixed64,2,opt,name=value,proto3" json:"value,omitempty"`
