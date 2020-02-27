@@ -14,7 +14,7 @@ endef
 
 # Function to make sure that the git directory is clean.
 define check-git-status
-if [[ -n $$(git --no-pager status -s 2> /dev/null) ]] ;\
+if [ -n $$(git --no-pager status -s 2> /dev/null) ] ;\
 then \
 	echo "Git tree is not clean. Did you forget to commit some files?" ;\
 	git --no-pager status ;\
