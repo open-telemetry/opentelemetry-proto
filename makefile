@@ -27,8 +27,14 @@ ci: validate-go gen-java gen-swagger
 
 # Validate that generated Go files are up to date.
 .PHONY: validate-go
-validate-go: gen-go
+validate-go: gen-go-ci
 	$(check-git-status)
+
+# Generate ProtoBuf implementation for Go.
+.PHONY: gen-go-ci
+gen-go-ci:
+	rm -rf ./$(GENDIR)/go
+	$(foreach file,$(PROTO_FILES),$(call exec-command,protoc --go_out=plugins=grpc:$(GOPATH)/src $(file)))
 
 # Generate ProtoBuf implementation for Go.
 .PHONY: gen-go
