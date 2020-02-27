@@ -33,8 +33,8 @@ validate-go: gen-go
 # Generate ProtoBuf implementation for Go.
 .PHONY: gen-go
 gen-go:
-	$(foreach file,$(PROTO_FILES),$(call exec-command,protoc --go_out=plugins=grpc:$(GOPATH)/src $(file)))
 	rm -rf ./$(GENDIR)/go
+	$(foreach file,$(PROTO_FILES),$(call exec-command,protoc --go_out=plugins=grpc:$(GOPATH)/src $(file)))
 	cp -R $(GOPATH)/src/github.com/open-telemetry/opentelemetry-proto/$(GENDIR)/go ./gen/
 
 # Generate ProtoBuf implementation for Java.
