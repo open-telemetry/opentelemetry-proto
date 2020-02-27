@@ -21,14 +21,21 @@ then \
 fi
 endef
 
+define print-hash
+find ./gen/go -type f -exec md5sum {} \; | sort -k 2 | md5sum
+endef
+
 # CI build
 .PHONY: ci
 ci: validate-go gen-java gen-swagger
 
 # Validate that generated Go files are up to date.
 .PHONY: validate-go
-validate-go: gen-go-ci
+validate-go: print-hash gen-go-ci
 	$(check-git-status)
+
+.PHONY: print-hash
+	echo $(print-hash)
 
 # Generate ProtoBuf implementation for Go.
 .PHONY: gen-go-ci
