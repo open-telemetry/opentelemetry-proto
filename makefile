@@ -1,5 +1,7 @@
+GOPATH_DIR := $(GOPATH)/src/github.com/open-telemetry/opentelemetry-proto
 GENDIR := gen
 OPENAPI_OUTDIR := "./$(GENDIR)/openapi"
+GOPATH_GENDIR := $(GOPATH_DIR)/$(GENDIR)
 
 # Find all .proto files.
 PROTO_FILES := $(wildcard opentelemetry/proto/*/v1/*.proto opentelemetry/proto/collector/*/v1/*.proto)
@@ -14,14 +16,18 @@ endef
 
 # CI build
 .PHONY: ci
-ci: gen-java gen-swagger
+ci: gen-go gen-java gen-swagger
 
 # Generate ProtoBuf implementation for Go.
 .PHONY: gen-go
 gen-go:
-	$(foreach file,$(PROTO_FILES),$(call exec-command,protoc --go_out=plugins=grpc:$(GOPATH)/src $(file)))
 	rm -rf ./$(GENDIR)/go
-	cp -R $(GOPATH)/src/github.com/open-telemetry/opentelemetry-proto/$(GENDIR)/go ./gen/
+	$(foreach file,$(PROTO_FILES),$(call exec-command,protoc --go_out=plugins=grpc:$(GOPATH)/src $(file)))
+# Only need to copy generated files if repo was checked out
+# into a directory different from the standard GOPATH based one.
+ifneq ($(PWD), $(GOPATH_DIR))
+	cp -R $(GOPATH_GENDIR)/go ./$(GENDIR)/
+endif
 
 # Generate ProtoBuf implementation for Java.
 .PHONY: gen-java
