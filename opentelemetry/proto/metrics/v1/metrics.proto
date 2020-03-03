@@ -162,9 +162,9 @@ message MetricDescriptor {
   }
   Type type = 4;
 
-  // The set of constant label associated with the metric descriptor. Labels in this list
-  // apply to all data points.
-  repeated opentelemetry.proto.common.v1.StringKeyValue constant_labels = 5;
+  // The set of labels associated with the metric descriptor. Labels in this list apply to
+  // all data points.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 5;
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
