@@ -2,11 +2,16 @@
 
 set -e
 
+
+# Calculating checksum of the 'gen' subdirectory.
+# This is more portable than git status which doesn't work with detached HEAD in Travis CI.
 gen_checksum()
 {
     find ./gen -type f -exec md5sum {} \; | sort -k 2 | md5sum
 }
 
+# Print checksum for each file in the 'gen' subdirectory.
+# Useful to see which specific files need updating when the directory is out of sync.
 print_checksum_details()
 {
     find ./gen -type f -exec md5sum {} \; | sort -k 2
