@@ -16,7 +16,7 @@ endef
 
 # CI build
 .PHONY: ci
-ci: gen-java gen-swagger
+ci: gen-go gen-java gen-swagger
 
 # Generate ProtoBuf implementation for Go.
 .PHONY: gen-go
