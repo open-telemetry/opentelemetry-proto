@@ -300,7 +300,7 @@ message HistogramValue {
   // count is the number of values in the population. Must be non-negative. This value
   // must be equal to the sum of the "count" fields in buckets if a histogram is
   // provided.
-  int64 count = 3;
+  uint64 count = 3;
 
   // sum of the values in the population. If count is zero then this field
   // must be zero. This value must be equal to the sum of the "sum" fields in buckets if
@@ -311,7 +311,7 @@ message HistogramValue {
   message Bucket {
     // The number of values in each bucket of the histogram, as described by
     // bucket_options.
-    int64 count = 1;
+    uint64 count = 1;
 
     // Exemplars are example points that may be used to annotate aggregated
     // Histogram values. They are metadata that gives information about a
@@ -366,7 +366,7 @@ message SummaryValue {
 
   // The total number of recorded values since start_time. Optional since
   // some systems don't expose this.
-  fixed64 count = 3;
+  uint64 count = 3;
 
   // The total sum of recorded values since start_time. Optional since some
   // systems don't expose this. If count is zero then this field must be zero.
