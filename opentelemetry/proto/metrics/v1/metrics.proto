@@ -196,24 +196,6 @@ message HistogramDataPoint {
   // The value of data point.
   HistogramValue value = 2;
 
-  // ExplicitBounds specifies buckets with explicitly defined bounds for values.
-  message ExplicitBounds {
-    // The bucket boundaries are described by "bounds" field.
-    //
-    // This defines size(bounds) + 1 (= N) buckets. The boundaries for bucket
-    // at index i are:
-    //
-    // [0, bounds[i]) for i == 0
-    // [bounds[i-1], bounds[i]) for 0 < i < N-1
-    // [bounds[i], +infinity) for i == N-1
-    // The values in bounds array must be strictly increasing and > 0.
-    //
-    // Note: only [a, b) intervals are currently supported for each bucket. If we decides
-    // to also support (a, b] intervals we should add support for these by defining a boolean
-    // value which decides what type of intervals to use.
-    repeated double bounds = 1;
-  }
-
   // A histogram may optionally contain the distribution of the values in the population.
   // In that case one of the option fields below and "buckets" field in HistogramValue
   // both must be defined. Otherwise all option fields and "buckets" field must be omitted
@@ -225,7 +207,23 @@ message HistogramDataPoint {
   // HistogramDataPoint each with its own bucket options.
 
   // explicit_bounds is the only supported bucket option currently.
-  ExplicitBounds explicit_bounds = 3;
+  // TODO: Add more bucket options.
+
+  // explicit_bounds specifies buckets with explicitly defined bounds for values.
+  // The bucket boundaries are described by "bounds" field.
+  //
+  // This defines size(bounds) + 1 (= N) buckets. The boundaries for bucket
+  // at index i are:
+  //
+  // [0, bounds[i]) for i == 0
+  // [bounds[i-1], bounds[i]) for 0 < i < N-1
+  // [bounds[i], +infinity) for i == N-1
+  // The values in bounds array must be strictly increasing and > 0.
+  //
+  // Note: only [a, b) intervals are currently supported for each bucket. If we decides
+  // to also support (a, b] intervals we should add support for these by defining a boolean
+  // value which decides what type of intervals to use.
+  repeated double explicit_bounds = 3;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the time-varying
