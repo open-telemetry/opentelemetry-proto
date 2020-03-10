@@ -64,8 +64,8 @@ message Span {
   // This field is required.
   bytes span_id = 2;
 
-  // tracestate conveys information about request position in multiple distributed tracing graphs.
-  // It is a tracestate in w3c-trace-context format: https://www.w3.org/TR/trace-context/#tracestate-header
+  // trace_state conveys information about request position in multiple distributed tracing graphs.
+  // It is a trace_state in w3c-trace-context format: https://www.w3.org/TR/trace-context/#tracestate-header
   // See also https://github.com/w3c/distributed-tracing for more details about this field.
   string trace_state = 3;
 
@@ -191,8 +191,8 @@ message Span {
     // A unique identifier for the linked span. The ID is an 8-byte array.
     bytes span_id = 2;
 
-    // The tracestate associated with the link.
-    string tracestate = 3;
+    // The trace_state associated with the link.
+    string trace_state = 3;
 
     // attributes is a collection of attribute key/value pairs on the link.
     repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 4;
