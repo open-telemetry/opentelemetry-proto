@@ -94,6 +94,7 @@ message Metric {
   repeated DoubleDataPoint double_datapoints = 3;
   repeated HistogramDataPoint histogram_datapoints = 4;
   repeated SummaryDataPoint summary_datapoints = 5;
+  repeated MinMaxSumCountDataPoint min_max_sum_count_datapoints = 6;
 }
 
 // Defines a metric type and its schema.
@@ -159,6 +160,13 @@ message MetricDescriptor {
     // window.
     // Corresponding values are stored in SummaryDataPoint.
     SUMMARY = 7;
+
+    // Minimum, maximum, sum, and count measurement. This collection of values
+    // represent the range , total value, and number of measurements made
+    // during a collection period.
+    //
+    // Corresponding values are stored in MinMaxSumCountDataPoint.
+    MIN_MAX_SUM_COUNT = 8;
   }
   Type type = 4;
 
@@ -352,4 +360,47 @@ message SummaryDataPoint {
   // A list of values at different percentiles of the distribution calculated
   // from the current snapshot. The percentiles must be strictly increasing.
   repeated ValueAtPercentile percentile_values = 6;
+}
+
+// MinMaxSumCountDataPoint is a single data point in a timeseries that
+// describes the range, total, and number of time-varying values of a
+// MinMaxSumCount metric.
+message MinMaxSumCountDataPoint {
+  // The set of labels that uniquely identify this timeseries.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
+
+  // start_time_unixnano is the time when the cumulative values (count and
+  // sum) and the range (min, max) were reset to zero.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // Value of 0 indicates that the start_time_unixnano is unspecified. In that case
+  // the values contained are assumed to incremental instead of cumulative.
+  fixed64 start_time_unixnano = 2;
+
+  // timestamp_unixnano is the moment when this value was recorded.
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // Value of 0 indicates that the timestamp_unixnano is unspecified. In that
+  // case the timestamp_unixnano should be decided by the backend.
+  fixed64 timestamp_unixnano = 3;
+
+  // The total number of recorded values since start_time. Optional since
+  // some systems don't expose this.
+  uint64 count = 4;
+
+  // The total sum of recorded values since start_time.
+  //
+  // If count is zero then this field should be ignored.
+  double sum = 5;
+
+  // The maximal value recorded during the recording period.
+  //
+  // If count is zero then this field should be ignored.
+  double maximum = 6;
+
+  // The minimal value recorded during the recording period.
+  //
+  // If count is zero then this field should be ignored.
+  double minimum = 7;
 }
