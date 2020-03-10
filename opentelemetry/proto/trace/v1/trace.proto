@@ -67,7 +67,7 @@ message Span {
   // tracestate conveys information about request position in multiple distributed tracing graphs.
   // It is a tracestate in w3c-trace-context format: https://www.w3.org/TR/trace-context/#tracestate-header
   // See also https://github.com/w3c/distributed-tracing for more details about this field.
-  string tracestate = 3;
+  string trace_state = 3;
 
   // The `span_id` of this span's parent span. If this is a root span, then this
   // field must be empty. The ID is an 8-byte array.
