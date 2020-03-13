@@ -90,10 +90,10 @@ message Metric {
   // Data is a list of one or more DataPoints for a single metric. Only one of the
   // following fields is used for the data, depending on the type of the metric defined
   // by MetricDescriptor.type field.
-  repeated Int64DataPoint int64_datapoints = 2;
-  repeated DoubleDataPoint double_datapoints = 3;
-  repeated HistogramDataPoint histogram_datapoints = 4;
-  repeated SummaryDataPoint summary_datapoints = 5;
+  repeated Int64DataPoint int64_data_points = 2;
+  repeated DoubleDataPoint double_data_points = 3;
+  repeated HistogramDataPoint histogram_data_points = 4;
+  repeated SummaryDataPoint summary_data_points = 5;
 }
 
 // Defines a metric type and its schema.
