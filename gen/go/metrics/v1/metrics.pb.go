@@ -854,16 +854,11 @@ func (m *SummaryDataPoint) GetPercentileValues() []*SummaryDataPoint_ValueAtPerc
 
 // Represents the value at a given percentile of a distribution.
 //
-// To support the Min and Max values of a MinMaxSumCount aggregation the
-// following conventions are used:
-//   - The 100th percentile is equivalent to the maximum value observed
-//     so can be used as a stand in for the Max value.
-//   - Set the 0th percentile to the Min value. This is mathematically
-//     incorrect, but the most suitable way to transmit this data with the
-//     existing metric kinds.
+// To record Min and Max values following conventions are used:
+// - The 100th percentile is equivalent to the maximum value observed.
+// - The 0th percentile is equivalent to the minimum value observed.
 //
-// For more information about work underway to better support the
-// MinMaxSumCount aggregation refer to:
+// See the following issue for more context:
 // https://github.com/open-telemetry/opentelemetry-proto/issues/125
 type SummaryDataPoint_ValueAtPercentile struct {
 	// The percentile of a distribution. Must be in the interval
