@@ -24,14 +24,24 @@ option java_package = "io.opentelemetry.proto.metrics.v1";
 option java_outer_classname = "MetricsProto";
 option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metrics/v1";
 
-// A collection of metrics from a Resource.
+// A collection of InstrumentationLibraryMetrics from a Resource.
 message ResourceMetrics {
-  // A list of metrics that originate from a resource.
-  repeated Metric metrics = 1;
-
   // The resource for the metrics in this message.
   // If this field is not set then no resource info is known.
-  opentelemetry.proto.resource.v1.Resource resource = 2;
+  opentelemetry.proto.resource.v1.Resource resource = 1;
+
+  // A list of metrics that originate from a resource.
+  repeated InstrumentationLibraryMetrics instrumentation_library_metrics = 2;
+}
+
+// A collection of Metrics produced by an InstrumentationLibrary.
+message InstrumentationLibraryMetrics {
+  // The instrumentation library information for the metrics in this message.
+  // If this field is not set then no library info is known.
+  opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;
+
+  // A list of metrics that originate from an instrumentation library.
+  repeated Metric metrics = 2;
 }
 
 // Defines a Metric which has one or more timeseries.
@@ -90,10 +100,10 @@ message Metric {
   // Data is a list of one or more DataPoints for a single metric. Only one of the
   // following fields is used for the data, depending on the type of the metric defined
   // by MetricDescriptor.type field.
-  repeated Int64DataPoint int64_datapoints = 2;
-  repeated DoubleDataPoint double_datapoints = 3;
-  repeated HistogramDataPoint histogram_datapoints = 4;
-  repeated SummaryDataPoint summary_datapoints = 5;
+  repeated Int64DataPoint int64_data_points = 2;
+  repeated DoubleDataPoint double_data_points = 3;
+  repeated HistogramDataPoint histogram_data_points = 4;
+  repeated SummaryDataPoint summary_data_points = 5;
 }
 
 // Defines a metric type and its schema.
@@ -340,6 +350,13 @@ message SummaryDataPoint {
   double sum = 5;
 
   // Represents the value at a given percentile of a distribution.
+  //
+  // To record Min and Max values following conventions are used:
+  // - The 100th percentile is equivalent to the maximum value observed.
+  // - The 0th percentile is equivalent to the minimum value observed.
+  //
+  // See the following issue for more context:
+  // https://github.com/open-telemetry/opentelemetry-proto/issues/125
   message ValueAtPercentile {
     // The percentile of a distribution. Must be in the interval
     // [0.0, 100.0].
