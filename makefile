@@ -23,6 +23,8 @@ ci: gen-go gen-java gen-swagger
 gen-go:
 	rm -rf ./$(GENDIR)/go
 	$(foreach file,$(PROTO_FILES),$(call exec-command,protoc --go_out=plugins=grpc:$(GOPATH)/src $(file)))
+	protoc --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:$(GOPATH)/src opentelemetry/proto/collector/trace/v1/trace_service.proto
+	protoc --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:$(GOPATH)/src opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 # Only need to copy generated files if repo was checked out
 # into a directory different from the standard GOPATH based one.
 ifneq ($(PWD), $(GOPATH_DIR))
@@ -41,3 +43,4 @@ gen-java:
 gen-swagger:
 	mkdir -p $(OPENAPI_OUTDIR)
 	protoc --plugin=protoc-gen-swagger=/usr/bin/protoc-gen-swagger --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:$(OPENAPI_OUTDIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
+	protoc --plugin=protoc-gen-swagger=/usr/bin/protoc-gen-swagger --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:$(OPENAPI_OUTDIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
