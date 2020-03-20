@@ -133,21 +133,21 @@ message Span {
   // and `SERVER` (callee) to identify queueing latency associated with the span.
   SpanKind kind = 6;
 
-  // start_time_unixnano is the start time of the span. On the client side, this is the time
+  // start_time_unix_nano is the start time of the span. On the client side, this is the time
   // kept by the local machine where the span execution starts. On the server side, this
   // is the time when the server's application handler starts running.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // This field is semantically required and it is expected that end_time >= start_time.
-  fixed64 start_time_unixnano = 7;
+  fixed64 start_time_unix_nano = 7;
 
-  // end_time_unixnano is the end time of the span. On the client side, this is the time
+  // end_time_unix_nano is the end time of the span. On the client side, this is the time
   // kept by the local machine where the span execution ends. On the server side, this
   // is the time when the server application handler stops running.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // This field is semantically required and it is expected that end_time >= start_time.
-  fixed64 end_time_unixnano = 8;
+  fixed64 end_time_unix_nano = 8;
 
   // attributes is a collection of key/value pairs. The value can be a string,
   // an integer, a double or the Boolean values `true` or `false`. Note, global attributes
@@ -167,8 +167,8 @@ message Span {
   // Event is a time-stamped annotation of the span, consisting of user-supplied
   // text description and key-value pairs.
   message Event {
-    // time_unixnano is the time the event occurred.
-    fixed64 time_unixnano = 1;
+    // time_unix_nano is the time the event occurred.
+    fixed64 time_unix_nano = 1;
 
     // name of the event.
     // This field is semantically required to be set to non-empty string.
