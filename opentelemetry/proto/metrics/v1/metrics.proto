@@ -146,19 +146,19 @@ message MetricDescriptor {
     GAUGE_HISTOGRAM = 3;
 
     // Integer counter measurement. The value cannot decrease; if value is reset then
-    // start_time_unixnano should also be reset.
+    // start_time_unix_nano should also be reset.
     // Corresponding values are stored in Int64DataPoint.
     COUNTER_INT64 = 4;
 
     // Floating point counter measurement. The value cannot decrease, if
-    // resets then the start_time_unixnano should also be reset.
+    // resets then the start_time_unix_nano should also be reset.
     // Recorded values are always >= 0.
     // Corresponding values are stored in DoubleDataPoint.
     COUNTER_DOUBLE = 5;
 
     // Histogram cumulative measurement.
     // Corresponding values are stored in HistogramDataPoint. The count and sum of the
-    // histogram cannot decrease; if values are reset then start_time_unixnano
+    // histogram cannot decrease; if values are reset then start_time_unix_nano
     // should also be reset to the new start timestamp.
     CUMULATIVE_HISTOGRAM = 6;
 
@@ -183,20 +183,20 @@ message Int64DataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unixnano is the time when the cumulative value was reset to zero.
+  // start_time_unix_nano is the time when the cumulative value was reset to zero.
   // This is used for Counter type only. For Gauge the value is not specified and
   // defaults to 0.
   //
-  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
+  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
   // may be decided by the backend.
-  fixed64 start_time_unixnano = 2;
+  fixed64 start_time_unix_nano = 2;
 
-  // timestamp_unixnano is the moment when this value was recorded.
+  // time_unix_nano is the moment when this value was recorded.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  fixed64 timestamp_unixnano = 3;
+  fixed64 time_unix_nano = 3;
 
   // value itself.
   int64 value = 4;
@@ -208,20 +208,20 @@ message DoubleDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unixnano is the time when the cumulative value was reset to zero.
+  // start_time_unix_nano is the time when the cumulative value was reset to zero.
   // This is used for Counter type only. For Gauge the value is not specified and
   // defaults to 0.
   //
-  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
+  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
   // may be decided by the backend.
-  fixed64 start_time_unixnano = 2;
+  fixed64 start_time_unix_nano = 2;
 
-  // timestamp_unixnano is the moment when this value was recorded.
+  // time_unix_nano is the moment when this value was recorded.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  fixed64 timestamp_unixnano = 3;
+  fixed64 time_unix_nano = 3;
 
   // value itself.
   double value = 4;
@@ -234,19 +234,19 @@ message HistogramDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unixnano is the time when the cumulative value was reset to zero.
+  // start_time_unix_nano is the time when the cumulative value was reset to zero.
   //
-  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
+  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
   // may be decided by the backend.
   // Note: this field is always unspecified and ignored if MetricDescriptor.type==GAUGE_HISTOGRAM.
-  fixed64 start_time_unixnano = 2;
+  fixed64 start_time_unix_nano = 2;
 
-  // timestamp_unixnano is the moment when this value was recorded.
+  // time_unix_nano is the moment when this value was recorded.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  fixed64 timestamp_unixnano = 3;
+  fixed64 time_unix_nano = 3;
 
   // count is the number of values in the population. Must be non-negative. This value
   // must be equal to the sum of the "count" fields in buckets if a histogram is provided.
@@ -272,9 +272,9 @@ message HistogramDataPoint {
       // the defined bounds.
       double value = 1;
 
-      // timestamp_unixnano is the moment when this exemplar was recorded.
+      // time_unix_nano is the moment when this exemplar was recorded.
       // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-      fixed64 timestamp_unixnano = 2;
+      fixed64 time_unix_nano = 2;
 
       // exemplar_attachments are contextual information about the example value.
       // Keys in this list must be unique.
@@ -328,18 +328,18 @@ message SummaryDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unixnano is the time when the cumulative value was reset to zero.
+  // start_time_unix_nano is the time when the cumulative value was reset to zero.
   //
-  // The cumulative value is over the time interval (start_time_unixnano, timestamp_unixnano].
+  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
   // may be decided by the backend.
-  fixed64 start_time_unixnano = 2;
+  fixed64 start_time_unix_nano = 2;
 
-  // timestamp_unixnano is the moment when this value was recorded.
+  // time_unix_nano is the moment when this value was recorded.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  fixed64 timestamp_unixnano = 3;
+  fixed64 time_unix_nano = 3;
 
   // The total number of recorded values since start_time. Optional since
   // some systems don't expose this.
