@@ -2,22 +2,23 @@
 
 ## Tagging the Release
 
-Our release branches follow the naming convention of `v<major>.<minor>.x`, while the tags include the
-patch version `v<major>.<minor>.<patch>`. For example, the same branch `v0.3.x` would be used to create
-all `v0.3` tags (e.g. `v0.3.0`, `v0.3.1`).
+Our release branches follow the naming convention of `v<major>.<minor>.x`, while
+the tags include the patch version `v<major>.<minor>.<patch>`. For example, the
+same branch `v0.3.x` would be used to create all `v0.3` tags (e.g. `v0.3.0`,
+`v0.3.1`).
 
-In this section upstream repository refers to the main opentelemetry-proto github
-repository.
+In this section upstream repository refers to the main opentelemetry-proto
+github repository.
 
 Before any push to the upstream repository you need to create a [personal access
 token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/).
 
-1.  Create the release branch and push it to GitHub:
+1. Create the release branch and push it to GitHub:
 
     ```bash
-    $ MAJOR=0 MINOR=3 PATCH=0 # Set appropriately for new release
-    $ git checkout -b v$MAJOR.$MINOR.x master
-    $ git push upstream v$MAJOR.$MINOR.x
+    MAJOR=0 MINOR=3 PATCH=0 # Set appropriately for new release
+    git checkout -b v$MAJOR.$MINOR.x master
+    git push upstream v$MAJOR.$MINOR.x
     ```
 
 2. Enable branch protection for the new branch, if you have admin access.
@@ -38,27 +39,30 @@ token](https://help.github.com/articles/creating-a-personal-access-token-for-the
     - Uncheck everything else.
     - Click "Save changes".
 
-3.  For `vMajor.Minor.x` branch:
+3. For `vMajor.Minor.x` branch:
 
     - Create and push a tag:
 
     ```bash
-    $ git checkout v$MAJOR.$MINOR.x
-    $ git pull upstream v$MAJOR.$MINOR.x
-    $ git tag -a v$MAJOR.$MINOR.$PATCH -m "Version $MAJOR.$MINOR.$PATCH"
-    $ git push upstream v$MAJOR.$MINOR.x
+    git checkout v$MAJOR.$MINOR.x
+    git pull upstream v$MAJOR.$MINOR.x
+    git tag -a v$MAJOR.$MINOR.$PATCH -m "Version $MAJOR.$MINOR.$PATCH"
+    git push upstream v$MAJOR.$MINOR.x
     ```
 
 ## Patch Release
-All patch releases should include only bug-fixes, and must avoid adding/modifying the public APIs.
-To cherry-pick one commit use the following instructions:
+
+All patch releases should include only bug-fixes, and must avoid
+adding/modifying the public APIs. To cherry-pick one commit use the following
+instructions:
+
 - Create and push a tag:
 
 ```bash
-$ COMMIT=1224f0a # Set the right commit hash.
-$ git checkout -b cherrypick v$MAJOR.$MINOR.x
-$ git cherry-pick -x $COMMIT
-$ git commit -a -m "Cherry-pick commit $COMMIT"
+COMMIT=1224f0a # Set the right commit hash.
+git checkout -b cherrypick v$MAJOR.$MINOR.x
+git cherry-pick -x $COMMIT
+git commit -a -m "Cherry-pick commit $COMMIT"
 ```
 
 - Go through PR review and merge it to GitHub v$MAJOR.$MINOR.x branch.
@@ -75,4 +79,16 @@ You can use `git log upstream/v$MAJOR.$((MINOR-1)).x..upstream/v$MAJOR.$MINOR.x 
 or the Github [compare tool](https://github.com/open-telemetry/opentelemetry-proto/compare/)
 to view a summary of all commits since last release as a reference.
 
-Please pick major or important user-visible changes only.
+In addition, you can refer to
+[CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-proto/blob/master/CHANGELOG.md)
+for a list of major changes since last release.
+
+## Update release versions in documentations and CHANGELOG files
+
+After releasing is done, you need to update
+[README.md](https://github.com/open-telemetry/opentelemetry-proto/blob/master/README.md) and
+[CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-proto/blob/master/CHANGELOG.md).
+
+Create a PR to mark the new release in
+[CHANGELOG.md](https://github.com/census-instrumentation/opencensus-java/blob/master/CHANGELOG.md)
+on master branch.
