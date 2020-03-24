@@ -47,7 +47,7 @@ token](https://help.github.com/articles/creating-a-personal-access-token-for-the
     git checkout v$MAJOR.$MINOR.x
     git pull upstream v$MAJOR.$MINOR.x
     git tag -a v$MAJOR.$MINOR.$PATCH -m "Version $MAJOR.$MINOR.$PATCH"
-    git push upstream v$MAJOR.$MINOR.x
+    git push upstream v$MAJOR.$MINOR.$PATCH
     ```
 
 ## Patch Release
