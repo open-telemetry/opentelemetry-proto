@@ -214,7 +214,7 @@ func (m *InstrumentationLibraryMetrics) GetMetrics() []*Metric {
 	return nil
 }
 
-// Metric represents timeseries produced by a telemetry system.
+// Metric represents a timeseries produced by a telemetry system.
 //
 // The data model and relation between entities is shown in the diagram below.
 //
@@ -319,7 +319,7 @@ type Metric_Data struct {
 	// If this data point is a part of a timeseries for an INSTANTANEOUS
 	// metric, this value is ignored.
 	//
-	// If this data point is a part of a timeseries for an DELTA, or
+	// If this data point is a part of a timeseries for a DELTA, or
 	// CUMULATIVE metric, this value represents the instant before the
 	// measuring time interval began (i.e. for time t to be in the measuring
 	// interval than start_time_unix_nano < t <= time_unix_nano).
