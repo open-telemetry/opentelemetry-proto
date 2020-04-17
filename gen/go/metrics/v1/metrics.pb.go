@@ -35,9 +35,9 @@ const (
 	// values are representative of distinct measurements within the
 	// interval.
 	MetricDescriptor_INSTANTANEOUS MetricDescriptor_Temporality = 1
-	// DELTA is a metric whose values are measured and successively added
-	// over a reporting interval. The reported value represents the change
-	// from the previous interval.
+	// DELTA is a metric whose values are measured and successively
+	// aggregated over a reporting interval. The reported value represents
+	// the change from the previous interval.
 	//
 	// Each reported value for a DELTA metric over a time interval is
 	// self-contained, the values do not depend on values in other time
