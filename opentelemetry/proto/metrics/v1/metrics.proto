@@ -186,10 +186,10 @@ message MetricDescriptor {
   // entirely non-decreasing.
   bool monotonic = 5;
 
-  // Subset describes the subset of numbers metric values belong to if any.
-  enum Subset {
+  // Domain describes the set of numbers metric values belong to if any.
+  enum Domain {
     // NONE is the default, and means the metric values do not belong to any
-    // subset.
+    // particular domain other than the value type itself.
     NONE = 0;
 
     // NONNEGATIVE is the set of numbers greater than or equal to zero.
@@ -198,7 +198,7 @@ message MetricDescriptor {
     // NONPOSITIVE is the set of numbers less than or equal to zero.
     NONPOSITIVE  = 2;
   }
-  Subset subset = 6;
+  Domain domain = 6;
 
   // The set of labels associated with the metric descriptor. Labels in this
   // list apply to all data points.
