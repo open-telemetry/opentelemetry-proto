@@ -44,7 +44,7 @@ message InstrumentationLibraryMetrics {
   repeated Metric metrics = 2;
 }
 
-// Metric represents timeseries produced by a telemetry system.
+// Metric represents a timeseries produced by a telemetry system.
 //
 // The data model and relation between entities is shown in the diagram below.
 //
