@@ -124,12 +124,19 @@ message Metric {
     // and may be set by the receiver.
     fixed64 time_unix_nano = 3;
 
-    // Value is the measured value.
-    oneof Value {
-      int64 int64_value = 4;
-      double double_value = 5;
-      Distribution distribution_value = 6;
-    }
+    // The following three fields are mutually exclusive and represent the
+    // measured value. Only one of the following three fields can be
+    // populated. The populated field MUST match the MetricDescriptor type.
+
+    // int64_value contains the measured value for INT64 type Metrics.
+    int64 int64_value = 4;
+
+    // double_value contains the measured value for DOUBLE type Metrics.
+    double double_value = 5;
+
+    // distribution_value contains the measured value for DISTRIBUTION type
+    // Metrics.
+    Distribution distribution_value = 6;
   }
 }
 
@@ -144,6 +151,34 @@ message MetricDescriptor {
   // unit in which the metric value is reported. Follows the format
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
+
+  // Type is the type of values this metric has.
+  enum Type {
+    // UNDEFINED is the default Type, it MUST not be used.
+    UNDEFINED = 0;
+
+    // INT64 values are represents as signed 64-bit integers.
+    //
+    // A Metric of this Type MUST assign values to the int64_value field in
+    // its Data.
+    INT64 = 1;
+
+    // DOUBLE values are represents as double-precision floating-point
+    // numbers.
+    //
+    // A Metric of this Type MUST assign values to the double_value field
+    // in its Data.
+    DOUBLE = 2;
+
+    // DISTRIBUTION values are statistics for an observed population
+    // represented. These statistics are represented as a Distribution
+    // message.
+    //
+    // A Metric of this Type MUST assign values to the distribution_value
+    // field in its Data.
+    DISTRIBUTION = 3;
+  }
+  Type type = 4;
 
   // Temporality describes how metric values are reported over time.
   enum Temporality {
@@ -180,11 +215,11 @@ message MetricDescriptor {
     // CUMULATIVE metrics are not guaranteed to be monotonic.
     CUMULATIVE = 3;
   }
-  Temporality temporality = 4;
+  Temporality temporality = 5;
 
   // monotonic is true if the metric values are entirely non-increasing, or
   // entirely non-decreasing.
-  bool monotonic = 5;
+  bool monotonic = 6;
 
   // Domain describes the set of numbers metric values belong to if any.
   enum Domain {
@@ -198,11 +233,11 @@ message MetricDescriptor {
     // NONPOSITIVE is the set of numbers less than or equal to zero.
     NONPOSITIVE  = 2;
   }
-  Domain domain = 6;
+  Domain domain = 7;
 
   // The set of labels associated with the metric descriptor. Labels in this
   // list apply to all data points.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 7;
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 8;
 }
 
 // Distribution is a data point in a timeseries containing statistics for
