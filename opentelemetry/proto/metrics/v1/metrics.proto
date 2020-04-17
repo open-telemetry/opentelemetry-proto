@@ -145,9 +145,9 @@ message MetricDescriptor {
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // Interval describes how metric values are reported over time.
-  enum Interval {
-    // UNSPECIFIED is the default Interval, it MUST not be used.
+  // Temporality describes how metric values are reported over time.
+  enum Temporality {
+    // UNSPECIFIED is the default Temporality, it MUST not be used.
     UNSPECIFIED = 0;
 
     // INSTANTANEOUS is a metric whose values are measured at a particular
@@ -180,7 +180,7 @@ message MetricDescriptor {
     // CUMULATIVE metrics are not guaranteed to be monotonic.
     CUMULATIVE = 3;
   }
-  Interval interval = 4;
+  Temporality temporality = 4;
 
   // monotonic is true if the metric values are entirely non-increasing, or
   // entirely non-decreasing.
