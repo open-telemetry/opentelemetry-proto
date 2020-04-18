@@ -217,9 +217,22 @@ message MetricDescriptor {
   }
   Temporality temporality = 5;
 
-  // monotonic is true if the metric values are entirely non-increasing, or
-  // entirely non-decreasing.
-  bool monotonic = 6;
+  // Monotonic describes the metric values to be entirely non-increasing,
+  // or entirely non-decreasing.
+  enum Monotonic {
+    // UNKNOWN is the default, and means it the monotonic nature of the
+    // metric values is known.
+    UNKNOWN = 0;
+
+    // NONINCREASING means all the successive metric values decrease or
+    // remain constant.
+    NONINCREASING = 1;
+
+    // NONDECREASING means all the successive metric values increase or
+    // remain constant.
+    NONDECREASING = 2;
+  }
+  Monotonic monotonic = 6;
 
   // Domain describes the set of numbers metric values belong to if any.
   enum Domain {
