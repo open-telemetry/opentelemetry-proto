@@ -264,13 +264,9 @@ message MetricDescriptor {
     // metric values is known.
     UNKNOWN = 0;
 
-    // NONINCREASING means all the successive metric values decrease or
-    // remain constant.
-    NONINCREASING = 1;
-
     // NONDECREASING means all the successive metric values increase or
     // remain constant.
-    NONDECREASING = 2;
+    NONDECREASING = 1;
   }
   Monotonic monotonic = 6;
 
@@ -282,9 +278,6 @@ message MetricDescriptor {
 
     // NONNEGATIVE is the set of numbers greater than or equal to zero.
     NONNEGATIVE = 1;
-
-    // NONPOSITIVE is the set of numbers less than or equal to zero.
-    NONPOSITIVE  = 2;
   }
   Domain domain = 7;
 
