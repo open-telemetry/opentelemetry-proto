@@ -91,40 +91,75 @@ message Metric {
   // metric_descriptor describing this Metric.
   MetricDescriptor metric_descriptor = 1;
 
+  // The following timestamps define the time interval over which all data
+  // for this Metric were recorded. How each timestamp is interpreted and
+  // its validity depend on the Temporality of this Metric.
+  //
+  // For an INSTANTANEOUS Metric, start_time_unix_nano is optional, but if
+  // specified, it MUST equal end_time_unix_nano. The end_time_unix_nano
+  // timestamp is the moment the data was recorded.
+  //
+  // For both a DELTA and CUMULATIVE Metric, start_time_unix_nano and
+  // end_time_unix_nano specify a non-zero positive time interval:
+  //
+  //   start_time_unix_nano <= t < end_time_unix_nano
+  //
+  // All the data for a DELTA and CUMULATIVE Metric are interpreted as being
+  // recorded over this time interval unless an additional valid time
+  // interval is defined for individual data. In that case, only that
+  // individual data is interpreted as being recorded over that different
+  // interval.
+  //
+  // Time intervals for successive DELTA Metrics MUST be non-overlapping.
+  // Each interval needs to define the unique time over which the Metric is
+  // reported.
+  //
+  // For successive CUMULATIVE Metrics, the start_time_unix_nano MUST remain
+  // the same until the cumulative value is reset. The end_time_unix_nano is
+  // increased successively to expand the overlapping interval the Metric
+  // series is defined.
+  //
+  // If any data specifies either timestamp itself, that time is interpreted
+  // as overriding the times specified here. If all data for this Metric are
+  // reported over the same time interval, data SHOULD NOT specify
+  // overrides. Rather, the time interval SHOULD be uniformly defined here.
+
+  // start_time_unix_nano is the beginning of the time interval over which
+  // all data for this Metric were recorded. It MUST be represented as the
+  // UNIX Epoch time in nanoseconds (nanoseconds since 00:00:00 UTC on 1
+  // January 1970). If zero, it is treated as unspecified.
+  fixed64 start_time_unix_nano = 2;
+
+  // end_time_unix_nano is the end of the time interval over which all data
+  // for this Metric were recorded. It MUST be represented as the UNIX Epoch
+  // time in nanoseconds (nanoseconds since 00:00:00 UTC on 1 January 1970).
+  // If zero, it is treated as unspecified and the end to the time interval
+  // is define by the receiver as the time this data is received. It is
+  // RECOMMENDED to not leave this unspecified.
+  fixed64 end_time_unix_nano = 3;
+
   // Data values of this Metric.
-  repeated Data data = 2;
+  repeated Data data = 4;
 
   message Data {
-    // The set of additional labels uniquely identifying this metric data.
+    // The set of additional labels uniquely identifying this data.
     //
     // It is considered an error for Labels used here to have the same key
     // as those defined in this Metric's MetricDescriptor and MUST be
     // avoided. The handling of this error is left up to the receiver.
     repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-    // start_time_unix_nano is the beginning of a time interval over which
-    // this data point was recorded. It MUST be represented as the UNIX Epoch
-    // time in nanoseconds (nanoseconds since 00:00:00 UTC on 1 January 1970).
-    // If zero, it is treated as unspecified and may be set by the receiver.
-    //
-    // If this data point is a part of a timeseries for an INSTANTANEOUS
-    // metric, this value is ignored.
-    //
-    // If this data point is a part of a timeseries for a DELTA, or
-    // CUMULATIVE metric, this value represents the instant before the
-    // measuring time interval began (i.e. for time t to be in the measuring
-    // interval than start_time_unix_nano < t <= time_unix_nano).
-    //
-    // This time MUST be reset so as to represent a new measurement lifetime
-    // if this data point is part of a timeseries for a CUMULATIVE metric and
-    // the metric value is reset to zero.
+    // start_time_unix_nano is the beginning of the time interval over which
+    // this data was recorded. It MUST be represented as the UNIX Epoch time
+    // in nanoseconds (nanoseconds since 00:00:00 UTC on 1 January 1970). If
+    // zero, it is treated as unspecified.
     fixed64 start_time_unix_nano = 2;
 
-    // time_unix_nano is the time when this data point was recorded. It MUST
-    // be represented as the UNIX Epoch time in nanoseconds (nanoseconds since
-    // 00:00:00 UTC on 1 January 1970). If zero, it is treated as unspecified
-    // and may be set by the receiver.
-    fixed64 time_unix_nano = 3;
+    // end_time_unix_nano is the end of the time interval over which this
+    // data was recorded. It MUST be represented as the UNIX Epoch time in
+    // nanoseconds (nanoseconds since 00:00:00 UTC on 1 January 1970). If
+    // zero, it is treated as unspecified.
+    fixed64 end_time_unix_nano = 3;
 
     // The following three fields are mutually exclusive and represent the
     // measured value. Only one of the following three fields can be
@@ -288,9 +323,9 @@ message Distribution {
       // the defined bounds.
       double value = 1;
 
-      // time_unix_nano is the moment when this exemplar was recorded.
+      // end_time_unix_nano is the moment when this exemplar was recorded.
       // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-      fixed64 time_unix_nano = 2;
+      fixed64 end_time_unix_nano = 2;
 
       // exemplar_attachments are contextual information about the example value.
       // Keys in this list must be unique.
