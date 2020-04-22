@@ -94,10 +94,11 @@ message Metric {
   repeated Data data = 2;
 
   message Data {
-    // The set of labels that uniquely identify this timeseries.
+    // The set of additional labels uniquely identifying this metric data.
     //
-    // These labels take precedence over any labels with the same key defined
-    // in the metric descriptor.
+    // It is considered an error for Labels used here to have the same key
+    // as those defined in this Metric's MetricDescriptor and MUST be
+    // avoided. The handling of this error is left up to the receiver.
     repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
     // start_time_unix_nano is the beginning of a time interval over which
