@@ -88,9 +88,10 @@ message InstrumentationLibraryMetrics {
 //
 //-----------------------------------------------------------------------
 message Metric {
-  // metric_descriptor describes the Metric.
+  // metric_descriptor describing this Metric.
   MetricDescriptor metric_descriptor = 1;
 
+  // Data values of this Metric.
   repeated Data data = 2;
 
   message Data {
@@ -141,12 +142,15 @@ message Metric {
   }
 }
 
-// Defines a metric type and its schema.
+// MetricDescriptor describes the identifying attributes of a metric.
 message MetricDescriptor {
-  // name of the metric, including its DNS name prefix. It must be unique.
+  // name of the metric.
   string name = 1;
 
-  // description of the metric, which can be used in documentation.
+  // description of the metric.
+  //
+  // This description is commonly used in documentation so it should be a
+  // human-readable explanation of the metric.
   string description = 2;
 
   // unit in which the metric value is reported. Follows the format
