@@ -172,9 +172,118 @@ message MetricDescriptor {
   }
   Type type = 4;
 
+  // Temporality is the temporal quality values of a metric have. It
+  // describes how those values relate to the time interval over which they
+  // are reported.
+  enum Temporality {
+    // TEMPORALITY_INVALID is the default Temporality, it MUST not be
+    // used.
+    TEMPORALITY_INVALID = 0;
+
+    // INSTANTANEOUS is a metric whose values are measured at a particular
+    // instant. The values are not aggregated over any time interval and are
+    // unique per timestamp.
+    INSTANTANEOUS = 1;
+
+    // DELTA is a metric whose values are the aggregation of measurements
+    // made over a time interval. Successive metrics contain aggregation of
+    // values from continuous and non-overlapping intervals.
+    //
+    // The values for a DELTA metric are based only on the time interval
+    // associated with one measurement cycle. There is no dependency on
+    // previous measurements like is the case for CUMULATIVE metrics.
+    //
+    // For example, consider a system measuring the number of requests that
+    // it receives every second and reports the sum of these requests as a
+    // DELTA metric:
+    //
+    //   1. The system starts receiving at time=t_0.
+    //   2. A request is received, the system measures 1 request.
+    //   3. A request is received, the system measures 1 request.
+    //   4. A request is received, the system measures 1 request.
+    //   5. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_0 to
+    //      t_0+1 with a value of 3.
+    //   6. A request is received, the system measures 1 request.
+    //   7. A request is received, the system measures 1 request.
+    //   8. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_0+1 to
+    //      t_0+2 with a value of 2.
+    DELTA = 2;
+
+    // CUMULATIVE is a metric whose values are the aggregation of
+    // successively made measurements from a fixed start time until the last
+    // reported measurement. This means that current values of a CUMULATIVE
+    // metric depend on all previous measurements since the start time.
+    // Because of this, the sender is required to retain this state in some
+    // form. If this state is lost or invalidated, the CUMULATIVE metric
+    // values MUST be reset and a new fixed start time following the last
+    // reported measurement time sent MUST be used.
+    //
+    // For example, consider a system measuring the number of requests that
+    // it receives every second and reports the sum of these requests as a
+    // CUMULATIVE metric:
+    //
+    //   1. The system starts receiving at time=t_0.
+    //   2. A request is received, the system measures 1 request.
+    //   3. A request is received, the system measures 1 request.
+    //   4. A request is received, the system measures 1 request.
+    //   5. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_0 to
+    //      t_0+1 with a value of 3.
+    //   6. A request is received, the system measures 1 request.
+    //   7. A request is received, the system measures 1 request.
+    //   8. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_0 to
+    //      t_0+2 with a value of 5.
+    //   9. The system experiences a fault and loses state.
+    //   10. The system recovers and resumes receiving at time=t_1.
+    //   11. A request is received, the system measures 1 request.
+    //   12. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_1 to
+    //      t_0+1 with a value of 1.
+    CUMULATIVE = 3;
+  }
+
+  // temporality is the Temporality of values this metric has.
+  Temporality temporality = 5;
+
+  // Monotonic is a refinement of the values a metric has. It defines the
+  // relationship values of successively reported metrics have
+  // (non-increasing, non-decreasing, or unknown). This is a refinement of
+  // the metric values that can be useful for a receiver in understanding
+  // how to deal with discontinuities in the data (i.e.  calculating
+  // derivates of the data without introducing artifacts from a reset).
+  enum Monotonic {
+    // MONOTONIC_UNSPECIFIED is the default, and means the monotonic nature
+    // of the metric values is unknown.
+    MONOTONIC_UNSPECIFIED = 0;
+
+    // NONDECREASING means all the successive metric values increase or
+    // remain constant.
+    NONDECREASING = 1;
+  }
+
+  // monotonic describes the Monotonic refinement of values this metric has.
+  Monotonic monotonic = 6;
+
+  // Domain is a refinement of the values a metric has. It describes the set
+  // of numbers metric values belong to, if any.
+  enum Domain {
+    // DOMAIN_UNSPECIFIED is the default, and means the metric values do
+    // not belong to any particular domain other than the Type itself.
+    DOMAIN_UNSPECIFIED = 0;
+
+    // NONNEGATIVE is the set of numbers greater than or equal to zero.
+    NONNEGATIVE = 1;
+  }
+
+  // domain describes the Domain refinement of values this metric has.
+  Domain domain = 7;
+
   // The set of labels associated with the metric descriptor. Labels in this list apply to
   // all data points.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 5;
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 8;
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
