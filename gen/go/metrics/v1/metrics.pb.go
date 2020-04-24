@@ -168,10 +168,10 @@ func (MetricDescriptor_Temporality) EnumDescriptor() ([]byte, []int) {
 }
 
 // Monotonic is a refinement of the values a metric has. It defines the
-// relationship values of successively reported metrics have
+// relationship between values of successively reported metrics
 // (non-decreasing or unknown). This is a refinement of the metric values
 // that can be useful for a receiver in understanding how to deal with
-// discontinuities in the data (i.e.  calculating derivates of the data
+// discontinuities in the data (i.e. calculating derivates of the data
 // without introducing artifacts from a reset).
 type MetricDescriptor_Monotonic int32
 
