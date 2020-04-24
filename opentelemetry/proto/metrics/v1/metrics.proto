@@ -134,11 +134,9 @@ message MetricDescriptor {
     // A Metric of this Type MUST store its values as DoubleDataPoint.
     DOUBLE = 2;
 
-    // Histogram cumulative measurement.
-    // Corresponding values are stored in HistogramDataPoint. The count and sum of the
-    // histogram cannot decrease; if values are reset then start_time_unix_nano
-    // should also be reset to the new start timestamp.
-    CUMULATIVE_HISTOGRAM = 3;
+    // Histogram measurement.
+    // Corresponding values are stored in HistogramDataPoint.
+    HISTOGRAM = 3;
 
     // Summary value. Some frameworks implemented Histograms as a summary of observations
     // (usually things like request durations and response sizes). While it
