@@ -118,49 +118,27 @@ message MetricDescriptor {
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // Type of the metric. It describes how the data is reported.
-  //
-  // A gauge is an instantaneous measurement of a value.
-  //
-  // A counter/cumulative measurement is a value accumulated over a time
-  // interval. In a time series, cumulative measurements should have the same
-  // start time, increasing values, until an event resets the cumulative value
-  // to zero and sets a new start time for the subsequent points.
+  // Type is the type of values a metric has.
   enum Type {
-    // Do not use this default value.
-    UNSPECIFIED = 0;
+    // TYPE_INVALID is the default Type, it MUST not be used.
+    TYPE_INVALID = 0;
 
-    // Integer gauge. The value can go both up and down over time.
-    // Corresponding values are stored in Int64DataPoint.
-    GAUGE_INT64 = 1;
+    // INT64 values are represents as signed 64-bit integers.
+    //
+    // A Metric of this Type MUST store its values as Int64DataPoint.
+    INT64 = 1;
 
-    // Floating point gauge. The value can go both up and down over time.
-    // Corresponding values are stored in DoubleDataPoint.
-    GAUGE_DOUBLE = 2;
-
-    // Histogram gauge measurement.
-    // Used in scenarios like a snapshot of time that current items in a queue
-    // have spent there.
-    // Corresponding values are stored in HistogramDataPoint. The count and sum of the
-    // histogram can go both up and down over time. Recorded values are always >= 0.
-    GAUGE_HISTOGRAM = 3;
-
-    // Integer counter measurement. The value cannot decrease; if value is reset then
-    // start_time_unix_nano should also be reset.
-    // Corresponding values are stored in Int64DataPoint.
-    COUNTER_INT64 = 4;
-
-    // Floating point counter measurement. The value cannot decrease, if
-    // resets then the start_time_unix_nano should also be reset.
-    // Recorded values are always >= 0.
-    // Corresponding values are stored in DoubleDataPoint.
-    COUNTER_DOUBLE = 5;
+    // DOUBLE values are represents as double-precision floating-point
+    // numbers.
+    //
+    // A Metric of this Type MUST store its values as DoubleDataPoint.
+    DOUBLE = 2;
 
     // Histogram cumulative measurement.
     // Corresponding values are stored in HistogramDataPoint. The count and sum of the
     // histogram cannot decrease; if values are reset then start_time_unix_nano
     // should also be reset to the new start timestamp.
-    CUMULATIVE_HISTOGRAM = 6;
+    CUMULATIVE_HISTOGRAM = 3;
 
     // Summary value. Some frameworks implemented Histograms as a summary of observations
     // (usually things like request durations and response sizes). While it
@@ -168,8 +146,10 @@ message MetricDescriptor {
     // values, it calculates configurable percentiles over a sliding time
     // window.
     // Corresponding values are stored in SummaryDataPoint.
-    SUMMARY = 7;
+    SUMMARY = 4;
   }
+
+  // type is the type of values this metric has.
   Type type = 4;
 
   // Temporality is the temporal quality values of a metric have. It
