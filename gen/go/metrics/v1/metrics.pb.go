@@ -84,7 +84,8 @@ const (
 	MetricDescriptor_TEMPORALITY_INVALID MetricDescriptor_Temporality = 0
 	// INSTANTANEOUS is a metric whose values are measured at a particular
 	// instant. The values are not aggregated over any time interval and are
-	// unique per timestamp.
+	// unique per timestamp. As such, these metrics are not expected to have
+	// an associated start time.
 	MetricDescriptor_INSTANTANEOUS MetricDescriptor_Temporality = 1
 	// DELTA is a metric whose values are the aggregation of measurements
 	// made over a time interval. Successive metrics contain aggregation of

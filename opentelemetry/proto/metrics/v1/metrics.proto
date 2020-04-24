@@ -160,7 +160,8 @@ message MetricDescriptor {
 
     // INSTANTANEOUS is a metric whose values are measured at a particular
     // instant. The values are not aggregated over any time interval and are
-    // unique per timestamp.
+    // unique per timestamp. As such, these metrics are not expected to have
+    // an associated start time.
     INSTANTANEOUS = 1;
 
     // DELTA is a metric whose values are the aggregation of measurements
