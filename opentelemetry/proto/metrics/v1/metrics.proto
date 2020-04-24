@@ -172,7 +172,7 @@ message MetricDescriptor {
     // previous measurements like is the case for CUMULATIVE metrics.
     //
     // For example, consider a system measuring the number of requests that
-    // it receives every second and reports the sum of these requests as a
+    // it receives and reports the sum of these requests every second as a
     // DELTA metric:
     //
     //   1. The system starts receiving at time=t_0.
