@@ -199,7 +199,7 @@ message MetricDescriptor {
     // reported measurement time sent MUST be used.
     //
     // For example, consider a system measuring the number of requests that
-    // it receives every second and reports the sum of these requests as a
+    // it receives and reports the sum of these requests every second as a
     // CUMULATIVE metric:
     //
     //   1. The system starts receiving at time=t_0.
