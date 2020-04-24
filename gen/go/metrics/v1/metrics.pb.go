@@ -121,7 +121,7 @@ const (
 	// reported measurement time sent MUST be used.
 	//
 	// For example, consider a system measuring the number of requests that
-	// it receives every second and reports the sum of these requests as a
+	// it receives and reports the sum of these requests every second as a
 	// CUMULATIVE metric:
 	//
 	//   1. The system starts receiving at time=t_0.
@@ -169,10 +169,10 @@ func (MetricDescriptor_Temporality) EnumDescriptor() ([]byte, []int) {
 
 // Monotonic is a refinement of the values a metric has. It defines the
 // relationship values of successively reported metrics have
-// (non-increasing, non-decreasing, or unknown). This is a refinement of
-// the metric values that can be useful for a receiver in understanding
-// how to deal with discontinuities in the data (i.e.  calculating
-// derivates of the data without introducing artifacts from a reset).
+// (non-decreasing or unknown). This is a refinement of the metric values
+// that can be useful for a receiver in understanding how to deal with
+// discontinuities in the data (i.e.  calculating derivates of the data
+// without introducing artifacts from a reset).
 type MetricDescriptor_Monotonic int32
 
 const (
