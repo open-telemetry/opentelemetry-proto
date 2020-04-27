@@ -42,5 +42,5 @@ gen-java:
 .PHONY: gen-swagger
 gen-swagger:
 	mkdir -p $(OPENAPI_OUTDIR)
-	protoc --plugin=protoc-gen-swagger=/usr/bin/protoc-gen-swagger --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:$(OPENAPI_OUTDIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
-	protoc --plugin=protoc-gen-swagger=/usr/bin/protoc-gen-swagger --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:$(OPENAPI_OUTDIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
+	protoc --plugin=protoc-gen-swagger=/usr/local/bin/protoc-gen-swagger --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:$(OPENAPI_OUTDIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
+	protoc --plugin=protoc-gen-swagger=/usr/local/bin/protoc-gen-swagger --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:$(OPENAPI_OUTDIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
