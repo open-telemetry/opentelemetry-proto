@@ -14,7 +14,7 @@ Install manually or use:
 - `install-proto.sh` (if on Linux).
     - Requires: `bash`, `wget`, `unzip`, `go`, and `sudo`.
     - The default install directory is `/usr/local` for all downloaded binaries and libraries.
-      This location can be overridden by passing a alternate location to the script.
+      This location can be overridden by passing an alternate location to the script.
       For example installing artifacts in `/opt`:
       ```
       ./install-proto.sh /opt
