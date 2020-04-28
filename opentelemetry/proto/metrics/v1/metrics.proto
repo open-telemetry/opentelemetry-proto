@@ -227,9 +227,39 @@ message MetricDescriptor {
   // temporality is the Temporality of values this metric has.
   Temporality temporality = 5;
 
+  // Monotonic describes the relationship between successively reported
+  // values of a metric (i.e. values of a metric with the same labels are
+  // non-decreasing).
+  //
+  // This refinement of metric values can be useful in understanding how to
+  // deal with discontinuities in the data (i.e. calculating rates of the
+  // data without introducing artifacts from a reset).
+  //
+  // This refinement is not coupled to any of the other metric qualities.
+  // For example, a CUMULATIVE metric is not implicitly NONDECREASING. This
+  // decoupling is needed in order for this protocol to agonistically
+  // transport metrics. However, it is important to note this diverges from
+  // some other metric systems (e.g Prometheus).
+  enum Monotonic {
+    // UNSPECIFIED_MONOTONIC is the default, and means the monotonic nature
+    // of the metric values is unknown.
+    UNSPECIFIED_MONOTONIC = 0;
+
+    // NONDECREASING means all the successive metric values increase or
+    // remain constant.
+    NONDECREASING = 1;
+
+    // NONINCREASING is currently omitted due to the lack of a known
+    // use-case. If you have a fitting use-case please open an issue to add
+    // this Monotonic value.
+  }
+
+  // monotonic describes the Monotonic refinement of values this metric has.
+  Monotonic monotonic = 6;
+
   // The set of labels associated with the metric descriptor. Labels in this list apply to
   // all data points.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 6;
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 7;
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
