@@ -256,10 +256,6 @@ message MetricDescriptor {
 
   // monotonic describes the Monotonic refinement of values this metric has.
   Monotonic monotonic = 6;
-
-  // The set of labels associated with the metric descriptor. Labels in this list apply to
-  // all data points.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 7;
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
