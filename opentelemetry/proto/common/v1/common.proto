@@ -68,10 +68,3 @@ message StringKeyValue {
   string key = 1;
   string value = 2;
 }
-
-// InstrumentationLibrary is a message representing the instrumentation library information
-// such as the fully qualified name and version. 
-message InstrumentationLibrary {
-  string name = 1;
-  string version = 2;
-}
