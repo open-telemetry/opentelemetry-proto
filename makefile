@@ -38,6 +38,13 @@ gen-java:
 	mkdir -p ./$(GENDIR)/java
 	$(foreach file,$(PROTO_FILES),$(call exec-command, protoc --java_out=./$(GENDIR)/java $(file)))
 
+# Generate ProtoBuf implementation for Python.
+.PHONY: gen-python
+gen-python:
+	rm -rf ./$(GENDIR)/python
+	mkdir -p ./$(GENDIR)/python
+	$(foreach file,$(PROTO_FILES),$(call exec-command,protoc --python_out=./$(GENDIR)/python $(file)))
+
 # Generate Swagger
 .PHONY: gen-swagger
 gen-swagger:
