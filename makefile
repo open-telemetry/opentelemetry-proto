@@ -43,7 +43,9 @@ gen-java:
 gen-python:
 	rm -rf ./$(GENDIR)/python
 	mkdir -p ./$(GENDIR)/python
-	$(foreach file,$(PROTO_FILES),$(call exec-command,protoc --python_out=./$(GENDIR)/python $(file)))
+	$(foreach file,$(PROTO_FILES),$(call exec-command, protoc --python_out=./$(GENDIR)/python $(file)))
+	python -m grpc_tools.protoc -I ./ --python_out=./$(GENDIR)/python --grpc_python_out=./$(GENDIR)/python opentelemetry/proto/collector/trace/v1/trace_service.proto
+	python -m grpc_tools.protoc -I ./ --python_out=./$(GENDIR)/python --grpc_python_out=./$(GENDIR)/python opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 
 # Generate Swagger
 .PHONY: gen-swagger
