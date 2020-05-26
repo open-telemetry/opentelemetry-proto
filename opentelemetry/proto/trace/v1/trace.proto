@@ -170,9 +170,11 @@ message Span {
     // time_unix_nano is the time the event occurred.
     fixed64 time_unix_nano = 1;
 
-    // name of the event.
-    // This field is semantically required to be set to non-empty string.
-    string name = 2;
+    // Short event identifier that does not contain varying parts. short_name describes
+    // what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
+    // characters. Not guaranteed to be unique in any way. Typically used for filtering
+    // and grouping purposes in backends. This field is optional.
+    string short_name = 2;
 
     // attributes is a collection of attribute key/value pairs on the event.
     repeated opentelemetry.proto.common.v1.AttributeKeyValue attributes = 3;
