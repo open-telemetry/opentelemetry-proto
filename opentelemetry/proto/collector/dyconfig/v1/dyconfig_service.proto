@@ -1,0 +1,98 @@
+// Copyright 2019, OpenTelemetry Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package opentelemetry.proto.collector.dyconfig.v1;
+
+import "opentelemetry/proto/resource/v1/resource.proto";
+
+option java_multiple_files = true;
+option java_package = "io.opentelemetry.proto.collector.dyconfig.v1";
+option java_outer_classname = "DyconfigServiceProto";
+option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/collector/dyconfig/v1";
+
+// DynamicConfig is a service that enables updating metric schedules, trace
+// parameters, and other configurations on an agent/SDK without having to
+// restart the instrumented application.
+service DynamicConfig {
+  rpc GetConfig (ConfigRequest) returns (ConfigResponse);
+}
+
+message ConfigRequest{
+  // Describe the version of the CS protocol to use. Required.
+  int32 version = 1;
+
+  // The resource whose config we are interested in.
+  opentelemetry.proto.resource.v1.Resource resource = 2;
+
+  // Optional. Identifies the last configuration version number
+  int32 last_config_fp = 3;
+
+  // An opaque string subject to client’s interpretation.
+  // Can includes encoded metadata such as replication level,
+  // traffic class, target information
+  string metadata = 4;
+}
+
+message ConfigResponse {
+  // Describe the version of the CS protocol to use. Should match the
+  // request’s version.
+  int32 version = 1;
+
+  // Tell the last configuration’s fingerprint. Required.
+  int32 config_fp = 2;
+
+  // Configs specific to metrics. Configs specific to traces should
+  // be a separate sub-message type.
+  message MetricConfig {
+
+    // Schedule is used to apply a particular scheduling configuration to
+    // a metric
+    message Schedule {
+      // this schedule is applied to metric names that follow this pattern
+      string metric_pattern = 1;  // Regexp
+
+      // Collection period (in seconds). Should be one of the following:
+      // * 30 seconds
+      // * 1 minute
+      // * 5 minutes
+      // * 10 minutes
+      // * 30 minutes
+      // * 1 hour
+      // * 4 hours
+      // * 12 hours
+      // * 1 day
+      // etc.
+      // Please ensure that all longer periods are divisible by all shorter
+      // ones.
+      int32 period = 2;
+
+      // Additional metadata associated with the schedule
+      string properties = 3;
+    }
+
+    repeated Schedule collecting_schedules = 1;
+
+    // A list of patterns to match metric names. Any metric
+    // matching any of this pattern should not be collected.
+    repeated string blacklist_patterns = 2;
+  }
+
+  MetricConfig metric_config = 3;
+
+  // Client is suggested to wait this long (in seconds) before pinging the
+  // configuration service again.
+  int32 suggested_wait_time = 4;
+}
