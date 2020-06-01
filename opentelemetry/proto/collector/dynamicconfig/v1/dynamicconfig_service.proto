@@ -14,14 +14,14 @@
 
 syntax = "proto3";
 
-package opentelemetry.proto.collector.dyconfig.v1;
+package opentelemetry.proto.collector.dynamicconfig.v1;
 
 import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
-option java_package = "io.opentelemetry.proto.collector.dyconfig.v1";
-option java_outer_classname = "DyconfigServiceProto";
-option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/collector/dyconfig/v1";
+option java_package = "io.opentelemetry.proto.collector.dynamicconfig.v1";
+option java_outer_classname = "DynamicConfigServiceProto";
+option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/collector/dynamicconfig/v1";
 
 // DynamicConfig is a service that enables updating metric schedules, trace
 // parameters, and other configurations on an agent/SDK without having to
