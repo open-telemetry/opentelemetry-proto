@@ -123,20 +123,31 @@ message MetricDescriptor {
     // INVALID_TYPE is the default Type, it MUST not be used.
     INVALID_TYPE = 0;
 
-    // INT64 values are represents as signed 64-bit integers.
+    // INT64 values are signed 64-bit integers.
     //
     // A Metric of this Type MUST store its values as Int64DataPoint.
     INT64 = 1;
 
-    // DOUBLE values are represents as double-precision floating-point
-    // numbers.
+    // MONOTONIC_INT64 values are monotonically increasing signed 64-bit
+    // integers.
+    //
+    // A Metric of this Type MUST store its values as Int64DataPoint.
+    MONOTONIC_INT64 = 2;
+
+    // DOUBLE values are double-precision floating-point numbers.
     //
     // A Metric of this Type MUST store its values as DoubleDataPoint.
-    DOUBLE = 2;
+    DOUBLE = 3;
+
+    // MONOTONIC_DOUBLE values are monotonically increasing double-precision
+    // floating-point numbers.
+    //
+    // A Metric of this Type MUST store its values as DoubleDataPoint.
+    MONOTONIC_DOUBLE = 4;
 
     // Histogram measurement.
     // Corresponding values are stored in HistogramDataPoint.
-    HISTOGRAM = 3;
+    HISTOGRAM = 5;
 
     // Summary value. Some frameworks implemented Histograms as a summary of observations
     // (usually things like request durations and response sizes). While it
@@ -144,7 +155,7 @@ message MetricDescriptor {
     // values, it calculates configurable percentiles over a sliding time
     // window.
     // Corresponding values are stored in SummaryDataPoint.
-    SUMMARY = 4;
+    SUMMARY = 6;
   }
 
   // type is the type of values this metric has.
