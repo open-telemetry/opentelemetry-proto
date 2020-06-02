@@ -69,12 +69,14 @@ message ConfigResponse {
   message MetricConfig {
 
     // A schedule is used to apply a particular scheduling configuration to
-    // a metric
+    // a metric. Order is important -- a metric that matches multiple
+    // schedules will take on the configurations specified in the first match.
     message Schedule {
 
       // Metrics with names that match the inclusion_pattern are targeted by
       // this schedule. Metrics that match the exclusion_pattern are not
       // targeted for this schedule, even if they match the inclusion pattern.
+      // A pattern should not exceded 120 characters.
       string inclusion_pattern = 1;
       string exclusion_pattern = 2;
 
