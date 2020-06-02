@@ -25,74 +25,97 @@ option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/collec
 
 // DynamicConfig is a service that enables updating metric schedules, trace
 // parameters, and other configurations on an agent/SDK without having to
-// restart the instrumented application.
+// restart the instrumented application. The server itself is hosted on the
+// collector. In this way, the collector may act as a bridge between third-
+// party configuration services and the agent/sdk, piping updated configs
+// from a third-party source (or itself) to an instrumented application.
 service DynamicConfig {
   rpc GetConfig (ConfigRequest) returns (ConfigResponse);
 }
 
 message ConfigRequest{
-  // Describe the version of the CS protocol to use. Required.
-  int32 version = 1;
+  // Describes the version of the config service protocol to use. Required.
+  int32 proto_version = 1;
 
-  // The resource whose config we are interested in.
+  // The target resource. This resource pings the config server requesting
+  // updated configs, and the server responds with the config information.
   opentelemetry.proto.resource.v1.Resource resource = 2;
 
-  // Optional. Identifies the last configuration version number
-  int32 last_config_fp = 3;
+  // Optional. Identifies the last configuration fingerprint / version number.
+  // The fingerprint serves as a quick way for the config server to determine
+  // whether an update to the configs had occurred -- if the client request's
+  // fingerprint differs from the server's, then the server knows that a change
+  // had occured and an updated configuration should be sent.
+  int32 last_fingerprint = 3;
 
-  // An opaque string subject to client’s interpretation.
-  // Can includes encoded metadata such as replication level,
-  // traffic class, target information
+  // An opaque string subject to individual implementation interpretation.
+  // Responsability to interpret and check safety of metadata falls on the
+  // specific implementation.
   string metadata = 4;
 }
 
 message ConfigResponse {
-  // Describe the version of the CS protocol to use. Should match the
-  // request’s version.
-  int32 version = 1;
+  // Describe the version of the config service protocol to use. Should match
+  // the request’s version.
+  int32 proto_version = 1;
 
-  // Tell the last configuration’s fingerprint. Required.
-  int32 config_fp = 2;
+  // The fingerprint associated with the current config settings. Each change in
+  // configs yields a different fingerpting. The client may cache a fingerprint,
+  // then return it on the next request to enable the server to quickly check
+  // whether a change in the configs occured.
+  int32 fingerprint = 2;
 
-  // Configs specific to metrics. Configs specific to traces should
-  // be a separate sub-message type.
+  // Configs specific to metric, namely the metric collection schedule
   message MetricConfig {
 
-    // Schedule is used to apply a particular scheduling configuration to
+    // A schedule is used to apply a particular scheduling configuration to
     // a metric
     message Schedule {
-      // this schedule is applied to metric names that follow this pattern
-      string metric_pattern = 1;  // Regexp
 
-      // Collection period (in seconds). Should be one of the following:
-      // * 30 seconds
-      // * 1 minute
-      // * 5 minutes
-      // * 10 minutes
-      // * 30 minutes
-      // * 1 hour
-      // * 4 hours
-      // * 12 hours
-      // * 1 day
-      // etc.
-      // Please ensure that all longer periods are divisible by all shorter
-      // ones.
-      int32 period = 2;
+      // Metrics with names that match the inclusion_pattern are targeted by
+      // this schedule. Metrics that match the exclusion_pattern are not
+      // targeted for this schedule, even if they match the inclusion pattern.
+      string inclusion_pattern = 1;
+      string exclusion_pattern = 2;
 
-      // Additional metadata associated with the schedule
-      string properties = 3;
+      // CollectionPeriod describes the sampling period for each metric. All
+      // larger units are divisible by all smaller ones.
+      enum CollectionPeriod {
+        NONE = 0;   // For non-periodic data. Client decides when to send points
+        SEC_1 = 1;
+        SEC_5 = 5;
+        SEC_10 = 10;
+        SEC_30 = 30;
+        MIN_1 = 60;
+        MIN_5 = 300;
+        MIN_10 = 600;
+        MIN_30 = 1800;
+        HR_1 = 3600;
+        HR_2 = 7200;
+        HR_4 = 14400;
+        HR_12 = 43200;
+        DAY_1 = 86400;
+        DAY_7 = 604800;
+      }
+      CollectionPeriod period = 3;
+
+      // Additional metadata associated with the schedule. Responsability to
+      // interpret and check safety of metadata falls on the specific
+      // implementation
+      string metadata = 4;
     }
 
     repeated Schedule collecting_schedules = 1;
 
-    // A list of patterns to match metric names. Any metric
-    // matching any of this pattern should not be collected.
-    repeated string blacklist_patterns = 2;
   }
-
   MetricConfig metric_config = 3;
 
-  // Client is suggested to wait this long (in seconds) before pinging the
+  message TraceConfig {
+    // TODO: unimplemented
+  }
+  TraceConfig trace_config = 4;
+
+  // The client is suggested to wait this long (in seconds) before pinging the
   // configuration service again.
-  int32 suggested_wait_time = 4;
+  int32 suggested_wait_time = 5;
 }
