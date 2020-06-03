@@ -46,7 +46,7 @@ message ConfigRequest{
   // whether an update to the configs had occurred -- if the client request's
   // fingerprint differs from the server's, then the server knows that a change
   // had occured and an updated configuration should be sent.
-  int32 last_fingerprint = 3;
+  string last_fingerprint = 3;
 
   // An opaque string subject to individual implementation interpretation.
   // Responsability to interpret and check safety of metadata falls on the
@@ -60,10 +60,10 @@ message ConfigResponse {
   int32 proto_version = 1;
 
   // The fingerprint associated with the current config settings. Each change in
-  // configs yields a different fingerpting. The client may cache a fingerprint,
+  // configs yields a different fingerprint. The client may cache a fingerprint,
   // then return it on the next request to enable the server to quickly check
   // whether a change in the configs occured.
-  int32 fingerprint = 2;
+  string fingerprint = 2;
 
   // Configs specific to metric, namely the metric collection schedule
   message MetricConfig {
@@ -73,12 +73,29 @@ message ConfigResponse {
     // schedules will take on the configurations specified in the first match.
     message Schedule {
 
-      // Metrics with names that match the inclusion_pattern are targeted by
-      // this schedule. Metrics that match the exclusion_pattern are not
-      // targeted for this schedule, even if they match the inclusion pattern.
-      // A pattern should not exceded 120 characters.
-      string inclusion_pattern = 1;
-      string exclusion_pattern = 2;
+      // MetricNamePattern dictates a light-weight pattern that can match 1 or
+      // more metrics, for which this schedule will apply.
+      message MetricNamePattern {
+
+        // pattern is a string used to match against metric names. A pattern
+        // should not exceed 100k characters.
+        string pattern = 1;
+
+        // PatternType refers to the kind of matching that this pattern will
+        // perform.
+        enum PatternType {
+          EQUALS = 0;       // matches the metric name exactly
+          STARTS_WITH = 1;  // prefix matches the metric name
+        }
+        PatternType pattern_type = 2;
+      }
+
+      // Metrics with names that match a rule in the inclusion_patterns are
+      // targeted by this schedule. Metrics that match the exclusion_patterns
+      // are not targeted for this schedule, even if they match an inclusion
+      // pattern.
+      repeated MetricNamePattern inclusion_patterns = 1;
+      repeated MetricNamePattern exclusion_patterns = 2;
 
       // CollectionPeriod describes the sampling period for each metric. All
       // larger units are divisible by all smaller ones.
