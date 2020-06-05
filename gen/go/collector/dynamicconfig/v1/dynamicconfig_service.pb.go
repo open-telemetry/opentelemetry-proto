@@ -246,6 +246,24 @@ func (m *ConfigResponse) GetSuggestedWaitTime() int32 {
 
 // Configs specific to metric, namely the metric collection schedule
 type ConfigResponse_MetricConfig struct {
+	// A single metric may match multiple schedules. This behavior enables a use
+	// case in which metadata properties may distinguish different collection
+	// periods for the same metric.
+	//
+	// For example, suppose an implementation uses a "traffic class" metadata
+	// property to determine the priority given to sampling a certain metric.
+	// Then a schedule may be applied in which a metric is sampled with high
+	// priority at an infrequent period, but with low priority at a frequent
+	// period.
+	//
+	// In the event no distinguishing metadata is applied to a metric that
+	// mutches multiple schedules, the schedule that specifies the smallest
+	// period is applied.
+	//
+	// Note, for optimization purposes, it is best practice to use as few
+	// schedules as possible to capture all required metric updates. Where you
+	// can be conservative, do take full advantage of the inclusion/exclusion
+	// patterns to capture as much of your targeted metrics.
 	Schedules            []*ConfigResponse_MetricConfig_Schedule `protobuf:"bytes,1,rep,name=schedules,proto3" json:"schedules,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                `json:"-"`
 	XXX_unrecognized     []byte                                  `json:"-"`
@@ -285,19 +303,8 @@ func (m *ConfigResponse_MetricConfig) GetSchedules() []*ConfigResponse_MetricCon
 }
 
 // A Schedule is used to apply a particular scheduling configuration to
-// a metric. A single metric may match multiple schedules. This behavior
-// enables a use case in which metadata properties may distinguish different
-// collection periods for the same metric.
-//
-// For example, suppose an implementation uses a "traffic class" metadata
-// property to determine the priority given to sampling a certain metric.
-// Then a schedule may be applied in which a metric is sampled with high
-// priority at an infrequent period, but with low priority at a frequent
-// period.
-//
-// In the event no distinguishing metadata is applied to a metric that
-// mutches multiple schedules, the schedule that specifies the smallest
-// period is applied.
+// a metric. If a metric name matches a schedule's patterns, then the metric
+// adopts the configuration specified by the scheduel.
 type ConfigResponse_MetricConfig_Schedule struct {
 	// Metrics with names that match a rule in the inclusion_patterns are
 	// targeted by this schedule. Metrics that match the exclusion_patterns

@@ -69,19 +69,8 @@ message ConfigResponse {
   message MetricConfig {
 
     // A Schedule is used to apply a particular scheduling configuration to
-    // a metric. A single metric may match multiple schedules. This behavior
-    // enables a use case in which metadata properties may distinguish different
-    // collection periods for the same metric.
-    //
-    // For example, suppose an implementation uses a "traffic class" metadata
-    // property to determine the priority given to sampling a certain metric.
-    // Then a schedule may be applied in which a metric is sampled with high
-    // priority at an infrequent period, but with low priority at a frequent
-    // period.
-    //
-    // In the event no distinguishing metadata is applied to a metric that
-    // mutches multiple schedules, the schedule that specifies the smallest
-    // period is applied.
+    // a metric. If a metric name matches a schedule's patterns, then the metric
+    // adopts the configuration specified by the scheduel.
     message Schedule {
 
       // Pattern dictates a light-weight pattern that can match 1 or more
@@ -128,6 +117,24 @@ message ConfigResponse {
       string metadata = 4;
     }
 
+    // A single metric may match multiple schedules. This behavior enables a use
+    // case in which metadata properties may distinguish different collection
+    // periods for the same metric.
+    //
+    // For example, suppose an implementation uses a "traffic class" metadata
+    // property to determine the priority given to sampling a certain metric.
+    // Then a schedule may be applied in which a metric is sampled with high
+    // priority at an infrequent period, but with low priority at a frequent
+    // period.
+    //
+    // In the event no distinguishing metadata is applied to a metric that
+    // mutches multiple schedules, the schedule that specifies the smallest
+    // period is applied.
+    //
+    // Note, for optimization purposes, it is best practice to use as few
+    // schedules as possible to capture all required metric updates. Where you
+    // can be conservative, do take full advantage of the inclusion/exclusion
+    // patterns to capture as much of your targeted metrics.
     repeated Schedule schedules = 1;
 
   }
