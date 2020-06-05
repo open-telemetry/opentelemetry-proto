@@ -23,12 +23,11 @@ option java_package = "io.opentelemetry.proto.collector.dynamicconfig.v1";
 option java_outer_classname = "DynamicConfigServiceProto";
 option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/collector/dynamicconfig/v1";
 
-// DynamicConfig is a service that enables updating metric schedules, trace
-// parameters, and other configurations on an agent/SDK without having to
-// restart the instrumented application. The server itself is hosted on the
-// collector. In this way, the collector may act as a bridge between third-
-// party configuration services and the agent/sdk, piping updated configs
-// from a third-party source (or itself) to an instrumented application.
+// DynamicConfig is a service on the collector that enables updating metric
+// schedules, trace parameters, and other configurations on an agent/SDK without
+// having to restart the instrumented application. The collector may also act as
+// a bridge between third-party configuration services and the agent/sdk, piping
+// updated configs from a third-party source to an instrumented application.
 service DynamicConfig {
   rpc GetConfig (ConfigRequest) returns (ConfigResponse);
 }
@@ -45,27 +44,28 @@ message ConfigRequest{
   // The fingerprint serves as a quick way for the config server to determine
   // whether an update to the configs had occurred -- if the client request's
   // fingerprint differs from the server's, then the server knows that a change
-  // had occured and an updated configuration should be sent.
+  // had occurred and an updated configuration should be sent.
   string last_fingerprint = 3;
 }
 
 message ConfigResponse {
-  // Describe the version of the config service protocol to use. Should match
+  // Describes the version of the config service protocol to use. Should match
   // the request’s version.
   int32 proto_version = 1;
 
-  // The fingerprint associated with the current config settings. Each change in
-  // configs yields a different fingerprint. The client may cache a fingerprint,
-  // then return it on the next request to enable the server to quickly check
-  // whether a change in the configs occured.
+  // Optional. The fingerprint associated with the current config settings. Each
+  // change in configs yields a different fingerprint. The client may cache a
+  // fingerprint, then return it on the next request to enable the server to
+  // quickly check whether a change in the configs occurred. If no changes
+  // occurred, then all other fields in the response are optional.
   string fingerprint = 2;
 
-  // Configs specific to metrics, namely the metric collection schedule
+  // Dynamic configs specific to metrics, namely the metric collection schedule
   message MetricConfig {
 
     // A Schedule is used to apply a particular scheduling configuration to
     // a metric. If a metric name matches a schedule's patterns, then the metric
-    // adopts the configuration specified by the scheduel.
+    // adopts the configuration specified by the schedule.
     message Schedule {
 
       // Pattern dictates a light-weight pattern that can match 1 or more
@@ -106,9 +106,21 @@ message ConfigResponse {
       }
       CollectionPeriod period = 3;
 
-      // Additional metadata associated with the schedule. Responsability to
-      // interpret and check safety of metadata falls on the specific
-      // implementation
+      // Optional. Additional opaque metadata associated with the schedule.
+      // Interpreting metadata is implementation specific. A metric backend may
+      // implement features not directly supported in this configuration
+      // protocol, but still desire to communicate these settings to
+      // instrumented applications. An application may in turn piggyback
+      // metadata on a vendor's metric exporter to communicate information back
+      // to its metric backend. In this way, metadata offers a channel to
+      // communicate custom settings.
+      //
+      // Example use cases may include:
+      //  * Specifying quality-of-service priority
+      //  * Tweaking configurations beyond collection period
+      //  * Using alternate representations for collection schedules, matching
+      //    metrics, resources, etc.
+      //  * Enabling other optimizations
       string metadata = 4;
     }
 
@@ -118,12 +130,12 @@ message ConfigResponse {
     //
     // For example, suppose an implementation uses a "traffic class" metadata
     // property to determine the priority given to sampling a certain metric.
-    // Then a schedule may be applied in which a metric is sampled with high
-    // priority at an infrequent period, but with low priority at a frequent
-    // period.
+    // Then one schedule may be applied in which a metric is sampled with high
+    // priority at an infrequent period, but another schedule may be applied
+    // with low priority at a frequent period.
     //
     // In the event no distinguishing metadata is applied to a metric that
-    // mutches multiple schedules, the schedule that specifies the smallest
+    // matches multiple schedules, the schedule that specifies the smallest
     // period is applied.
     //
     // Note, for optimization purposes, it is best practice to use as few
@@ -135,12 +147,13 @@ message ConfigResponse {
   }
   MetricConfig metric_config = 3;
 
+  // Dynamic configs specific to trace, like sampling rate of a resource.
   message TraceConfig {
     // TODO: unimplemented
   }
   TraceConfig trace_config = 4;
 
-  // The client is suggested to wait this long (in seconds) before pinging the
-  // configuration service again.
+  // Optional. The client is suggested to wait this long (in seconds) before
+  // pinging the configuration service again.
   int32 suggested_wait_time = 5;
 }

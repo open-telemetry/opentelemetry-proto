@@ -101,7 +101,7 @@ type ConfigRequest struct {
 	// The fingerprint serves as a quick way for the config server to determine
 	// whether an update to the configs had occurred -- if the client request's
 	// fingerprint differs from the server's, then the server knows that a change
-	// had occured and an updated configuration should be sent.
+	// had occurred and an updated configuration should be sent.
 	LastFingerprint      string   `protobuf:"bytes,3,opt,name=last_fingerprint,json=lastFingerprint,proto3" json:"last_fingerprint,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -155,18 +155,19 @@ func (m *ConfigRequest) GetLastFingerprint() string {
 }
 
 type ConfigResponse struct {
-	// Describe the version of the config service protocol to use. Should match
+	// Describes the version of the config service protocol to use. Should match
 	// the request’s version.
 	ProtoVersion int32 `protobuf:"varint,1,opt,name=proto_version,json=protoVersion,proto3" json:"proto_version,omitempty"`
-	// The fingerprint associated with the current config settings. Each change in
-	// configs yields a different fingerprint. The client may cache a fingerprint,
-	// then return it on the next request to enable the server to quickly check
-	// whether a change in the configs occured.
+	// Optional. The fingerprint associated with the current config settings. Each
+	// change in configs yields a different fingerprint. The client may cache a
+	// fingerprint, then return it on the next request to enable the server to
+	// quickly check whether a change in the configs occurred. If no changes
+	// occurred, then all other fields in the response are optional.
 	Fingerprint  string                       `protobuf:"bytes,2,opt,name=fingerprint,proto3" json:"fingerprint,omitempty"`
 	MetricConfig *ConfigResponse_MetricConfig `protobuf:"bytes,3,opt,name=metric_config,json=metricConfig,proto3" json:"metric_config,omitempty"`
 	TraceConfig  *ConfigResponse_TraceConfig  `protobuf:"bytes,4,opt,name=trace_config,json=traceConfig,proto3" json:"trace_config,omitempty"`
-	// The client is suggested to wait this long (in seconds) before pinging the
-	// configuration service again.
+	// Optional. The client is suggested to wait this long (in seconds) before
+	// pinging the configuration service again.
 	SuggestedWaitTime    int32    `protobuf:"varint,5,opt,name=suggested_wait_time,json=suggestedWaitTime,proto3" json:"suggested_wait_time,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -233,7 +234,7 @@ func (m *ConfigResponse) GetSuggestedWaitTime() int32 {
 	return 0
 }
 
-// Configs specific to metrics, namely the metric collection schedule
+// Dynamic configs specific to metrics, namely the metric collection schedule
 type ConfigResponse_MetricConfig struct {
 	// A single metric may match multiple schedules. This behavior enables a use
 	// case in which metadata properties may distinguish different collection
@@ -241,12 +242,12 @@ type ConfigResponse_MetricConfig struct {
 	//
 	// For example, suppose an implementation uses a "traffic class" metadata
 	// property to determine the priority given to sampling a certain metric.
-	// Then a schedule may be applied in which a metric is sampled with high
-	// priority at an infrequent period, but with low priority at a frequent
-	// period.
+	// Then one schedule may be applied in which a metric is sampled with high
+	// priority at an infrequent period, but another schedule may be applied
+	// with low priority at a frequent period.
 	//
 	// In the event no distinguishing metadata is applied to a metric that
-	// mutches multiple schedules, the schedule that specifies the smallest
+	// matches multiple schedules, the schedule that specifies the smallest
 	// period is applied.
 	//
 	// Note, for optimization purposes, it is best practice to use as few
@@ -293,7 +294,7 @@ func (m *ConfigResponse_MetricConfig) GetSchedules() []*ConfigResponse_MetricCon
 
 // A Schedule is used to apply a particular scheduling configuration to
 // a metric. If a metric name matches a schedule's patterns, then the metric
-// adopts the configuration specified by the scheduel.
+// adopts the configuration specified by the schedule.
 type ConfigResponse_MetricConfig_Schedule struct {
 	// Metrics with names that match a rule in the inclusion_patterns are
 	// targeted by this schedule. Metrics that match the exclusion_patterns
@@ -302,9 +303,21 @@ type ConfigResponse_MetricConfig_Schedule struct {
 	InclusionPatterns []*ConfigResponse_MetricConfig_Schedule_Pattern       `protobuf:"bytes,1,rep,name=inclusion_patterns,json=inclusionPatterns,proto3" json:"inclusion_patterns,omitempty"`
 	ExclusionPatterns []*ConfigResponse_MetricConfig_Schedule_Pattern       `protobuf:"bytes,2,rep,name=exclusion_patterns,json=exclusionPatterns,proto3" json:"exclusion_patterns,omitempty"`
 	Period            ConfigResponse_MetricConfig_Schedule_CollectionPeriod `protobuf:"varint,3,opt,name=period,proto3,enum=opentelemetry.proto.collector.dynamicconfig.v1.ConfigResponse_MetricConfig_Schedule_CollectionPeriod" json:"period,omitempty"`
-	// Additional metadata associated with the schedule. Responsability to
-	// interpret and check safety of metadata falls on the specific
-	// implementation
+	// Optional. Additional opaque metadata associated with the schedule.
+	// Interpreting metadata is implementation specific. A metric backend may
+	// implement features not directly supported in this configuration
+	// protocol, but still desire to communicate these settings to
+	// instrumented applications. An application may in turn piggyback
+	// metadata on a vendor's metric exporter to communicate information back
+	// to its metric backend. In this way, metadata offers a channel to
+	// communicate custom settings.
+	//
+	// Example use cases may include:
+	//  * Specifying quality-of-service priority
+	//  * Tweaking configurations beyond collection period
+	//  * Using alternate representations for collection schedules, matching
+	//    metrics, resources, etc.
+	//  * Enabling other optimizations
 	Metadata             string   `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -453,6 +466,7 @@ func (*ConfigResponse_MetricConfig_Schedule_Pattern) XXX_OneofWrappers() []inter
 	}
 }
 
+// Dynamic configs specific to trace, like sampling rate of a resource.
 type ConfigResponse_TraceConfig struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
