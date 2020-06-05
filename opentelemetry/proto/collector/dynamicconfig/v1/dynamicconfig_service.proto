@@ -47,11 +47,6 @@ message ConfigRequest{
   // fingerprint differs from the server's, then the server knows that a change
   // had occured and an updated configuration should be sent.
   string last_fingerprint = 3;
-
-  // An opaque string subject to individual implementation interpretation.
-  // Responsability to interpret and check safety of metadata falls on the
-  // specific implementation.
-  string metadata = 4;
 }
 
 message ConfigResponse {
@@ -65,7 +60,7 @@ message ConfigResponse {
   // whether a change in the configs occured.
   string fingerprint = 2;
 
-  // Configs specific to metric, namely the metric collection schedule
+  // Configs specific to metrics, namely the metric collection schedule
   message MetricConfig {
 
     // A Schedule is used to apply a particular scheduling configuration to
@@ -93,7 +88,7 @@ message ConfigResponse {
       // CollectionPeriod describes the sampling period for each metric. All
       // larger units are divisible by all smaller ones.
       enum CollectionPeriod {
-        NONE = 0;   // For non-periodic data. Client decides when to send points
+        NONE = 0;  // For non-periodic data (client sends points whenever)
         SEC_1 = 1;
         SEC_5 = 5;
         SEC_10 = 10;
