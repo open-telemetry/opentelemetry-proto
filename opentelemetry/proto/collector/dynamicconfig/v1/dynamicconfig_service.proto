@@ -38,7 +38,7 @@ message ConfigRequest{
   opentelemetry.proto.resource.v1.Resource resource = 2;
 
   // Optional. The value of ConfigResponse.fingerprint for the last configuration
-  // a resource received that was successfully applied.
+  // a resource received, regardless whether it was successfully applied.
   bytes last_known_fingerprint = 3;
 }
 
@@ -51,6 +51,12 @@ message ConfigResponse {
   // ConfigRequest.last_known_fingerprint, then all other fields besides
   // fingerprint in the response are optional, or the same as the last update if
   // present.
+  //
+  // The exact mechanics of generating the fingerprint is up to the
+  // implementation. However, a fingerprint must be deterministically determined
+  // by the configurations -- the same configuration will generate the same
+  // fingerprint on any instance of an implementation. Hence using a timestamp is
+  // unacceptable, but a deterministic hash is fine.
   bytes fingerprint = 2;
 
   // Dynamic configs specific to metrics

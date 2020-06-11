@@ -95,7 +95,7 @@ type ConfigRequest struct {
 	// Required. The resource for which configuration should be returned.
 	Resource *v1.Resource `protobuf:"bytes,2,opt,name=resource,proto3" json:"resource,omitempty"`
 	// Optional. The value of ConfigResponse.fingerprint for the last configuration
-	// a resource received that was successfully applied.
+	// a resource received, regardless whether it was successfully applied.
 	LastKnownFingerprint []byte   `protobuf:"bytes,3,opt,name=last_known_fingerprint,json=lastKnownFingerprint,proto3" json:"last_known_fingerprint,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -149,6 +149,12 @@ type ConfigResponse struct {
 	// ConfigRequest.last_known_fingerprint, then all other fields besides
 	// fingerprint in the response are optional, or the same as the last update if
 	// present.
+	//
+	// The exact mechanics of generating the fingerprint is up to the
+	// implementation. However, a fingerprint must be deterministically determined
+	// by the configurations -- the same configuration will generate the same
+	// fingerprint on any instance of an implementation. Hence using a timestamp is
+	// unacceptable, but a deterministic hash is fine.
 	Fingerprint  []byte                       `protobuf:"bytes,2,opt,name=fingerprint,proto3" json:"fingerprint,omitempty"`
 	MetricConfig *ConfigResponse_MetricConfig `protobuf:"bytes,3,opt,name=metric_config,json=metricConfig,proto3" json:"metric_config,omitempty"`
 	TraceConfig  *ConfigResponse_TraceConfig  `protobuf:"bytes,4,opt,name=trace_config,json=traceConfig,proto3" json:"trace_config,omitempty"`
