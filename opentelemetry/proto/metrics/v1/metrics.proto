@@ -161,82 +161,49 @@ message MetricDescriptor {
   // type is the type of values this metric has.
   Type type = 4;
 
-  // Temporality is the temporal quality values of a metric have. It
-  // describes how those values relate to the time interval over which they
-  // are reported.
-  enum Temporality {
-    // INVALID_TEMPORALITY is the default Temporality, it MUST not be
-    // used.
-    INVALID_TEMPORALITY = 0;
+  // Structure describes the relation between data of a Metric. This
+  // relation is expressed by the operation(s) supported by the data. The
+  // Structure of data is important to know if further analysis or roll-up
+  // of the data is to be performed. Without knowledge of data Structure
+  // meaningless results could be produced from these tasks.
+  //
+  // Note:
+  // Knowing the Structure of data does not guarantee meaningfully results
+  // for arbitrary operations on the data, rather it means that the results
+  // of performing the operation(s) related to the data Structure COULD
+  // produce meaningful results.
+  //
+  // Take for example adding together two different the measurements of
+  // request counts from a server. This data has ADDING structure, but if
+  // the two measurements were for different services, or even different
+  // servers, this result is likely meaningless.
+  enum Structure {
+    // GROUPING data does not support a combination operation, rather it is
+    // the arrangement of values by some dimension of association like time,
+    // label(s), or location.
+    //
+    // GROUPING is the default Structure. It SHOULD be used when the data
+    // does not support any operation(s) or it is unknown.
+    //
+    // Examples of GROUPING data:
+    // - CPU core number that was the hottest.
+    // - If a system was stopped, crashed, or running (represented by the
+    //   integers '0', '1', or '2' respectively).
+    // - The average power consumption of a server.
+    // - CPU fan speed.
+    GROUPING = 0;
 
-    // INSTANTANEOUS is a metric whose values are measured at a particular
-    // instant. The values are not aggregated over any time interval and are
-    // unique per timestamp. As such, these metrics are not expected to have
-    // an associated start time.
-    INSTANTANEOUS = 1;
-
-    // DELTA is a metric whose values are the aggregation of measurements
-    // made over a time interval. Successive metrics contain aggregation of
-    // values from continuous and non-overlapping intervals.
+    // ADDING data can be combined meaningfully when added together.
     //
-    // The values for a DELTA metric are based only on the time interval
-    // associated with one measurement cycle. There is no dependency on
-    // previous measurements like is the case for CUMULATIVE metrics.
-    //
-    // For example, consider a system measuring the number of requests that
-    // it receives and reports the sum of these requests every second as a
-    // DELTA metric:
-    //
-    //   1. The system starts receiving at time=t_0.
-    //   2. A request is received, the system measures 1 request.
-    //   3. A request is received, the system measures 1 request.
-    //   4. A request is received, the system measures 1 request.
-    //   5. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_0 to
-    //      t_0+1 with a value of 3.
-    //   6. A request is received, the system measures 1 request.
-    //   7. A request is received, the system measures 1 request.
-    //   8. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_0+1 to
-    //      t_0+2 with a value of 2.
-    DELTA = 2;
-
-    // CUMULATIVE is a metric whose values are the aggregation of
-    // successively made measurements from a fixed start time until the last
-    // reported measurement. This means that current values of a CUMULATIVE
-    // metric depend on all previous measurements since the start time.
-    // Because of this, the sender is required to retain this state in some
-    // form. If this state is lost or invalidated, the CUMULATIVE metric
-    // values MUST be reset and a new fixed start time following the last
-    // reported measurement time sent MUST be used.
-    //
-    // For example, consider a system measuring the number of requests that
-    // it receives and reports the sum of these requests every second as a
-    // CUMULATIVE metric:
-    //
-    //   1. The system starts receiving at time=t_0.
-    //   2. A request is received, the system measures 1 request.
-    //   3. A request is received, the system measures 1 request.
-    //   4. A request is received, the system measures 1 request.
-    //   5. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_0 to
-    //      t_0+1 with a value of 3.
-    //   6. A request is received, the system measures 1 request.
-    //   7. A request is received, the system measures 1 request.
-    //   8. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_0 to
-    //      t_0+2 with a value of 5.
-    //   9. The system experiences a fault and loses state.
-    //   10. The system recovers and resumes receiving at time=t_1.
-    //   11. A request is received, the system measures 1 request.
-    //   12. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_1 to
-    //      t_0+1 with a value of 1.
-    CUMULATIVE = 3;
+    // Examples of ADDING data:
+    // - CPU core temperature.
+    // - Number or requests to a server.
+    // - Number of errors.
+    ADDING = 1;
   }
 
-  // temporality is the Temporality of values this metric has.
-  Temporality temporality = 5;
+  // structure is the Structure of the values this metric has.
+  Structure structure = 5;
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
