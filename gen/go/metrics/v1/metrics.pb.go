@@ -91,17 +91,6 @@ func (MetricDescriptor_Type) EnumDescriptor() ([]byte, []int) {
 // Structure of data is important to know if further analysis or roll-up
 // of the data is to be performed. Without knowledge of data Structure
 // meaningless results could be produced from these tasks.
-//
-// Note:
-// Knowing the Structure of data does not guarantee meaningful results
-// for arbitrary operations on the data, rather it means that the results
-// of performing the operation(s) related to the data Structure COULD
-// produce meaningful results.
-//
-// Take for example adding together two different measurements of
-// request counts from a server. This data has ADDING structure, but if
-// the two measurements were for different services, or even different
-// servers, this result is likely meaningless.
 type MetricDescriptor_Structure int32
 
 const (
@@ -116,13 +105,13 @@ const (
 	// - CPU core number that was the hottest.
 	// - If a system was stopped, crashed, or running (represented by the
 	//   integers '0', '1', or '2' respectively).
-	// - The average power consumption of a server.
+	// - Request latency.
+	// - CPU core temperature.
 	// - CPU fan speed.
 	MetricDescriptor_GROUPING MetricDescriptor_Structure = 0
 	// ADDING data can be combined meaningfully when added together.
 	//
 	// Examples of ADDING data:
-	// - CPU core temperature.
 	// - Number or requests to a server.
 	// - Number of errors.
 	MetricDescriptor_ADDING MetricDescriptor_Structure = 1
