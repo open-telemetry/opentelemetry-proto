@@ -93,12 +93,12 @@ func (MetricDescriptor_Type) EnumDescriptor() ([]byte, []int) {
 // meaningless results could be produced from these tasks.
 //
 // Note:
-// Knowing the Structure of data does not guarantee meaningfully results
+// Knowing the Structure of data does not guarantee meaningful results
 // for arbitrary operations on the data, rather it means that the results
 // of performing the operation(s) related to the data Structure COULD
 // produce meaningful results.
 //
-// Take for example adding together two different the measurements of
+// Take for example adding together two different measurements of
 // request counts from a server. This data has ADDING structure, but if
 // the two measurements were for different services, or even different
 // servers, this result is likely meaningless.
