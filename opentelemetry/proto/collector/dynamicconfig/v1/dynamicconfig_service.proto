@@ -35,11 +35,11 @@ service DynamicConfig {
 message ConfigRequest{
 
   // Required. The resource for which configuration should be returned.
-  opentelemetry.proto.resource.v1.Resource resource = 2;
+  opentelemetry.proto.resource.v1.Resource resource = 1;
 
   // Optional. The value of ConfigResponse.fingerprint for the last configuration
   // a resource received, regardless whether it was successfully applied.
-  bytes last_known_fingerprint = 3;
+  bytes last_known_fingerprint = 2;
 }
 
 message ConfigResponse {
@@ -57,7 +57,7 @@ message ConfigResponse {
   // by the configurations -- the same configuration will generate the same
   // fingerprint on any instance of an implementation. Hence using a timestamp is
   // unacceptable, but a deterministic hash is fine.
-  bytes fingerprint = 2;
+  bytes fingerprint = 1;
 
   // Dynamic configs specific to metrics
   message MetricConfig {
@@ -144,15 +144,15 @@ message ConfigResponse {
     repeated Schedule schedules = 1;
 
   }
-  MetricConfig metric_config = 3;
+  MetricConfig metric_config = 2;
 
   // Dynamic configs specific to trace, like sampling rate of a resource.
   message TraceConfig {
     // TODO: unimplemented
   }
-  TraceConfig trace_config = 4;
+  TraceConfig trace_config = 3;
 
   // Optional. The client is suggested to wait this long (in seconds) before
   // pinging the configuration service again.
-  int32 suggested_wait_time_sec = 5;
+  int32 suggested_wait_time_sec = 4;
 }
