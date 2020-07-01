@@ -24,75 +24,251 @@ option java_package = "io.opentelemetry.proto.metrics.v1";
 option java_outer_classname = "MetricsProto";
 option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metrics/v1";
 
+// A collection of InstrumentationLibraryMetrics from a Resource.
 message ResourceMetrics {
+  // The resource for the metrics in this message.
+  // If this field is not set then no resource info is known.
   opentelemetry.proto.resource.v1.Resource resource = 1;
 
+  // A list of metrics that originate from a resource.
   repeated InstrumentationLibraryMetrics instrumentation_library_metrics = 2;
 }
 
+// A collection of Metrics produced by an InstrumentationLibrary.
 message InstrumentationLibraryMetrics {
+  // The instrumentation library information for the metrics in this message.
+  // If this field is not set then no library info is known.
   opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;
 
+  // A list of metrics that originate from an instrumentation library.
   repeated Metric metrics = 2;
 }
 
+// Defines a Metric which has one or more timeseries.
+//
+// The data model and relation between entities is shown in the diagram below.
+//
+// - Metric is composed of a MetricDescriptor and a list of data points.
+// - MetricDescriptor contains a name, description, unit, kind, and value type.
+// - Points is a list of DataPoints (shown vertically).
+// - DataPoint contains timestamps, labels, and one of the value type fields.
+//
+//     Metric
+//  +----------+         +------------------------+
+//  |descriptor|-------->| MetricDescriptor       |
+//  |          |         | name                   |
+//  |          |         | description            |
+//  |          |         | unit                   |
+//  |    points|--+      | kind                   |
+//  +----------+  |      | value type             |
+//                |      +------------------------+
+//                |
+//                |      +---------------------------+
+//                |      |DataPoint 1                |
+//                v      |+------+------+   +------+ |
+//             +-----+   ||label |label |...|label | |
+//             |  1  |-->||value1|value2|...|valueN| |
+//             +-----+   |+------+------+   +------+ |
+//             |  .  |   |+-----+                    |
+//             |  .  |   ||value|                    |
+//             |  .  |   |+-----+                    |
+//             |  .  |   +---------------------------+
+//             |  .  |                   .
+//             |  .  |                   .
+//             |  .  |                   .
+//             |  .  |   +---------------------------+
+//             |  .  |   |DataPoint M                |
+//             +-----+   |+------+------+   +------+ |
+//             |  M  |-->||label |label |...|label | |
+//             +-----+   ||value1|value2|...|valueN| |
+//                       |+------+------+   +------+ |
+//                       |+-----+                    |
+//                       ||value|                    |
+//                       |+-----+                    |
+//                       +---------------------------+
+//
+//-----------------------------------------------------------------------
+// DataPoint is a general type that includes three common fields:
+// - Labels are the optional key, value pairs associated with the data point.
+// - StartTimeUnixNano MUST be set to the start of the interval when the
+//   descriptor kind includes MASK_CUMULATIVE or MASK_DELTA.
+// - TimeUnixNano MUST be set to:
+//   - the end of the interval (MASK_CUMULATIVE or MASK_DELTA)
+//   - the instantaneous time of the event (MASK_INSTANTANEOUS).
+//	
+// DataPoint values are strongly typed: each DataPoint uses a specific field
+// depending on the value type of the metric.  The scalar value types
+// (SCALAR_INT64, SCALAR_DOUBLE) use fields of the DataPoint directly, while
+// there are currently 3 DataPoint sub-messages (Histogram, Summary, RawValue).
 message Metric {
+  // metric_descriptor describes the Metric.
   MetricDescriptor metric_descriptor = 1;
 
+  // Points is a list of one or more DataPoints for a single metric.
   repeated DataPoint points = 2;
 }
 
+// Defines a metric type and its schema.
 message MetricDescriptor {
+  // name of the metric, including its DNS name prefix. It must be unique.
   string name = 1;
+
+  // description of the metric, which can be used in documentation.	
   string description = 2;
+
+  // unit in which the metric value is reported. Follows the format	
+  // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
+  // ValueType is the type of values a metric has.  ValueType determines
+  // which field of the DataPoint will be used for Metrics with this
+  // descriptor.
   enum ValueType {
+    // INVALID_TYPE is the default ValueType, it MUST not be used.
     INVALID_VALUE_TYPE = 0;
 
+    // Note that int64 ValueTypes use the even numbers and double
+    // ValueTypes use the odd numbers.
+
+    // Metric.Points MUST use DataPoint.value_int64.
     SCALAR_INT64     = 2;
+    // Metric.Points MUST use DataPoint.value_double.
     SCALAR_DOUBLE    = 3;
 
+    // Metric.Points MUST use DataPoint.histogram with int64 boundaries.
     HISTOGRAM_INT64  = 4;
+    // Metric.Points MUST use DataPoint.histogram with floating point boundaries.
     HISTOGRAM_DOUBLE = 5;
 
+    // Metric.Points MUST use DataPoint.summary with int64 min/max/sum/last values.
     SUMMARY_INT64    = 6;
+    // Metric.Points MUST use DataPoint.summary with double min/max/sum/last values.
     SUMMARY_DOUBLE   = 7;
 
+    // Metric.Points MUST use DataPoint.raw with int64 values.
     RAW_INT64        = 8;
+    // Metric.Points MUST use DataPoint.raw with double value.
     RAW_DOUBLE       = 9;
-
-    // TODO: Sketches can be represented in various ways, depending on
-    // the technique.  One viable representation simply uses weighted
-    // RAW_* value types (e.g., a T-digest can be encoded this way).
   }
 
+  // value_type is the type of values this metric has.
   ValueType value_type = 4;
 
+  // KindMask contains a set of bit masks used to construct Kind enum values.
+  // There are 7 bits used presently.
   enum KindMask {
+    // INVALID_KIND_MASK is not used.
     INVALID_KIND_MASK = 0;
 
     // One of the following three MUST be set. There are 3 exclusive Temporality kinds.
+
+    // INSTANTANEOUS is a metric whose values are measured at a particular
+    // instant. The values are not aggregated over any time interval and are
+    // unique per timestamp. As such, these metrics are not expected to have	
+    // an associated start time.
     INSTANTANEOUS = 0x1;
-    CUMULATIVE    = 0x2;
-    DELTA         = 0x4;
+
+    // DELTA is a metric whose values are the aggregation of measurements
+    // made over a time interval. Successive metrics contain aggregation of
+    // values from continuous and non-overlapping intervals.
+    //	
+    // The values for a DELTA metric are based only on the time interval
+    // associated with one measurement cycle. There is no dependency on
+    // previous measurements like is the case for CUMULATIVE metrics.
+    //
+    // For example, consider a system measuring the number of requests that	
+    // it receives and reports the sum of these requests every second as a
+    // DELTA metric:
+    //	    
+    //   1. The system starts receiving at time=t_0.
+    //   2. A request is received, the system measures 1 request.
+    //   3. A request is received, the system measures 1 request.
+    //   4. A request is received, the system measures 1 request.	
+    //   5. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_0 to
+    //      t_0+1 with a value of 3.	    
+    //   6. A request is received, the system measures 1 request.
+    //   7. A request is received, the system measures 1 request.
+    //   8. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_0+1 to	
+    //      t_0+2 with a value of 2.	
+    DELTA = 0x4;
+
+    // CUMULATIVE is a metric whose values are the aggregation of
+    // successively made measurements from a fixed start time until the last
+    // reported measurement. This means that current values of a CUMULATIVE
+    // metric depend on all previous measurements since the start time.	
+    // Because of this, the sender is required to retain this state in some	
+    // form. If this state is lost or invalidated, the CUMULATIVE metric	
+    // values MUST be reset and a new fixed start time following the last	
+    // reported measurement time sent MUST be used.	
+    //	
+    // For example, consider a system measuring the number of requests that	
+    // it receives and reports the sum of these requests every second as a	
+    // CUMULATIVE metric:	
+    //	
+    //   1. The system starts receiving at time=t_0.	
+    //   2. A request is received, the system measures 1 request.	
+    //   3. A request is received, the system measures 1 request.	
+    //   4. A request is received, the system measures 1 request.	
+    //   5. The 1 second collection cycle ends. A metric is exported for the	
+    //      number of requests received over the interval of time t_0 to	
+    //      t_0+1 with a value of 3.	
+    //   6. A request is received, the system measures 1 request.	
+    //   7. A request is received, the system measures 1 request.	
+    //   8. The 1 second collection cycle ends. A metric is exported for the	
+    //      number of requests received over the interval of time t_0 to	
+    //      t_0+2 with a value of 5.	
+    //   9. The system experiences a fault and loses state.	
+    //   10. The system recovers and resumes receiving at time=t_1.	
+    //   11. A request is received, the system measures 1 request.	
+    //   12. The 1 second collection cycle ends. A metric is exported for the	
+    //      number of requests received over the interval of time t_1 to	
+    //      t_0+1 with a value of 1.
+    CUMULATIVE = 0x2;
 
     // One of the following two MUST be set. There are 2 exclusive Structure kinds.
-    GROUPING      = 0x8;
-    ADDING        = 0x10;
 
-    // May be set with ADDING.
-    MONOTONIC     = 0x20;
+    // GROUPING structure means the value has been computed by combining
+    // individual values in a meaningful aggregation.
+    // [TODO MrAlias wrote a good comment, use it]
+    GROUPING = 0x8;
 
-    // May be set for any instrument.
-    SYNCHRONOUS   = 0x40;
+    // ADDING structure means the value has been computed 
+    // [TODO MrAlias wrote a good comment, use it]
+    ADDING = 0x10;
+
+    // MONOTONIC may be set in conjunction with ADDING kinds.
+    MONOTONIC = 0x20;
+
+    // SYNCHRONOUS may be set for any kind of metric, indicating it was generated
+    // through synchronous events in which the application calls the API.  If
+    // SYNCHRONOUS is not set, it implies the event originated in a callback
+    // where the SDK called the application.
+    SYNCHRONOUS = 0x40;
   }
 
+  // Kind explains how the DataPoint was produced (Structure), how
+  // the point was aggregated with resepect to time (Temporality), and
+  // whether it was computed synchronously, and when the Structure is
+  // ADDING, whether the captured Sum is also monotonic.
+  //
+  // Kind names are generated from valid combinations of KindMask
+  // by joining the effective KindMasks using underscores.  There
+  // are:
+  // 
+  // - 3 possibilities for Temporality
+  // - 2 possibilities for Synchronous/Asynchronous
+  // - 3 possibilities for Structure/Monotonicity: Grouping, Adding
+  //   Monotonic, and Adding (not monotonic)
+  //
+  // This makes 18 valid values.
   enum Kind {
+    // INVALID_KIND is the default Kind, it MUST not be used.
     INVALID_KIND = 0;
 
-    // The following codes are generated from the valid combinations of the mask bits above.
-    
+    // The following codes are generated by a program.
+
     ADDING_MONOTONIC_INSTANTANEOUS_SYNCHRONOUS  = 0x71;
     ADDING_MONOTONIC_INSTANTANEOUS_ASYNCHRONOUS = 0x31;
     ADDING_MONOTONIC_CUMULATIVE_SYNCHRONOUS     = 0x72;
@@ -108,109 +284,70 @@ message MetricDescriptor {
     ADDING_DELTA_ASYNCHRONOUS                   = 0x14;
 
     GROUPING_INSTANTANEOUS_SYNCHRONOUS          = 0x49;
-    GROUPING_INSTANTANEOUS_ASYNCHRONOUS         = 0x9; 
+    GROUPING_INSTANTANEOUS_ASYNCHRONOUS         = 0x9;
     GROUPING_CUMULATIVE_SYNCHRONOUS             = 0x4a;
-    GROUPING_CUMULATIVE_ASYNCHRONOUS            = 0xa; 
+    GROUPING_CUMULATIVE_ASYNCHRONOUS            = 0xa;
     GROUPING_DELTA_SYNCHRONOUS                  = 0x4c;
-    GROUPING_DELTA_ASYNCHRONOUS                 = 0xc; 
+    GROUPING_DELTA_ASYNCHRONOUS                 = 0xc;
   }
 
+  // Kind describes properties of the Metric that are necessary to
+  // interpret the data and/or describe how it was produced.
   Kind kind = 5;
 }
 
+// DataPoint is a point of raw or aggregate metric data, generally containing
+// the labels, one or two timestamps, and a single value field.  The value field
+// that is used is determined by the descriptor ValueType.
 message DataPoint {
-  // (Same comment)
+  // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // (Same comment)
-  // If omitted and not instantaneous, this is taken as the default _REPORT_TIMESTAMP_.
+  // start_time_unix_nano is the start of the interval for which a CUMULATIVE or
+  // DELTA kind of metric was computed.
+  // reset.
+  //
+  // This must not be set for INSTANTANEOUS metric kinds.
+  //	
+  // The cumulative or delta value is over the time interval (start_time_unix_nano, time_unix_nano].	
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.	
+  //
+  // TODO: Can we omit this when all metrics in a report share the same start time?
   fixed64 start_time_unix_nano = 2;
 
-  // (Same comment)
-  // Use this in conjunction with `value_int64` and `value_double`, or `summary`.
-  // When the kind is instantaneous, this field applies to *this point*.  
+  // time_unix_nano is the end of the interval for CUMULATIVE and DELTA kinds,
+  // or it is the event timestamp for INSTANTANEOUS kinds.
+  // 
+  // TODO: Can we omit this when a non-instantaneous metric has the same end time
+  // as others in the report?
   fixed64 time_unix_nano = 3;
 
   // A logical oneof among the following fields, as prescribed by ValueType:
 
-  // INT64/FLOAT ADDING -> Sum (Counter), Grouping -> RAW (Gauge); This
-  // could be "last value" or it could be a random value (or other
-  // selection approach)
+  // SCALAR_INT64 uses this.
   int64 value_int64 = 4;
+
+  // SCALAR_DOUBLE uses this.
   double value_double = 5;
 
-  // HISTOGRAM
-  // (Similar comments)
-  // Note this is an exact representation for Adding instruments.
+  // HISTOGRAM_INT64 and HISTOGRAM_DOUBLE use this.
   Histogram histogram = 6;
 
-  // SUMMARY
-  // (see changes below)
+  // SUMMARY_INT64 and SUMMARU_DOUBLE use this.
   Summary summary = 7;
 
-  // Optional exemplars
+  // Exemplars are the value for RAW_INT64 and RAW_DOUBLE ValueTypes.
+  //
+  // Exemplars may also be set alongside any other ValueType than RAW_INT64
+  // or RAW_DOUBLE, in which case the exemplars carry additional information,
+  // including the full label set, exact timestamp, and optional trace context
+  // and sampling information.
   repeated RawValue exemplars = 8;
 }
 
-// Summary is a single data point in a timeseries that describes the time-varying
-// values of a Summary metric.
-message Summary {
-  // Remove the labels, start_time, and time TODO.
-  //
-  // fields: Add min, max, last fields
-  // as described in https://github.com/open-telemetry/oteps/pull/117
-  //
-  // (Same comment)
-  uint64 count = 1;
-
-  // (Same comment)
-  int64  sum_int64 = 2;
-  double sum_double = 3;
-
-  // MIN, MAX, LAST value
-  int64  min_int64 = 4;
-  double min_double = 5;
-
-  int64  max_int64 = 6;
-  double max_double = 7;
-
-  int64  last_int64 = 8;
-  double last_double = 9;
-  
-  // (Similar comments)
-  message ValueAtQuantile {
-    double quantile = 1;  // [0,1], if 0 prefer MIN, if 1 prefer MAX.
-    int64  value_int64 = 2;
-    double value_double = 3;
-  }
-
-  // (Same comment)
-  repeated ValueAtQuantile quantile_values = 10;
-}
-
-message RawValue {
-  // Numerical value of the measurement that was recorded. Only one of these 
-  // two fields is used for the data, based on MetricDescriptor.measurement_type
-  double value_double = 1;
-  int64 value_int64 = 2;
-
-  // Exact time that the measurement was recorded
-  fixed64 time_unix_nano = 3;
-
-  // Labels that were passed with the measurement, but not included in the DataPoint's labels
-  repeated opentelemetry.proto.common.v1.StringKeyValue additional_labels = 4;
-
-  // (Optional) Span ID of the current trace
-  bytes span_id = 5;
-
-  // (Optional) Trace ID of the current trace
-  bytes trace_id = 6;
-
-  // (Optional) When sample_count is non-zero, this exemplar has been chosen in a statistically
-  // unbiased way such that the exemplar is representative of `sample_count` individual events
-  double sample_count = 7;
-}
-
+// Histogram is a single data point in a timeseries that describes the time-varying
+// values of a Histogram. A Histogram contains summary statistics for a population of values,
+// it may optionally contain the distribution of those values across a set of buckets.
 message Histogram {
   // count is the number of values in the population. Must be non-negative. This value
   // must be equal to the sum of the "count" fields in buckets if a histogram is provided.
@@ -266,3 +403,63 @@ message Histogram {
   repeated int64 explicit_bounds_int64 = 7;
   repeated double explicit_bounds_double = 8;
 }
+
+// Summary is a single data point in a timeseries that describes the time-varying
+// values of a Summary metric.
+message Summary {
+  // Remove the labels, start_time, and time TODO.
+  //
+  // fields: Add min, max, last fields
+  // as described in https://github.com/open-telemetry/oteps/pull/117
+  //
+  // (Same comment)
+  uint64 count = 1;
+
+  // (Same comment)
+  int64  sum_int64 = 2;
+  double sum_double = 3;
+
+  // MIN, MAX, LAST value
+  int64  min_int64 = 4;
+  double min_double = 5;
+
+  int64  max_int64 = 6;
+  double max_double = 7;
+
+  int64  last_int64 = 8;
+  double last_double = 9;
+
+  // (Similar comments)
+  message ValueAtQuantile {
+    double quantile = 1;  // [0,1], if 0 prefer MIN, if 1 prefer MAX.
+    int64  value_int64 = 2;
+    double value_double = 3;
+  }
+
+  // (Same comment)
+  repeated ValueAtQuantile quantile_values = 10;
+}
+
+message RawValue {
+  // Numerical value of the measurement that was recorded. Only one of these
+  // two fields is used for the data, based on MetricDescriptor.measurement_type
+  double value_double = 1;
+  int64 value_int64 = 2;
+
+  // Exact time that the measurement was recorded
+  fixed64 time_unix_nano = 3;
+
+  // Labels that were passed with the measurement, but not included in the DataPoint's labels
+  repeated opentelemetry.proto.common.v1.StringKeyValue additional_labels = 4;
+
+  // (Optional) Span ID of the current trace
+  bytes span_id = 5;
+
+  // (Optional) Trace ID of the current trace
+  bytes trace_id = 6;
+
+  // (Optional) When sample_count is non-zero, this exemplar has been chosen in a statistically
+  // unbiased way such that the exemplar is representative of `sample_count` individual events
+  double sample_count = 7;
+}
+
