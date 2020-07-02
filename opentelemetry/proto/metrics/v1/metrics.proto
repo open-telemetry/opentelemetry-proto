@@ -44,7 +44,7 @@ message InstrumentationLibraryMetrics {
   repeated Metric metrics = 2;
 }
 
-// Defines a Metric which has one or more timeseries.
+// Metric contains one or more timeseries.
 //
 // The data model and relation between entities is shown in the diagram below.
 //
@@ -89,7 +89,7 @@ message InstrumentationLibraryMetrics {
 //
 //-----------------------------------------------------------------------
 // DataPoint is a general type that includes three common fields:
-// - Labels are the optional key, value pairs associated with the data point.
+// - Labels are the optional key-value pairs associated with the data point.
 // - StartTimeUnixNano MUST be set to the start of the interval when the
 //   descriptor kind includes MASK_CUMULATIVE or MASK_DELTA.
 // - TimeUnixNano MUST be set to:
@@ -101,8 +101,8 @@ message InstrumentationLibraryMetrics {
 // (SCALAR_INT64, SCALAR_DOUBLE) use fields of the DataPoint directly, while
 // there are currently 3 DataPoint sub-messages (Histogram, Summary, RawValue).
 message Metric {
-  // metric_descriptor describes the Metric.
-  MetricDescriptor metric_descriptor = 1;
+  // Descriptor describes the Metric.
+  MetricDescriptor descriptor = 1;
 
   // Points is a list of one or more DataPoints for a single metric.
   repeated DataPoint points = 2;
@@ -140,9 +140,9 @@ message MetricDescriptor {
     // Metric.Points MUST use DataPoint.histogram with floating point boundaries.
     HISTOGRAM_DOUBLE = 5;
 
-    // Metric.Points MUST use DataPoint.summary with int64 min/max/sum/last values.
+    // Metric.Points MUST use DataPoint.summary with int64 min/max/sum/last/count values.
     SUMMARY_INT64    = 6;
-    // Metric.Points MUST use DataPoint.summary with double min/max/sum/last values.
+    // Metric.Points MUST use DataPoint.summary with double min/max/sum/last/count values.
     SUMMARY_DOUBLE   = 7;
 
     // Metric.Points MUST use DataPoint.raw with int64 values.
