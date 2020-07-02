@@ -91,11 +91,11 @@ message InstrumentationLibraryMetrics {
 // DataPoint is a general type that includes three common fields:
 // - Labels are the optional key-value pairs associated with the data point.
 // - StartTimeUnixNano MUST be set to the start of the interval when the
-//   descriptor kind includes MASK_CUMULATIVE or MASK_DELTA.
+//   descriptor kind includes CUMULATIVE or DELTA.
 // - TimeUnixNano MUST be set to:
-//   - the end of the interval (MASK_CUMULATIVE or MASK_DELTA)
-//   - the instantaneous time of the event (MASK_INSTANTANEOUS).
-//	
+//   - the end of the interval (CUMULATIVE or DELTA)
+//   - the instantaneous time of the event (INSTANTANEOUS).
+//
 // DataPoint values are strongly typed: each DataPoint uses a specific field
 // depending on the value type of the metric.  The scalar value types
 // (SCALAR_INT64, SCALAR_DOUBLE) use fields of the DataPoint directly, while
@@ -110,13 +110,13 @@ message Metric {
 
 // Defines a metric type and its schema.
 message MetricDescriptor {
-  // name of the metric, including its DNS name prefix. It must be unique.
+  // Name of the metric, including its DNS name prefix. It must be unique.
   string name = 1;
 
-  // description of the metric, which can be used in documentation.	
+  // Description of the metric, which can be used in documentation.
   string description = 2;
 
-  // unit in which the metric value is reported. Follows the format	
+  // Unit in which the metric value is reported. Follows the format
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
@@ -130,28 +130,28 @@ message MetricDescriptor {
     // Note that int64 ValueTypes use the even numbers and double
     // ValueTypes use the odd numbers.
 
-    // Metric.Points MUST use DataPoint.value_int64.
+    // ScalarInt64 indicates Metric.Points MUST use DataPoint.value_int64.
     SCALAR_INT64     = 2;
-    // Metric.Points MUST use DataPoint.value_double.
+    // ScalarDouble indicates Metric.Points MUST use DataPoint.value_double.
     SCALAR_DOUBLE    = 3;
 
-    // Metric.Points MUST use DataPoint.histogram with int64 boundaries.
+    // HistogramInt64 indicates Metric.Points MUST use DataPoint.histogram with int64 boundaries.
     HISTOGRAM_INT64  = 4;
-    // Metric.Points MUST use DataPoint.histogram with floating point boundaries.
+    // HistogramDouble indicates Metric.Points MUST use DataPoint.histogram with floating point boundaries.
     HISTOGRAM_DOUBLE = 5;
 
-    // Metric.Points MUST use DataPoint.summary with int64 min/max/sum/last/count values.
+    // SummaryInt64 indicates Metric.Points MUST use DataPoint.summary with int64 min/max/sum/last/count values.
     SUMMARY_INT64    = 6;
-    // Metric.Points MUST use DataPoint.summary with double min/max/sum/last/count values.
+    // SummaryDouble indicates Metric.Points MUST use DataPoint.summary with double min/max/sum/last/count values.
     SUMMARY_DOUBLE   = 7;
 
-    // Metric.Points MUST use DataPoint.raw with int64 values.
+    // RawInt64 indicates Metric.Points MUST use DataPoint.raw with int64 values.
     RAW_INT64        = 8;
-    // Metric.Points MUST use DataPoint.raw with double value.
+    // RawDouble indicates Metric.Points MUST use DataPoint.raw with double value.
     RAW_DOUBLE       = 9;
   }
 
-  // value_type is the type of values this metric has.
+  // ValueType is the type of values this metric has.
   ValueType value_type = 4;
 
   // KindMask contains a set of bit masks used to construct Kind enum values.
@@ -164,66 +164,66 @@ message MetricDescriptor {
 
     // INSTANTANEOUS is a metric whose values are measured at a particular
     // instant. The values are not aggregated over any time interval and are
-    // unique per timestamp. As such, these metrics are not expected to have	
+    // unique per timestamp. As such, these metrics are not expected to have
     // an associated start time.
     INSTANTANEOUS = 0x1;
 
     // DELTA is a metric whose values are the aggregation of measurements
     // made over a time interval. Successive metrics contain aggregation of
     // values from continuous and non-overlapping intervals.
-    //	
+    //
     // The values for a DELTA metric are based only on the time interval
     // associated with one measurement cycle. There is no dependency on
     // previous measurements like is the case for CUMULATIVE metrics.
     //
-    // For example, consider a system measuring the number of requests that	
+    // For example, consider a system measuring the number of requests that
     // it receives and reports the sum of these requests every second as a
     // DELTA metric:
-    //	    
+    //
     //   1. The system starts receiving at time=t_0.
     //   2. A request is received, the system measures 1 request.
     //   3. A request is received, the system measures 1 request.
-    //   4. A request is received, the system measures 1 request.	
+    //   4. A request is received, the system measures 1 request.
     //   5. The 1 second collection cycle ends. A metric is exported for the
     //      number of requests received over the interval of time t_0 to
-    //      t_0+1 with a value of 3.	    
+    //      t_0+1 with a value of 3.
     //   6. A request is received, the system measures 1 request.
     //   7. A request is received, the system measures 1 request.
     //   8. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_0+1 to	
-    //      t_0+2 with a value of 2.	
+    //      number of requests received over the interval of time t_0+1 to
+    //      t_0+2 with a value of 2.
     DELTA = 0x4;
 
     // CUMULATIVE is a metric whose values are the aggregation of
     // successively made measurements from a fixed start time until the last
     // reported measurement. This means that current values of a CUMULATIVE
-    // metric depend on all previous measurements since the start time.	
-    // Because of this, the sender is required to retain this state in some	
-    // form. If this state is lost or invalidated, the CUMULATIVE metric	
-    // values MUST be reset and a new fixed start time following the last	
-    // reported measurement time sent MUST be used.	
-    //	
-    // For example, consider a system measuring the number of requests that	
-    // it receives and reports the sum of these requests every second as a	
-    // CUMULATIVE metric:	
-    //	
-    //   1. The system starts receiving at time=t_0.	
-    //   2. A request is received, the system measures 1 request.	
-    //   3. A request is received, the system measures 1 request.	
-    //   4. A request is received, the system measures 1 request.	
-    //   5. The 1 second collection cycle ends. A metric is exported for the	
-    //      number of requests received over the interval of time t_0 to	
-    //      t_0+1 with a value of 3.	
-    //   6. A request is received, the system measures 1 request.	
-    //   7. A request is received, the system measures 1 request.	
-    //   8. The 1 second collection cycle ends. A metric is exported for the	
-    //      number of requests received over the interval of time t_0 to	
-    //      t_0+2 with a value of 5.	
-    //   9. The system experiences a fault and loses state.	
-    //   10. The system recovers and resumes receiving at time=t_1.	
-    //   11. A request is received, the system measures 1 request.	
-    //   12. The 1 second collection cycle ends. A metric is exported for the	
-    //      number of requests received over the interval of time t_1 to	
+    // metric depend on all previous measurements since the start time.
+    // Because of this, the sender is required to retain this state in some
+    // form. If this state is lost or invalidated, the CUMULATIVE metric
+    // values MUST be reset and a new fixed start time following the last
+    // reported measurement time sent MUST be used.
+    //
+    // For example, consider a system measuring the number of requests that
+    // it receives and reports the sum of these requests every second as a
+    // CUMULATIVE metric:
+    //
+    //   1. The system starts receiving at time=t_0.
+    //   2. A request is received, the system measures 1 request.
+    //   3. A request is received, the system measures 1 request.
+    //   4. A request is received, the system measures 1 request.
+    //   5. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_0 to
+    //      t_0+1 with a value of 3.
+    //   6. A request is received, the system measures 1 request.
+    //   7. A request is received, the system measures 1 request.
+    //   8. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_0 to
+    //      t_0+2 with a value of 5.
+    //   9. The system experiences a fault and loses state.
+    //   10. The system recovers and resumes receiving at time=t_1.
+    //   11. A request is received, the system measures 1 request.
+    //   12. The 1 second collection cycle ends. A metric is exported for the
+    //      number of requests received over the interval of time t_1 to
     //      t_0+1 with a value of 1.
     CUMULATIVE = 0x2;
 
@@ -234,7 +234,7 @@ message MetricDescriptor {
     // [TODO MrAlias wrote a good comment, use it]
     GROUPING = 0x8;
 
-    // ADDING structure means the value has been computed 
+    // ADDING structure means the value has been computed
     // [TODO MrAlias wrote a good comment, use it]
     ADDING = 0x10;
 
@@ -256,7 +256,7 @@ message MetricDescriptor {
   // Kind names are generated from valid combinations of KindMask
   // by joining the effective KindMasks using underscores.  There
   // are:
-  // 
+  //
   // - 3 possibilities for Temporality
   // - 2 possibilities for Synchronous/Asynchronous
   // - 3 possibilities for Structure/Monotonicity: Grouping, Adding
@@ -308,16 +308,16 @@ message DataPoint {
   // reset.
   //
   // This must not be set for INSTANTANEOUS metric kinds.
-  //	
-  // The cumulative or delta value is over the time interval (start_time_unix_nano, time_unix_nano].	
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.	
+  //
+  // The cumulative or delta value is over the time interval (start_time_unix_nano, time_unix_nano].
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // TODO: Can we omit this when all metrics in a report share the same start time?
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the end of the interval for CUMULATIVE and DELTA kinds,
   // or it is the event timestamp for INSTANTANEOUS kinds.
-  // 
+  //
   // TODO: Can we omit this when a non-instantaneous metric has the same end time
   // as others in the report?
   fixed64 time_unix_nano = 3;
@@ -462,4 +462,3 @@ message RawValue {
   // unbiased way such that the exemplar is representative of `sample_count` individual events
   double sample_count = 7;
 }
-
