@@ -130,33 +130,69 @@ message MetricDescriptor {
     // Note that int64 ValueTypes use the even numbers and double
     // ValueTypes use the odd numbers.
 
-    // ScalarInt64 indicates Metric.Points MUST use DataPoint.value_int64.
+    // ScalarInt64 implies that Metric.Points MUST use DataPoint.value_int64.
     SCALAR_INT64     = 2;
-    // ScalarDouble indicates Metric.Points MUST use DataPoint.value_double.
+    // ScalarDouble implies that Metric.Points MUST use DataPoint.value_double.
     SCALAR_DOUBLE    = 3;
 
-    // HistogramInt64 indicates Metric.Points MUST use DataPoint.histogram with int64 boundaries.
+    // HistogramInt64 implies that Metric.Points MUST use
+    // DataPoint.histogram with int64 boundaries.
     HISTOGRAM_INT64  = 4;
-    // HistogramDouble indicates Metric.Points MUST use DataPoint.histogram with floating point boundaries.
+    // HistogramDouble implies that Metric.Points MUST use
+    // DataPoint.histogram with floating point boundaries.
     HISTOGRAM_DOUBLE = 5;
 
-    // SummaryInt64 indicates Metric.Points MUST use DataPoint.summary with int64 min/max/sum/last/count values.
+    // SummaryInt64 implies that Metric.Points MUST use DataPoint.summary
+    // with int64 min/max/sum/last/count values.
     SUMMARY_INT64    = 6;
-    // SummaryDouble indicates Metric.Points MUST use DataPoint.summary with double min/max/sum/last/count values.
+    // SummaryDouble implies that Metric.Points MUST use
+    // DataPoint.summary with double min/max/sum/last/count values.
     SUMMARY_DOUBLE   = 7;
 
-    // RawInt64 indicates Metric.Points MUST use DataPoint.raw with int64 values.
+    // RawInt64 implies that Metric.Points MUST use DataPoint.raw with
+    // int64 values.
     RAW_INT64        = 8;
-    // RawDouble indicates Metric.Points MUST use DataPoint.raw with double value.
+    // RawDouble implies that Metric.Points MUST use DataPoint.raw with
+    // double value.
     RAW_DOUBLE       = 9;
   }
 
   // ValueType is the type of values this metric has.
   ValueType value_type = 4;
 
-  // KindMask contains a set of bit masks used to construct Kind enum values.
-  // There are 7 bits used presently.
-  enum KindMask {
+  // KindElement contains a set of bit masks used to construct Kind enum values.
+  // There are 7 bits used presently, broken into groups:
+  //
+  //   Temporality is the temporal quality values of a metric have. It
+  //   describes how those values relate to the time interval over
+  //   which they are reported.  One of the 3 Temporality values
+  //   (CUMULATIVE, DELTA, INSTANTANEOUS) MUST be set.
+  //
+  //   Structure indicates whether metric data describes a sum of
+  //   measurements (ADDING) or a collection of individual
+  //   measurements (GROUPING).  Value types may be interpreted
+  //   differently depending on Structure.  For example, a Histogram
+  //   DataPoint may be computed for a Counter (ADDING) instrument
+  //   or a ValueRecorder (GROUPING) instrument, and:
+  //
+  //   - ADDING Histograms define a meaningful Sum in the form of a
+  //     distribution of constituent measurements.
+  //   - GROUPING Histograms define a distribution of measurements,
+  //     where the sum is potentially not meaningful.  If also
+  //     SYNCHRONOUS, these data points define a rate in terms of
+  //     their Count.
+  //
+  //   Monotonicity applies only to ADDING data points.  When set,
+  //   MONOTONIC indicates that the calculated sum can be monitored
+  //   as a rate of change.
+  //
+  //   Synchronicity applies to data points produced when the
+  //   application called the API, as opposed to the SDK calling the
+  //   application via a callback.  When set, SYNCHRONOUS indicates
+  //   that there may be an associated trace context, otherwise 
+  //   data points are considered asynchronous.  Asynchronous Counts
+  //   define the rate of collection, not an application-level rate.
+  enum KindElement {
     // INVALID_KIND_MASK is not used.
     INVALID_KIND_MASK = 0;
 
@@ -227,18 +263,24 @@ message MetricDescriptor {
     //      t_0+1 with a value of 1.
     CUMULATIVE = 0x2;
 
-    // One of the following two MUST be set. There are 2 exclusive Structure kinds.
+    // One of the following two MUST be set. There are 2 exclusive
+    // Structure kinds.  Structure defines how the data 
 
     // GROUPING structure means the value has been computed by combining
-    // individual values in a meaningful aggregation.
-    // [TODO MrAlias wrote a good comment, use it]
+    // individual values in a meaningful aggregation.  GROUPING structure
+    // implies the sum of
     GROUPING = 0x8;
 
-    // ADDING structure means the value has been computed
-    // [TODO MrAlias wrote a good comment, use it]
+    // ADDING structure means the measurement determines a sum.  For
+    // DELTA kind this is expressed as the change in sum since the
+    // last collection.  For CUMULATIVE kind this is express as last
+    // collected value of the sum.
     ADDING = 0x10;
 
-    // MONOTONIC may be set in conjunction with ADDING kinds.
+    // MONOTONIC may be set in conjunction with ADDING kinds, implying
+    // that the sum determines a meaningful rate.  For DELTA kind,
+    // this implies non-negative value series.  For CUMULATIVE kind,
+    // this implies a non-decreasing value series.
     MONOTONIC = 0x20;
 
     // SYNCHRONOUS may be set for any kind of metric, indicating it was generated
@@ -253,8 +295,8 @@ message MetricDescriptor {
   // whether it was computed synchronously, and when the Structure is
   // ADDING, whether the captured Sum is also monotonic.
   //
-  // Kind names are generated from valid combinations of KindMask
-  // by joining the effective KindMasks using underscores.  There
+  // Kind names are generated from valid combinations of KindElement
+  // by joining the effective KindElements using underscores.  There
   // are:
   //
   // - 3 possibilities for Temporality
