@@ -91,7 +91,9 @@ message InstrumentationLibraryMetrics {
 // DataPoint is a general type that includes three common fields:
 // - Labels are the optional key-value pairs associated with the data point.
 // - StartTimeUnixNano MUST be set to the start of the interval when the
-//   descriptor kind includes CUMULATIVE or DELTA.
+//   descriptor kind includes CUMULATIVE or DELTA.  This field is not set
+//   for INSTANTANEOUS timeseries, where instead the TimeUnixNano field is
+//   set for individual points.
 // - TimeUnixNano MUST be set to:
 //   - the end of the interval (CUMULATIVE or DELTA)
 //   - the instantaneous time of the event (INSTANTANEOUS).
@@ -183,15 +185,29 @@ message MetricDescriptor {
   //     their Count.
   //
   //   Monotonicity applies only to ADDING data points.  When set,
-  //   MONOTONIC indicates that the calculated sum can be monitored
-  //   as a rate of change.
+  //   MONOTONIC indicates that the calculated sum can be monitored as
+  //   a rate of change.  Observers of MONOTONIC metrics should never
+  //   see the value decrease without a reset (i.e., StartTimeUnixNano
+  //   advances), otherwise a decreasing MONOTONIC metric suggests an
+  //   SDK bug.
   //
   //   Synchronicity applies to data points produced when the
   //   application called the API, as opposed to the SDK calling the
   //   application via a callback.  When set, SYNCHRONOUS indicates
-  //   that there may be an associated trace context, otherwise 
-  //   data points are considered asynchronous.  Asynchronous Counts
-  //   define the rate of collection, not an application-level rate.
+  //   that there may be an associated trace context.  The rate of
+  //   synchronous events has a meaningful interpretation, when
+  //   considering the DataPoint.Histogram.Count or
+  //   DataPoint.Summary.Count fields, as these are true
+  //   application-level events.
+  //
+  //   Data points without SYNCHRONOUS are considered asynchronous.
+  //   The DataPoint.Histogram.Count and DataPoint.Summary.Count
+  //   fields record a number of observations, which is controlled
+  //   both by the number of distinct label sets observed and by the
+  //   rate of collection.  Because asynchronous metric Count fields
+  //   depend on the rate of collection, the rate of these metrics
+  //   should not be interpreted as rates (however these Counts may
+  //   still be used to form an average value of these metrics).
   enum KindElement {
     // INVALID_KIND_MASK is not used.
     INVALID_KIND_MASK = 0;
@@ -349,9 +365,9 @@ message DataPoint {
   // DELTA kind of metric was computed.
   // reset.
   //
-  // This must not be set for INSTANTANEOUS metric kinds.
+  // This field is ignored for INSTANTANEOUS metric kinds and SHOULD not be set.
   //
-  // The cumulative or delta value is over the time interval (start_time_unix_nano, time_unix_nano].
+  // The CUMULATIVE or DELTA value is over the time interval (start_time_unix_nano, time_unix_nano].
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   //
   // TODO: Can we omit this when all metrics in a report share the same start time?
@@ -366,25 +382,28 @@ message DataPoint {
 
   // A logical oneof among the following fields, as prescribed by ValueType:
 
-  // SCALAR_INT64 uses this.
+  // SCALAR_INT64 uses this field.
   int64 value_int64 = 4;
 
-  // SCALAR_DOUBLE uses this.
+  // SCALAR_DOUBLE uses this field.
   double value_double = 5;
 
-  // HISTOGRAM_INT64 and HISTOGRAM_DOUBLE use this.
+  // HISTOGRAM_INT64 and HISTOGRAM_DOUBLE use this field.
   Histogram histogram = 6;
 
-  // SUMMARY_INT64 and SUMMARU_DOUBLE use this.
+  // SUMMARY_INT64 and SUMMARY_DOUBLE use this field.
   Summary summary = 7;
 
-  // Exemplars are the value for RAW_INT64 and RAW_DOUBLE ValueTypes.
-  //
-  // Exemplars may also be set alongside any other ValueType than RAW_INT64
-  // or RAW_DOUBLE, in which case the exemplars carry additional information,
-  // including the full label set, exact timestamp, and optional trace context
-  // and sampling information.
-  repeated RawValue exemplars = 8;
+  // RAW_INT64 and RAW_DOUBLE use this field.  Do not set "exemplars" when reporting
+  // raw values, as exemplars can be computed by the receiver when in that case.
+  repeated RawValue raw_values = 8;
+  
+  // Exemplars are set alongside value_int64, value_double, histogram,
+  // and summary fields, in which case the exemplars carry additional
+  // information, including the full label set, exact timestamp,
+  // optional trace context, and sample count associated with selected
+  // events.
+  repeated RawValue exemplars = 9;
 }
 
 // Histogram is a single data point in a timeseries that describes the time-varying
