@@ -87,44 +87,44 @@ message LogRecord {
     // Value of 0 indicates unknown or missing timestamp.
     fixed64 time_unix_nano = 1;
 
+    // Numerical value of the severity, normalized to values described in Log Data Model.
+    // [Optional].
+    SeverityNumber severity_number = 2;
+
+    // The severity text (also known as log level). The original string representation as
+    // it is known at the source. [Optional].
+    string severity_text = 3;
+
+    // Short event identifier that does not contain varying parts. Name describes
+    // what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
+    // characters. Not guaranteed to be unique in any way. [Optional].
+    string name = 4;
+
+    // A value containing the body of the log record. Can be for example a human-readable
+    // string message (including multi-line) describing the event in a free form or it can
+    // be a structured data composed of arrays and maps of other values. [Optional].
+    opentelemetry.proto.common.v1.AnyValue body = 5;
+
+    // Additional attributes that describe the specific event occurrence. [Optional].
+    repeated opentelemetry.proto.common.v1.KeyValue attributes = 6;
+    uint32 dropped_attributes_count = 7;
+
+    // Flags, a bit field. 8 least significant bits are the trace flags as
+    // defined in W3C Trace Context specification. 24 most significant bits are reserved
+    // and must be set to 0. Readers must not assume that 24 most significant bits
+    // will be zero and must correctly mask the bits when reading 8-bit trace flag (use
+    // flags & TRACE_FLAGS_MASK). [Optional].
+    fixed32 flags = 8;
+
     // A unique identifier for a trace. All logs from the same trace share
     // the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes
     // is considered invalid. Can be set for logs that are part of request processing
-    // and have an assigned trace id. Optional.
-    bytes trace_id = 2;
+    // and have an assigned trace id. [Optional].
+    bytes trace_id = 9;
 
     // A unique identifier for a span within a trace, assigned when the span
     // is created. The ID is an 8-byte array. An ID with all zeroes is considered
     // invalid. Can be set for logs that are part of a particular processing span.
-    // If span_id is present trace_id SHOULD be also present. Optional.
-    bytes span_id = 3;
-
-    // Optional flags, a bit field. 8 least significant bits are the trace flags as
-    // defined in W3C Trace Context specification. 24 most significant bits are reserved
-    // and must be set to 0. Readers that must not assume that 24 most significant bits
-    // will be zero and must correctly mask the bits when reading 8-bit trace flag (use
-    // flags & TRACE_FLAGS_MASK). Optional.
-    fixed32 flags = 4;
-
-    // Numerical value of the severity, normalized to values described Log Data Model.
-    // Optional.
-    SeverityNumber severity_number = 5;
-
-    // The severity text (also known as log level). The original string representation as
-    // it is known at the source. Optional.
-    string severity_text = 6;
-
-    // Short event identifier that does not contain varying parts. Name describes
-    // what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
-    // characters. Not guaranteed to be unique in any way. Optional.
-    string name = 7;
-
-    // A value containing the body of the log record. Can be for example a human-readable
-    // string message (including multi-line) describing the event in a free form or it can
-    // be a structured data composed of arrays and maps of other values. Optional.
-    opentelemetry.proto.common.v1.AnyValue body = 8;
-
-    // Additional attributes that describe the specific event occurrence. Optional.
-    repeated opentelemetry.proto.common.v1.KeyValue attributes = 9;
-    uint32 dropped_attributes_count = 10;
+    // If span_id is present trace_id SHOULD be also present. [Optional].
+    bytes span_id = 10;
 }
