@@ -411,6 +411,10 @@ message SummaryDataPoint {
   // systems don't expose this. If count is zero then this field must be zero.
   double sum = 5;
 
+  double last = 7;
+  double min = 8;
+  double max = 9;
+
   // Represents the value at a given percentile of a distribution.
   //
   // To record Min and Max values following conventions are used:
