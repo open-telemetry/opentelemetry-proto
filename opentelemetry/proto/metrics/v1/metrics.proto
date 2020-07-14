@@ -153,57 +153,50 @@ message MetricDescriptor {
   // ValueType is the type of values this metric has.
   ValueType value_type = 4;
 
-  // KindElement contains a set of bit masks used to construct Kind enum values.
-  // There are 7 bits used presently, broken into groups:
+  // KindElement contains a set of bit masks used to construct Kind
+  // enum values.  There are 7 bits used presently, broken into
+  // groups:
   //
-  //   Temporality is the temporal quality values of a metric have. It
-  //   describes how those values relate to the time interval over
-  //   which they are reported.  One of the 3 Temporality values
-  //   (CUMULATIVE, DELTA, INSTANTANEOUS) MUST be set.
+  //   _Temporality_ is the temporal quality of a metric, indicating
+  //   how values relate to the time interval over which they are
+  //   reported.  One of the 3 Temporality values MUST be set:
+  //   CUMULATIVE, DELTA, or INSTANTANEOUS.
   //
-  //   Structure indicates whether metric data describes a sum of
-  //   measurements (ADDING) or a collection of individual
-  //   measurements (GROUPING).  Value types may be interpreted
-  //   differently depending on Structure.  For example, a Histogram
-  //   DataPoint may be computed for a Counter (ADDING) instrument
-  //   or a ValueRecorder (GROUPING) instrument, and:
+  //   _Structure_ is the structural quality of a metric, indicating
+  //   whether metric data describes a sum of measurements (ADDING) or
+  //   a collection of individual measurements (GROUPING).  Value
+  //   types may be interpreted differently depending on Structure.
+  //   For example, a Histogram DataPoint may be computed for a
+  //   Counter (ADDING) instrument or a ValueRecorder (GROUPING)
+  //   instrument, and the Sum and Count of the resulting aggregation
+  //   may be interpreted differently depending on structure.
   //
-  //   - ADDING Histograms define a meaningful Sum in the form of a
-  //     distribution of constituent measurements.
-  //   - GROUPING Histograms define a distribution of measurements,
-  //     where the sum is potentially not meaningful.  If also
-  //     SYNCHRONOUS, these data points define a rate in terms of
-  //     their Count.
+  //   _Monotonic_ is a boolean option that may be applied to
+  //   ADDING-structure metrics.
   //
-  //   Monotonicity applies only to ADDING data points.  When set,
-  //   MONOTONIC indicates that the calculated sum can be monitored as
-  //   a rate of change.  Observers of MONOTONIC metrics should never
-  //   see the value decrease without a reset (i.e., StartTimeUnixNano
-  //   advances), otherwise a decreasing MONOTONIC metric suggests an
-  //   SDK bug.
+  //   _Asynchronous_ is a boolean option that may be applied to all
+  //   metrics.  When set, an ASYNCHRONOUS kind indicates that the
+  //   corresponding measurement was made through a callback called by
+  //   the SDK.  When measurements originate from an OpenTelemetry
+  //   API, the ASYNCHRONOUS kind allows the interpreter to recognize
+  //   values that were emitted by the same callback invokation, which
+  //   are permitted to record at most one value per label set under
+  //   the specification.  This property can be safetly disregarded
+  //   and not set when importing data from other sources, but when
+  //   set its presence is always meaningful.  It means:
+  //   - The count of events is a measure of the rate of SDK collection
+  //     times the aggregated cardinality, therefore cannot be used
+  //     to extrapolate application-specific rate information.
+  //   - Measurements with the same Resource and StartTimeUnixNano
+  //     form a meaningful ratio, and the set of measurements is coherent.
+  //   - Trace context MUST not be set.
   //
-  //   Synchronicity applies to data points produced when the
-  //   application called the API, as opposed to the SDK calling the
-  //   application via a callback.  When set, SYNCHRONOUS indicates
-  //   that there may be an associated trace context.  The rate of
-  //   synchronous events has a meaningful interpretation, when
-  //   considering the DataPoint.Histogram.Count or
-  //   DataPoint.Summary.Count fields, as these are true
-  //   application-level events.
-  //
-  //   Data points without SYNCHRONOUS are considered asynchronous.
-  //   The DataPoint.Histogram.Count and DataPoint.Summary.Count
-  //   fields record a number of observations, which is controlled
-  //   both by the number of distinct label sets observed and by the
-  //   rate of collection.  Because asynchronous metric Count fields
-  //   depend on the rate of collection, the rate of these metrics
-  //   should not be interpreted as rates (however these Counts may
-  //   still be used to form an average value of these metrics).
   enum KindElement {
     // INVALID_KIND_MASK is not used.
     INVALID_KIND_MASK = 0;
 
-    // One of the following three MUST be set. There are 3 exclusive Temporality kinds.
+    // One of the following three MUST be set. There are 3 exclusive
+    // Temporality kinds.
 
     // INSTANTANEOUS is a metric whose values are measured at a particular
     // instant. The values are not aggregated over any time interval and are
@@ -271,23 +264,38 @@ message MetricDescriptor {
     CUMULATIVE = 0x4;
 
     // One of the following two MUST be set. There are 2 exclusive
-    // Structure kinds.  Structure defines how the data 
+    // Structure kinds.
 
     // ADDING structure means the measurement determines a sum.  For
     // DELTA kind this is expressed as the change in sum since the
-    // last collection.  For CUMULATIVE kind this is express as last
-    // collected value of the sum.
+    // last collection.  For CUMULATIVE kind this is expressed as the
+    // last collected value of the sum.  For INSTANTANEOUS kind this
+    // is expressed as a scalar value that would be added into a Sum.
     ADDING = 0x8;
 
-    // GROUPING structure means the value has been computed by combining
-    // individual values in a meaningful aggregation.  GROUPING structure
-    // implies the sum of
+    // GROUPING structure means the value has been computed by
+    // combining individual values in a meaningful aggregation.
+    // GROUPING structure implies the sum of measurements is not
+    // necessarily meaningful.  These may be expressed as DELTA
+    // kind, indicating an aggregation of values since the last
+    // collection, or as CUMULATIVE kind, indicating an aggregation
+    // of values since the last StartTimeUnixNano reset.  These may
+    // also be expressed as INSTANTANEOUS kind when reporting a
+    // scalar value type.
     GROUPING = 0x10;
 
-    // MONOTONIC may be set in conjunction with ADDING kinds, implying
-    // that the sum determines a meaningful rate.  For DELTA kind,
-    // this implies non-negative value series.  For CUMULATIVE kind,
-    // this implies a non-decreasing value series.
+    // MONOTONIC may be set in conjunction with ADDING kinds.  When
+    // set, MONOTONIC indicates that the calculated sum can be
+    // monitored as a non-negative rate of change.
+    //
+    // For DELTA
+    // kind, this implies non-negative value series.  For CUMULATIVE
+    // kind, this implies a non-decreasing value series.
+    //
+    // Observers of
+    // MONOTONIC metrics should never see the value decrease without a
+    // reset (i.e., StartTimeUnixNano advances), otherwise a
+    // decreasing MONOTONIC metric suggests an SDK bug.
     MONOTONIC = 0x20;
 
     // ASYNCHRONOUS may be set for any kind of metric, indicating it
