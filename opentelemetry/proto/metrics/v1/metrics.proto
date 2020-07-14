@@ -140,7 +140,7 @@ message MetricDescriptor {
     // ScalarInt64 implies that the value is found in Metric.scalar_data_points[].value_int64.
     SCALAR_INT64 = 1;
 
-    // ScalarDouble implies that the value is found in Metric.scalar_data_points[].double_int64.
+    // ScalarDouble implies that the value is found in Metric.scalar_data_points[].value_double.
     SCALAR_DOUBLE = 2;
 
     // Histogram implies that the value is found in Metric.histogram_data_points[].histogram.
@@ -290,10 +290,10 @@ message MetricDescriptor {
     // this implies a non-decreasing value series.
     MONOTONIC = 0x20;
 
-    // ASYNCHRONOUS may be set for any kind of metric, indicating it was generated
-    // through asynchronous events in which the SDK calls the application.  If
-    // ASYNCHRONOUS is not set, it implies the event originated from the application
-    // calling the SDK.
+    // ASYNCHRONOUS may be set for any kind of metric, indicating it
+    // was generated through asynchronous events in which the SDK
+    // calls the application.  If ASYNCHRONOUS is not set, it implies
+    // the event originated from the application calling the SDK.
     ASYNCHRONOUS = 0x40;
   }
 
