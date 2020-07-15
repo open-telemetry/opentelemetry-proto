@@ -114,8 +114,8 @@ message Metric {
   // by MetricDescriptor.value_type field.
 
   repeated ScalarDataPoint scalar_data_points = 2;
-  repeated HistogramDataPoint histogram_data_points = 4;
-  repeated SummaryDataPoint summary_data_points = 5;
+  repeated HistogramDataPoint histogram_data_points = 3;
+  repeated SummaryDataPoint summary_data_points = 4;
 }
 
 // Defines a metric type and its schema.
@@ -138,6 +138,14 @@ message MetricDescriptor {
     INVALID_VALUE_TYPE = 0;
 
     // ScalarInt64 implies that the value is found in Metric.scalar_data_points[].value_int64.
+    //
+    // When paired with GROUPING kind, the value corresponds with an
+    // individual measurement. Paired with ADDING kind, the value 
+    //
+    // .  When paired with ADDING kind, the value
+    // 
+    //
+    // When INSTANTANEOUS, this 
     SCALAR_INT64 = 1;
 
     // ScalarDouble implies that the value is found in Metric.scalar_data_points[].value_double.
@@ -171,32 +179,41 @@ message MetricDescriptor {
   //   instrument, and the Sum and Count of the resulting aggregation
   //   may be interpreted differently depending on structure.
   //
-  //   _Monotonic_ is a boolean option that may be applied to
+  //   MONOTONIC is a boolean option that may be applied to
   //   ADDING-structure metrics.
   //
-  //   _Asynchronous_ is a boolean option that may be applied to all
+  //   ASYNCHRONOUS is a boolean option that may be applied to all
   //   metrics.  When set, an ASYNCHRONOUS kind indicates that the
   //   corresponding measurement was made through a callback called by
-  //   the SDK.  When measurements originate from an OpenTelemetry
-  //   API, the ASYNCHRONOUS kind allows the interpreter to recognize
-  //   values that were emitted by the same callback invokation, which
-  //   are permitted to record at most one value per label set under
-  //   the specification.  This property can be safetly disregarded
-  //   and not set when importing data from other sources, but when
-  //   set its presence is always meaningful.  It means:
+  //   the SDK.  TimeUnixNano is deliberate, not the result of an
+  //   application-level event.
+  //
+  //   When measurements originate from an OpenTelemetry API, the
+  //   ASYNCHRONOUS kind allows the interpreter to recognize values
+  //   that were emitted by the same callback invokation, as
+  //   identified by equal an Resource and TimeUnixNano.
+  //   OpenTelemetry callbacks are permitted to record at most one
+  //   value per label set under the specification.  This property can
+  //   be safetly disregarded and not set when importing data from
+  //   other sources, but when set its presence is always meaningful.
+  //
+  //   ASYNCHRONOUS means that:
   //   - The count of events is a measure of the rate of SDK collection
   //     times the aggregated cardinality, therefore cannot be used
   //     to extrapolate application-specific rate information.
-  //   - Measurements with the same Resource and StartTimeUnixNano
-  //     form a meaningful ratio, and the set of measurements is coherent.
-  //   - Trace context MUST not be set.
+  //   - Measurements with the same Resource and TimeUnixNano
+  //     form a meaningful ratio, and the set of measurements at this
+  //     instant are coherent, resulting from a single callback.
+  //   - Trace context MUST not be set in exemplars.
+  //     TODO(#159): raw values.
   //
+  //   ASYNCHRONOUS is incompatible with INSTANTANEOUS.
   enum KindElement {
     // INVALID_KIND_MASK is not used.
     INVALID_KIND_MASK = 0;
 
-    // One of the following three MUST be set. There are 3 exclusive
-    // Temporality kinds.
+    // The three Temporality kinds are exclusive of one another.  One
+    // of the following three MUST be set.
 
     // INSTANTANEOUS is a metric whose values are measured at a particular
     // instant. The values are not aggregated over any time interval and are
@@ -261,10 +278,17 @@ message MetricDescriptor {
     //   12. The 1 second collection cycle ends. A metric is exported for the
     //      number of requests received over the interval of time t_1 to
     //      t_0+1 with a value of 1.
+    //
+    // Note that the first value in a sequence of CUMULATIVE metrics
+    // after a reset is equivalent in value to a DELTA metric for the
+    // period since the reset.  Although a CUMULATIVE metric could
+    // technically be reset after every collection event and still be
+    // described as CUMULATIVE, exporters should use DELTA if there is
+    // no intention of repeating the StartTimeUnixNano timestamp.
     CUMULATIVE = 0x4;
 
-    // One of the following two MUST be set. There are 2 exclusive
-    // Structure kinds.
+    // The two Structure kinds are exclusive of one another.  One
+    // of the Structure kind elements MUST be set.
 
     // ADDING structure means the measurement determines a sum.  For
     // DELTA kind this is expressed as the change in sum since the
@@ -274,34 +298,29 @@ message MetricDescriptor {
     ADDING = 0x8;
 
     // GROUPING structure means the value has been computed by
-    // combining individual values in a meaningful aggregation.
+    // combining individual values through a meaningful aggregation.
     // GROUPING structure implies the sum of measurements is not
     // necessarily meaningful.  These may be expressed as DELTA
     // kind, indicating an aggregation of values since the last
     // collection, or as CUMULATIVE kind, indicating an aggregation
     // of values since the last StartTimeUnixNano reset.  These may
     // also be expressed as INSTANTANEOUS kind when reporting a
-    // scalar value type.
+    // scalar value type.  TODO(#159) or raw value.
     GROUPING = 0x10;
 
     // MONOTONIC may be set in conjunction with ADDING kinds.  When
-    // set, MONOTONIC indicates that the calculated sum can be
-    // monitored as a non-negative rate of change.
-    //
-    // For DELTA
-    // kind, this implies non-negative value series.  For CUMULATIVE
-    // kind, this implies a non-decreasing value series.
-    //
-    // Observers of
-    // MONOTONIC metrics should never see the value decrease without a
-    // reset (i.e., StartTimeUnixNano advances), otherwise a
-    // decreasing MONOTONIC metric suggests an SDK bug.
+    // set, MONOTONIC indicates that the calculated sum is
+    // non-decreasing, therefore can be monitored as a non-negative
+    // rate of change.
     MONOTONIC = 0x20;
 
     // ASYNCHRONOUS may be set for any kind of metric, indicating it
-    // was generated through asynchronous events in which the SDK
-    // calls the application.  If ASYNCHRONOUS is not set, it implies
-    // the event originated from the application calling the SDK.
+    // was generated through callbacks, willed by the SDK.  In
+    // ASYNCHRONOUS measurements, TimeUnixNano results deliberately
+    // from the SDK, not from the application.
+    //
+    // When ASYNCHRONOUS is not set, it implies the event originated
+    // from the application calling the SDK.
     ASYNCHRONOUS = 0x40;
   }
 
@@ -318,35 +337,110 @@ message MetricDescriptor {
   // - 3 possibilities for Temporality
   // - 3 possibilities for Structure/Monotonicity: Adding Monotonic,
   //     Adding Non-Monotonic, and Grouping
-  // - 2 possibilities of being Asynchronous
+  // - 2 possibilities of being Asynchronous or not.
   //
-  // This makes 18 valid values.
+  // Exclusing the asynchronous instantaneous combinations, this makes
+  // 15 valid values.
   enum Kind {
     // INVALID_KIND is the default Kind, it MUST not be used.
     INVALID_KIND = 0;
 
-    // The following codes are generated by a program.
+    // The following hex values are generated by gen.go in this source
+    // directory.
 
-    ADDING_MONOTONIC_INSTANTANEOUS              = 0x29; // ADDING|INSTANTANEOUS|MONOTONIC
-    ADDING_MONOTONIC_INSTANTANEOUS_ASYNCHRONOUS = 0x69; // ADDING|INSTANTANEOUS|MONOTONIC|ASYNCHRONOUS
-    ADDING_MONOTONIC_CUMULATIVE                 = 0x2c; // ADDING|CUMULATIVE|MONOTONIC
-    ADDING_MONOTONIC_CUMULATIVE_ASYNCHRONOUS    = 0x6c; // ADDING|CUMULATIVE|MONOTONIC|ASYNCHRONOUS
-    ADDING_MONOTONIC_DELTA                      = 0x2a; // ADDING|DELTA|MONOTONIC
+    // ADDING_MONOTONIC_INSTANTANEOUS kind describes the change in a
+    // sum as measured at an instant (TimeUnixNano).  The value MUST
+    // be non-negative.  Generally this is the value of an
+    // OpenTelemetry Counter instrument without aggregation.
+    // Typically expressed as a scalar (TODO(#159): or raw) value.
+    ADDING_MONOTONIC_INSTANTANEOUS = 0x29; // ADDING|INSTANTANEOUS|MONOTONIC
+
+    // ADDING_MONOTONIC_DELTA describes the change in a sum
+    // accumulated since the metric was last collected
+    // (StartTimeUnixNano) through the measured time (TimeUnixNano).
+    // The value MUST be non-negative.  Generally this is the result
+    // of aggregating an OpenTelemetry Counter instrument since the
+    // last collection.  Typically expressed as a scalar or histogram
+    // value.
+    ADDING_MONOTONIC_DELTA = 0x2a; // ADDING|DELTA|MONOTONIC
+
+    // ADDING_MONOTONIC_DELTA_ASYNCHRONOUS is ADDING_MONOTONIC_DELTA
+    // with asynchronous semantics specified by the OpenTelemetry API,
+    // indicating the value was collected through a callback.
+    // Generally this is the temporal difference between values of an
+    // OpenTelemetry SumObserver instrument.  Typically expressed as a
+    // scalar or histogram value.
     ADDING_MONOTONIC_DELTA_ASYNCHRONOUS         = 0x6a; // ADDING|DELTA|MONOTONIC|ASYNCHRONOUS
 
-    ADDING_INSTANTANEOUS                        = 0x9 ; // ADDING|INSTANTANEOUS
-    ADDING_INSTANTANEOUS_ASYNCHRONOUS           = 0x49; // ADDING|INSTANTANEOUS|ASYNCHRONOUS
-    ADDING_CUMULATIVE                           = 0xc ; // ADDING|CUMULATIVE
-    ADDING_CUMULATIVE_ASYNCHRONOUS              = 0x4c; // ADDING|CUMULATIVE|ASYNCHRONOUS
-    ADDING_DELTA                                = 0xa ; // ADDING|DELTA
-    ADDING_DELTA_ASYNCHRONOUS                   = 0x4a; // ADDING|DELTA|ASYNCHRONOUS
+    // ADDING_MONOTONIC_CUMULATIVE describes the current value of a
+    // sum accumulated from the reset time (StartTimeUnixNano) through
+    // the measured time (TimeUnixNano).  The value must be
+    // non-negative and not less than the previously reported value of
+    // the same metric.  Generally this is the result of aggregating an
+    // OpenTelemetry Counter instrument since the last reset time.
+    // Typically expressed as a scalar or histogram value.
+    ADDING_MONOTONIC_CUMULATIVE = 0x2c; // ADDING|CUMULATIVE|MONOTONIC
 
-    GROUPING_INSTANTANEOUS                      = 0x11; // GROUPING|INSTANTANEOUS
-    GROUPING_INSTANTANEOUS_ASYNCHRONOUS         = 0x51; // GROUPING|INSTANTANEOUS|ASYNCHRONOUS
-    GROUPING_CUMULATIVE                         = 0x14; // GROUPING|CUMULATIVE
-    GROUPING_CUMULATIVE_ASYNCHRONOUS            = 0x54; // GROUPING|CUMULATIVE|ASYNCHRONOUS
-    GROUPING_DELTA                              = 0x12; // GROUPING|DELTA
-    GROUPING_DELTA_ASYNCHRONOUS                 = 0x52; // GROUPING|DELTA|ASYNCHRONOUS
+    // ADDING_MONOTONIC_CUMULATIVE_ASYNCHRONOUS is
+    // ADDING_MONOTONIC_CUMULATIVE with asynchronous semantics
+    // specified by the OpenTelemetry API, indicating the value was
+    // collected through a callback.  Generally this is the sum of
+    // measurements of an OpenTelemetry SumObserver instrument.
+    // Typically expressed as a scalar or histogram value.
+    ADDING_MONOTONIC_CUMULATIVE_ASYNCHRONOUS = 0x6c; // ADDING|CUMULATIVE|MONOTONIC|ASYNCHRONOUS
+
+    // TODO(jmacd): The following five values have nearly-identical
+    // comments as the above, with the "non-negative" sentence changed
+    // to and the Counter instrument replaced by the UpDownCounter
+    // instrument.  Update comments following review of the above.
+
+    ADDING_INSTANTANEOUS = 0x9; // ADDING|INSTANTANEOUS
+    ADDING_DELTA = 0xa; // ADDING|DELTA
+    ADDING_DELTA_ASYNCHRONOUS = 0x4a; // ADDING|DELTA|ASYNCHRONOUS
+    ADDING_CUMULATIVE = 0xc; // ADDING|CUMULATIVE
+    ADDING_CUMULATIVE_ASYNCHRONOUS = 0x4c; // ADDING|CUMULATIVE|ASYNCHRONOUS
+    
+    // GROUPING_INSTANTANEOUS kind describes an individual value
+    // measured at an instant (TimeUnixNano).  Generally this is the value of an
+    // OpenTelemetry ValueRecorder instrument without aggregation.
+    // Typically expressed as a scalar (TODO(#159): or raw) value.
+    GROUPING_INSTANTANEOUS = 0x11; // GROUPING|INSTANTANEOUS
+
+    // GROUPING_DELTA kind describes a set of individual values
+    // measured from the most recent collection (StartTimeUnixNano)
+    // through the measured time (TimeUnixNano).  Generally this is
+    // the aggregated value of an OpenTelemetry ValueRecorder
+    // instrument.  Typically expressed as a scalar, histogram, or
+    // summary value.  When expressed as a scalar value, this is
+    // specified to mean the most recent (i.e., "last") value to occur
+    // within the collection interval.
+    GROUPING_DELTA = 0x12; // GROUPING|DELTA
+
+    // GROUPING_DELTA_ASYNCHRONOUS is GROUPING_DELTA with asynchronous
+    // semantics specified by the OpenTelemetry API, indicating the
+    // value was collected through a callback.  Generally this is the
+    // aggregated value of an OpenTelemetry ValueObserver instrument.
+    // Typically expressed as a scalar, histogram, or summary value.
+    GROUPING_DELTA_ASYNCHRONOUS = 0x52; // GROUPING|DELTA|ASYNCHRONOUS
+
+    // GROUPING_CUMULATIVE kind describes a set of individual values
+    // measured from the last reset time (StartTimeUnixNano) through
+    // the measured time (TimeUnixNano).  Generally this is the
+    // aggregated value of an OpenTelemetry ValueRecorder instrument.
+    // Typically expressed as a scalar or histogram value.  When
+    // expressed as a scalar value, this is specified to mean the most
+    // recent (i.e., "last") value to occur since the reset time,
+    // which may have occurred prior to the most recent collection
+    // interval.
+    GROUPING_CUMULATIVE = 0x14; // GROUPING|CUMULATIVE
+
+    // GROUPING_CUMULATIVE_ASYNCHRONOUS is GROUPING_CUMULATIVE with
+    // asynchronous semantics specified by the OpenTelemetry API,
+    // indicating the value was collected through a callback.
+    // Generally this is the aggregated value of an OpenTelemetry
+    // ValueObserver instrument.  Typically expressed as a scalar or
+    // histogram value.
+    GROUPING_CUMULATIVE_ASYNCHRONOUS = 0x54; // GROUPING|CUMULATIVE|ASYNCHRONOUS
   }
 
   // Kind describes properties of the Metric that are necessary to
@@ -354,54 +448,33 @@ message MetricDescriptor {
   Kind kind = 5;
 }
 
-// Int64DataPoint is a single data point in a timeseries that describes the time-varying
-// values of a SCALAR_INT64 metric.
-message Int64DataPoint {
+// ScalarDataPoint is a single data point in a timeseries that
+// describes the time-varying values of a SCALAR_INT64 or
+// SCALAR_DOUBLE metric.
+message ScalarDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
-  // This is used for Counter type only. For Gauge the value is not specified and
-  // defaults to 0.
+  // start_time_unix_nano is the time when the value was reset to zero
+  // for CUMULATIVE or DELTA metrics.
   //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
+  // The value is measured over the time interval
+  // (start_time_unix_nano, time_unix_nano].  Value is UNIX Epoch time
+  // in nanoseconds since 00:00:00 UTC on 1 January 1970.  The value
+  // MUST be set when the instrument descriptor Kind includes either
+  // CUMULATIVE or DELTA and MUST NOT be set when Kind includes
+  // INSTANTANOUS.
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this value was recorded.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   fixed64 time_unix_nano = 3;
 
-  // value itself.
-  int64 value = 4;
-}
+  // value itself, if SCALAR_INT64.
+  int64 value_int64 = 4;
 
-// DoubleDataPoint is a single data point in a timeseries that describes the time-varying
-// value of a SCALAR_DOUBLE metric.
-message DoubleDataPoint {
-  // The set of labels that uniquely identify this timeseries.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
-
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
-  // This is used for Counter type only. For Gauge the value is not specified and
-  // defaults to 0.
-  //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
-  fixed64 start_time_unix_nano = 2;
-
-  // time_unix_nano is the moment when this value was recorded.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  fixed64 time_unix_nano = 3;
-
-  // value itself.
-  double value = 4;
+  // value itself, if SCALAR_DOUBLE.
+  double value_double = 4;
 }
 
 // HistogramDataPoint is a single data point in a timeseries that describes the time-varying

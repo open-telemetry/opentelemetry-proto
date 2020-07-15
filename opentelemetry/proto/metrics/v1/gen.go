@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	cumulativeProps = []string{"Instantaneous", "Cumulative", "Delta"}
+	cumulativeProps = []string{"Instantaneous", "Delta", "Cumulative"}
 	addingProps     = []string{"Adding", "Grouping"}
 	monoProps       = []string{"Monotonic", ""}
 	syncProps       = []string{"Synchronous", "Asynchronous"}
@@ -72,6 +72,7 @@ var (
 			if a == "Grouping" && m == "Monotonic" {
 				continue
 			}
+
 			mfrag := ""
 			mname := ""
 			if m == "Monotonic" {
@@ -80,6 +81,9 @@ var (
 			}
 			for _, c := range cumulativeProps {
 				for _, s := range syncProps {
+					if c == "Instantaneous" && s == "Asynchronous" {
+						continue
+					}
 					sfrag := ""
 					sname := ""
 					if s == "Asynchronous" {
@@ -109,7 +113,7 @@ func main() {
 	}
 
 	for i, fn := range fullnames {
-		fmt.Println(`fmt.Printf("  %-*s = %-*s; // %s\n", `, maxNameSize, ",", strconv.Quote(fn), ",", 4, ",", `fmt.Sprintf("%#x",`, fn, `)`, ",", strconv.Quote(fullvalues[i]), ")")
+		fmt.Println(`fmt.Printf("  %s = %s; // %s\n", `, strconv.Quote(fn), ",", `fmt.Sprintf("%#x",`, fn, `)`, ",", strconv.Quote(fullvalues[i]), ")")
 	}
 	fmt.Println(`}`)
 }
