@@ -100,8 +100,8 @@ message InstrumentationLibraryMetrics {
 //   - the end of the interval (CUMULATIVE or DELTA)
 //   - the instantaneous time of the event (INSTANTANEOUS).
 //
-// The ValueType of the descriptor determines which of the repeated points
-// fields is used.
+// The ValueType of the descriptor determines which of the repeated
+// points fields is used.
 message Metric {
   // Descriptor describes the Metric.
   //
@@ -136,31 +136,29 @@ message MetricDescriptor {
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // ValueType is the type of values a metric has.  ValueType determines
-  // which field of the DataPoint will be used for Metrics with this
-  // descriptor.
+  // ValueType is the type of values a metric has.  ValueType
+  // determines which field of the DataPoint will be used for Metrics
+  // with this descriptor.  See the definition of Kind for detail on
+  // which aggregations may be expressed for which instruments using
+  // which value types.
   enum ValueType {
     // INVALID_TYPE is the default ValueType, it MUST not be used.
     INVALID_VALUE_TYPE = 0;
 
-    // ScalarInt64 implies that the value is found in Metric.scalar_data_points[].value_int64.
-    //
-    // When paired with GROUPING kind, the value corresponds with an
-    // individual measurement. Paired with ADDING kind, the value 
-    //
-    // .  When paired with ADDING kind, the value
-    // 
-    //
-    // When INSTANTANEOUS, this 
+    // ScalarInt64 implies that the value is found in
+    // Metric.scalar_data_points[].value_int64.
     SCALAR_INT64 = 1;
 
-    // ScalarDouble implies that the value is found in Metric.scalar_data_points[].value_double.
+    // ScalarDouble implies that the value is found in
+    // Metric.scalar_data_points[].value_double.
     SCALAR_DOUBLE = 2;
 
-    // Histogram implies that the value is found in Metric.histogram_data_points[].histogram.
+    // Histogram implies that the value is found in
+    // Metric.histogram_data_points[].histogram.
     HISTOGRAM = 3;
 
-    // Summary implies that the value is found in Metric.summary_data_points[].summary.
+    // Summary implies that the value is found in
+    // Metric.summary_data_points[].summary.
     SUMMARY = 4;
 
     // TODO(#159): add RAW_INT64 and RAW_DOUBLE value types.
@@ -173,49 +171,49 @@ message MetricDescriptor {
   // enum values.  There are 7 bits used presently, broken into
   // groups:
   //
-  //   _Temporality_ is the temporal quality of a metric, indicating
-  //   how values relate to the time interval over which they are
-  //   reported.  One of the 3 Temporality values MUST be set:
-  //   CUMULATIVE, DELTA, or INSTANTANEOUS.
+  // "Temporality" is the temporal quality of a metric, indicating how
+  // values relate to the time interval over which they are reported.
+  // One of the 3 Temporality values MUST be set: CUMULATIVE, DELTA,
+  // or INSTANTANEOUS.
   //
-  //   _Structure_ is the structural quality of a metric, indicating
-  //   whether metric data describes a sum of measurements (ADDING) or
-  //   a collection of individual measurements (GROUPING).  Value
-  //   types may be interpreted differently depending on Structure.
-  //   For example, a Histogram DataPoint may be computed for a
-  //   Counter (ADDING) instrument or a ValueRecorder (GROUPING)
-  //   instrument, and the Sum and Count of the resulting aggregation
-  //   may be interpreted differently depending on structure.
+  // "Structure" is the structural quality of a metric, indicating
+  // whether metric data describes a sum of measurements (ADDING) or a
+  // collection of individual measurements (GROUPING).  Value types
+  // may be interpreted differently depending on Structure.  For
+  // example, a Histogram DataPoint may be computed for a Counter
+  // (ADDING) instrument or a ValueRecorder (GROUPING) instrument, and
+  // the Sum and Count of the resulting aggregation may be interpreted
+  // differently depending on structure.
   //
-  //   MONOTONIC is a boolean option that may be applied to
-  //   ADDING-structure metrics.
+  // MONOTONIC is a boolean option that may be applied to
+  // ADDING-structure metrics.
   //
-  //   ASYNCHRONOUS is a boolean option that may be applied to all
-  //   metrics.  When set, an ASYNCHRONOUS kind indicates that the
-  //   corresponding measurement was made through a callback called by
-  //   the SDK.  TimeUnixNano is deliberate, not the result of an
-  //   application-level event.
+  // ASYNCHRONOUS is a boolean option that may be applied to all
+  // metrics.  When set, an ASYNCHRONOUS kind indicates that the
+  // corresponding measurement was made through a callback called by
+  // the SDK.  TimeUnixNano is deliberate, not the result of an
+  // application-level event.
   //
-  //   When measurements originate from an OpenTelemetry API, the
-  //   ASYNCHRONOUS kind allows the interpreter to recognize values
-  //   that were emitted by the same callback invokation, as
-  //   identified by equal an Resource and TimeUnixNano.
-  //   OpenTelemetry callbacks are permitted to record at most one
-  //   value per label set under the specification.  This property can
-  //   be safetly disregarded and not set when importing data from
-  //   other sources, but when set its presence is always meaningful.
+  // When measurements originate from an OpenTelemetry API, the
+  // ASYNCHRONOUS kind allows the interpreter to recognize values that
+  // were emitted by the same callback invokation, as identified by
+  // equal an Resource and TimeUnixNano.  OpenTelemetry callbacks are
+  // permitted to record at most one value per label set under the
+  // specification.  This property can be safetly disregarded and not
+  // set when importing data from other sources, but when set its
+  // presence is always meaningful.
   //
-  //   ASYNCHRONOUS means that:
-  //   - The count of events is a measure of the rate of SDK collection
-  //     times the aggregated cardinality, therefore cannot be used
-  //     to extrapolate application-specific rate information.
-  //   - Measurements with the same Resource and TimeUnixNano
-  //     form a meaningful ratio, and the set of measurements at this
-  //     instant are coherent, resulting from a single callback.
-  //   - Trace context MUST not be set in exemplars.
-  //     TODO(#159): raw values.
+  // ASYNCHRONOUS means that:
+  // - The count of events is a measure of the rate of SDK collection
+  //   times the aggregated cardinality, therefore cannot be used
+  //   to extrapolate application-specific rate information.
+  // - Measurements with the same Resource and TimeUnixNano
+  //   form a meaningful ratio, and the set of measurements at this
+  //   instant are coherent, resulting from a single callback.
+  // - Trace context MUST not be set in exemplars.
+  //   TODO(#159): raw values.
   //
-  //   ASYNCHRONOUS is incompatible with INSTANTANEOUS.
+  // ASYNCHRONOUS is incompatible with INSTANTANEOUS.
   enum KindElement {
     // INVALID_KIND_MASK is not used.
     INVALID_KIND_MASK = 0;
