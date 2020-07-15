@@ -106,12 +106,14 @@ message Metric {
   // Descriptor describes the Metric.
   //
   // N.B. "Descriptor" is a reserved term in protobuf, protoc
-  // generates a field named "Descriptor_" thus we use "metric_descriptor".
+  // generates a field named "Descriptor_" thus we use
+  // "metric_descriptor".
   MetricDescriptor metric_descriptor = 1;
 
-  // Data is a list of one or more DataPoints for a single metric. Only one of the
-  // following fields is used for the data, depending on the type of the metric defined
-  // by MetricDescriptor.value_type field.
+  // Data is a list of one or more DataPoints for a single
+  // metric. Only one of the following fields is used for the data,
+  // depending on the type of the metric defined by
+  // MetricDescriptor.value_type field.
 
   repeated ScalarDataPoint scalar_data_points = 2;
   repeated HistogramDataPoint histogram_data_points = 4;
