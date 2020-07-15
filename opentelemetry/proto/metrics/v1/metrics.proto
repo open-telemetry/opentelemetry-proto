@@ -474,7 +474,7 @@ message ScalarDataPoint {
   int64 value_int64 = 4;
 
   // value itself, if SCALAR_DOUBLE.
-  double value_double = 4;
+  double value_double = 5;
 }
 
 // HistogramDataPoint is a single data point in a timeseries that describes the time-varying
