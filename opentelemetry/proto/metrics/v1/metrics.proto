@@ -156,6 +156,8 @@ message MetricDescriptor {
 
     // Summary implies that the value is found in Metric.summary_data_points[].summary.
     SUMMARY = 4;
+
+    // TODO(#159): add RAW_INT64 and RAW_DOUBLE value types.
   }
 
   // ValueType is the type of values this metric has.
