@@ -23,7 +23,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"go/format"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -36,7 +39,8 @@ var (
 )
 
 func main() {
-	fmt.Println(`package main
+	var buf bytes.Buffer
+	buf.WriteString(`package main
 
 import "fmt"
 
@@ -94,26 +98,26 @@ var (
 					fullnames = append(fullnames, fullname)
 					fullvalue := fmt.Sprint("", strings.ToUpper(a), "|", strings.ToUpper(c), mfrag, sfrag)
 					fullvalues = append(fullvalues, fullvalue)
-					fmt.Print(fullname, " Kind = ", fullvalue, "\n")
+					buf.WriteString(fmt.Sprint(fullname, " Kind = ", fullvalue, "\n"))
 				}
 			}
 		}
 	}
-	fmt.Println(`)
+	buf.WriteString(`)
 
 func main() {
 `)
 
-	maxNameSize := 0
-
-	for _, fn := range fullnames {
-		if maxNameSize < len(fn) {
-			maxNameSize = len(fn)
-		}
-	}
-
 	for i, fn := range fullnames {
-		fmt.Println(`fmt.Printf("  %s = %s; // %s\n", `, strconv.Quote(fn), ",", `fmt.Sprintf("%#x",`, fn, `)`, ",", strconv.Quote(fullvalues[i]), ")")
+		buf.WriteString(fmt.Sprint(`fmt.Printf("  %s = %s; // %s\n", `, strconv.Quote(fn), ",", `fmt.Sprintf("%#x",`, fn, `)`, ",", strconv.Quote(fullvalues[i]), ")\n"))
 	}
-	fmt.Println(`}`)
+	buf.WriteRune('}')
+
+	src, err := format.Source(buf.Bytes())
+	if err != nil {
+		panic(err)
+	}
+	if nwritten, err := os.Stdout.Write(src); err != nil || nwritten != len(src) {
+		panic(err)
+	}
 }
