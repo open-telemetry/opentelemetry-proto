@@ -114,8 +114,12 @@ message Metric {
   // by MetricDescriptor.value_type field.
 
   repeated ScalarDataPoint scalar_data_points = 2;
-  repeated HistogramDataPoint histogram_data_points = 3;
-  repeated SummaryDataPoint summary_data_points = 4;
+  repeated HistogramDataPoint histogram_data_points = 4;
+  repeated SummaryDataPoint summary_data_points = 5;
+
+  // TODO(#159) Use for exemplars of aggregated metrics or for
+  // RAW_INT64 or RAW_DOUBLE metrics:
+  //   repeated RawDataPoint raw_data_points = 3;
 }
 
 // Defines a metric type and its schema.
