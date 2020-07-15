@@ -347,6 +347,49 @@ message MetricDescriptor {
   //
   // Exclusing the asynchronous instantaneous combinations, this makes
   // 15 valid values.
+  //
+  // The cases are detailed below in terms of:
+  //
+  // - How StartTimeUnixNano and TimeUnixNano are interpreted?
+  // - Which OpenTelemetry is likely to produce instrument?
+  // - Under which typical aggregations?
+  // - Producing which kind of data point?
+  //
+  // Certain general statements can be made.
+  //
+  // About the two Structure kinds:
+  //
+  // 1. ADDING kinds associate with (UpDown)Counter and (UpDown)SumObserver instruments
+  //    - MONOTONIC kinds associate with Counter and SumObserver
+  //    - non-MONOTONIC kinds associate with UpDownCounter and UpDownSumObserver
+  // 2. GROUPING kinds associate with ValueRecorder and ValueObserver instruments
+  // 3. GROUPING and ADDING kinds both typically yield Histogram data points.
+  //
+  // About ASYNCHRONOUS kinds:
+  // 
+  // 1. ASYNCHRONOUS kinds associate with Observer instruments
+  // 2. INSTANTANEOUS temporality does not combine with ASYNCHRONOUS kinds.
+  //
+  // About SCALAR_INT64 and SCALAR_DOUBLE value type (TODO(#159) and
+  // equally the RAW value types):
+  //
+  // 1. SCALAR value type interpretation depends on
+  //    both temporality and structure
+  // 2. For GROUPING kinds:
+  //    - For INSTANTANEOUS temporality: An individual measurement
+  //    - For DELTA or CUMULATIVE temporality: The last measured individual value
+  //      in the collection interval.
+  // 3. For ADDING kinds:
+  //    - For INSTANTANEOUS temporality: An instantaneously measured change in a sum
+  //    - For DELTA temporality: An aggregated change in a sum
+  //    - For CUMULATIVE temporality: An aggregated sum.
+  // 4. INSTANTANEOUS kinds are always scalar values (TODO(#159) or raw)
+  //
+  // About CUMULATIVE kinds:
+  //
+  // 1. CUMULATIVE GROUPING kinds typically use Histogram data points, rarely use
+  //    Summary data points
+  // 
   enum Kind {
     // INVALID_KIND is the default Kind, it MUST not be used.
     INVALID_KIND = 0;
