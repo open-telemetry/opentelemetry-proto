@@ -311,12 +311,11 @@ message MetricDescriptor {
     // GROUPING structure means the value has been computed by
     // combining individual values through a meaningful aggregation.
     // GROUPING structure implies the sum of measurements is not
-    // necessarily meaningful.  These may be expressed as DELTA
-    // kind, indicating an aggregation of values since the last
-    // collection, or as CUMULATIVE kind, indicating an aggregation
-    // of values since the last StartTimeUnixNano reset.  These may
-    // also be expressed as INSTANTANEOUS kind when reporting a
-    // scalar value type.  TODO(#159) or raw value.
+    // necessarily meaningful.  These may be expressed as Histogram or
+    // Summary data points for DELTA kind and CUMULATIVE temporality
+    // kinds.  These may also be expressed as INSTANTANEOUS kind when
+    // reporting a scalar value type (e.g., for LastValue
+    // aggregation).  TODO(#159) or raw value (i.e., no aggregation).
     GROUPING = 0x10;
 
     // MONOTONIC may be set in conjunction with ADDING kinds.  When
