@@ -192,16 +192,21 @@ message MetricDescriptor {
   // metrics.  When set, an ASYNCHRONOUS kind indicates that the
   // corresponding measurement was made through a callback called by
   // the SDK.  TimeUnixNano is deliberate, not the result of an
-  // application-level event.
+  // application-level event.  This property can be safetly
+  // disregarded and not set when importing data from other sources,
+  // but when set its presence is always meaningful.
   //
   // When measurements originate from an OpenTelemetry API, the
   // ASYNCHRONOUS kind allows the interpreter to recognize values that
   // were emitted by the same callback invokation, as identified by
-  // equal an Resource and TimeUnixNano.  OpenTelemetry callbacks are
-  // permitted to record at most one value per label set under the
-  // specification.  This property can be safetly disregarded and not
-  // set when importing data from other sources, but when set its
-  // presence is always meaningful.
+  // equal Resource and TimeUnixNano values. As required by the API
+  // specification, all observations from a single callback must have
+  // the same TimeUnixNano applied and callbacks are permitted to
+  // record at most one value per label set.  This is implied here as
+  // well: an ASYNCHRONOUS metric MUST NOT have more than one data
+  // point per TimeUnixNano, Resource, and LabelSet.  If the
+  // interpreter of this data finds such matching data points, they
+  // are considered duplicate by definition.
   //
   // ASYNCHRONOUS means that:
   // - The count of events is a measure of the rate of SDK collection
