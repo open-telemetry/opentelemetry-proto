@@ -198,7 +198,7 @@ message MetricDescriptor {
   //
   // When measurements originate from an OpenTelemetry API, the
   // ASYNCHRONOUS kind allows the interpreter to recognize values that
-  // were emitted by the same callback invokation, as identified by
+  // were emitted by the same callback invocation, as identified by
   // equal Resource and TimeUnixNano values. As required by the API
   // specification, all observations from a single callback must have
   // the same TimeUnixNano applied and callbacks are permitted to
