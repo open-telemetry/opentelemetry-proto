@@ -35,7 +35,7 @@ var (
 	cumulativeProps = []string{"Instantaneous", "Delta", "Cumulative"}
 	addingProps     = []string{"Adding", "Grouping"}
 	monoProps       = []string{"Monotonic", ""}
-	syncProps       = []string{"Synchronous", "Asynchronous"}
+	syncProps       = []string{"Synchronous", "Chronological"}
 )
 
 func main() {
@@ -63,7 +63,7 @@ const (
 	MONOTONIC = 1 << 5
 
 	// May be set for any instrument.
-	ASYNCHRONOUS = 1 << 6
+	CHRONOLOGICAL = 1 << 6
 )
 
 var (
@@ -85,14 +85,14 @@ var (
 			}
 			for _, c := range cumulativeProps {
 				for _, s := range syncProps {
-					if c == "Instantaneous" && s == "Asynchronous" {
+					if c == "Instantaneous" && s == "Chronological" {
 						continue
 					}
 					sfrag := ""
 					sname := ""
-					if s == "Asynchronous" {
-						sfrag = "|ASYNCHRONOUS"
-						sname = "_ASYNCHRONOUS"
+					if s == "Chronological" {
+						sfrag = "|CHRONOLOGICAL"
+						sname = "_CHRONOLOGICAL"
 					}
 					fullname := fmt.Sprint(strings.ToUpper(a), mname, "_", strings.ToUpper(c), sname)
 					fullnames = append(fullnames, fullname)
