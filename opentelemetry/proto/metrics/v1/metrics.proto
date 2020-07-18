@@ -190,25 +190,21 @@ message MetricDescriptor {
   //
   // CHRONOLOGICAL is a boolean option that may be applied to all
   // metrics, meaning that the metric was generated periodically, at a
-  // time chosen by the SDK.  When set, an CHRONOLOGICAL kind
-  // indicates that the corresponding measurement was made through a
-  // callback called by the SDK.  TimeUnixNano is deliberate, not the
-  // result of an application-level event.  This property can be
-  // safetly disregarded and not set when importing data from other
-  // sources, but when set its presence is always meaningful.
+  // time chosen by the SDK.  OpenTelemetry Observer instruments
+  // report CHRONOLOGICAL measurements, with observations from a
+  // single callback invokation sharing a single logical timestamp.
+  // This property can be safetly disregarded and not set when
+  // importing data from other sources, but when set its presence is
+  // always meaningful.
   //
   // When measurements originate from an OpenTelemetry API, the
-  // CHRONOLOGICAL kind allows the interpreter to recognize values that
-  // were emitted by the same callback invocation, as identified by
-  // equal Resource and TimeUnixNano values. As required by the API
-  // specification, all observations from a single callback must have
-  // the same TimeUnixNano applied and callbacks are permitted to
-  // record at most one value per label set.  This is implied here as
-  // well: an CHRONOLOGICAL metric MUST NOT have more than one data
-  // point per TimeUnixNano, Resource, and LabelSet.  If the
-  // interpreter of this data finds such matching data points, they
-  // are considered duplicate by definition and all but one SHOULD
-  // be discarded.
+  // CHRONOLOGICAL kind allows the interpreter to recognize values
+  // that were emitted by the same callback invocation, as identified
+  // by equal Resource and TimeUnixNano values.  CHRONOLOGICAL metrics
+  // MUST NOT have more than one data point per TimeUnixNano,
+  // Resource, and LabelSet.  If the interpreter of this data finds
+  // such matching data points, they are considered duplicate by
+  // definition and all but one SHOULD be discarded.
   //
   // CHRONOLOGICAL means that:
   // - The count of events is a measure of the rate of SDK collection
@@ -216,7 +212,8 @@ message MetricDescriptor {
   //   to extrapolate application-specific rate information.
   // - Measurements with the same Resource and TimeUnixNano
   //   form a meaningful ratio, and the set of measurements at this
-  //   instant are coherent, resulting from a single callback.
+  //   instant are coherent at the point-in-time, as they result from
+  //   a single callback.
   // - Measurements are not traced, by definition, and SHOULD NOT have
   //   associated trace context (e.g., no exemplars with trace_id,
   //   span_id).
