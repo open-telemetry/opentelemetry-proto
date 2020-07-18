@@ -403,16 +403,36 @@ message SummaryDataPoint {
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   fixed64 time_unix_nano = 3;
 
-  // The total number of recorded values since start_time. Optional since
-  // some systems don't expose this.
+  // The total number of recorded values since start_time.  This field
+  // MUST be omitted when its true value is 1.  An omitted or zero
+  // value is interpreted as having `count` equal to 1, and in this
+  // case the value of `sum`, `min`, and `max` are implied to equal
+  // the value of `last`.
   uint64 count = 4;
 
-  // The total sum of recorded values since start_time. Optional since some
-  // systems don't expose this. If count is zero then this field must be zero.
+  // The last value MUST be set to the last value that was measured
+  // since start_time.
+  double last = 7;
+
+  // The total sum of recorded values since start_time.  If the count
+  // was omitted or zero because its true value was 1, the value of
+  // `sum` shall be set by the reader to value of `last`.  Otherwise,
+  // this field MUST be set to the sum of measurements reflected in
+  // count.
   double sum = 5;
 
-  double last = 7;
+  // The minimum of recorded values since start_time.  If the count
+  // was omitted or zero because its true value was 1, the value of
+  // `min` shall be set by the reader to value of `last`.  Otherwise,
+  // this field MUST be set to the minimum of the measurements
+  // reflected in count.
   double min = 8;
+
+  // The maximum of recorded values since start_time.  If the count
+  // was omitted or zero because its true value was 1, the value of
+  // `max` shall be set by the reader to value of `last`.  Otherwise,
+  // this field MUST be set to the maximum of the measurements
+  // reflected in count.
   double max = 9;
 
   // Represents the value at a given percentile of a distribution.
