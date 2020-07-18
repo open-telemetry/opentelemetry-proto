@@ -435,17 +435,12 @@ message SummaryDataPoint {
   // be set to the maximum of the measurements reflected in count.
   double max = 9;
 
-  // Represents the value at a given percentile of a distribution.
-  //
-  // To record Min and Max values following conventions are used:
-  // - The 100th percentile is equivalent to the maximum value observed.
-  // - The 0th percentile is equivalent to the minimum value observed.
-  //
-  // See the following issue for more context:
-  // https://github.com/open-telemetry/opentelemetry-proto/issues/125
+  // Represents the value at a given percentile of a distribution.  to
+  // represent the maximum or minimum values, use `max` and `min`
+  // fields, do not use percentiles 0 or 100.
   message ValueAtPercentile {
     // The percentile of a distribution. Must be in the interval
-    // [0.0, 100.0].
+    // (0.0, 100.0).
     double percentile = 1;
 
     // The value at the given percentile of a distribution.
