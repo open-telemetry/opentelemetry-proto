@@ -152,7 +152,7 @@ message MetricDescriptor {
     // Summary value. Some frameworks implemented Histograms as a summary of observations
     // (usually things like request durations and response sizes). While it
     // also provides a total count of observations and a sum of all observed
-    // values, it calculates configurable percentiles over a sliding time
+    // values, it calculates configurable quantiles over a sliding time
     // window.
     // Corresponding values are stored in SummaryDataPoint.
     SUMMARY = 6;
@@ -411,24 +411,24 @@ message SummaryDataPoint {
   // systems don't expose this. If count is zero then this field must be zero.
   double sum = 5;
 
-  // Represents the value at a given percentile of a distribution.
+  // Represents the value at a given quantile of a distribution.
   //
   // To record Min and Max values following conventions are used:
-  // - The 100th percentile is equivalent to the maximum value observed.
-  // - The 0th percentile is equivalent to the minimum value observed.
+  // - The 100th quantile is equivalent to the maximum value observed.
+  // - The 0th quantile is equivalent to the minimum value observed.
   //
   // See the following issue for more context:
   // https://github.com/open-telemetry/opentelemetry-proto/issues/125
-  message ValueAtPercentile {
-    // The percentile of a distribution. Must be in the interval
-    // [0.0, 100.0].
-    double percentile = 1;
+  message ValueAtQuantile {
+    // The quantile of a distribution. Must be in the interval
+    // (0.0, 1.0).
+    double quantile = 1;
 
-    // The value at the given percentile of a distribution.
+    // The value at the given quantile of a distribution.
     double value = 2;
   }
 
-  // A list of values at different percentiles of the distribution calculated
-  // from the current snapshot. The percentiles must be strictly increasing.
-  repeated ValueAtPercentile percentile_values = 6;
+  // A list of values at different quantiles of the distribution calculated
+  // from the current snapshot. The quantiles must be strictly increasing.
+  repeated ValueAtQuantile quantile_values = 6;
 }
