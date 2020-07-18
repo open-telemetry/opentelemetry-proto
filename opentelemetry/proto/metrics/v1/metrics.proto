@@ -414,14 +414,14 @@ message SummaryDataPoint {
   // Represents the value at a given quantile of a distribution.
   //
   // To record Min and Max values following conventions are used:
-  // - The 100th quantile is equivalent to the maximum value observed.
-  // - The 0th quantile is equivalent to the minimum value observed.
+  // - The 1.0 quantile is equivalent to the maximum value observed.
+  // - The 0.0 quantile is equivalent to the minimum value observed.
   //
   // See the following issue for more context:
   // https://github.com/open-telemetry/opentelemetry-proto/issues/125
   message ValueAtQuantile {
     // The quantile of a distribution. Must be in the interval
-    // (0.0, 1.0).
+    // [0.0, 1.0].
     double quantile = 1;
 
     // The value at the given quantile of a distribution.
