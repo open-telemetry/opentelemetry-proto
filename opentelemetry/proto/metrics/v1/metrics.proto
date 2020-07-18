@@ -376,8 +376,8 @@ message MetricDescriptor {
   //
   // About ADDING|INSTANTANEOUS vs ADDING|DELTA:
   //
-  // 1. An INSTANTANEOUS|ADDING event is stateless, has no StartTimeUnixNano.
-  // 2. A DELTA|ADDING event remembers its start time, sets StartTimeUnixNano.
+  // 1. An ADDING|INSTANTANEOUS event is stateless, has no StartTimeUnixNano.
+  // 2. An ADDING|DELTA event remembers its start time, sets StartTimeUnixNano.
   //
   // About SCALAR_INT64 and SCALAR_DOUBLE value type (TODO(#159) and
   // equally the RAW value types):
