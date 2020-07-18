@@ -374,6 +374,11 @@ message MetricDescriptor {
   // 1. CHRONOLOGICAL kinds associate with Observer instruments
   // 2. INSTANTANEOUS temporality does not combine with CHRONOLOGICAL kinds.
   //
+  // About ADDING|INSTANTANEOUS vs ADDING|DELTA:
+  //
+  // 1. An INSTANTANEOUS|ADDING event is stateless, has no StartTimeUnixNano.
+  // 2. A DELTA|ADDING event remembers its start time, sets StartTimeUnixNano.
+  //
   // About SCALAR_INT64 and SCALAR_DOUBLE value type (TODO(#159) and
   // equally the RAW value types):
   //
@@ -391,9 +396,8 @@ message MetricDescriptor {
   //
   // About CUMULATIVE kinds:
   //
-  // 1. CUMULATIVE GROUPING kinds typically use Histogram data points, rarely use
-  //    Summary data points
-  // 
+  // 1. CUMULATIVE GROUPING kinds typically use Histogram data points
+  // 2. CUMULATIVE is rarely used with Summary data points
   enum Kind {
     // INVALID_KIND is the default Kind, it MUST not be used.
     INVALID_KIND = 0;
