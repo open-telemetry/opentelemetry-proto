@@ -415,24 +415,24 @@ message SummaryDataPoint {
   double last = 7;
 
   // The total sum of recorded values since start_time.  If the count
-  // was omitted or zero because its true value was 1, the value of
-  // `sum` shall be set by the reader to value of `last`.  Otherwise,
-  // this field MUST be set to the sum of measurements reflected in
-  // count.
+  // was omitted or zero because its true value was 1, this field
+  // shall be omitted by the writer and the value of `sum` shall be
+  // set by the reader to value of `last`.  Otherwise, this field MUST
+  // be set to the sum of measurements reflected in count.
   double sum = 5;
 
   // The minimum of recorded values since start_time.  If the count
-  // was omitted or zero because its true value was 1, the value of
-  // `min` shall be set by the reader to value of `last`.  Otherwise,
-  // this field MUST be set to the minimum of the measurements
-  // reflected in count.
+  // was omitted or zero because its true value was 1, this field
+  // shall be omitted by the writer and the value of `min` shall be
+  // set by the reader to value of `last`.  Otherwise, this field MUST
+  // be set to the minimum of the measurements reflected in count.
   double min = 8;
 
   // The maximum of recorded values since start_time.  If the count
-  // was omitted or zero because its true value was 1, the value of
-  // `max` shall be set by the reader to value of `last`.  Otherwise,
-  // this field MUST be set to the maximum of the measurements
-  // reflected in count.
+  // was omitted or zero because its true value was 1, this field
+  // shall be omitted by the writer and the value of `max` shall be
+  // set by the reader to value of `last`.  Otherwise, this field MUST
+  // be set to the maximum of the measurements reflected in count.
   double max = 9;
 
   // Represents the value at a given percentile of a distribution.
