@@ -326,12 +326,12 @@ message MetricDescriptor {
     MONOTONIC = 0x20;
 
     // CHRONOLOGICAL may be set for any kind of metric, indicating it
-    // was generated through callbacks, willed by the SDK.  In
-    // CHRONOLOGICAL measurements, TimeUnixNano results deliberately
-    // from the SDK, not from the application.
+    // was generated through a callback invoked deliberately by the
+    // SDK.  In CHRONOLOGICAL measurements, TimeUnixNano values depend
+    // on the SDK's decision to collect, not the application.
     //
     // When CHRONOLOGICAL is not set, it implies the event originated
-    // from the application calling the SDK.
+    // from the application calling the SDK with a measurement.
     CHRONOLOGICAL = 0x40;
   }
 
@@ -443,15 +443,44 @@ message MetricDescriptor {
     // Typically expressed as a scalar or histogram value.
     ADDING_MONOTONIC_CUMULATIVE_CHRONOLOGICAL = 0x6c; // ADDING|CUMULATIVE|MONOTONIC|CHRONOLOGICAL
 
-    // TODO(jmacd): The following five values have nearly-identical
-    // comments as the above, with the "non-negative" sentence changed
-    // to and the Counter instrument replaced by the UpDownCounter
-    // instrument.  Update comments following review of the above.
-
+    // ADDING_INSTANTANEOUS kind describes the change in a sum as
+    // measured at an instant (TimeUnixNano).  The value may be
+    // positive or negative.  Generally this is the value of an
+    // OpenTelemetry UpDownCounter instrument without aggregation.
+    // Typically expressed as a scalar (TODO(#159): or raw) value.
     ADDING_INSTANTANEOUS = 0x9; // ADDING|INSTANTANEOUS
+
+    // ADDING_DELTA describes the change in a sum accumulated since
+    // the metric was last collected (StartTimeUnixNano) through the
+    // measured time (TimeUnixNano).  The value may be positive or
+    // negative.  Generally this is the result of aggregating an
+    // OpenTelemetry UpDownCounter instrument since the last
+    // collection.  Typically expressed as a scalar or histogram
+    // value.
     ADDING_DELTA = 0xa; // ADDING|DELTA
+
+    // ADDING_DELTA_CHRONOLOGICAL is ADDING_DELTA with asynchronous
+    // semantics specified by the OpenTelemetry API, indicating the
+    // value was collected through a callback.  Generally this is the
+    // temporal difference between values of an OpenTelemetry
+    // UpDownSumObserver instrument.  Typically expressed as a scalar
+    // or histogram value.
     ADDING_DELTA_CHRONOLOGICAL = 0x4a; // ADDING|DELTA|CHRONOLOGICAL
+
+    // ADDING_CUMULATIVE describes the current value of a sum
+    // accumulated from the reset time (StartTimeUnixNano) through the
+    // measured time (TimeUnixNano).  The value may be positive or
+    // negative.  Generally this is the result of aggregating an
+    // OpenTelemetry UpDownCounter instrument since the last reset
+    // time.  Typically expressed as a scalar or histogram value.
     ADDING_CUMULATIVE = 0xc; // ADDING|CUMULATIVE
+
+    // ADDING_CUMULATIVE_CHRONOLOGICAL is ADDING_CUMULATIVE with
+    // asynchronous semantics specified by the OpenTelemetry API,
+    // indicating the value was collected through a callback.
+    // Generally this is the sum of measurements of an OpenTelemetry
+    // UpDownSumObserver instrument.  Typically expressed as a scalar
+    // or histogram value.
     ADDING_CUMULATIVE_CHRONOLOGICAL = 0x4c; // ADDING|CUMULATIVE|CHRONOLOGICAL
     
     // GROUPING_INSTANTANEOUS kind describes an individual value
