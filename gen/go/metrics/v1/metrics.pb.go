@@ -22,84 +22,114 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-// Type is the type of values a metric has.
-type MetricDescriptor_Type int32
+// ValueType is the type of values a metric has.  ValueType
+// determines which field of the DataPoint will be used for Metrics
+// with this descriptor.  See the definition of Kind for detail on
+// which aggregations may be expressed for which instruments using
+// which value types.
+type MetricDescriptor_ValueType int32
 
 const (
-	// INVALID_TYPE is the default Type, it MUST not be used.
-	MetricDescriptor_INVALID_TYPE MetricDescriptor_Type = 0
-	// INT64 values are signed 64-bit integers.
-	//
-	// A Metric of this Type MUST store its values as Int64DataPoint.
-	MetricDescriptor_INT64 MetricDescriptor_Type = 1
-	// MONOTONIC_INT64 values are monotonically increasing signed 64-bit
-	// integers.
-	//
-	// A Metric of this Type MUST store its values as Int64DataPoint.
-	MetricDescriptor_MONOTONIC_INT64 MetricDescriptor_Type = 2
-	// DOUBLE values are double-precision floating-point numbers.
-	//
-	// A Metric of this Type MUST store its values as DoubleDataPoint.
-	MetricDescriptor_DOUBLE MetricDescriptor_Type = 3
-	// MONOTONIC_DOUBLE values are monotonically increasing double-precision
-	// floating-point numbers.
-	//
-	// A Metric of this Type MUST store its values as DoubleDataPoint.
-	MetricDescriptor_MONOTONIC_DOUBLE MetricDescriptor_Type = 4
-	// Histogram measurement.
-	// Corresponding values are stored in HistogramDataPoint.
-	MetricDescriptor_HISTOGRAM MetricDescriptor_Type = 5
-	// Summary value. Some frameworks implemented Histograms as a summary of observations
-	// (usually things like request durations and response sizes). While it
-	// also provides a total count of observations and a sum of all observed
-	// values, it calculates configurable percentiles over a sliding time
-	// window.
-	// Corresponding values are stored in SummaryDataPoint.
-	MetricDescriptor_SUMMARY MetricDescriptor_Type = 6
+	// INVALID_TYPE is the default ValueType, it MUST not be used.
+	MetricDescriptor_INVALID_VALUE_TYPE MetricDescriptor_ValueType = 0
+	// ScalarInt64 implies that the value is found in
+	// Metric.int64_data_points[].value.
+	MetricDescriptor_SCALAR_INT64 MetricDescriptor_ValueType = 1
+	// ScalarDouble implies that the value is found in
+	// Metric.double_data_points[].value.
+	MetricDescriptor_SCALAR_DOUBLE MetricDescriptor_ValueType = 2
+	// Histogram implies that the value is found in
+	// Metric.histogram_data_points[].histogram.
+	MetricDescriptor_HISTOGRAM MetricDescriptor_ValueType = 3
+	// Summary implies that the value is found in
+	// Metric.summary_data_points[].summary.
+	MetricDescriptor_SUMMARY MetricDescriptor_ValueType = 4
 )
 
-var MetricDescriptor_Type_name = map[int32]string{
-	0: "INVALID_TYPE",
-	1: "INT64",
-	2: "MONOTONIC_INT64",
-	3: "DOUBLE",
-	4: "MONOTONIC_DOUBLE",
-	5: "HISTOGRAM",
-	6: "SUMMARY",
+var MetricDescriptor_ValueType_name = map[int32]string{
+	0: "INVALID_VALUE_TYPE",
+	1: "SCALAR_INT64",
+	2: "SCALAR_DOUBLE",
+	3: "HISTOGRAM",
+	4: "SUMMARY",
 }
 
-var MetricDescriptor_Type_value = map[string]int32{
-	"INVALID_TYPE":     0,
-	"INT64":            1,
-	"MONOTONIC_INT64":  2,
-	"DOUBLE":           3,
-	"MONOTONIC_DOUBLE": 4,
-	"HISTOGRAM":        5,
-	"SUMMARY":          6,
+var MetricDescriptor_ValueType_value = map[string]int32{
+	"INVALID_VALUE_TYPE": 0,
+	"SCALAR_INT64":       1,
+	"SCALAR_DOUBLE":      2,
+	"HISTOGRAM":          3,
+	"SUMMARY":            4,
 }
 
-func (x MetricDescriptor_Type) String() string {
-	return proto.EnumName(MetricDescriptor_Type_name, int32(x))
+func (x MetricDescriptor_ValueType) String() string {
+	return proto.EnumName(MetricDescriptor_ValueType_name, int32(x))
 }
 
-func (MetricDescriptor_Type) EnumDescriptor() ([]byte, []int) {
+func (MetricDescriptor_ValueType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_3c3112f9fa006917, []int{3, 0}
 }
 
-// Temporality is the temporal quality values of a metric have. It
-// describes how those values relate to the time interval over which they
-// are reported.
-type MetricDescriptor_Temporality int32
+// KindElement contains a set of bit masks used to construct Kind
+// enum values.  There are 7 bits used presently, broken into
+// groups:
+//
+// "Temporality" is the temporal quality of a metric, indicating how
+// values relate to the time interval over which they are reported.
+// One of the 3 Temporality values MUST be set: CUMULATIVE, DELTA,
+// or INSTANTANEOUS.
+//
+// "Structure" is the structural quality of a metric, indicating
+// whether metric data describes a sum of measurements (ADDING),
+// whether it is a monotonic sum (ADDING_MONOTONIC), or a
+// collection of individual measurements (GROUPING).  Value types
+// may be interpreted differently depending on Structure.  For
+// example, a Histogram DataPoint may be computed for a Counter
+// (ADDING) instrument or a ValueRecorder (GROUPING) instrument, and
+// the Sum and Count of the resulting aggregation may be interpreted
+// differently depending on structure.
+//
+// SNAPSHOT is a boolean option that may be applied to all
+// metrics, meaning that it was generated periodically, at a
+// time determined by the SDK.  OpenTelemetry Observer instruments
+// report SNAPSHOT measurements, with observations from a
+// single callback invokation sharing a single logical timestamp.
+// This property can be safetly disregarded and not set when
+// importing data from other sources, but when set its presence is
+// always meaningful.
+//
+// When measurements originate from an OpenTelemetry API, the
+// SNAPSHOT kind allows the interpreter to recognize values
+// that were emitted by the same callback invocation, as identified
+// by equal Resource and TimeUnixNano values.  SNAPSHOT metrics
+// MUST NOT have more than one data point per TimeUnixNano,
+// Resource, and LabelSet.  If the interpreter of this data finds
+// such matching data points, they are considered duplicate by
+// definition and all but one SHOULD be discarded.
+//
+// SNAPSHOT means that:
+// - The count of events is a measure of the rate of SDK collection
+//   times the aggregated cardinality, therefore cannot be used
+//   to extrapolate application-specific rate information.
+// - Measurements with the same Resource and TimeUnixNano
+//   form a meaningful ratio, and the set of measurements at this
+//   instant are coherent at the point-in-time, as they result from
+//   a single callback.
+// - Measurements are not traced, by definition, and SHOULD NOT have
+//   associated trace context (e.g., no exemplars with trace_id,
+//   span_id).
+//
+// SNAPSHOT is incompatible with INSTANTANEOUS.
+type MetricDescriptor_KindElement int32
 
 const (
-	// INVALID_TEMPORALITY is the default Temporality, it MUST not be
-	// used.
-	MetricDescriptor_INVALID_TEMPORALITY MetricDescriptor_Temporality = 0
+	// INVALID_KIND_ELEMENT is not used.
+	MetricDescriptor_INVALID_KIND_ELEMENT MetricDescriptor_KindElement = 0
 	// INSTANTANEOUS is a metric whose values are measured at a particular
 	// instant. The values are not aggregated over any time interval and are
 	// unique per timestamp. As such, these metrics are not expected to have
 	// an associated start time.
-	MetricDescriptor_INSTANTANEOUS MetricDescriptor_Temporality = 1
+	MetricDescriptor_INSTANTANEOUS MetricDescriptor_KindElement = 1
 	// DELTA is a metric whose values are the aggregation of measurements
 	// made over a time interval. Successive metrics contain aggregation of
 	// values from continuous and non-overlapping intervals.
@@ -124,7 +154,7 @@ const (
 	//   8. The 1 second collection cycle ends. A metric is exported for the
 	//      number of requests received over the interval of time t_0+1 to
 	//      t_0+2 with a value of 2.
-	MetricDescriptor_DELTA MetricDescriptor_Temporality = 2
+	MetricDescriptor_DELTA MetricDescriptor_KindElement = 2
 	// CUMULATIVE is a metric whose values are the aggregation of
 	// successively made measurements from a fixed start time until the last
 	// reported measurement. This means that current values of a CUMULATIVE
@@ -156,29 +186,297 @@ const (
 	//   12. The 1 second collection cycle ends. A metric is exported for the
 	//      number of requests received over the interval of time t_1 to
 	//      t_0+1 with a value of 1.
-	MetricDescriptor_CUMULATIVE MetricDescriptor_Temporality = 3
+	//
+	// Note that the first value in a sequence of CUMULATIVE metrics
+	// after a reset is equivalent in value to a DELTA metric for the
+	// period since the reset.  Although a CUMULATIVE metric could
+	// technically be reset after every collection event and still be
+	// described as CUMULATIVE, exporters should use DELTA if there is
+	// no intention of repeating the StartTimeUnixNano timestamp.
+	MetricDescriptor_CUMULATIVE MetricDescriptor_KindElement = 3
+	// GROUPING structure means the value has been computed by
+	// combining individual values through a meaningful aggregation.
+	// GROUPING structure implies the sum of measurements is not
+	// necessarily meaningful.  These may be expressed as Histogram or
+	// Summary data points for DELTA kind and CUMULATIVE temporality
+	// kinds.  These may also be expressed as INSTANTANEOUS kind when
+	// reporting a scalar value type (e.g., for LastValue
+	// aggregation).  TODO(#159) or raw value (i.e., no aggregation).
+	MetricDescriptor_GROUPING MetricDescriptor_KindElement = 4
+	// ADDING structure means the measurement determines a sum.  For
+	// DELTA kind this is expressed as the change in sum since the
+	// last collection.  For CUMULATIVE kind this is expressed as the
+	// last collected value of the sum.  For INSTANTANEOUS kind this
+	// is expressed as a scalar value that would be added into a Sum.
+	MetricDescriptor_ADDING MetricDescriptor_KindElement = 8
+	// ADDING_MONOTONIC has ADDING structure with a guaranteed
+	// monotonic sum.  ADDING_MONOTONIC indicates that the calculated
+	// sum is non-decreasing, therefore can be monitored as a
+	// non-negative rate of change.
+	MetricDescriptor_ADDING_MONOTONIC MetricDescriptor_KindElement = 12
+	// SNAPSHOT may be set for any kind of metric, indicating it
+	// was generated through a callback invoked deliberately by the
+	// SDK.  In SNAPSHOT measurements, TimeUnixNano values depend
+	// on the SDK's decision to collect, not the application.
+	//
+	// When SNAPSHOT is not set, it implies the event originated from
+	// the application calling the SDK with a measurement with a
+	// context.  These events are CONTINUOUS measurements, in that
+	// case.
+	MetricDescriptor_SNAPSHOT MetricDescriptor_KindElement = 16
 )
 
-var MetricDescriptor_Temporality_name = map[int32]string{
-	0: "INVALID_TEMPORALITY",
-	1: "INSTANTANEOUS",
-	2: "DELTA",
-	3: "CUMULATIVE",
+var MetricDescriptor_KindElement_name = map[int32]string{
+	0:  "INVALID_KIND_ELEMENT",
+	1:  "INSTANTANEOUS",
+	2:  "DELTA",
+	3:  "CUMULATIVE",
+	4:  "GROUPING",
+	8:  "ADDING",
+	12: "ADDING_MONOTONIC",
+	16: "SNAPSHOT",
 }
 
-var MetricDescriptor_Temporality_value = map[string]int32{
-	"INVALID_TEMPORALITY": 0,
-	"INSTANTANEOUS":       1,
-	"DELTA":               2,
-	"CUMULATIVE":          3,
+var MetricDescriptor_KindElement_value = map[string]int32{
+	"INVALID_KIND_ELEMENT": 0,
+	"INSTANTANEOUS":        1,
+	"DELTA":                2,
+	"CUMULATIVE":           3,
+	"GROUPING":             4,
+	"ADDING":               8,
+	"ADDING_MONOTONIC":     12,
+	"SNAPSHOT":             16,
 }
 
-func (x MetricDescriptor_Temporality) String() string {
-	return proto.EnumName(MetricDescriptor_Temporality_name, int32(x))
+func (x MetricDescriptor_KindElement) String() string {
+	return proto.EnumName(MetricDescriptor_KindElement_name, int32(x))
 }
 
-func (MetricDescriptor_Temporality) EnumDescriptor() ([]byte, []int) {
+func (MetricDescriptor_KindElement) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_3c3112f9fa006917, []int{3, 1}
+}
+
+// Kind explains how the DataPoint was produced (called
+// "Structure"), how the point was aggregated with resepect to time
+// (called "Temporality"), whether it was computed by a snapshot,
+// and (when the Structure is ADDING) whether the sum is not
+// monotonic.
+//
+// Kind names are generated from valid combinations of KindElement
+// by joining the effective KindElements using underscores.  There
+// are:
+//
+// - 3 possibilities for Temporality
+// - 3 possibilities for Structure:
+// - 2 possibilities of being a Snapshot or not (i.e., Continuous).
+//
+// Excluding the snapshot instantaneous combinations, this makes
+// 15 valid values.
+//
+// The cases are detailed below in terms of:
+//
+// - How StartTimeUnixNano and TimeUnixNano are interpreted?
+// - Which OpenTelemetry is likely to produce instrument?
+// - Under which typical aggregations?
+// - Producing which kind of data point?
+//
+// Certain general statements can be made.
+//
+// About the three Structure kinds:
+//
+// 1. ADDING_MONOTONIC kinds associate with Counter and SumObserver
+// 2. ADDING kinds associate with UpDownCounter and UpDownSumObserver
+// 3. GROUPING kinds associate with ValueRecorder and ValueObserver instruments
+//
+// About SNAPSHOT kinds:
+//
+// 1. SNAPSHOT kinds associate with Observer instruments
+// 2. INSTANTANEOUS temporality does not combine with SNAPSHOT kinds.
+//
+// About ADDING|INSTANTANEOUS vs ADDING|DELTA:
+//
+// 1. An ADDING|INSTANTANEOUS event is stateless, has no StartTimeUnixNano.
+// 2. An ADDING|DELTA event remembers its start time, sets StartTimeUnixNano.
+// 3. Same consideration for ADDING_MONOTONIC instantaneous vs delta.
+//
+// About SCALAR_INT64 and SCALAR_DOUBLE value type (TODO(#159) and
+// equally the RAW value types):
+//
+// 1. SCALAR value type interpretation depends on both temporality
+//    and structure.
+// 2. For GROUPING kinds:
+//    - For INSTANTANEOUS temporality: An individual measurement
+//    - For DELTA or CUMULATIVE temporality: The last measured individual value
+//      in the collection interval.
+// 3. For ADDING and ADDING_MONOONIC kinds:
+//    - For INSTANTANEOUS temporality: An instantaneously measured change in a sum
+//    - For DELTA temporality: An aggregated change in a sum
+//    - For CUMULATIVE temporality: An aggregated sum.
+// 4. INSTANTANEOUS kinds are always scalar values (TODO(#159) or raw).
+//
+// About CUMULATIVE kinds:
+//
+// 1. CUMULATIVE GROUPING kinds typically use Histogram data points
+// 2. CUMULATIVE is rarely used with Summary data points
+type MetricDescriptor_Kind int32
+
+const (
+	// INVALID_KIND is the default Kind, it MUST not be used.
+	MetricDescriptor_INVALID_KIND MetricDescriptor_Kind = 0
+	// ADDING_MONOTONIC_INSTANTANEOUS kind describes the change in a
+	// sum as measured at an instant (TimeUnixNano).  The value MUST
+	// be non-negative.  Generally this is the value of an
+	// OpenTelemetry Counter instrument without aggregation.
+	// Typically expressed as a scalar (TODO(#159): or raw) value.
+	MetricDescriptor_ADDING_MONOTONIC_INSTANTANEOUS MetricDescriptor_Kind = 13
+	// ADDING_MONOTONIC_DELTA describes the change in a sum
+	// accumulated since the metric was last collected
+	// (StartTimeUnixNano) through the measured time (TimeUnixNano).
+	// The value MUST be non-negative.  Generally this is the result
+	// of aggregating an OpenTelemetry Counter instrument since the
+	// last collection.  Typically expressed as a scalar or histogram
+	// value.
+	MetricDescriptor_ADDING_MONOTONIC_DELTA MetricDescriptor_Kind = 14
+	// ADDING_MONOTONIC_DELTA_SNAPSHOT is ADDING_MONOTONIC_DELTA
+	// with snapshot semantics specified by the OpenTelemetry API,
+	// indicating the value was collected through a callback.
+	// Generally this is the temporal difference between values of an
+	// OpenTelemetry SumObserver instrument.  Typically expressed as a
+	// scalar or histogram value.
+	MetricDescriptor_ADDING_MONOTONIC_DELTA_SNAPSHOT MetricDescriptor_Kind = 30
+	// ADDING_MONOTONIC_CUMULATIVE describes the current value of a
+	// sum accumulated from the reset time (StartTimeUnixNano) through
+	// the measured time (TimeUnixNano).  The value must be
+	// non-negative and not less than the previously reported value of
+	// the same metric.  Generally this is the result of aggregating an
+	// OpenTelemetry Counter instrument since the last reset time.
+	// Typically expressed as a scalar or histogram value.
+	MetricDescriptor_ADDING_MONOTONIC_CUMULATIVE MetricDescriptor_Kind = 15
+	// ADDING_MONOTONIC_CUMULATIVE_SNAPSHOT is
+	// ADDING_MONOTONIC_CUMULATIVE with snapshot semantics
+	// specified by the OpenTelemetry API, indicating the value was
+	// collected through a callback.  Generally this is the sum of
+	// measurements of an OpenTelemetry SumObserver instrument.
+	// Typically expressed as a scalar or histogram value.
+	MetricDescriptor_ADDING_MONOTONIC_CUMULATIVE_SNAPSHOT MetricDescriptor_Kind = 31
+	// ADDING_INSTANTANEOUS kind describes the change in a sum as
+	// measured at an instant (TimeUnixNano).  The value may be
+	// positive or negative.  Generally this is the value of an
+	// OpenTelemetry UpDownCounter instrument without aggregation.
+	// Typically expressed as a scalar (TODO(#159): or raw) value.
+	MetricDescriptor_ADDING_INSTANTANEOUS MetricDescriptor_Kind = 9
+	// ADDING_DELTA describes the change in a sum accumulated since
+	// the metric was last collected (StartTimeUnixNano) through the
+	// measured time (TimeUnixNano).  The value may be positive or
+	// negative.  Generally this is the result of aggregating an
+	// OpenTelemetry UpDownCounter instrument since the last
+	// collection.  Typically expressed as a scalar or histogram
+	// value.
+	MetricDescriptor_ADDING_DELTA MetricDescriptor_Kind = 10
+	// ADDING_DELTA_SNAPSHOT is ADDING_DELTA with snapshot
+	// semantics specified by the OpenTelemetry API, indicating the
+	// value was collected through a callback.  Generally this is the
+	// temporal difference between values of an OpenTelemetry
+	// UpDownSumObserver instrument.  Typically expressed as a scalar
+	// or histogram value.
+	MetricDescriptor_ADDING_DELTA_SNAPSHOT MetricDescriptor_Kind = 26
+	// ADDING_CUMULATIVE describes the current value of a sum
+	// accumulated from the reset time (StartTimeUnixNano) through the
+	// measured time (TimeUnixNano).  The value may be positive or
+	// negative.  Generally this is the result of aggregating an
+	// OpenTelemetry UpDownCounter instrument since the last reset
+	// time.  Typically expressed as a scalar or histogram value.
+	MetricDescriptor_ADDING_CUMULATIVE MetricDescriptor_Kind = 11
+	// ADDING_CUMULATIVE_SNAPSHOT is ADDING_CUMULATIVE with
+	// snapshot semantics specified by the OpenTelemetry API,
+	// indicating the value was collected through a callback.
+	// Generally this is the sum of measurements of an OpenTelemetry
+	// UpDownSumObserver instrument.  Typically expressed as a scalar
+	// or histogram value.
+	MetricDescriptor_ADDING_CUMULATIVE_SNAPSHOT MetricDescriptor_Kind = 27
+	// GROUPING_INSTANTANEOUS kind describes an individual value
+	// measured at an instant (TimeUnixNano).  Generally this is the value of an
+	// OpenTelemetry ValueRecorder instrument without aggregation.
+	// Typically expressed as a scalar (TODO(#159): or raw) value.
+	MetricDescriptor_GROUPING_INSTANTANEOUS MetricDescriptor_Kind = 5
+	// GROUPING_DELTA kind describes a set of individual values
+	// measured from the most recent collection (StartTimeUnixNano)
+	// through the measured time (TimeUnixNano).  Generally this is
+	// the aggregated value of an OpenTelemetry ValueRecorder
+	// instrument.  Typically expressed as a scalar, histogram, or
+	// summary value.  When expressed as a scalar value, this is
+	// specified to mean the most recent (i.e., "last") value to occur
+	// within the collection interval.
+	MetricDescriptor_GROUPING_DELTA MetricDescriptor_Kind = 6
+	// GROUPING_DELTA_SNAPSHOT is GROUPING_DELTA with snapshot
+	// semantics specified by the OpenTelemetry API, indicating the
+	// value was collected through a callback.  Generally this is the
+	// aggregated value of an OpenTelemetry ValueObserver instrument.
+	// Typically expressed as a scalar, histogram, or summary value.
+	MetricDescriptor_GROUPING_DELTA_SNAPSHOT MetricDescriptor_Kind = 22
+	// GROUPING_CUMULATIVE kind describes a set of individual values
+	// measured from the last reset time (StartTimeUnixNano) through
+	// the measured time (TimeUnixNano).  Generally this is the
+	// aggregated value of an OpenTelemetry ValueRecorder instrument.
+	// Typically expressed as a scalar or histogram value.  When
+	// expressed as a scalar value, this is specified to mean the most
+	// recent (i.e., "last") value to occur since the reset time,
+	// which may have occurred prior to the most recent collection
+	// interval.
+	MetricDescriptor_GROUPING_CUMULATIVE MetricDescriptor_Kind = 7
+	// GROUPING_CUMULATIVE_SNAPSHOT is GROUPING_CUMULATIVE with
+	// snapshot semantics specified by the OpenTelemetry API,
+	// indicating the value was collected through a callback.
+	// Generally this is the aggregated value of an OpenTelemetry
+	// ValueObserver instrument.  Typically expressed as a scalar or
+	// histogram value.
+	MetricDescriptor_GROUPING_CUMULATIVE_SNAPSHOT MetricDescriptor_Kind = 23
+)
+
+var MetricDescriptor_Kind_name = map[int32]string{
+	0:  "INVALID_KIND",
+	13: "ADDING_MONOTONIC_INSTANTANEOUS",
+	14: "ADDING_MONOTONIC_DELTA",
+	30: "ADDING_MONOTONIC_DELTA_SNAPSHOT",
+	15: "ADDING_MONOTONIC_CUMULATIVE",
+	31: "ADDING_MONOTONIC_CUMULATIVE_SNAPSHOT",
+	9:  "ADDING_INSTANTANEOUS",
+	10: "ADDING_DELTA",
+	26: "ADDING_DELTA_SNAPSHOT",
+	11: "ADDING_CUMULATIVE",
+	27: "ADDING_CUMULATIVE_SNAPSHOT",
+	5:  "GROUPING_INSTANTANEOUS",
+	6:  "GROUPING_DELTA",
+	22: "GROUPING_DELTA_SNAPSHOT",
+	7:  "GROUPING_CUMULATIVE",
+	23: "GROUPING_CUMULATIVE_SNAPSHOT",
+}
+
+var MetricDescriptor_Kind_value = map[string]int32{
+	"INVALID_KIND":                         0,
+	"ADDING_MONOTONIC_INSTANTANEOUS":       13,
+	"ADDING_MONOTONIC_DELTA":               14,
+	"ADDING_MONOTONIC_DELTA_SNAPSHOT":      30,
+	"ADDING_MONOTONIC_CUMULATIVE":          15,
+	"ADDING_MONOTONIC_CUMULATIVE_SNAPSHOT": 31,
+	"ADDING_INSTANTANEOUS":                 9,
+	"ADDING_DELTA":                         10,
+	"ADDING_DELTA_SNAPSHOT":                26,
+	"ADDING_CUMULATIVE":                    11,
+	"ADDING_CUMULATIVE_SNAPSHOT":           27,
+	"GROUPING_INSTANTANEOUS":               5,
+	"GROUPING_DELTA":                       6,
+	"GROUPING_DELTA_SNAPSHOT":              22,
+	"GROUPING_CUMULATIVE":                  7,
+	"GROUPING_CUMULATIVE_SNAPSHOT":         23,
+}
+
+func (x MetricDescriptor_Kind) String() string {
+	return proto.EnumName(MetricDescriptor_Kind_name, int32(x))
+}
+
+func (MetricDescriptor_Kind) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_3c3112f9fa006917, []int{3, 2}
 }
 
 // A collection of InstrumentationLibraryMetrics from a Resource.
@@ -283,22 +581,26 @@ func (m *InstrumentationLibraryMetrics) GetMetrics() []*Metric {
 	return nil
 }
 
-// Defines a Metric which has one or more timeseries.
+// Metric contains one or more timeseries.
 //
-// The data model and relation between entities is shown in the diagram below.
+// The data model and relation between entities is shown in the
+// diagram below.  Here, "DataPoint" is the term used to refer to any
+// one of the specific data point kinds, and "points" is the term use
+// to refer to any one of the lists of points contained in the Metric.
 //
 // - Metric is composed of a MetricDescriptor and a list of data points.
-// - MetricDescriptor contains a list of label keys (shown horizontally).
-// - Data is a list of DataPoints (shown vertically).
-// - DataPoint contains a list of label values and a value.
+// - MetricDescriptor contains a name, description, unit, kind, and value type.
+// - Points is a list of DataPoints (shown vertically).
+// - DataPoint contains timestamps, labels, and one of the value type fields.
 //
 //     Metric
 //  +----------+         +------------------------+
 //  |descriptor|-------->| MetricDescriptor       |
-//  |          |         |+-----+-----+   +-----+ |
-//  |          |         ||label|label|...|label| |
-//  |      data|--+      ||key1 |key2 |   |keyN | |
-//  +----------+  |      |+-----+-----+   +-----+ |
+//  |          |         | name                   |
+//  |          |         | description            |
+//  |          |         | unit                   |
+//  |    points|--+      | kind                   |
+//  +----------+  |      | value type             |
 //                |      +------------------------+
 //                |
 //                |      +---------------------------+
@@ -325,15 +627,24 @@ func (m *InstrumentationLibraryMetrics) GetMetrics() []*Metric {
 //                       |+-----+                    |
 //                       +---------------------------+
 //
-//-----------------------------------------------------------------------
-// DataPoint is a value of specific type corresponding to a given moment in
-// time. Each DataPoint is timestamped.
+// All DataPoint types have includes three common fields:
+// - Labels are the optional key-value pairs associated with the data point.
+// - StartTimeUnixNano MUST be set to the start of the interval when the
+//   descriptor kind includes CUMULATIVE or DELTA.  This field is not set
+//   for INSTANTANEOUS timeseries, where instead the TimeUnixNano field is
+//   set for individual points.
+// - TimeUnixNano MUST be set to:
+//   - the end of the interval (CUMULATIVE or DELTA)
+//   - the instantaneous time of the event (INSTANTANEOUS).
 //
-// DataPoint is strongly typed: each DataPoint type has a specific Protobuf message
-// depending on the value type of the metric and thus there are currently 4 DataPoint
-// messages, which correspond to the types of metric values.
+// The ValueType of the descriptor determines which of the repeated
+// points fields is used.
 type Metric struct {
-	// metric_descriptor describes the Metric.
+	// Descriptor describes the Metric.
+	//
+	// N.B. "Descriptor" is a reserved term in protobuf, protoc
+	// generates a field named "Descriptor_" thus we use
+	// "metric_descriptor".
 	MetricDescriptor *MetricDescriptor `protobuf:"bytes,1,opt,name=metric_descriptor,json=metricDescriptor,proto3" json:"metric_descriptor,omitempty"`
 	// Data is a list of one or more DataPoints for a single metric. Only one of the
 	// following fields is used for the data, depending on the type of the metric defined
@@ -409,20 +720,21 @@ func (m *Metric) GetSummaryDataPoints() []*SummaryDataPoint {
 
 // Defines a metric type and its schema.
 type MetricDescriptor struct {
-	// name of the metric, including its DNS name prefix. It must be unique.
+	// Name of the metric, including its DNS name prefix. It must be unique.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// description of the metric, which can be used in documentation.
+	// Description of the metric, which can be used in documentation.
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// unit in which the metric value is reported. Follows the format
+	// Unit in which the metric value is reported. Follows the format
 	// described by http://unitsofmeasure.org/ucum.html.
 	Unit string `protobuf:"bytes,3,opt,name=unit,proto3" json:"unit,omitempty"`
-	// type is the type of values this metric has.
-	Type MetricDescriptor_Type `protobuf:"varint,4,opt,name=type,proto3,enum=opentelemetry.proto.metrics.v1.MetricDescriptor_Type" json:"type,omitempty"`
-	// temporality is the Temporality of values this metric has.
-	Temporality          MetricDescriptor_Temporality `protobuf:"varint,5,opt,name=temporality,proto3,enum=opentelemetry.proto.metrics.v1.MetricDescriptor_Temporality" json:"temporality,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
-	XXX_unrecognized     []byte                       `json:"-"`
-	XXX_sizecache        int32                        `json:"-"`
+	// ValueType is the type of values this metric has.
+	ValueType MetricDescriptor_ValueType `protobuf:"varint,4,opt,name=value_type,json=valueType,proto3,enum=opentelemetry.proto.metrics.v1.MetricDescriptor_ValueType" json:"value_type,omitempty"`
+	// Kind describes properties of the Metric that are necessary to
+	// interpret the data and/or describe how it was produced.
+	Kind                 MetricDescriptor_Kind `protobuf:"varint,5,opt,name=kind,proto3,enum=opentelemetry.proto.metrics.v1.MetricDescriptor_Kind" json:"kind,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
+	XXX_unrecognized     []byte                `json:"-"`
+	XXX_sizecache        int32                 `json:"-"`
 }
 
 func (m *MetricDescriptor) Reset()         { *m = MetricDescriptor{} }
@@ -471,18 +783,18 @@ func (m *MetricDescriptor) GetUnit() string {
 	return ""
 }
 
-func (m *MetricDescriptor) GetType() MetricDescriptor_Type {
+func (m *MetricDescriptor) GetValueType() MetricDescriptor_ValueType {
 	if m != nil {
-		return m.Type
+		return m.ValueType
 	}
-	return MetricDescriptor_INVALID_TYPE
+	return MetricDescriptor_INVALID_VALUE_TYPE
 }
 
-func (m *MetricDescriptor) GetTemporality() MetricDescriptor_Temporality {
+func (m *MetricDescriptor) GetKind() MetricDescriptor_Kind {
 	if m != nil {
-		return m.Temporality
+		return m.Kind
 	}
-	return MetricDescriptor_INVALID_TEMPORALITY
+	return MetricDescriptor_INVALID_KIND
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
@@ -1043,8 +1355,9 @@ func (m *SummaryDataPoint_ValueAtPercentile) GetValue() float64 {
 }
 
 func init() {
-	proto.RegisterEnum("opentelemetry.proto.metrics.v1.MetricDescriptor_Type", MetricDescriptor_Type_name, MetricDescriptor_Type_value)
-	proto.RegisterEnum("opentelemetry.proto.metrics.v1.MetricDescriptor_Temporality", MetricDescriptor_Temporality_name, MetricDescriptor_Temporality_value)
+	proto.RegisterEnum("opentelemetry.proto.metrics.v1.MetricDescriptor_ValueType", MetricDescriptor_ValueType_name, MetricDescriptor_ValueType_value)
+	proto.RegisterEnum("opentelemetry.proto.metrics.v1.MetricDescriptor_KindElement", MetricDescriptor_KindElement_name, MetricDescriptor_KindElement_value)
+	proto.RegisterEnum("opentelemetry.proto.metrics.v1.MetricDescriptor_Kind", MetricDescriptor_Kind_name, MetricDescriptor_Kind_value)
 	proto.RegisterType((*ResourceMetrics)(nil), "opentelemetry.proto.metrics.v1.ResourceMetrics")
 	proto.RegisterType((*InstrumentationLibraryMetrics)(nil), "opentelemetry.proto.metrics.v1.InstrumentationLibraryMetrics")
 	proto.RegisterType((*Metric)(nil), "opentelemetry.proto.metrics.v1.Metric")
@@ -1063,69 +1376,80 @@ func init() {
 }
 
 var fileDescriptor_3c3112f9fa006917 = []byte{
-	// 1012 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x57, 0xdd, 0x6e, 0xe3, 0x44,
-	0x14, 0x5e, 0xc7, 0x69, 0xda, 0x9e, 0x74, 0x5b, 0x67, 0x5a, 0xd8, 0xa8, 0xd2, 0x2e, 0x25, 0x42,
-	0x50, 0x10, 0x75, 0x68, 0x29, 0x95, 0x90, 0x40, 0x90, 0x6c, 0x22, 0xd6, 0x22, 0x7f, 0x9a, 0x38,
-	0x95, 0xba, 0xd2, 0xae, 0x71, 0x92, 0x21, 0x1d, 0x61, 0x8f, 0x2d, 0x7b, 0x1c, 0x35, 0x0f, 0xc0,
-	0x1b, 0x20, 0xc1, 0x03, 0xc1, 0x03, 0x70, 0xc1, 0x3d, 0x0f, 0xc0, 0x1d, 0x2f, 0x80, 0x3c, 0xb6,
-	0x63, 0x27, 0x4d, 0x1b, 0xca, 0x15, 0x70, 0x37, 0xfe, 0xce, 0x39, 0xdf, 0xf9, 0xce, 0xcf, 0xc4,
-	0x0e, 0x7c, 0xe8, 0xb8, 0x84, 0x71, 0x62, 0x11, 0x9b, 0x70, 0x6f, 0x56, 0x75, 0x3d, 0x87, 0x3b,
-	0xd5, 0xf0, 0x4c, 0x47, 0x7e, 0x75, 0x7a, 0x9a, 0x1c, 0x55, 0x61, 0x40, 0xcf, 0x16, 0xbc, 0x23,
-	0x50, 0x4d, 0x5c, 0xa6, 0xa7, 0x87, 0x1f, 0xac, 0x62, 0x1b, 0x39, 0xb6, 0xed, 0xb0, 0x90, 0x2c,
-	0x3a, 0x45, 0x61, 0x87, 0xea, 0x2a, 0x5f, 0x8f, 0xf8, 0x4e, 0xe0, 0x8d, 0x48, 0xe8, 0x9d, 0x9c,
-	0x23, 0xff, 0xca, 0xef, 0x12, 0xec, 0xe1, 0x18, 0x6a, 0x47, 0x29, 0x51, 0x13, 0xb6, 0x12, 0xaf,
-	0xb2, 0x74, 0x24, 0x1d, 0x17, 0xcf, 0xde, 0x57, 0x57, 0x49, 0x9c, 0x53, 0x4d, 0x4f, 0xd5, 0x84,
-	0x03, 0xcf, 0x43, 0xd1, 0xf7, 0x12, 0xbc, 0x45, 0x99, 0xcf, 0xbd, 0xc0, 0x26, 0x8c, 0x9b, 0x9c,
-	0x3a, 0xcc, 0xb0, 0xe8, 0xd0, 0x33, 0xbd, 0x99, 0x11, 0x57, 0x57, 0xce, 0x1d, 0xc9, 0xc7, 0xc5,
-	0xb3, 0xcf, 0xd5, 0xfb, 0x3b, 0xa0, 0x6a, 0x8b, 0x34, 0xad, 0x88, 0x25, 0xd6, 0x8b, 0x9f, 0xd2,
-	0xfb, 0xcc, 0x95, 0x5f, 0x25, 0x78, 0x7a, 0x2f, 0x01, 0x62, 0xf0, 0xe4, 0x0e, 0xa1, 0x71, 0xfd,
-	0x9f, 0xac, 0x14, 0x18, 0x37, 0xfe, 0x4e, 0x7d, 0xf8, 0xcd, 0xd5, 0xc2, 0xd0, 0x97, 0xb0, 0xb9,
-	0xd8, 0x80, 0x77, 0xd7, 0x35, 0x20, 0x52, 0x8a, 0x93, 0xb0, 0xca, 0x1f, 0x32, 0x14, 0x22, 0x0c,
-	0xbd, 0x82, 0x52, 0x84, 0x1a, 0x63, 0xe2, 0x8f, 0x3c, 0xea, 0x72, 0xc7, 0x8b, 0x65, 0x7f, 0xf4,
-	0xf7, 0x68, 0x1b, 0xf3, 0x38, 0xac, 0xd8, 0x4b, 0x08, 0x7a, 0x09, 0x25, 0xca, 0xf8, 0xc5, 0xb9,
-	0x31, 0x36, 0xb9, 0x69, 0xb8, 0x0e, 0x65, 0x3c, 0x51, 0xad, 0xae, 0x1f, 0x1b, 0xbf, 0x38, 0x6f,
-	0x98, 0xdc, 0xec, 0x85, 0x61, 0x78, 0x8f, 0x2e, 0x3c, 0xfb, 0xe8, 0x15, 0xa0, 0xb1, 0x13, 0x0c,
-	0x2d, 0xb2, 0x40, 0x2e, 0x0b, 0xf2, 0xea, 0x3a, 0xf2, 0x86, 0x88, 0x4c, 0xd9, 0x95, 0xf1, 0x22,
-	0xe0, 0xa3, 0x6f, 0xe1, 0x8d, 0x6b, 0xea, 0x73, 0x67, 0xe2, 0x99, 0xf6, 0x42, 0x86, 0xbc, 0xc8,
-	0x70, 0xb6, 0x2e, 0xc3, 0x8b, 0x24, 0x38, 0x4d, 0xb2, 0x7f, 0x7d, 0x0b, 0xf3, 0xd1, 0x37, 0xb0,
-	0xef, 0x07, 0xb6, 0x1d, 0xee, 0x75, 0x36, 0xcb, 0x86, 0xc8, 0xb2, 0x76, 0x06, 0xfd, 0x28, 0x34,
-	0xcd, 0x51, 0xf2, 0x97, 0x10, 0xbf, 0xf2, 0x9b, 0x0c, 0xca, 0xf2, 0xac, 0x10, 0x82, 0x3c, 0x33,
-	0xed, 0xe8, 0x8a, 0x6e, 0x63, 0x71, 0x46, 0x47, 0x50, 0x4c, 0xb6, 0x80, 0x3a, 0xac, 0x9c, 0x13,
-	0xa6, 0x2c, 0x14, 0x46, 0x05, 0x8c, 0xf2, 0xb2, 0x1c, 0x45, 0x85, 0x67, 0xa4, 0x41, 0x9e, 0xcf,
-	0x5c, 0x52, 0xce, 0x1f, 0x49, 0xc7, 0xbb, 0x77, 0x2c, 0xfb, 0x3d, 0x5b, 0xa3, 0xea, 0x33, 0x97,
-	0x60, 0x41, 0x81, 0x5e, 0x43, 0x91, 0x13, 0xdb, 0x75, 0x3c, 0xd3, 0xa2, 0x7c, 0x56, 0xde, 0x10,
-	0x8c, 0x9f, 0x3d, 0x9c, 0x31, 0xe5, 0xc0, 0x59, 0xc2, 0xca, 0x14, 0xf2, 0x61, 0x36, 0xa4, 0xc0,
-	0x8e, 0xd6, 0xb9, 0xac, 0xb5, 0xb4, 0x86, 0xa1, 0x5f, 0xf5, 0x9a, 0xca, 0x23, 0xb4, 0x0d, 0x1b,
-	0x5a, 0x47, 0xbf, 0x38, 0x57, 0x24, 0xb4, 0x0f, 0x7b, 0xed, 0x6e, 0xa7, 0xab, 0x77, 0x3b, 0xda,
-	0x73, 0x23, 0x02, 0x73, 0x08, 0xa0, 0xd0, 0xe8, 0x0e, 0xea, 0xad, 0xa6, 0x22, 0xa3, 0x03, 0x50,
-	0x52, 0x87, 0x18, 0xcd, 0xa3, 0xc7, 0xb0, 0xfd, 0x42, 0xeb, 0xeb, 0xdd, 0xaf, 0x70, 0xad, 0xad,
-	0x6c, 0xa0, 0x22, 0x6c, 0xf6, 0x07, 0xed, 0x76, 0x0d, 0x5f, 0x29, 0x85, 0x8a, 0x0e, 0xc5, 0x8c,
-	0x26, 0xf4, 0x04, 0xf6, 0xe7, 0xe9, 0x9b, 0xed, 0x5e, 0x17, 0xd7, 0x5a, 0x9a, 0x7e, 0xa5, 0x3c,
-	0x42, 0x25, 0x78, 0xac, 0x75, 0xfa, 0x7a, 0xad, 0xa3, 0xd7, 0x3a, 0xcd, 0xee, 0xa0, 0xaf, 0x48,
-	0xa1, 0xb0, 0x46, 0xb3, 0xa5, 0xd7, 0x94, 0x1c, 0xda, 0x05, 0x78, 0x3e, 0x68, 0x0f, 0x5a, 0x35,
-	0x5d, 0xbb, 0x6c, 0x2a, 0x72, 0xe5, 0x67, 0x09, 0x76, 0x17, 0x2f, 0x09, 0x6a, 0x42, 0xc1, 0x32,
-	0x87, 0xc4, 0xf2, 0xcb, 0x92, 0xd8, 0x9f, 0x93, 0x35, 0x3f, 0x3d, 0x7d, 0xee, 0x51, 0x36, 0xf9,
-	0x9a, 0xcc, 0x2e, 0x4d, 0x2b, 0x20, 0x38, 0x0e, 0x46, 0x55, 0x38, 0xf0, 0xb9, 0xe9, 0x71, 0x83,
-	0x53, 0x9b, 0x18, 0x01, 0xa3, 0x37, 0x06, 0x33, 0x99, 0x23, 0x36, 0xa2, 0x80, 0x4b, 0xc2, 0xa6,
-	0x53, 0x9b, 0x0c, 0x18, 0xbd, 0xe9, 0x98, 0xcc, 0x41, 0xef, 0xc0, 0xee, 0x92, 0xab, 0x2c, 0x5c,
-	0x77, 0x78, 0xd6, 0xeb, 0x00, 0x36, 0xa6, 0x61, 0x1e, 0xb1, 0x2a, 0x32, 0x8e, 0x1e, 0x2a, 0xbf,
-	0x48, 0xb0, 0xb7, 0x74, 0x1d, 0xff, 0x4b, 0x75, 0x48, 0x49, 0x1d, 0x7f, 0xe6, 0x01, 0xdd, 0xbe,
-	0xf4, 0xff, 0xfe, 0x52, 0x46, 0x4e, 0xc0, 0xb8, 0x28, 0x25, 0x8f, 0xa3, 0x07, 0xa4, 0x80, 0xec,
-	0x07, 0xb6, 0xb8, 0x7f, 0x12, 0x0e, 0x8f, 0xa8, 0x0f, 0x9b, 0xc3, 0x60, 0xf4, 0x1d, 0xe1, 0x7e,
-	0xb9, 0x20, 0xca, 0xf8, 0xf4, 0xe1, 0xbf, 0x7f, 0x6a, 0x5d, 0x30, 0xe0, 0x84, 0x09, 0xbd, 0x07,
-	0x7b, 0xe4, 0xc6, 0xb5, 0xe8, 0x88, 0x72, 0x63, 0xe8, 0x04, 0x6c, 0xec, 0x97, 0x37, 0x8f, 0xe4,
-	0x63, 0x09, 0xef, 0x26, 0x70, 0x5d, 0xa0, 0x87, 0x3f, 0xe5, 0xa0, 0x10, 0x05, 0xa7, 0x82, 0xa5,
-	0xac, 0xe0, 0xd7, 0xb0, 0x45, 0x6e, 0x88, 0xed, 0x5a, 0xa6, 0x27, 0x3a, 0x52, 0x3c, 0xab, 0xff,
-	0x63, 0x7d, 0x6a, 0x33, 0x66, 0xc2, 0x73, 0xce, 0xc3, 0x1f, 0x25, 0xd8, 0x4a, 0xe0, 0x74, 0xfc,
-	0x52, 0x66, 0xfc, 0x2b, 0xfa, 0x9d, 0x5b, 0xd1, 0xef, 0x2e, 0x14, 0x4d, 0xce, 0xcd, 0xd1, 0x75,
-	0xf8, 0x5a, 0x4f, 0xde, 0x56, 0x0f, 0x5c, 0x89, 0x2c, 0x43, 0xe5, 0x07, 0x19, 0x94, 0xe5, 0x97,
-	0xc0, 0xff, 0x64, 0xe7, 0x1c, 0x28, 0xb9, 0xc4, 0x1b, 0x11, 0xc6, 0xa9, 0x45, 0x0c, 0xd1, 0xe5,
-	0x64, 0xfb, 0xea, 0x0f, 0x7d, 0x2f, 0xaa, 0xa2, 0xb2, 0x1a, 0xef, 0xcd, 0x09, 0xb1, 0x92, 0x92,
-	0x0b, 0xa3, 0x7f, 0xa8, 0x41, 0xe9, 0x96, 0x1b, 0x7a, 0x06, 0x90, 0x3a, 0xc6, 0x23, 0xcf, 0x20,
-	0xe9, 0x36, 0xe4, 0x32, 0xdb, 0x50, 0xe7, 0xf0, 0x36, 0x75, 0xd6, 0x88, 0xac, 0xef, 0xc4, 0x9f,
-	0x90, 0xbd, 0xd0, 0xd0, 0x93, 0x5e, 0x7e, 0x31, 0xa1, 0xfc, 0x3a, 0x18, 0x86, 0x83, 0xa9, 0x86,
-	0xa1, 0x27, 0xe9, 0xa7, 0xf8, 0x02, 0xd3, 0x49, 0xf4, 0x61, 0x3e, 0x21, 0xac, 0x3a, 0xc9, 0xfe,
-	0x33, 0x18, 0x16, 0x84, 0xe1, 0xe3, 0xbf, 0x02, 0x00, 0x00, 0xff, 0xff, 0x3f, 0x02, 0x26, 0x81,
-	0x42, 0x0c, 0x00, 0x00,
+	// 1192 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x57, 0xef, 0x6e, 0xdb, 0x54,
+	0x14, 0x9f, 0x93, 0x34, 0x6d, 0x4f, 0xba, 0xd4, 0x39, 0xeb, 0xda, 0x90, 0xb1, 0xb6, 0x84, 0x09,
+	0x0a, 0x62, 0x09, 0x2b, 0xdb, 0x24, 0x90, 0x10, 0x38, 0x8b, 0xb5, 0x45, 0xcb, 0x3f, 0x39, 0x49,
+	0xa5, 0x4d, 0x1a, 0xc6, 0x49, 0x2e, 0xed, 0xd5, 0xe2, 0xeb, 0xc8, 0xbe, 0xae, 0xda, 0x07, 0xe0,
+	0x09, 0x40, 0x82, 0x07, 0x82, 0xaf, 0x20, 0xde, 0x80, 0x07, 0xe0, 0x1b, 0x2f, 0x80, 0x7c, 0x6d,
+	0xc7, 0x76, 0x92, 0x35, 0x94, 0x4f, 0xc0, 0xb7, 0xe3, 0xdf, 0x39, 0xe7, 0x77, 0x7e, 0xe7, 0xdc,
+	0xeb, 0x6b, 0x5f, 0xf8, 0xc8, 0x9a, 0x12, 0xc6, 0xc9, 0x84, 0x98, 0x84, 0xdb, 0x97, 0xd5, 0xa9,
+	0x6d, 0x71, 0xab, 0xea, 0xd9, 0x74, 0xe4, 0x54, 0xcf, 0x1f, 0x84, 0x66, 0x45, 0x38, 0x70, 0x3f,
+	0x11, 0xed, 0x83, 0x95, 0x30, 0xe4, 0xfc, 0x41, 0xe9, 0xc3, 0x65, 0x6c, 0x23, 0xcb, 0x34, 0x2d,
+	0xe6, 0x91, 0xf9, 0x96, 0x9f, 0x56, 0xaa, 0x2c, 0x8b, 0xb5, 0x89, 0x63, 0xb9, 0xf6, 0x88, 0x78,
+	0xd1, 0xa1, 0xed, 0xc7, 0x97, 0x7f, 0x97, 0x60, 0x5b, 0x0b, 0xa0, 0x96, 0x5f, 0x12, 0x55, 0xd8,
+	0x08, 0xa3, 0x8a, 0xd2, 0xa1, 0x74, 0x94, 0x3b, 0xfe, 0xa0, 0xb2, 0x4c, 0xe2, 0x8c, 0xea, 0xfc,
+	0x41, 0x25, 0xe4, 0xd0, 0x66, 0xa9, 0xf8, 0xad, 0x04, 0x07, 0x94, 0x39, 0xdc, 0x76, 0x4d, 0xc2,
+	0xb8, 0xc1, 0xa9, 0xc5, 0xf4, 0x09, 0x1d, 0xda, 0x86, 0x7d, 0xa9, 0x07, 0xdd, 0x15, 0x53, 0x87,
+	0xe9, 0xa3, 0xdc, 0xf1, 0xe7, 0x95, 0xab, 0x27, 0x50, 0x69, 0x24, 0x69, 0x9a, 0x3e, 0x4b, 0xa0,
+	0x57, 0xbb, 0x4b, 0xaf, 0x72, 0x97, 0x7f, 0x93, 0xe0, 0xee, 0x95, 0x04, 0xc8, 0x60, 0xef, 0x0d,
+	0x42, 0x83, 0xfe, 0x1f, 0x2d, 0x15, 0x18, 0x0c, 0xfe, 0x8d, 0xfa, 0xb4, 0xdd, 0xe5, 0xc2, 0xf0,
+	0x4b, 0x58, 0x4f, 0x0e, 0xe0, 0xbd, 0x55, 0x03, 0xf0, 0x95, 0x6a, 0x61, 0x5a, 0xf9, 0x8f, 0x34,
+	0x64, 0x7d, 0x0c, 0x5f, 0x41, 0xc1, 0x47, 0xf5, 0x31, 0x71, 0x46, 0x36, 0x9d, 0x72, 0xcb, 0x0e,
+	0x64, 0x7f, 0xfc, 0xf7, 0x68, 0xeb, 0xb3, 0x3c, 0x4d, 0x36, 0xe7, 0x10, 0x7c, 0x09, 0x05, 0xca,
+	0xf8, 0xe3, 0x87, 0xfa, 0xd8, 0xe0, 0x86, 0x3e, 0xb5, 0x28, 0xe3, 0xa1, 0xea, 0xca, 0xea, 0x65,
+	0xe3, 0x8f, 0x1f, 0xd6, 0x0d, 0x6e, 0x74, 0xbd, 0x34, 0x6d, 0x9b, 0x26, 0x9e, 0x1d, 0x7c, 0x05,
+	0x38, 0xb6, 0xdc, 0xe1, 0x84, 0x24, 0xc8, 0xd3, 0x82, 0xbc, 0xba, 0x8a, 0xbc, 0x2e, 0x32, 0x23,
+	0x76, 0x79, 0x9c, 0x04, 0x1c, 0xfc, 0x06, 0x6e, 0x9f, 0x51, 0x87, 0x5b, 0xa7, 0xb6, 0x61, 0x26,
+	0x2a, 0x64, 0x44, 0x85, 0xe3, 0x55, 0x15, 0x9e, 0x85, 0xc9, 0x51, 0x91, 0x5b, 0x67, 0x0b, 0x98,
+	0x83, 0x5f, 0xc3, 0x2d, 0xc7, 0x35, 0x4d, 0x6f, 0x5f, 0xc7, 0xab, 0xac, 0x89, 0x2a, 0x2b, 0xd7,
+	0xa0, 0xe7, 0xa7, 0x46, 0x35, 0x0a, 0xce, 0x1c, 0xe2, 0x94, 0x7f, 0x5d, 0x07, 0x79, 0x7e, 0xad,
+	0x10, 0x21, 0xc3, 0x0c, 0xd3, 0x7f, 0x45, 0x37, 0x35, 0x61, 0xe3, 0x21, 0xe4, 0xc2, 0x5d, 0x40,
+	0x2d, 0x56, 0x4c, 0x09, 0x57, 0x1c, 0xf2, 0xb2, 0x5c, 0x46, 0x79, 0x31, 0xed, 0x67, 0x79, 0x36,
+	0xbe, 0x00, 0x38, 0x37, 0x26, 0x2e, 0xd1, 0xf9, 0xe5, 0x94, 0x14, 0x33, 0x87, 0xd2, 0x51, 0xfe,
+	0xf8, 0xb3, 0xeb, 0xee, 0x9d, 0xca, 0x89, 0x47, 0xd1, 0xbf, 0x9c, 0x12, 0x6d, 0xf3, 0x3c, 0x34,
+	0xb1, 0x01, 0x99, 0xd7, 0x94, 0x8d, 0x8b, 0x6b, 0x82, 0xf4, 0xd1, 0xb5, 0x49, 0x9f, 0x53, 0x36,
+	0xd6, 0x04, 0x45, 0x79, 0x0c, 0x9b, 0xb3, 0x12, 0xb8, 0x0b, 0xd8, 0x68, 0x9f, 0x28, 0xcd, 0x46,
+	0x5d, 0x3f, 0x51, 0x9a, 0x03, 0x55, 0xef, 0xbf, 0xe8, 0xaa, 0xf2, 0x0d, 0x94, 0x61, 0xab, 0xf7,
+	0x44, 0x69, 0x2a, 0x9a, 0xde, 0x68, 0xf7, 0x1f, 0x3f, 0x94, 0x25, 0x2c, 0xc0, 0xcd, 0x00, 0xa9,
+	0x77, 0x06, 0xb5, 0xa6, 0x2a, 0xa7, 0xf0, 0x26, 0x6c, 0x3e, 0x6b, 0xf4, 0xfa, 0x9d, 0xa7, 0x9a,
+	0xd2, 0x92, 0xd3, 0x98, 0x83, 0xf5, 0xde, 0xa0, 0xd5, 0x52, 0xb4, 0x17, 0x72, 0xa6, 0xfc, 0x9d,
+	0x04, 0x39, 0xaf, 0xa8, 0xea, 0x69, 0x64, 0x1c, 0x8b, 0xb0, 0x13, 0x16, 0x7a, 0xde, 0x68, 0xd7,
+	0x75, 0xb5, 0xa9, 0xb6, 0xd4, 0x76, 0x5f, 0xbe, 0xe1, 0x11, 0x37, 0xda, 0xbd, 0xbe, 0xd2, 0xee,
+	0x2b, 0x6d, 0xb5, 0x33, 0xe8, 0xc9, 0x12, 0x6e, 0xc2, 0x5a, 0x5d, 0x6d, 0xf6, 0x15, 0x39, 0x85,
+	0x79, 0x80, 0x27, 0x83, 0xd6, 0xa0, 0xa9, 0xf4, 0x1b, 0x27, 0xaa, 0x9c, 0xc6, 0x2d, 0xd8, 0x78,
+	0xaa, 0x75, 0x06, 0xdd, 0x46, 0xfb, 0xa9, 0x9c, 0x41, 0x80, 0xac, 0x52, 0xaf, 0x7b, 0xf6, 0x06,
+	0xee, 0x80, 0xec, 0xdb, 0x7a, 0xab, 0xd3, 0xee, 0xf4, 0x3b, 0xed, 0xc6, 0x13, 0x79, 0xcb, 0x8b,
+	0xef, 0xb5, 0x95, 0x6e, 0xef, 0x59, 0xa7, 0x2f, 0xcb, 0xe5, 0x5f, 0xd2, 0x90, 0xf1, 0x54, 0x79,
+	0xfd, 0xc5, 0xe5, 0xc8, 0x37, 0xb0, 0x0c, 0xfb, 0xf3, 0xe9, 0x7a, 0x52, 0xd7, 0x4d, 0x2c, 0xc1,
+	0xee, 0x42, 0x8c, 0x2f, 0x34, 0x8f, 0xef, 0xc2, 0xc1, 0x72, 0x9f, 0x3e, 0xab, 0xbf, 0x8f, 0x07,
+	0x70, 0x67, 0x21, 0x28, 0xd6, 0xde, 0x36, 0x1e, 0xc1, 0xbd, 0x2b, 0x02, 0x22, 0xaa, 0x03, 0x6f,
+	0xa0, 0x41, 0x64, 0x52, 0xe5, 0xa6, 0xd7, 0x5b, 0xe0, 0xf1, 0xb5, 0x01, 0xbe, 0x05, 0xb7, 0xe3,
+	0x48, 0x44, 0x53, 0xc2, 0xdb, 0x50, 0x08, 0x5c, 0x31, 0x1d, 0x39, 0xdc, 0x87, 0xd2, 0x02, 0x1c,
+	0xa5, 0xdd, 0xf1, 0x26, 0x11, 0x2e, 0xc3, 0x5c, 0xfd, 0x35, 0x44, 0xc8, 0xcf, 0x7c, 0xbe, 0x82,
+	0x2c, 0xde, 0x81, 0xbd, 0x24, 0x16, 0x91, 0xed, 0xe2, 0x1e, 0xdc, 0x9a, 0x39, 0x63, 0x2a, 0xd6,
+	0xf1, 0x10, 0xde, 0x5e, 0xe2, 0x88, 0x52, 0xf7, 0xca, 0x3f, 0x49, 0x90, 0x4f, 0x1e, 0x8f, 0xa8,
+	0x42, 0x76, 0x62, 0x0c, 0xc9, 0xc4, 0x29, 0x4a, 0xe2, 0xe4, 0xb8, 0xbf, 0xe2, 0xa3, 0xd3, 0xe3,
+	0x36, 0x65, 0xa7, 0xcf, 0xc9, 0xa5, 0x78, 0x2b, 0xb4, 0x20, 0x19, 0xab, 0xb0, 0xe3, 0x70, 0xc3,
+	0xe6, 0x3a, 0xa7, 0x26, 0xd1, 0x5d, 0x46, 0x2f, 0x74, 0x66, 0x30, 0x4b, 0x9c, 0x05, 0x59, 0xad,
+	0x20, 0x7c, 0x7d, 0x6a, 0x92, 0x01, 0xa3, 0x17, 0x6d, 0x83, 0x59, 0x78, 0x0f, 0xf2, 0x73, 0xa1,
+	0x69, 0x11, 0xba, 0xc5, 0xe3, 0x51, 0x3b, 0xb0, 0x26, 0xde, 0x6a, 0x71, 0x3c, 0xa4, 0x35, 0xff,
+	0xa1, 0xfc, 0xb3, 0x04, 0xdb, 0x73, 0x07, 0xf1, 0x7f, 0xa9, 0x0f, 0x29, 0xec, 0xe3, 0xcf, 0x0c,
+	0xe0, 0xe2, 0x71, 0xff, 0xef, 0x6f, 0x65, 0x64, 0xb9, 0x8c, 0x8b, 0x56, 0x32, 0x9a, 0xff, 0x80,
+	0x32, 0xa4, 0x1d, 0xd7, 0x14, 0x07, 0xae, 0xa4, 0x79, 0x26, 0xf6, 0x60, 0x7d, 0xe8, 0x8e, 0x5e,
+	0x13, 0xee, 0x14, 0xb3, 0xa2, 0x8d, 0x4f, 0xaf, 0xff, 0xe5, 0xab, 0xd4, 0x04, 0x83, 0x16, 0x32,
+	0xe1, 0xfb, 0xb0, 0x4d, 0x2e, 0xa6, 0x13, 0x3a, 0xa2, 0x5c, 0x1f, 0x5a, 0x2e, 0x1b, 0x3b, 0xc5,
+	0xf5, 0xc3, 0xf4, 0x91, 0xa4, 0xe5, 0x43, 0xb8, 0x26, 0xd0, 0xd2, 0x8f, 0x29, 0xc8, 0xfa, 0xc9,
+	0x91, 0x60, 0x29, 0x2e, 0xf8, 0x2b, 0xd8, 0x20, 0x17, 0xc4, 0x9c, 0x4e, 0x0c, 0x5b, 0x4c, 0x24,
+	0x77, 0x5c, 0xfb, 0xc7, 0xfa, 0x2a, 0x6a, 0xc0, 0xa4, 0xcd, 0x38, 0x4b, 0x3f, 0x48, 0xb0, 0x11,
+	0xc2, 0xd1, 0xf2, 0x4b, 0xb1, 0xe5, 0x5f, 0x32, 0xef, 0xd4, 0x92, 0x79, 0x77, 0x20, 0x67, 0x70,
+	0x6e, 0x8c, 0xce, 0xbc, 0x0f, 0x43, 0xf8, 0x9f, 0x72, 0xcd, 0x2d, 0x11, 0x67, 0x28, 0x7f, 0x9f,
+	0x06, 0x79, 0xfe, 0xf3, 0xff, 0x3f, 0xd9, 0x73, 0x16, 0x14, 0xa6, 0xc4, 0x1e, 0x11, 0xc6, 0xe9,
+	0x84, 0xe8, 0x62, 0xca, 0xe1, 0xee, 0xab, 0x5d, 0xf7, 0x8f, 0xc8, 0xff, 0xb3, 0x50, 0x78, 0x77,
+	0x46, 0xa8, 0xc9, 0x11, 0xb9, 0x70, 0x3a, 0xa5, 0x06, 0x14, 0x16, 0xc2, 0x70, 0x1f, 0x20, 0x0a,
+	0x0c, 0x96, 0x3c, 0x86, 0x44, 0xbb, 0x21, 0x15, 0xdb, 0x0d, 0x35, 0x0e, 0xef, 0x50, 0x6b, 0x85,
+	0xc8, 0xda, 0x56, 0x70, 0x79, 0xe8, 0x7a, 0x8e, 0xae, 0xf4, 0xf2, 0x8b, 0x53, 0xca, 0xcf, 0xdc,
+	0xa1, 0xb7, 0x30, 0x55, 0x2f, 0xf5, 0x7e, 0x74, 0x09, 0x4b, 0x30, 0xdd, 0xf7, 0xaf, 0x64, 0xa7,
+	0x84, 0x55, 0x4f, 0xe3, 0x77, 0xc2, 0x61, 0x56, 0x38, 0x3e, 0xf9, 0x2b, 0x00, 0x00, 0xff, 0xff,
+	0xbd, 0xb8, 0xbe, 0xef, 0x3c, 0x0e, 0x00, 0x00,
 }
