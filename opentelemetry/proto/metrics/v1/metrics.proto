@@ -110,12 +110,11 @@ message Metric {
   // "metric_descriptor".
   MetricDescriptor metric_descriptor = 1;
 
-  // Data is a list of one or more DataPoints for a single
-  // metric. Only one of the following fields is used for the data,
-  // depending on the type of the metric defined by
-  // MetricDescriptor.value_type field.
-
-  repeated ScalarDataPoint scalar_data_points = 2;
+  // Data is a list of one or more DataPoints for a single metric. Only one of the
+  // following fields is used for the data, depending on the type of the metric defined
+  // by MetricDescriptor.type field.
+  repeated Int64DataPoint int64_data_points = 2;
+  repeated DoubleDataPoint double_data_points = 3;
   repeated HistogramDataPoint histogram_data_points = 4;
   repeated SummaryDataPoint summary_data_points = 5;
 
@@ -534,33 +533,54 @@ message MetricDescriptor {
   Kind kind = 5;
 }
 
-// ScalarDataPoint is a single data point in a timeseries that
-// describes the time-varying values of a SCALAR_INT64 or
-// SCALAR_DOUBLE metric.
-message ScalarDataPoint {
+// Int64DataPoint is a single data point in a timeseries that describes the time-varying
+// values of a int64 metric.
+message Int64DataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the value was reset to zero
-  // for CUMULATIVE or DELTA metrics.
+  // start_time_unix_nano is the time when the cumulative value was reset to zero.
+  // This is used for Counter type only. For Gauge the value is not specified and
+  // defaults to 0.
   //
-  // The value is measured over the time interval
-  // (start_time_unix_nano, time_unix_nano].  Value is UNIX Epoch time
-  // in nanoseconds since 00:00:00 UTC on 1 January 1970.  The value
-  // MUST be set when the instrument descriptor Kind includes either
-  // CUMULATIVE or DELTA and MUST NOT be set when Kind includes
-  // INSTANTANOUS.
+  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
+  // may be decided by the backend.
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this value was recorded.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   fixed64 time_unix_nano = 3;
 
-  // value itself, if SCALAR_INT64.
-  int64 value_int64 = 4;
+  // value itself.
+  int64 value = 4;
+}
 
-  // value itself, if SCALAR_DOUBLE.
-  double value_double = 5;
+// DoubleDataPoint is a single data point in a timeseries that describes the time-varying
+// value of a double metric.
+message DoubleDataPoint {
+  // The set of labels that uniquely identify this timeseries.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
+
+  // start_time_unix_nano is the time when the cumulative value was reset to zero.
+  // This is used for Counter type only. For Gauge the value is not specified and
+  // defaults to 0.
+  //
+  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
+  // may be decided by the backend.
+  fixed64 start_time_unix_nano = 2;
+
+  // time_unix_nano is the moment when this value was recorded.
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  fixed64 time_unix_nano = 3;
+
+  // value itself.
+  double value = 4;
 }
 
 // HistogramDataPoint is a single data point in a timeseries that describes the time-varying
