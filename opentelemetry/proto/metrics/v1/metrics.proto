@@ -145,11 +145,11 @@ message MetricDescriptor {
     INVALID_VALUE_TYPE = 0;
 
     // ScalarInt64 implies that the value is found in
-    // Metric.scalar_data_points[].value_int64.
+    // Metric.int64_data_points[].value.
     SCALAR_INT64 = 1;
 
     // ScalarDouble implies that the value is found in
-    // Metric.scalar_data_points[].value_double.
+    // Metric.double_data_points[].value.
     SCALAR_DOUBLE = 2;
 
     // Histogram implies that the value is found in
@@ -187,25 +187,25 @@ message MetricDescriptor {
   // MONOTONIC is a boolean option that may be applied to
   // ADDING-structure metrics.
   //
-  // CHRONOLOGICAL is a boolean option that may be applied to all
-  // metrics, meaning that the metric was generated periodically, at a
-  // time chosen by the SDK.  OpenTelemetry Observer instruments
-  // report CHRONOLOGICAL measurements, with observations from a
+  // SNAPSHOT is a boolean option that may be applied to all
+  // metrics, meaning that it was generated periodically, at a
+  // time determined by the SDK.  OpenTelemetry Observer instruments
+  // report SNAPSHOT measurements, with observations from a
   // single callback invokation sharing a single logical timestamp.
   // This property can be safetly disregarded and not set when
   // importing data from other sources, but when set its presence is
   // always meaningful.
   //
   // When measurements originate from an OpenTelemetry API, the
-  // CHRONOLOGICAL kind allows the interpreter to recognize values
+  // SNAPSHOT kind allows the interpreter to recognize values
   // that were emitted by the same callback invocation, as identified
-  // by equal Resource and TimeUnixNano values.  CHRONOLOGICAL metrics
+  // by equal Resource and TimeUnixNano values.  SNAPSHOT metrics
   // MUST NOT have more than one data point per TimeUnixNano,
   // Resource, and LabelSet.  If the interpreter of this data finds
   // such matching data points, they are considered duplicate by
   // definition and all but one SHOULD be discarded.
   //
-  // CHRONOLOGICAL means that:
+  // SNAPSHOT means that:
   // - The count of events is a measure of the rate of SDK collection
   //   times the aggregated cardinality, therefore cannot be used
   //   to extrapolate application-specific rate information.
@@ -217,7 +217,7 @@ message MetricDescriptor {
   //   associated trace context (e.g., no exemplars with trace_id,
   //   span_id).
   //
-  // CHRONOLOGICAL is incompatible with INSTANTANEOUS.
+  // SNAPSHOT is incompatible with INSTANTANEOUS.
   enum KindElement {
     // INVALID_KIND_MASK is not used.
     INVALID_KIND_MASK = 0;
@@ -323,19 +323,20 @@ message MetricDescriptor {
     // rate of change.
     MONOTONIC = 0x20;
 
-    // CHRONOLOGICAL may be set for any kind of metric, indicating it
+    // SNAPSHOT may be set for any kind of metric, indicating it
     // was generated through a callback invoked deliberately by the
-    // SDK.  In CHRONOLOGICAL measurements, TimeUnixNano values depend
+    // SDK.  In SNAPSHOT measurements, TimeUnixNano values depend
     // on the SDK's decision to collect, not the application.
     //
-    // When CHRONOLOGICAL is not set, it implies the event originated
+    // When SNAPSHOT is not set, it implies the event originated
     // from the application calling the SDK with a measurement.
-    CHRONOLOGICAL = 0x40;
+    // (Referred to as CONTINUOUS measurements, in that case.)
+    SNAPSHOT = 0x40;
   }
 
   // Kind explains how the DataPoint was produced (called
   // "Structure"), how the point was aggregated with resepect to time
-  // (called "Temporality"), whether it was computed asynchronously,
+  // (called "Temporality"), whether it was computed by a snapshot,
   // and (when the Structure is ADDING) whether the sum is not
   // monotonic.
   //
@@ -346,9 +347,9 @@ message MetricDescriptor {
   // - 3 possibilities for Temporality
   // - 3 possibilities for Structure/Monotonicity: Adding Monotonic,
   //     Adding Non-Monotonic, and Grouping
-  // - 2 possibilities of being Asynchronous or not.
+  // - 2 possibilities of being a Snapshot or Continuous.
   //
-  // Exclusing the asynchronous instantaneous combinations, this makes
+  // Excluding the snapshot instantaneous combinations, this makes
   // 15 valid values.
   //
   // The cases are detailed below in terms of:
@@ -368,10 +369,10 @@ message MetricDescriptor {
   // 2. GROUPING kinds associate with ValueRecorder and ValueObserver instruments
   // 3. GROUPING and ADDING kinds both typically yield Histogram data points.
   //
-  // About CHRONOLOGICAL kinds:
+  // About SNAPSHOT kinds:
   // 
-  // 1. CHRONOLOGICAL kinds associate with Observer instruments
-  // 2. INSTANTANEOUS temporality does not combine with CHRONOLOGICAL kinds.
+  // 1. SNAPSHOT kinds associate with Observer instruments
+  // 2. INSTANTANEOUS temporality does not combine with SNAPSHOT kinds.
   //
   // About ADDING|INSTANTANEOUS vs ADDING|DELTA:
   //
@@ -420,13 +421,13 @@ message MetricDescriptor {
     // value.
     ADDING_MONOTONIC_DELTA = 0x2a; // ADDING|DELTA|MONOTONIC
 
-    // ADDING_MONOTONIC_DELTA_CHRONOLOGICAL is ADDING_MONOTONIC_DELTA
-    // with asynchronous semantics specified by the OpenTelemetry API,
+    // ADDING_MONOTONIC_DELTA_SNAPSHOT is ADDING_MONOTONIC_DELTA
+    // with snapshot semantics specified by the OpenTelemetry API,
     // indicating the value was collected through a callback.
     // Generally this is the temporal difference between values of an
     // OpenTelemetry SumObserver instrument.  Typically expressed as a
     // scalar or histogram value.
-    ADDING_MONOTONIC_DELTA_CHRONOLOGICAL         = 0x6a; // ADDING|DELTA|MONOTONIC|CHRONOLOGICAL
+    ADDING_MONOTONIC_DELTA_SNAPSHOT         = 0x6a; // ADDING|DELTA|MONOTONIC|SNAPSHOT
 
     // ADDING_MONOTONIC_CUMULATIVE describes the current value of a
     // sum accumulated from the reset time (StartTimeUnixNano) through
@@ -437,13 +438,13 @@ message MetricDescriptor {
     // Typically expressed as a scalar or histogram value.
     ADDING_MONOTONIC_CUMULATIVE = 0x2c; // ADDING|CUMULATIVE|MONOTONIC
 
-    // ADDING_MONOTONIC_CUMULATIVE_CHRONOLOGICAL is
-    // ADDING_MONOTONIC_CUMULATIVE with asynchronous semantics
+    // ADDING_MONOTONIC_CUMULATIVE_SNAPSHOT is
+    // ADDING_MONOTONIC_CUMULATIVE with snapshot semantics
     // specified by the OpenTelemetry API, indicating the value was
     // collected through a callback.  Generally this is the sum of
     // measurements of an OpenTelemetry SumObserver instrument.
     // Typically expressed as a scalar or histogram value.
-    ADDING_MONOTONIC_CUMULATIVE_CHRONOLOGICAL = 0x6c; // ADDING|CUMULATIVE|MONOTONIC|CHRONOLOGICAL
+    ADDING_MONOTONIC_CUMULATIVE_SNAPSHOT = 0x6c; // ADDING|CUMULATIVE|MONOTONIC|SNAPSHOT
 
     // ADDING_INSTANTANEOUS kind describes the change in a sum as
     // measured at an instant (TimeUnixNano).  The value may be
@@ -461,13 +462,13 @@ message MetricDescriptor {
     // value.
     ADDING_DELTA = 0xa; // ADDING|DELTA
 
-    // ADDING_DELTA_CHRONOLOGICAL is ADDING_DELTA with asynchronous
+    // ADDING_DELTA_SNAPSHOT is ADDING_DELTA with snapshot
     // semantics specified by the OpenTelemetry API, indicating the
     // value was collected through a callback.  Generally this is the
     // temporal difference between values of an OpenTelemetry
     // UpDownSumObserver instrument.  Typically expressed as a scalar
     // or histogram value.
-    ADDING_DELTA_CHRONOLOGICAL = 0x4a; // ADDING|DELTA|CHRONOLOGICAL
+    ADDING_DELTA_SNAPSHOT = 0x4a; // ADDING|DELTA|SNAPSHOT
 
     // ADDING_CUMULATIVE describes the current value of a sum
     // accumulated from the reset time (StartTimeUnixNano) through the
@@ -477,13 +478,13 @@ message MetricDescriptor {
     // time.  Typically expressed as a scalar or histogram value.
     ADDING_CUMULATIVE = 0xc; // ADDING|CUMULATIVE
 
-    // ADDING_CUMULATIVE_CHRONOLOGICAL is ADDING_CUMULATIVE with
-    // asynchronous semantics specified by the OpenTelemetry API,
+    // ADDING_CUMULATIVE_SNAPSHOT is ADDING_CUMULATIVE with
+    // snapshot semantics specified by the OpenTelemetry API,
     // indicating the value was collected through a callback.
     // Generally this is the sum of measurements of an OpenTelemetry
     // UpDownSumObserver instrument.  Typically expressed as a scalar
     // or histogram value.
-    ADDING_CUMULATIVE_CHRONOLOGICAL = 0x4c; // ADDING|CUMULATIVE|CHRONOLOGICAL
+    ADDING_CUMULATIVE_SNAPSHOT = 0x4c; // ADDING|CUMULATIVE|SNAPSHOT
     
     // GROUPING_INSTANTANEOUS kind describes an individual value
     // measured at an instant (TimeUnixNano).  Generally this is the value of an
@@ -501,12 +502,12 @@ message MetricDescriptor {
     // within the collection interval.
     GROUPING_DELTA = 0x12; // GROUPING|DELTA
 
-    // GROUPING_DELTA_CHRONOLOGICAL is GROUPING_DELTA with asynchronous
+    // GROUPING_DELTA_SNAPSHOT is GROUPING_DELTA with snapshot
     // semantics specified by the OpenTelemetry API, indicating the
     // value was collected through a callback.  Generally this is the
     // aggregated value of an OpenTelemetry ValueObserver instrument.
     // Typically expressed as a scalar, histogram, or summary value.
-    GROUPING_DELTA_CHRONOLOGICAL = 0x52; // GROUPING|DELTA|CHRONOLOGICAL
+    GROUPING_DELTA_SNAPSHOT = 0x52; // GROUPING|DELTA|SNAPSHOT
 
     // GROUPING_CUMULATIVE kind describes a set of individual values
     // measured from the last reset time (StartTimeUnixNano) through
@@ -519,13 +520,13 @@ message MetricDescriptor {
     // interval.
     GROUPING_CUMULATIVE = 0x14; // GROUPING|CUMULATIVE
 
-    // GROUPING_CUMULATIVE_CHRONOLOGICAL is GROUPING_CUMULATIVE with
-    // asynchronous semantics specified by the OpenTelemetry API,
+    // GROUPING_CUMULATIVE_SNAPSHOT is GROUPING_CUMULATIVE with
+    // snapshot semantics specified by the OpenTelemetry API,
     // indicating the value was collected through a callback.
     // Generally this is the aggregated value of an OpenTelemetry
     // ValueObserver instrument.  Typically expressed as a scalar or
     // histogram value.
-    GROUPING_CUMULATIVE_CHRONOLOGICAL = 0x54; // GROUPING|CUMULATIVE|CHRONOLOGICAL
+    GROUPING_CUMULATIVE_SNAPSHOT = 0x54; // GROUPING|CUMULATIVE|SNAPSHOT
   }
 
   // Kind describes properties of the Metric that are necessary to
