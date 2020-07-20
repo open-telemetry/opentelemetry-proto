@@ -223,7 +223,14 @@ message Span {
   // An optional final status for this span. Semantically when Status
   // wasn't set it is means span ended without errors and assume
   // Status.Ok (code = 0).
-  Status status = 15;
+  // 
+  // This field is being deprecated in favour of the
+  // error field combined with semantic conventions of attributes
+  // containing additional details on the error that occurred
+  Status status = 15 [deprecated = true];
+
+  // error is a field to indicate if the span contained an error 
+  bool error = 16;
 }
 
 // The Status type defines a logical error model that is suitable for different
