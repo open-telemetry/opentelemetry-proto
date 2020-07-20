@@ -44,6 +44,35 @@ message InstrumentationLibraryMetrics {
   repeated Metric metrics = 2;
 }
 
+// A representation of raw measurements, which can have statistical meaning based
+// on how the measurement was sampled, as well as a span ID and trace ID of the
+// active span when the measurement was recorded
+message RawValue {
+  // Numerical value of the measurement that was recorded. Only one of these 
+  // two fields is used for the data, based on MetricDescriptor.measurement_type
+  double double_value = 1;
+  int64 int64_value = 2;
+  
+  // Exact time that the measurement was recorded
+  fixed64 time_unix_nano = 3;
+
+  // For RawValue data points, this is the set of labels that uniquely identify this timeseries.
+  // Only labels kept by the aggregator (and not dropped labels) should be included.
+  // For exemplars, this is the set of labels that were dropped by the aggregator, but recorded
+  // alongside the original measurement. Only labels that were dropped by the aggregator should be included
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 4;
+
+  // (Optional) Span ID of the current trace
+  bytes span_id = 5;
+
+  // (Optional) Trace ID of the current trace
+  bytes trace_id = 6;
+
+  // (Optional) When sample_count is non-zero, this exemplar has been chosen in a statistically
+  // unbiased way such that the exemplar is representative of `sample_count` individual events
+  double sample_count = 7;
+}
+
 // Defines a Metric which has one or more timeseries.
 //
 // The data model and relation between entities is shown in the
@@ -111,6 +140,7 @@ message Metric {
   repeated DoubleDataPoint double_data_points = 3;
   repeated HistogramDataPoint histogram_data_points = 4;
   repeated SummaryDataPoint summary_data_points = 5;
+  repeated RawValue raw_data_points = 6;
 }
 
 // Defines a metric type and its schema.
@@ -352,6 +382,10 @@ message Int64DataPoint {
 
   // value itself.
   int64 value = 4;
+
+  // (Optional) List of exemplars collected from 
+  // measurements that were used to form the data point
+  repeated RawValue exemplars = 5;
 }
 
 // DoubleDataPoint is a single data point in a timeseries that describes the time-varying
@@ -382,6 +416,10 @@ message DoubleDataPoint {
 
   // value itself.
   double value = 4;
+
+  // (Optional) List of exemplars collected from 
+  // measurements that were used to form the data point
+  repeated RawValue exemplars = 5;
 }
 
 // HistogramDataPoint is a single data point in a timeseries that describes the time-varying
@@ -452,6 +490,10 @@ message HistogramDataPoint {
   // If we decide to also support (a, b] intervals we should add support for these by defining
   // a boolean value which decides what type of intervals to use.
   repeated double explicit_bounds = 7;
+
+  // (Optional) List of exemplars collected from 
+  // measurements that were used to form the data point
+  repeated RawValue exemplars = 8;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the time-varying
@@ -508,4 +550,8 @@ message SummaryDataPoint {
   // A list of values at different quantiles of the distribution calculated
   // from the current snapshot. The quantiles must be strictly increasing.
   repeated ValueAtQuantile quantile_values = 6;
+
+  // (Optional) List of exemplars collected from 
+  // measurements that were used to form the data point
+  repeated RawValue exemplars = 7;
 }
