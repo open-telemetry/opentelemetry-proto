@@ -435,7 +435,7 @@ message SummaryDataPoint {
   // be set to the maximum of the measurements reflected in count.
   double max = 9;
 
-  // Represents the value at a given percentile of a distribution.  to
+  // Represents the value at a given percentile of a distribution.  To
   // represent the maximum or minimum values, use `max` and `min`
   // fields, do not use percentiles 0 or 100.
   message ValueAtPercentile {
