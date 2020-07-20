@@ -33,8 +33,7 @@ import (
 
 var (
 	cumulativeProps = []string{"Instantaneous", "Delta", "Cumulative"}
-	addingProps     = []string{"Adding", "Grouping"}
-	monoProps       = []string{"Monotonic", ""}
+	structureProps  = []string{"Adding_Monotonic", "Adding", "Grouping"}
 	syncProps       = []string{"Continuous", "Snapshot"}
 )
 
@@ -50,20 +49,20 @@ type (
 )
 
 const (
+        INVALID = 0
+
 	// One of the following three MUST be set. There are 3 exclusive Temporality kinds.
 	INSTANTANEOUS = 1 << 0
-	DELTA         = 1 << 1
-	CUMULATIVE    = 1 << 2
+	DELTA         = 2 << 0
+	CUMULATIVE    = 3 << 0
 
-	// One of the following two MUST be set. There are 2 exclusive Structure kinds.
-	ADDING   = 1 << 3
-	GROUPING = 1 << 4
-
-	// May be set with ADDING.
-	MONOTONIC = 1 << 5
+	// One of the following three MUST be set. There are 3 exclusive Structure kinds.
+	GROUPING         = 1 << 2
+	ADDING           = 2 << 2
+	ADDING_MONOTONIC = 3 << 2
 
 	// May be set for any instrument.
-	SNAPSHOT = 1 << 6
+	SNAPSHOT = 1 << 4
 )
 
 var (
@@ -71,35 +70,23 @@ var (
 	var fullnames []string
 	var fullvalues []string
 
-	for _, a := range addingProps {
-		for _, m := range monoProps {
-			if a == "Grouping" && m == "Monotonic" {
-				continue
-			}
-
-			mfrag := ""
-			mname := ""
-			if m == "Monotonic" {
-				mfrag = "|MONOTONIC"
-				mname = "_MONOTONIC"
-			}
-			for _, c := range cumulativeProps {
-				for _, s := range syncProps {
-					if c == "Instantaneous" && s == "Snapshot" {
-						continue
-					}
-					sfrag := ""
-					sname := ""
-					if s == "Snapshot" {
-						sfrag = "|SNAPSHOT"
-						sname = "_SNAPSHOT"
-					}
-					fullname := fmt.Sprint(strings.ToUpper(a), mname, "_", strings.ToUpper(c), sname)
-					fullnames = append(fullnames, fullname)
-					fullvalue := fmt.Sprint("", strings.ToUpper(a), "|", strings.ToUpper(c), mfrag, sfrag)
-					fullvalues = append(fullvalues, fullvalue)
-					buf.WriteString(fmt.Sprint(fullname, " Kind = ", fullvalue, "\n"))
+	for _, a := range structureProps {
+		for _, c := range cumulativeProps {
+			for _, s := range syncProps {
+				if c == "Instantaneous" && s == "Snapshot" {
+					continue
 				}
+				sfrag := ""
+				sname := ""
+				if s == "Snapshot" {
+					sfrag = "|SNAPSHOT"
+					sname = "_SNAPSHOT"
+				}
+				fullname := fmt.Sprint(strings.ToUpper(a), "_", strings.ToUpper(c), sname)
+				fullnames = append(fullnames, fullname)
+				fullvalue := fmt.Sprint("", strings.ToUpper(a), "|", strings.ToUpper(c), sfrag)
+				fullvalues = append(fullvalues, fullvalue)
+				buf.WriteString(fmt.Sprint(fullname, " Kind = ", fullvalue, "\n"))
 			}
 		}
 	}
@@ -115,6 +102,7 @@ func main() {
 
 	src, err := format.Source(buf.Bytes())
 	if err != nil {
+		fmt.Println("SOURCE WAS\n", string(buf.Bytes()))
 		panic(err)
 	}
 	if nwritten, err := os.Stdout.Write(src); err != nil || nwritten != len(src) {
