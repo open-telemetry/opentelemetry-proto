@@ -46,20 +46,24 @@ message InstrumentationLibraryMetrics {
 
 // Defines a Metric which has one or more timeseries.
 //
-// The data model and relation between entities is shown in the diagram below.
+// The data model and relation between entities is shown in the
+// diagram below. Here, "DataPoint" is the term used to refer to any
+// one of the specific data point value types, and "points" is the term used
+// to refer to any one of the lists of points contained in the Metric.
 //
 // - Metric is composed of a MetricDescriptor and a list of data points.
-// - MetricDescriptor contains a list of label keys (shown horizontally).
-// - Data is a list of DataPoints (shown vertically).
-// - DataPoint contains a list of label values and a value.
+// - MetricDescriptor contains a name, description, unit, type, and temporarility.
+// - Points is a list of DataPoints (shown vertically).
+// - DataPoint contains timestamps, labels, and one of the possible value type fields.
 //
 //     Metric
 //  +----------+         +------------------------+
 //  |descriptor|-------->| MetricDescriptor       |
-//  |          |         |+-----+-----+   +-----+ |
-//  |          |         ||label|label|...|label| |
-//  |      data|--+      ||key1 |key2 |   |keyN | |
-//  +----------+  |      |+-----+-----+   +-----+ |
+//  |          |         | name                   |
+//  |          |         | description            |
+//  |          |         | unit                   |
+//  |    points|--+      | type                   |
+//  +----------+  |      | temporarility          |
 //                |      +------------------------+
 //                |
 //                |      +---------------------------+
@@ -86,13 +90,15 @@ message InstrumentationLibraryMetrics {
 //                       |+-----+                    |
 //                       +---------------------------+
 //
-//-----------------------------------------------------------------------
-// DataPoint is a value of specific type corresponding to a given moment in
-// time. Each DataPoint is timestamped.
-//
-// DataPoint is strongly typed: each DataPoint type has a specific Protobuf message
-// depending on the value type of the metric and thus there are currently 4 DataPoint
-// messages, which correspond to the types of metric values.
+// All DataPoint types have three common fields:
+// - Labels zero or more key-value pairs associated with the data point.
+// - StartTimeUnixNano MUST be set to the start of the interval when the
+//   descriptor Temporality includes CUMULATIVE or DELTA. This field is not set
+//   for INSTANTANEOUS timeseries, where instead the TimeUnixNano field is
+//   set for individual points.
+// - TimeUnixNano MUST be set to:
+//   - the end of the interval (CUMULATIVE or DELTA)
+//   - the instantaneous time of the event (INSTANTANEOUS).
 message Metric {
   // metric_descriptor describes the Metric.
   MetricDescriptor metric_descriptor = 1;
