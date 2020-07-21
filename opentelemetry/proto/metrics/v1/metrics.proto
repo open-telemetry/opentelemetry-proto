@@ -52,9 +52,10 @@ message InstrumentationLibraryMetrics {
 // to refer to any one of the lists of points contained in the Metric.
 //
 // - Metric is composed of a MetricDescriptor and a list of data points.
-// - MetricDescriptor contains a name, description, unit, type, and temporarility.
+// - MetricDescriptor contains a name, description, unit, and type.
 // - Points is a list of DataPoints (shown vertically).
-// - DataPoint contains timestamps, labels, and one of the possible value type fields.
+// - DataPoint contains timestamps, labels, and one of the possible value type
+//   fields.
 //
 //     Metric
 //  +----------+         +------------------------+
@@ -63,8 +64,8 @@ message InstrumentationLibraryMetrics {
 //  |          |         | description            |
 //  |          |         | unit                   |
 //  |    points|--+      | type                   |
-//  +----------+  |      | temporarility          |
-//                |      +------------------------+
+//  +----------+  |      +------------------------+
+//                |
 //                |
 //                |      +---------------------------+
 //                |      |DataPoint 1                |
@@ -98,7 +99,7 @@ message InstrumentationLibraryMetrics {
 //   set for individual points.
 // - TimeUnixNano MUST be set to:
 //   - the end of the interval (CUMULATIVE or DELTA)
-//   - the instantaneous time of the event (INSTANTANEOUS).
+//   - the instantaneous time of the event.
 message Metric {
   // metric_descriptor describes the Metric.
   MetricDescriptor metric_descriptor = 1;
@@ -124,48 +125,133 @@ message MetricDescriptor {
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // Type is the type of values a metric has.
-  enum Type {
-    // INVALID_TYPE is the default Type, it MUST not be used.
-    INVALID_TYPE = 0;
-
-    // INT64 values are signed 64-bit integers.
-    //
-    // A Metric of this Type MUST store its values as Int64DataPoint.
+  // MeasurementValueType determines the value type for a measurement.
+  enum MeasurementValueType {
+    // INVALID_SCALAR_VALUE_TYPE is the default ScalarValueType, it MUST not be
+    // used.
+    INVALID_MEASUREMENT_VALUE_TYPE = 0;
+    // The scalar value type is an int64.
     INT64 = 1;
-
-    // MONOTONIC_INT64 values are monotonically increasing signed 64-bit
-    // integers.
-    //
-    // A Metric of this Type MUST store its values as Int64DataPoint.
-    MONOTONIC_INT64 = 2;
-
-    // DOUBLE values are double-precision floating-point numbers.
-    //
-    // A Metric of this Type MUST store its values as DoubleDataPoint.
-    DOUBLE = 3;
-
-    // MONOTONIC_DOUBLE values are monotonically increasing double-precision
-    // floating-point numbers.
-    //
-    // A Metric of this Type MUST store its values as DoubleDataPoint.
-    MONOTONIC_DOUBLE = 4;
-
-    // Histogram measurement.
-    // Corresponding values are stored in HistogramDataPoint.
-    HISTOGRAM = 5;
-
-    // Summary value. Some frameworks implemented Histograms as a summary of observations
-    // (usually things like request durations and response sizes). While it
-    // also provides a total count of observations and a sum of all observed
-    // values, it calculates configurable quantiles over a sliding time
-    // window.
-    // Corresponding values are stored in SummaryDataPoint.
-    SUMMARY = 6;
+    // The scalar value type is a floating point number.
+    DOUBLE = 2;
   }
 
-  // type is the type of values this metric has.
-  Type type = 4;
+  // TODO: Decide if support for RawMeasurements (measurements recorded using
+  // the synchronous instruments) is necessary. It can be used to delegate the
+  // aggregation from the application to the agent/collector.
+
+  // Represents the type of a scalar metric that always exports the "current
+  // value" for every data point. It can be used when an "unknown" aggregation.
+  // 
+  // It does not contain a temporality field (even if it may be known) because
+  // the aggregation is unknown so points cannot be combined using the same
+  // aggregation to aggregate over different time window. Because of this
+  // "StartTimeUnixNano" is ignored for all data points.
+  //
+  // A Metric of this Type MUST store its values as Int64DataPoint or
+  // DoubleDataPoint.
+  message Gauge {
+    // It describes the value type of the measurement used to build this
+    // aggregation.
+    //
+    // Determines if the points are Int64DataPoint or DoubleDataPoint, as well
+    // as the value type of the exemplars.
+    MeasurementValueType measurement_value_type = 1;
+  }
+
+  // Represents the type of a numeric scalar metric that is calculated as a sum
+  // of all reported measurements over a time interval.
+  //
+  // TODO: Decide if this should support only MonotonicSum
+  // https://github.com/open-telemetry/opentelemetry-specification/issues/725.
+  //
+  // A Metric of this Type MUST store its values as Int64DataPoint or
+  // DoubleDataPoint.
+  message Sum {
+    // It describes the value type of the measurement used to build this
+    // aggregation.
+    //
+    // Determines if the points are Int64DataPoint or DoubleDataPoint, as well
+    // as the value type of the exemplars.
+    MeasurementValueType measurement_value_type = 1;
+
+    // Temporality is the temporal quality values of a metric have.
+    Temporality temporality = 2;
+
+    // If "true" means that the sum is monotonic.
+    bool is_monotonic = 3;
+
+    // TODO: Decide if knowing that the aggregated measurements are raw
+    // measurements is important or not. Equivalent of "Snapshot" in #162.
+  }
+
+  // Represents the type of a metric that is calculated by aggregating as a
+  // Histogram of all reported measurements over a time interval.
+  //
+  // A Metric of this Type MUST store its values as HistogramDataPoint.
+  message Histogram {
+    // It describes the value type of the measurement used to build this
+    // aggregation.
+    //
+    // Determines the value type of the exemplars.
+    MeasurementValueType measurement_value_type = 1;
+
+    // Temporality is the temporal quality values of a metric have.
+    Temporality temporality = 2;
+
+    // TODO: Decide if knowing that the aggregated measurements are raw
+    // measurements is important or not. Equivalent of "Snapshot" in #162.
+
+    // TODO: Decide if knowing that the Sum is monotonic is important or not,
+    // may be derived from the buckets definition.
+  }
+
+  // Represents the type of a metric that is calculated by computing a summary
+  // of all reported measurements over a time interval.
+  //
+  // A Metric of this Type MUST store its values as SummaryDataPoint.
+  message Summary {
+    // It describes the value type of the measurement used to build this
+    // aggregation.
+    //
+    // Determines the value type of the exemplars.
+    MeasurementValueType measurement_value_type = 1;
+
+    // Temporality is the temporal quality values of a metric have.
+    Temporality temporality = 2;
+
+    // TODO: Decide if knowing that the aggregated measurements are raw
+    // measurements is important or not. Equivalent of "Snapshot" in #162.
+
+    // TODO: Decide if knowing that the Sum is monotonic is important or not,
+    // may be derived from the buckets definition.
+  }
+
+  // Type is the type of the metric and determines what are the type of the
+  // reported value, as well as the relatationship to the time interval over
+  // which they are reported.
+  //
+  // TODO: Update table after the decision on:
+  // https://github.com/open-telemetry/opentelemetry-specification/issues/731.
+  // Be default metrics recording using the OpenTelemetry API are exported as
+  // (the table does not include MeasurementValueType to avoid extra rows):
+  //
+  //   Instrument         Type
+  //   ----------------------------------------------
+  //   Counter            Sum(temporality=delta;is_monotonic=true)
+  //   UpDownCounter      Sum(temporality=delta;is_monotonic=false)
+  //   ValueRecorder      Summary(temporality=delta)
+  //   SumObserver        Sum(temporality=cumulative;is_monotonic=true)
+  //   UpDownSumObserver  Sum(temporality=cumulative;is_monotonic=false)
+  //   ValueObserver      Gauge()
+  oneof type {
+    // TODO: Determine if encoding all possible values in a uint64 bitset
+    // improves performance significantly and propose that if that is the case.
+    Gauge gauge = 4;
+    Sum sum = 5;
+    Histogram histogram = 6;
+    Summary summary = 7;
+  }
 
   // Temporality is the temporal quality values of a metric have. It
   // describes how those values relate to the time interval over which they
@@ -175,6 +261,7 @@ message MetricDescriptor {
     // used.
     INVALID_TEMPORALITY = 0;
 
+    // TODO: Re-evaluate if this is still needed.
     // INSTANTANEOUS is a metric whose values are measured at a particular
     // instant. The values are not aggregated over any time interval and are
     // unique per timestamp. As such, these metrics are not expected to have
@@ -240,9 +327,6 @@ message MetricDescriptor {
     //      t_0+1 with a value of 1.
     CUMULATIVE = 3;
   }
-
-  // temporality is the Temporality of values this metric has.
-  Temporality temporality = 5;
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
