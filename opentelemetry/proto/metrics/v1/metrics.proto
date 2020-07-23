@@ -141,35 +141,39 @@ message MetricDescriptor {
   // which aggregations may be expressed for which instruments using
   // which value types.
   //
-  // The main feature of the individual ValueType with broad
-  // interpretation is whether a data point of this kind can
-  // _possibly_ represent more than one individual value of input
-  // measurements.  Single-value data points have a 1:1 relationship
-  // with input measurements, therefore have additional interpratetion
-  // as sample data points.  Multi-value data points, on the other
-  // hand, always represent 1 or more data points.
+  // ValueTypes are distinguished by whether a data point of its type
+  // can _possibly_ represent more than one individual input
+  // measurement.  Single-value data points have a definite one-to-one
+  // relationship with input measurements.  Multi-value data points,
+  // by contrast, represent one or more input measurements.
+  //
+  // ValueTypes are also distinguished by whether the value supports
+  // subtraction.  Not all value types support subtraction, but types
+  // which do can be converted from CUMULATIVE kind into DELTA kind.
   enum ValueType {
     // INVALID_TYPE is the default ValueType, it MUST not be used.
     INVALID_VALUE_TYPE = 0;
 
     // ScalarInt64 implies that the value is found in
     // Metric.int64_data_points[].value.  This indicates a
-    // single-value data point.
+    // single-value data point.  Supports subtraction when the Kind is
+    // ADDING or ADDING_MONOTONIC.
     SCALAR_INT64 = 1;
 
     // ScalarDouble implies that the value is found in
     // Metric.double_data_points[].value.  This indicates a
-    // single-value data point.
+    // single-value data point.  Supports subtraction when the Kind is
+    // ADDING or ADDING_MONOTONIC.
     SCALAR_DOUBLE = 2;
 
     // Histogram implies that the value is found in
     // Metric.histogram_data_points[].histogram.  This indicates a
-    // multi-value data point.
+    // multi-value data point.  Supports subtraction for Kinds.
     HISTOGRAM = 3;
 
     // Summary implies that the value is found in
     // Metric.summary_data_points[].summary.  This indicates a
-    // multi-value data point.
+    // multi-value data point.  Does not support subtraction.
     SUMMARY = 4;
 
     // TODO(#159): add RAW_INT64 and RAW_DOUBLE value types.  These
@@ -210,7 +214,7 @@ message MetricDescriptor {
   //   Instrument         Structure        Continuity
   //   ----------------------------------------------
   //   Counter            ADDING_MONOTONIC CONTINUOUS
-  //   UpDownCounter      ADDING 	   CONTINUOUS
+  //   UpDownCounter      ADDING           CONTINUOUS
   //   ValueRecorder      GROUPING         CONTINUOUS
   //   SumObserver        ADDING_MONOTONIC SNAPSHOT
   //   UpDownSumObserver  ADDING           SNAPSHOT
@@ -241,12 +245,18 @@ message MetricDescriptor {
   //   identical in form, but commonly differ in interpretation.  In
   //   both cases, individual data points are meant to be combined
   //   into a sum.  In the monotonic case, the sum has a useful
-  //   non-negative-rate property.
+  //   non-negative-rate property.  When represented by a single-value
+  //   DELTA or CONTINUOUS data point, the point represents a sum
+  //   across the interval; when INSTANTANEOUS, the single-value point
+  //   represents an instantaneous change in sum or a pre-computed
+  //   sum, depending on Continuity.
   //
   //   GROUPING structure data points represent individual
   //   measurements, meant to be combined into a distribution.  The
   //   sum of these data may be meaningful, but individual
-  //   measurements are the focus of these metrics.
+  //   measurements are the focus of these metrics.  When represented
+  //   by a single-value data point, the value is the individual
+  //   measurement regardless of Temporality or Continuity.
   //
   // About Continuity:
   //
@@ -273,8 +283,9 @@ message MetricDescriptor {
   //   CONTINUOUS-kind ADDING (and ADDING_MONOTONIC) INSTANTANOUS
   //   values are changes to a sum, such as might originate from an
   //   OpenTelemetry Counter or UpDownCounter instrument.  This metric
-  //   kind must be represented by a single-value data point (e.g., a
-  //   LastValue of GROUPING kind, a sum of ADDING kind).
+  //   kind must be represented by a single-value data point because
+  //   they are instantaneous (e.g., a LastValue of GROUPING kind,
+  //   a sum of ADDING kind).
   //
   //   SNAPSHOT-kind ADDING (and ADDING_MONOTONIC) INSTANTANEOUS
   //   values are sums, such as might originate from an OpenTelemetry
@@ -390,12 +401,10 @@ message MetricDescriptor {
     // is expressed as a scalar value that would be added into a Sum.
     //
     // Paired with CONTINUOUS INSTANTANEOUS metrics, values of this
-    // kind are defined as a change in the implied sum when
-    // represented by single-value data points.
+    // kind are defined as the change in a sum.
     //
     // Paired with SNAPSHOT INSTANTANEOUS metrics, values of this kind
-    // are defined as sum (i.e., not changes in a sum) when
-    // represented by single-value data points.
+    // are defined as a precomputed sum (i.e., not the change).
     ADDING = 0x8;
 
     // ADDING_MONOTONIC has ADDING structure with a guaranteed
@@ -404,12 +413,10 @@ message MetricDescriptor {
     // non-negative rate of change.
     //
     // Paired with CONTINUOUS INSTANTANEOUS metrics, values of this
-    // kind are defined as a change in the implied sum when
-    // represented by single-value data points.
+    // kind are defined as the change in a sum.
     //
     // Paired with SNAPSHOT INSTANTANEOUS metrics, values of this kind
-    // are defined as sum (i.e., not changes in a sum) when
-    // represented by single-value data points.
+    // are defined as a precomputed sum (i.e., not the change).
     ADDING_MONOTONIC = 0xc;
 
     // SNAPSHOT may be set for any kind of metric, indicating it
@@ -429,7 +436,30 @@ message MetricDescriptor {
   }
 
   // Kind describes how the metric was produced, according to its
-  // contituent KindElements.
+  // contituent KindElements.  With 18 meaningful combinations of the
+  // Kind element and a distinction bewteen single-value and
+  // multi-value data points, there exist 36 possible meaningful
+  // combinations of kind and value type, with several notes:
+  // 
+  //   Three pairings of INSTANTANEOUS and CONTINUOUS do not admit
+  //   multi-value data points, excluding 3 meaningless Kinds.
+  //
+  //   The CUMULATIVE kinds are generally paired with value types that
+  //   support subtraction, since they can be used to observe
+  //   differences between cumulative states.
+  //
+  // Kinds are described below by reference to the OpenTelemetry API
+  // instrument that would produce such a point.  The use of
+  // OpenTelemetry instruments in these descriptions is an
+  // abbreviation technique.  Data points imported from external
+  // systems should be mapped into data points with a compatible value
+  // type and Kind should be selectedb based on what is known about
+  // Temporality, Structure, and Continuity.
+  //
+  // It is not expected that receivers of this data format will need
+  // to construct switch statements for all Kind combinations.  For
+  // example, a consumer that demands only CUMULATIVE data is only
+  // required to handle 6 data point Kinds.  For the most part, information about Continuity is only needed in a few places
   enum Kind {
     // INVALID_KIND is the default Kind, it MUST not be used.
     INVALID_KIND = 0;
@@ -437,26 +467,77 @@ message MetricDescriptor {
     // The following hex values are generated by gen.go in this source
     // directory.
 
-    INSTANTANEOUS_ADDING_MONOTONIC_CONTINUOUS = 0xd; // INSTANTANEOUS|ADDING_MONOTONIC
-    INSTANTANEOUS_ADDING_MONOTONIC_SNAPSHOT = 0x1d; // INSTANTANEOUS|ADDING_MONOTONIC|SNAPSHOT
-    INSTANTANEOUS_ADDING_CONTINUOUS = 0x9; // INSTANTANEOUS|ADDING
-    INSTANTANEOUS_ADDING_SNAPSHOT = 0x19; // INSTANTANEOUS|ADDING|SNAPSHOT
-    INSTANTANEOUS_GROUPING_CONTINUOUS = 0x5; // INSTANTANEOUS|GROUPING
-    INSTANTANEOUS_GROUPING_SNAPSHOT = 0x15; // INSTANTANEOUS|GROUPING|SNAPSHOT
+    // Metric data point contains a single Counter measurement.
+    // Multi-value type data points are not applicable.
+    INSTANTANEOUS_ADDING_MONOTONIC_CONTINUOUS = 0xd;
 
-    DELTA_ADDING_MONOTONIC_CONTINUOUS = 0xe; // DELTA|ADDING_MONOTONIC
-    DELTA_ADDING_MONOTONIC_SNAPSHOT = 0x1e; // DELTA|ADDING_MONOTONIC|SNAPSHOT
-    DELTA_ADDING_CONTINUOUS = 0xa; // DELTA|ADDING
-    DELTA_ADDING_SNAPSHOT = 0x1a; // DELTA|ADDING|SNAPSHOT
-    DELTA_GROUPING_CONTINUOUS = 0x6; // DELTA|GROUPING
-    DELTA_GROUPING_SNAPSHOT = 0x16; // DELTA|GROUPING|SNAPSHOT
+    // Metric data point contains one or more SumObserver measurement
+    // at the same instant.
+    INSTANTANEOUS_ADDING_MONOTONIC_SNAPSHOT = 0x1d;
 
-    CUMULATIVE_ADDING_MONOTONIC_CONTINUOUS = 0xf; // CUMULATIVE|ADDING_MONOTONIC
-    CUMULATIVE_ADDING_MONOTONIC_SNAPSHOT = 0x1f; // CUMULATIVE|ADDING_MONOTONIC|SNAPSHOT
-    CUMULATIVE_ADDING_CONTINUOUS = 0xb; // CUMULATIVE|ADDING
-    CUMULATIVE_ADDING_SNAPSHOT = 0x1b; // CUMULATIVE|ADDING|SNAPSHOT
-    CUMULATIVE_GROUPING_CONTINUOUS = 0x7; // CUMULATIVE|GROUPING
-    CUMULATIVE_GROUPING_SNAPSHOT = 0x17; // CUMULATIVE|GROUPING|SNAPSHOT
+    // Metric data point contains a single UpDownCounter measurement.
+    // Multi-value type data points are not applicable.
+    INSTANTANEOUS_ADDING_CONTINUOUS = 0x9;
+
+    // Metric data point contains one or more UpDownSumObserver
+    // measurement at the same instant.
+    INSTANTANEOUS_ADDING_SNAPSHOT = 0x19;
+
+    // Metric data point contains one or more ValueRecorder measurement.
+    // Multi-value type data points are not applicable.
+    INSTANTANEOUS_GROUPING_CONTINUOUS = 0x5;
+
+    // Metric data point contains one or more ValueObserver measurement
+    // at the same instant.
+    INSTANTANEOUS_GROUPING_SNAPSHOT = 0x15;
+
+    // Metric data point contains the accumulated change due to a
+    // series of Counter measurements across a collection interval.
+    DELTA_ADDING_MONOTONIC_CONTINUOUS = 0xe;
+
+    // Metric data point contains the change between subsequent
+    // SubObserver measurements.
+    DELTA_ADDING_MONOTONIC_SNAPSHOT = 0x1e;
+
+    // Metric data point contains the accumulated change due to a
+    // series of UpDownCounter measurements across a collection interval.
+    DELTA_ADDING_CONTINUOUS = 0xa;
+
+    // Metric data point contains the change between subsequent
+    // UpDownSubObserver measurements.
+    DELTA_ADDING_SNAPSHOT = 0x1a;
+
+    // Metric data point contains one or more ValueRecorder
+    // measurement collected during an interval.
+    DELTA_GROUPING_CONTINUOUS = 0x6;
+
+    // Metric data point contains one or more ValueObserver
+    // measurement collected during an interval.
+    DELTA_GROUPING_SNAPSHOT = 0x16;
+
+    // Metric data point contains an accumulation of Counter
+    // measurements across multiple collection intervals.
+    CUMULATIVE_ADDING_MONOTONIC_CONTINUOUS = 0xf;
+
+    // Metric data point contains one or more SumObserver
+    // measurements across multiple collection intervals.
+    CUMULATIVE_ADDING_MONOTONIC_SNAPSHOT = 0x1f;
+
+    // Metric data point contains an accumulation of UpDownCounter
+    // measurements across multiple collection intervals.
+    CUMULATIVE_ADDING_CONTINUOUS = 0xb;
+
+    // Metric data point contains one or more UpDownSumObserver
+    // measurements across multiple collection intervals.
+    CUMULATIVE_ADDING_SNAPSHOT = 0x1b;
+
+    // Metric data point contains one or more ValueRecorder
+    // measurement collected across multiple collection intervals.
+    CUMULATIVE_GROUPING_CONTINUOUS = 0x7;
+
+    // Metric data point contains one or more ValueObserver
+    // measurement collected across multiple collection intervals.
+    CUMULATIVE_GROUPING_SNAPSHOT = 0x17;
   }
 
   // Kind describes properties of the Metric that are necessary to
