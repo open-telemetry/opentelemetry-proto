@@ -47,14 +47,14 @@ message InstrumentationLibraryMetrics {
 // Metric contains one or more timeseries.
 //
 // The data model and relation between entities is shown in the
-// diagram below.  Here, "DataPoint" is the term used to refer to any
-// one of the specific data point kinds, and "points" is the term use
+// diagram below. Here, "DataPoint" is the term used to refer to any
+// one of the specific data point value types, and "points" is the term used
 // to refer to any one of the lists of points contained in the Metric.
 //
 // - Metric is composed of a MetricDescriptor and a list of data points.
-// - MetricDescriptor contains a name, description, unit, kind, and value type.
+// - MetricDescriptor contains a name, description, unit, type, and temporarility.
 // - Points is a list of DataPoints (shown vertically).
-// - DataPoint contains timestamps, labels, and one of the value type fields.
+// - DataPoint contains timestamps, labels, and one of the possible value type fields.
 //
 //     Metric
 //  +----------+         +------------------------+
@@ -62,8 +62,8 @@ message InstrumentationLibraryMetrics {
 //  |          |         | name                   |
 //  |          |         | description            |
 //  |          |         | unit                   |
-//  |    points|--+      | kind                   |
-//  +----------+  |      | value type             |
+//  |    points|--+      | type                   |
+//  +----------+  |      | temporarility          |
 //                |      +------------------------+
 //                |
 //                |      +---------------------------+
@@ -90,18 +90,15 @@ message InstrumentationLibraryMetrics {
 //                       |+-----+                    |
 //                       +---------------------------+
 //
-// All DataPoint types have includes three common fields:
-// - Labels are the optional key-value pairs associated with the data point.
+// All DataPoint types have three common fields:
+// - Labels zero or more key-value pairs associated with the data point.
 // - StartTimeUnixNano MUST be set to the start of the interval when the
-//   descriptor kind includes CUMULATIVE or DELTA.  This field is not set
+//   descriptor Temporality includes CUMULATIVE or DELTA. This field is not set
 //   for INSTANTANEOUS timeseries, where instead the TimeUnixNano field is
 //   set for individual points.
 // - TimeUnixNano MUST be set to:
 //   - the end of the interval (CUMULATIVE or DELTA)
 //   - the instantaneous time of the event (INSTANTANEOUS).
-//
-// The ValueType of the descriptor determines which of the repeated
-// points fields is used.
 message Metric {
   // Descriptor describes the Metric.
   //
@@ -717,24 +714,24 @@ message SummaryDataPoint {
   // systems don't expose this. If count is zero then this field must be zero.
   double sum = 5;
 
-  // Represents the value at a given percentile of a distribution.
+  // Represents the value at a given quantile of a distribution.
   //
   // To record Min and Max values following conventions are used:
-  // - The 100th percentile is equivalent to the maximum value observed.
-  // - The 0th percentile is equivalent to the minimum value observed.
+  // - The 1.0 quantile is equivalent to the maximum value observed.
+  // - The 0.0 quantile is equivalent to the minimum value observed.
   //
   // See the following issue for more context:
   // https://github.com/open-telemetry/opentelemetry-proto/issues/125
-  message ValueAtPercentile {
-    // The percentile of a distribution. Must be in the interval
-    // [0.0, 100.0].
-    double percentile = 1;
+  message ValueAtQuantile {
+    // The quantile of a distribution. Must be in the interval
+    // [0.0, 1.0].
+    double quantile = 1;
 
-    // The value at the given percentile of a distribution.
+    // The value at the given quantile of a distribution.
     double value = 2;
   }
 
-  // A list of values at different percentiles of the distribution calculated
-  // from the current snapshot. The percentiles must be strictly increasing.
-  repeated ValueAtPercentile percentile_values = 6;
+  // A list of values at different quantiles of the distribution calculated
+  // from the current snapshot. The quantiles must be strictly increasing.
+  repeated ValueAtQuantile quantile_values = 6;
 }
