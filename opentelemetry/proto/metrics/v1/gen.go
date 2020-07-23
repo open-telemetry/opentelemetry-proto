@@ -74,12 +74,10 @@ var (
 		for _, a := range structureProps {
 			for _, s := range syncProps {
 				sfrag := ""
-				sname := ""
 				if s == "Snapshot" {
-					sfrag = "|SNAPSHOT"
-					sname = "_SNAPSHOT"
+					sfrag = fmt.Sprint("|", strings.ToUpper(s))
 				}
-				fullname := fmt.Sprint(strings.ToUpper(c), "_", strings.ToUpper(a), sname)
+				fullname := fmt.Sprint(strings.ToUpper(c), "_", strings.ToUpper(a), "_", strings.ToUpper(s))
 				fullnames = append(fullnames, fullname)
 				fullvalue := fmt.Sprint(strings.ToUpper(c), "|", strings.ToUpper(a), sfrag)
 				fullvalues = append(fullvalues, fullvalue)

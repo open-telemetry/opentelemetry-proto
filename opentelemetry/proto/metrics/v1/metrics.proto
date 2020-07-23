@@ -135,32 +135,45 @@ message MetricDescriptor {
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // ValueType is the type of values a metric has.  ValueType
+  // ValueType is the type of value(s) a metric represents.  ValueType
   // determines which field of the DataPoint will be used for Metrics
   // with this descriptor.  See the definition of Kind for detail on
   // which aggregations may be expressed for which instruments using
   // which value types.
+  //
+  // The main feature of the individual ValueType with broad
+  // interpretation is whether a data point of this kind can
+  // _possibly_ represent more than one individual value of input
+  // measurements.  Single-value data points have a 1:1 relationship
+  // with input measurements, therefore have additional interpratetion
+  // as sample data points.  Multi-value data points, on the other
+  // hand, always represent 1 or more data points.
   enum ValueType {
     // INVALID_TYPE is the default ValueType, it MUST not be used.
     INVALID_VALUE_TYPE = 0;
 
     // ScalarInt64 implies that the value is found in
-    // Metric.int64_data_points[].value.
+    // Metric.int64_data_points[].value.  This indicates a
+    // single-value data point.
     SCALAR_INT64 = 1;
 
     // ScalarDouble implies that the value is found in
-    // Metric.double_data_points[].value.
+    // Metric.double_data_points[].value.  This indicates a
+    // single-value data point.
     SCALAR_DOUBLE = 2;
 
     // Histogram implies that the value is found in
-    // Metric.histogram_data_points[].histogram.
+    // Metric.histogram_data_points[].histogram.  This indicates a
+    // multi-value data point.
     HISTOGRAM = 3;
 
     // Summary implies that the value is found in
-    // Metric.summary_data_points[].summary.
+    // Metric.summary_data_points[].summary.  This indicates a
+    // multi-value data point.
     SUMMARY = 4;
 
-    // TODO(#159): add RAW_INT64 and RAW_DOUBLE value types.
+    // TODO(#159): add RAW_INT64 and RAW_DOUBLE value types.  These
+    // indicate single-value data points.
   }
 
   // ValueType is the type of values this metric has.
@@ -175,30 +188,87 @@ message MetricDescriptor {
   // INSTANTANEOUS.
   //
   // "Structure" is the structural quality of a metric, indicating
-  // whether the input measurements represent part of a sum or are
-  // considered individual measurements.  One of the 3 Structure
-  // values MUST be set: ADDING, ADDING_MONOTONIC, or GROUPING.
+  // whether the input measurements represent part of an individual
+  // sum or are considered individual measurements.  One of the 3
+  // Structure values MUST be set: ADDING_MONOTONIC, ADDING, or
+  // GROUPING.
   //
-  // "Snapshot" is a booelan property of a metric, indicating that
-  // measurements have been collected through a callback invoked by
-  // the SDK, as produced by OpenTelemetry Observer instruments, which
-  // can affect how these metrics are interpreted.
+  // "Continuity" describes how the measurement was captured,
+  // indicating whether measurements represent application-level
+  // events or were generated through a callback invoked by the SDK.
+  // One of the 2 Continuity values MUST be set: CONTINUOUS or
+  // SNAPSHOT.
   //
-  // All 18 combinations of Temporality, Structure, and the Snapshot
-  // property are meaningful expressions of metric data.  Although the
-  // number of combinations is large, several observations help reduce
-  // the conceptual load:
+  // All 18 combinations of Temporality, Structure, and Coninuity are
+  // meaningful expressions of metric data.  Although the number of
+  // combinations is large, several observations help reduce the
+  // conceptual load as we begin to understand the practical meaning
+  // of Temporality combined with Structure. 
   //
-  // - DELTA and CUMULATIVE temporalities are practically identical.
-  //   A data point is described by its time interval in both cases,
-  //   with the same interpretation.  The distinction between DELTA
-  //   and CUMULATIVE metrics changes what we expect the next point's
-  //   interval to be, not how we interpret the individual point.
-  // - ADDING and ADDING_MONOTONIC structures have pratically identical
-  //   except that ADDING does not ensure monotonicity of the sum.
+  // About Temporality:
   //
-  // Ignoring the two nearly-identical pairs, the number of
-  // significant combinations of these Kind elements is reduced to 8.
+  //   DELTA and CUMULATIVE temporalities are practically identical in
+  //   interpretation, though they differ in intention.  In both
+  //   cases, the data point represents data collected across an
+  //   interval of time.  The CUMULATIVE kind indicates that the
+  //   client does not reset and that StartTimeUnixNano will be held
+  //   as a constant across data points for a single process.
+  //
+  //   INSTANTANEOUS data points represent one (or more) data points
+  //   measured at the same (logical) instant in time.  For SNAPSHOT
+  //   metrics, these may be represented by multi-value data points,
+  //   but for CONTINUOUS metrics these MUST be represented as
+  //   single-value data points.
+  //
+  // About Structure:
+  //
+  //   ADDING_MONOTONIC and ADDING structures are practically
+  //   identical in form, but commonly differ in interpretation.  In
+  //   both cases, individual data points are meant to be combined
+  //   into a sum.  In the monotonic case, the sum has a useful
+  //   non-negative-rate property.
+  //
+  //   GROUPING structure data points represent individual data
+  //   points, meant to be combined into a distribution.  The sum of
+  //   these data may be meaningful, but individual values are the
+  //   focus of these metrics.
+  //
+  // About Continuity:
+  //
+  //   CONTINUOUS kind data points result directly from
+  //   application-level events, therefore the count of events defines
+  //   a meaningful rate to the user.  Identical CONTINUOUS data
+  //   points (with the same Resource and TimeUnixNano) are considered
+  //   conincidental, therefore instantaneous CONTINUOUS kinds do not
+  //   meaningfully pair with multi-value data points.
+  //
+  //   SNAPSHOT kind data points result from callbacks invoked by the
+  //   SDK, therefore are called in SDK context (i.e., not traced) and
+  //   the rate of measurements does not define a meaningful rate to
+  //   the user.  Identical SNAPSHOT data points (with the same
+  //   Resource and TimeUnixNano) are considered invalid, as only one
+  //   Snapshot can be taken per instant per SDK.  Measurements of a
+  //   SNAPSHOT metric are recorded for all label sets at the same
+  //   logical time, therefore can be used to calculate meaningful
+  //   point-in-time ratios.
+  //
+  // There is a relationship between ADDING (and ADDING_MONOTONIC)
+  // Structure and INSTANTANEOUS Continuity:
+  //
+  //   CONTINUOUS-kind (i.e., ADDING(_MONOTONIC)_INSTANTANEOUS_CONTINUOUS)
+  //   INSTANTANOUS values are changes in a sum, such as might
+  //   originate from an OpenTelemetry Counter or UpDownCounter
+  //   instrument.  This metric kind must be represented by a single-value
+  //   data point (e.g., a LastValue of GROUPING kind, a sum of ADDING
+  //   kind).
+  //
+  //   SNAPSHOT-kind (i.e., ADDING(_MONOTONIC)_INSTANTANEOUS_SNAPSHOT)
+  //   INSTANTANEOUS values are sums, such as might originate from an
+  //   OpenTelemetry SumObserver or UpDownSumObserver instrument.
+  //   This metric kind can be meaningfully represented by a
+  //   multi-value data point (e.g., a histogram of aggregated
+  //   instantaneous values produced by an Observer callback).
+  //
   enum KindElement {
     // INVALID_KIND_ELEMENT is not used.
     INVALID_KIND_ELEMENT = 0;
@@ -314,76 +384,16 @@ message MetricDescriptor {
     // the application calling the SDK with a measurement with a
     // context.  These events are CONTINUOUS measurements, in that
     // case.
+    //
+    // INSTANTANEOUS (ADDING or ADDING_MONOTONIC) CONTINUOUS kind
+    // values are defined as changes in a sum, whereas the
+    // corresponding SNAPSHOT kind values are defined as sums,
+    // following the OpenTelemetry API.
     SNAPSHOT = 0x10;
   }
 
-  // Kind describes how the metric was produced in several aspects.
-  //
-  // There are three temporality kinds, three structure kinds, and a
-  // boolean snapshot property
-  
-  // Kind explains how the DataPoint was produced (called
-  // "Structure"), how the point was aggregated with resepect to time
-  // (called "Temporality"), whether it was computed by a snapshot,
-  // and (when the Structure is ADDING) whether the sum is or is not
-  // monotonic.
-  //
-  // Kind names are generated from valid combinations of KindElement
-  // by joining the effective KindElements using underscores.  There
-  // are:
-  //
-  // - 3 possibilities for Temporality
-  // - 3 possibilities for Structure:
-  // - 2 possibilities of being a Snapshot or not (i.e., Continuous).
-  //
-  // Excluding the snapshot instantaneous combinations, this makes
-  // 15 valid values.
-  //
-  // The cases are detailed below in terms of:
-  //
-  // - How StartTimeUnixNano and TimeUnixNano are interpreted?
-  // - Which OpenTelemetry is likely to produce instrument?
-  // - Under which typical aggregations?
-  // - Producing which kind of data point?
-  //
-  // Certain general statements can be made.
-  //
-  // About the three Structure kinds:
-  //
-  // 1. ADDING_MONOTONIC kinds associate with Counter and SumObserver
-  // 2. ADDING kinds associate with UpDownCounter and UpDownSumObserver
-  // 3. GROUPING kinds associate with ValueRecorder and ValueObserver instruments
-  //
-  // About SNAPSHOT kinds:
-  // 
-  // 1. SNAPSHOT kinds associate with Observer instruments
-  // 2. INSTANTANEOUS temporality does not combine with SNAPSHOT kinds.
-  //
-  // About ADDING|INSTANTANEOUS vs ADDING|DELTA:
-  //
-  // 1. An ADDING|INSTANTANEOUS event is stateless, has no StartTimeUnixNano.
-  // 2. An ADDING|DELTA event remembers its start time, sets StartTimeUnixNano.
-  // 3. Same consideration for ADDING_MONOTONIC instantaneous vs delta.
-  //
-  // About SCALAR_INT64 and SCALAR_DOUBLE value type (TODO(#159) and
-  // equally the RAW value types):
-  //
-  // 1. SCALAR value type interpretation depends on both temporality
-  //    and structure.
-  // 2. For GROUPING kinds:
-  //    - For INSTANTANEOUS temporality: An individual measurement
-  //    - For DELTA or CUMULATIVE temporality: The last measured individual value
-  //      in the collection interval.
-  // 3. For ADDING and ADDING_MONOONIC kinds:
-  //    - For INSTANTANEOUS temporality: An instantaneously measured change in a sum
-  //    - For DELTA temporality: An aggregated change in a sum
-  //    - For CUMULATIVE temporality: An aggregated sum.
-  // 4. INSTANTANEOUS kinds are always scalar values (TODO(#159) or raw).
-  //
-  // About CUMULATIVE kinds:
-  //
-  // 1. CUMULATIVE GROUPING kinds typically use Histogram data points
-  // 2. CUMULATIVE is rarely used with Summary data points
+  // Kind describes how the metric was produced, according to its
+  // contituent KindElements.
   enum Kind {
     // INVALID_KIND is the default Kind, it MUST not be used.
     INVALID_KIND = 0;
@@ -391,128 +401,26 @@ message MetricDescriptor {
     // The following hex values are generated by gen.go in this source
     // directory.
 
-    // ADDING_MONOTONIC_INSTANTANEOUS kind describes the change in a
-    // sum as measured at an instant (TimeUnixNano).  The value MUST
-    // be non-negative.  Generally this is the value of an
-    // OpenTelemetry Counter instrument without aggregation.
-    // Typically expressed as a scalar (TODO(#159): or raw) value.
-    ADDING_MONOTONIC_INSTANTANEOUS = 0xd; // ADDING_MONOTONIC|INSTANTANEOUS
+    INSTANTANEOUS_ADDING_MONOTONIC_CONTINUOUS = 0xd; // INSTANTANEOUS|ADDING_MONOTONIC
+    INSTANTANEOUS_ADDING_MONOTONIC_SNAPSHOT = 0x1d; // INSTANTANEOUS|ADDING_MONOTONIC|SNAPSHOT
+    INSTANTANEOUS_ADDING_CONTINUOUS = 0x9; // INSTANTANEOUS|ADDING
+    INSTANTANEOUS_ADDING_SNAPSHOT = 0x19; // INSTANTANEOUS|ADDING|SNAPSHOT
+    INSTANTANEOUS_GROUPING_CONTINUOUS = 0x5; // INSTANTANEOUS|GROUPING
+    INSTANTANEOUS_GROUPING_SNAPSHOT = 0x15; // INSTANTANEOUS|GROUPING|SNAPSHOT
 
-    // ADDING_MONOTONIC_DELTA describes the change in a sum
-    // accumulated since the metric was last collected
-    // (StartTimeUnixNano) through the measured time (TimeUnixNano).
-    // The value MUST be non-negative.  Generally this is the result
-    // of aggregating an OpenTelemetry Counter instrument since the
-    // last collection.  Typically expressed as a scalar or histogram
-    // value.
-    ADDING_MONOTONIC_DELTA = 0xe; // ADDING_MONOTONIC|DELTA
+    DELTA_ADDING_MONOTONIC_CONTINUOUS = 0xe; // DELTA|ADDING_MONOTONIC
+    DELTA_ADDING_MONOTONIC_SNAPSHOT = 0x1e; // DELTA|ADDING_MONOTONIC|SNAPSHOT
+    DELTA_ADDING_CONTINUOUS = 0xa; // DELTA|ADDING
+    DELTA_ADDING_SNAPSHOT = 0x1a; // DELTA|ADDING|SNAPSHOT
+    DELTA_GROUPING_CONTINUOUS = 0x6; // DELTA|GROUPING
+    DELTA_GROUPING_SNAPSHOT = 0x16; // DELTA|GROUPING|SNAPSHOT
 
-    // ADDING_MONOTONIC_DELTA_SNAPSHOT is ADDING_MONOTONIC_DELTA
-    // with snapshot semantics specified by the OpenTelemetry API,
-    // indicating the value was collected through a callback.
-    // Generally this is the temporal difference between values of an
-    // OpenTelemetry SumObserver instrument.  Typically expressed as a
-    // scalar or histogram value.
-    ADDING_MONOTONIC_DELTA_SNAPSHOT = 0x1e; // ADDING_MONOTONIC|DELTA|SNAPSHOT
-
-    // ADDING_MONOTONIC_CUMULATIVE describes the current value of a
-    // sum accumulated from the reset time (StartTimeUnixNano) through
-    // the measured time (TimeUnixNano).  The value must be
-    // non-negative and not less than the previously reported value of
-    // the same metric.  Generally this is the result of aggregating an
-    // OpenTelemetry Counter instrument since the last reset time.
-    // Typically expressed as a scalar or histogram value.
-    ADDING_MONOTONIC_CUMULATIVE = 0xf; // ADDING_MONOTONIC|CUMULATIVE
-
-    // ADDING_MONOTONIC_CUMULATIVE_SNAPSHOT is
-    // ADDING_MONOTONIC_CUMULATIVE with snapshot semantics
-    // specified by the OpenTelemetry API, indicating the value was
-    // collected through a callback.  Generally this is the sum of
-    // measurements of an OpenTelemetry SumObserver instrument.
-    // Typically expressed as a scalar or histogram value.
-    ADDING_MONOTONIC_CUMULATIVE_SNAPSHOT = 0x1f; // ADDING_MONOTONIC|CUMULATIVE|SNAPSHOT
-
-    // ADDING_INSTANTANEOUS kind describes the change in a sum as
-    // measured at an instant (TimeUnixNano).  The value may be
-    // positive or negative.  Generally this is the value of an
-    // OpenTelemetry UpDownCounter instrument without aggregation.
-    // Typically expressed as a scalar (TODO(#159): or raw) value.
-    ADDING_INSTANTANEOUS = 0x9; // ADDING|INSTANTANEOUS
-
-    // ADDING_DELTA describes the change in a sum accumulated since
-    // the metric was last collected (StartTimeUnixNano) through the
-    // measured time (TimeUnixNano).  The value may be positive or
-    // negative.  Generally this is the result of aggregating an
-    // OpenTelemetry UpDownCounter instrument since the last
-    // collection.  Typically expressed as a scalar or histogram
-    // value.
-    ADDING_DELTA = 0xa; // ADDING|DELTA
-
-    // ADDING_DELTA_SNAPSHOT is ADDING_DELTA with snapshot
-    // semantics specified by the OpenTelemetry API, indicating the
-    // value was collected through a callback.  Generally this is the
-    // temporal difference between values of an OpenTelemetry
-    // UpDownSumObserver instrument.  Typically expressed as a scalar
-    // or histogram value.
-    ADDING_DELTA_SNAPSHOT = 0x1a; // ADDING|DELTA|SNAPSHOT
-
-    // ADDING_CUMULATIVE describes the current value of a sum
-    // accumulated from the reset time (StartTimeUnixNano) through the
-    // measured time (TimeUnixNano).  The value may be positive or
-    // negative.  Generally this is the result of aggregating an
-    // OpenTelemetry UpDownCounter instrument since the last reset
-    // time.  Typically expressed as a scalar or histogram value.
-    ADDING_CUMULATIVE = 0xb; // ADDING|CUMULATIVE
-
-    // ADDING_CUMULATIVE_SNAPSHOT is ADDING_CUMULATIVE with
-    // snapshot semantics specified by the OpenTelemetry API,
-    // indicating the value was collected through a callback.
-    // Generally this is the sum of measurements of an OpenTelemetry
-    // UpDownSumObserver instrument.  Typically expressed as a scalar
-    // or histogram value.
-    ADDING_CUMULATIVE_SNAPSHOT = 0x1b; // ADDING|CUMULATIVE|SNAPSHOT
-    
-    // GROUPING_INSTANTANEOUS kind describes an individual value
-    // measured at an instant (TimeUnixNano).  Generally this is the value of an
-    // OpenTelemetry ValueRecorder instrument without aggregation.
-    // Typically expressed as a scalar (TODO(#159): or raw) value.
-    GROUPING_INSTANTANEOUS = 0x5; // GROUPING|INSTANTANEOUS
-
-    // GROUPING_DELTA kind describes a set of individual values
-    // measured from the most recent collection (StartTimeUnixNano)
-    // through the measured time (TimeUnixNano).  Generally this is
-    // the aggregated value of an OpenTelemetry ValueRecorder
-    // instrument.  Typically expressed as a scalar, histogram, or
-    // summary value.  When expressed as a scalar value, this is
-    // specified to mean the most recent (i.e., "last") value to occur
-    // within the collection interval.
-    GROUPING_DELTA = 0x6; // GROUPING|DELTA
-
-    // GROUPING_DELTA_SNAPSHOT is GROUPING_DELTA with snapshot
-    // semantics specified by the OpenTelemetry API, indicating the
-    // value was collected through a callback.  Generally this is the
-    // aggregated value of an OpenTelemetry ValueObserver instrument.
-    // Typically expressed as a scalar, histogram, or summary value.
-    GROUPING_DELTA_SNAPSHOT = 0x16; // GROUPING|DELTA|SNAPSHOT
-
-    // GROUPING_CUMULATIVE kind describes a set of individual values
-    // measured from the last reset time (StartTimeUnixNano) through
-    // the measured time (TimeUnixNano).  Generally this is the
-    // aggregated value of an OpenTelemetry ValueRecorder instrument.
-    // Typically expressed as a scalar or histogram value.  When
-    // expressed as a scalar value, this is specified to mean the most
-    // recent (i.e., "last") value to occur since the reset time,
-    // which may have occurred prior to the most recent collection
-    // interval.
-    GROUPING_CUMULATIVE = 0x7; // GROUPING|CUMULATIVE
-
-    // GROUPING_CUMULATIVE_SNAPSHOT is GROUPING_CUMULATIVE with
-    // snapshot semantics specified by the OpenTelemetry API,
-    // indicating the value was collected through a callback.
-    // Generally this is the aggregated value of an OpenTelemetry
-    // ValueObserver instrument.  Typically expressed as a scalar or
-    // histogram value.
-    GROUPING_CUMULATIVE_SNAPSHOT = 0x17; // GROUPING|CUMULATIVE|SNAPSHOT
+    CUMULATIVE_ADDING_MONOTONIC_CONTINUOUS = 0xf; // CUMULATIVE|ADDING_MONOTONIC
+    CUMULATIVE_ADDING_MONOTONIC_SNAPSHOT = 0x1f; // CUMULATIVE|ADDING_MONOTONIC|SNAPSHOT
+    CUMULATIVE_ADDING_CONTINUOUS = 0xb; // CUMULATIVE|ADDING
+    CUMULATIVE_ADDING_SNAPSHOT = 0x1b; // CUMULATIVE|ADDING|SNAPSHOT
+    CUMULATIVE_GROUPING_CONTINUOUS = 0x7; // CUMULATIVE|GROUPING
+    CUMULATIVE_GROUPING_SNAPSHOT = 0x17; // CUMULATIVE|GROUPING|SNAPSHOT
   }
 
   // Kind describes properties of the Metric that are necessary to
