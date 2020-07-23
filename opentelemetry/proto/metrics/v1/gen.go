@@ -70,21 +70,18 @@ var (
 	var fullnames []string
 	var fullvalues []string
 
-	for _, a := range structureProps {
-		for _, c := range cumulativeProps {
+	for _, c := range cumulativeProps {
+		for _, a := range structureProps {
 			for _, s := range syncProps {
-				if c == "Instantaneous" && s == "Snapshot" {
-					continue
-				}
 				sfrag := ""
 				sname := ""
 				if s == "Snapshot" {
 					sfrag = "|SNAPSHOT"
 					sname = "_SNAPSHOT"
 				}
-				fullname := fmt.Sprint(strings.ToUpper(a), "_", strings.ToUpper(c), sname)
+				fullname := fmt.Sprint(strings.ToUpper(c), "_", strings.ToUpper(a), sname)
 				fullnames = append(fullnames, fullname)
-				fullvalue := fmt.Sprint("", strings.ToUpper(a), "|", strings.ToUpper(c), sfrag)
+				fullvalue := fmt.Sprint(strings.ToUpper(c), "|", strings.ToUpper(a), sfrag)
 				fullvalues = append(fullvalues, fullvalue)
 				buf.WriteString(fmt.Sprint(fullname, " Kind = ", fullvalue, "\n"))
 			}

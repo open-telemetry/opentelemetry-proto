@@ -167,55 +167,38 @@ message MetricDescriptor {
   ValueType value_type = 4;
 
   // KindElement contains a set of bit masks used to construct Kind
-  // enum values.  There are 7 bits used presently, broken into
-  // groups:
+  // enum values, broken into groups:
   //
-  // "Temporality" is the temporal quality of a metric, indicating how
-  // values relate to the time interval over which they are reported.
-  // One of the 3 Temporality values MUST be set: CUMULATIVE, DELTA,
-  // or INSTANTANEOUS.
+  // "Temporality" is the temporal quality of a metric, indicating the
+  // time interval over which they are reported.  One of the 3
+  // Temporality values MUST be set: CUMULATIVE, DELTA, or
+  // INSTANTANEOUS.
   //
   // "Structure" is the structural quality of a metric, indicating
-  // whether metric data describes a sum of measurements (ADDING),
-  // whether it is a monotonic sum (ADDING_MONOTONIC), or a
-  // collection of individual measurements (GROUPING).  Value types
-  // may be interpreted differently depending on Structure.  For
-  // example, a Histogram DataPoint may be computed for a Counter
-  // (ADDING) instrument or a ValueRecorder (GROUPING) instrument, and
-  // the Sum and Count of the resulting aggregation may be interpreted
-  // differently depending on structure.
+  // whether the input measurements represent part of a sum or are
+  // considered individual measurements.  One of the 3 Structure
+  // values MUST be set: ADDING, ADDING_MONOTONIC, or GROUPING.
   //
-  // SNAPSHOT is a boolean option that may be applied to all
-  // metrics, meaning that it was generated periodically, at a
-  // time determined by the SDK.  OpenTelemetry Observer instruments
-  // report SNAPSHOT measurements, with observations from a
-  // single callback invokation sharing a single logical timestamp.
-  // This property can be safetly disregarded and not set when
-  // importing data from other sources, but when set its presence is
-  // always meaningful.
+  // "Snapshot" is a booelan property of a metric, indicating that
+  // measurements have been collected through a callback invoked by
+  // the SDK, as produced by OpenTelemetry Observer instruments, which
+  // can affect how these metrics are interpreted.
   //
-  // When measurements originate from an OpenTelemetry API, the
-  // SNAPSHOT kind allows the interpreter to recognize values
-  // that were emitted by the same callback invocation, as identified
-  // by equal Resource and TimeUnixNano values.  SNAPSHOT metrics
-  // MUST NOT have more than one data point per TimeUnixNano,
-  // Resource, and LabelSet.  If the interpreter of this data finds
-  // such matching data points, they are considered duplicate by
-  // definition and all but one SHOULD be discarded.
+  // All 18 combinations of Temporality, Structure, and the Snapshot
+  // property are meaningful expressions of metric data.  Although the
+  // number of combinations is large, several observations help reduce
+  // the conceptual load:
   //
-  // SNAPSHOT means that:
-  // - The count of events is a measure of the rate of SDK collection
-  //   times the aggregated cardinality, therefore cannot be used
-  //   to extrapolate application-specific rate information.
-  // - Measurements with the same Resource and TimeUnixNano
-  //   form a meaningful ratio, and the set of measurements at this
-  //   instant are coherent at the point-in-time, as they result from
-  //   a single callback.
-  // - Measurements are not traced, by definition, and SHOULD NOT have
-  //   associated trace context (e.g., no exemplars with trace_id,
-  //   span_id).
+  // - DELTA and CUMULATIVE temporalities are practically identical.
+  //   A data point is described by its time interval in both cases,
+  //   with the same interpretation.  The distinction between DELTA
+  //   and CUMULATIVE metrics changes what we expect the next point's
+  //   interval to be, not how we interpret the individual point.
+  // - ADDING and ADDING_MONOTONIC structures have pratically identical
+  //   except that ADDING does not ensure monotonicity of the sum.
   //
-  // SNAPSHOT is incompatible with INSTANTANEOUS.
+  // Ignoring the two nearly-identical pairs, the number of
+  // significant combinations of these Kind elements is reduced to 8.
   enum KindElement {
     // INVALID_KIND_ELEMENT is not used.
     INVALID_KIND_ELEMENT = 0;
@@ -297,7 +280,10 @@ message MetricDescriptor {
     // One of the Structure kind elements MUST be set.
 
     // GROUPING structure means the value has been computed by
-    // combining individual values through a meaningful aggregation.
+    // combining individual values through a meaningful aggregation,
+    // such as a histogram or a MMLSC.
+
+
     // GROUPING structure implies the sum of measurements is not
     // necessarily meaningful.  These may be expressed as Histogram or
     // Summary data points for DELTA kind and CUMULATIVE temporality
@@ -331,10 +317,15 @@ message MetricDescriptor {
     SNAPSHOT = 0x10;
   }
 
+  // Kind describes how the metric was produced in several aspects.
+  //
+  // There are three temporality kinds, three structure kinds, and a
+  // boolean snapshot property
+  
   // Kind explains how the DataPoint was produced (called
   // "Structure"), how the point was aggregated with resepect to time
   // (called "Temporality"), whether it was computed by a snapshot,
-  // and (when the Structure is ADDING) whether the sum is not
+  // and (when the Structure is ADDING) whether the sum is or is not
   // monotonic.
   //
   // Kind names are generated from valid combinations of KindElement
