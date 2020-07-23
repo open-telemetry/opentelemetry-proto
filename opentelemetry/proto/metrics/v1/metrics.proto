@@ -199,11 +199,26 @@ message MetricDescriptor {
   // One of the 2 Continuity values MUST be set: CONTINUOUS or
   // SNAPSHOT.
   //
-  // All 18 combinations of Temporality, Structure, and Coninuity are
-  // meaningful expressions of metric data.  Although the number of
-  // combinations is large, several observations help reduce the
-  // conceptual load as we begin to understand the practical meaning
-  // of Temporality combined with Structure. 
+  // All 18 combinations of Temporality, Structure, and Coninuity
+  // describe a meaningful expression of metric data.  Users familiar
+  // with the user-facing OpenTelemetry Metrics API will recognize
+  // these 18 values as comprised of 6 kinds of instrument combined
+  // with 3 values of temporality.  Structure and Continuity form the
+  // semantic basis of the various metric instruments, while
+  // Temporality is an orthogonal concept.  The instrument mapping:
+  //
+  //   Instrument         Structure        Continuity
+  //   ----------------------------------------------
+  //   Counter            ADDING_MONOTONIC CONTINUOUS
+  //   UpDownCounter      ADDING 	   CONTINUOUS
+  //   ValueRecorder      GROUPING         CONTINUOUS
+  //   SumObserver        ADDING_MONOTONIC SNAPSHOT
+  //   UpDownSumObserver  ADDING           SNAPSHOT
+  //   ValueObserver      GROUPING         SNAPSHOT
+  //
+  // Although the number of KindElement combinations is large, several
+  // observations help simplify our understanding of Temporality and
+  // Structure.
   //
   // About Temporality:
   //
@@ -228,10 +243,10 @@ message MetricDescriptor {
   //   into a sum.  In the monotonic case, the sum has a useful
   //   non-negative-rate property.
   //
-  //   GROUPING structure data points represent individual data
-  //   points, meant to be combined into a distribution.  The sum of
-  //   these data may be meaningful, but individual values are the
-  //   focus of these metrics.
+  //   GROUPING structure data points represent individual
+  //   measurements, meant to be combined into a distribution.  The
+  //   sum of these data may be meaningful, but individual
+  //   measurements are the focus of these metrics.
   //
   // About Continuity:
   //
@@ -255,19 +270,18 @@ message MetricDescriptor {
   // There is a relationship between ADDING (and ADDING_MONOTONIC)
   // Structure and INSTANTANEOUS Continuity:
   //
-  //   CONTINUOUS-kind (i.e., ADDING(_MONOTONIC)_INSTANTANEOUS_CONTINUOUS)
-  //   INSTANTANOUS values are changes in a sum, such as might
-  //   originate from an OpenTelemetry Counter or UpDownCounter
-  //   instrument.  This metric kind must be represented by a single-value
-  //   data point (e.g., a LastValue of GROUPING kind, a sum of ADDING
-  //   kind).
+  //   CONTINUOUS-kind ADDING (and ADDING_MONOTONIC) INSTANTANOUS
+  //   values are changes to a sum, such as might originate from an
+  //   OpenTelemetry Counter or UpDownCounter instrument.  This metric
+  //   kind must be represented by a single-value data point (e.g., a
+  //   LastValue of GROUPING kind, a sum of ADDING kind).
   //
-  //   SNAPSHOT-kind (i.e., ADDING(_MONOTONIC)_INSTANTANEOUS_SNAPSHOT)
-  //   INSTANTANEOUS values are sums, such as might originate from an
-  //   OpenTelemetry SumObserver or UpDownSumObserver instrument.
-  //   This metric kind can be meaningfully represented by a
-  //   multi-value data point (e.g., a histogram of aggregated
-  //   instantaneous values produced by an Observer callback).
+  //   SNAPSHOT-kind ADDING (and ADDING_MONOTONIC) INSTANTANEOUS
+  //   values are sums, such as might originate from an OpenTelemetry
+  //   SumObserver or UpDownSumObserver instrument.  This metric kind
+  //   can be meaningfully represented by a multi-value data point
+  //   (e.g., a histogram of aggregated instantaneous values produced
+  //   by an Observer callback).
   //
   enum KindElement {
     // INVALID_KIND_ELEMENT is not used.
@@ -275,10 +289,21 @@ message MetricDescriptor {
 
     // One of the Temporality kind elements MUST be set.
 
-    // INSTANTANEOUS is a metric whose values are measured at a particular
-    // instant. The values are not aggregated over any time interval and are
-    // unique per timestamp. As such, these metrics are not expected to have
-    // an associated start time.
+    // INSTANTANEOUS is a metric whose values are measured at a
+    // particular instant. The values are not aggregated over any time
+    // interval and are unique per timestamp. As such, these metrics
+    // are not expected to have an associated start time.
+    //
+    // When paired with CONTINUOUS kinds, INSTANTANEOUS metrics must
+    // be represnted by single-value data points (i.e., an individual
+    // measurement).  When also paired with ADDING (or
+    // ADDING_MONOTONIC) kinds, the individual measurement is defined
+    // as a change in the sum.
+    //
+    // When paired with SNAPSHOT kinds, INSTANTANEOUS metrics may be
+    // represented by multi-value data points.  When also paired with
+    // ADDING (or ADDING_MONOTONIC) kinds, the individual measurement
+    // is defined as a sum.
     INSTANTANEOUS = 0x1;
 
     // DELTA is a metric whose values are the aggregation of measurements
@@ -349,17 +374,13 @@ message MetricDescriptor {
 
     // One of the Structure kind elements MUST be set.
 
-    // GROUPING structure means the value has been computed by
-    // combining individual values through a meaningful aggregation,
-    // such as a histogram or a MMLSC.
-
-
+    // GROUPING structure means the value has been computed from
+    // individual input values considered part of a distribution.
     // GROUPING structure implies the sum of measurements is not
-    // necessarily meaningful.  These may be expressed as Histogram or
-    // Summary data points for DELTA kind and CUMULATIVE temporality
-    // kinds.  These may also be expressed as INSTANTANEOUS kind when
-    // reporting a scalar value type (e.g., for LastValue
-    // aggregation).  TODO(#159) or raw value (i.e., no aggregation).
+    // necessarily meaningful.
+    //
+    // Value of this kind are defined as a current measurement of the
+    // metric when represented by single-value data points.
     GROUPING = 0x4;
 
     // ADDING structure means the measurement determines a sum.  For
@@ -367,12 +388,28 @@ message MetricDescriptor {
     // last collection.  For CUMULATIVE kind this is expressed as the
     // last collected value of the sum.  For INSTANTANEOUS kind this
     // is expressed as a scalar value that would be added into a Sum.
+    //
+    // Paired with CONTINUOUS INSTANTANEOUS metrics, values of this
+    // kind are defined as a change in the implied sum when
+    // represented by single-value data points.
+    //
+    // Paired with SNAPSHOT INSTANTANEOUS metrics, values of this kind
+    // are defined as sum (i.e., not changes in a sum) when
+    // represented by single-value data points.
     ADDING = 0x8;
 
     // ADDING_MONOTONIC has ADDING structure with a guaranteed
     // monotonic sum.  ADDING_MONOTONIC indicates that the calculated
     // sum is non-decreasing, therefore can be monitored as a
     // non-negative rate of change.
+    //
+    // Paired with CONTINUOUS INSTANTANEOUS metrics, values of this
+    // kind are defined as a change in the implied sum when
+    // represented by single-value data points.
+    //
+    // Paired with SNAPSHOT INSTANTANEOUS metrics, values of this kind
+    // are defined as sum (i.e., not changes in a sum) when
+    // represented by single-value data points.
     ADDING_MONOTONIC = 0xc;
 
     // SNAPSHOT may be set for any kind of metric, indicating it
@@ -380,15 +417,14 @@ message MetricDescriptor {
     // SDK.  In SNAPSHOT measurements, TimeUnixNano values depend
     // on the SDK's decision to collect, not the application.
     //
-    // When SNAPSHOT is not set, it implies the event originated from
-    // the application calling the SDK with a measurement with a
-    // context.  These events are CONTINUOUS measurements, in that
-    // case.
+    // SNAPSHOT measurements may be used to define point-in-time
+    // ratios, as data points from the same callback execution MUST
+    // share a single logical timestamp.
     //
-    // INSTANTANEOUS (ADDING or ADDING_MONOTONIC) CONTINUOUS kind
-    // values are defined as changes in a sum, whereas the
-    // corresponding SNAPSHOT kind values are defined as sums,
-    // following the OpenTelemetry API.
+    // When SNAPSHOT is not set, it implies the event originated from
+    // the application calling the SDK with a measurement and possibly
+    // a tracing context.  These events are CONTINUOUS measurements,
+    // in that case.
     SNAPSHOT = 0x10;
   }
 
