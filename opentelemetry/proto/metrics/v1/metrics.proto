@@ -44,7 +44,7 @@ message InstrumentationLibraryMetrics {
   repeated Metric metrics = 2;
 }
 
-// Defines a Metric which has one or more timeseries.
+// Metric contains one or more timeseries.
 //
 // The data model and relation between entities is shown in the
 // diagram below. Here, "DataPoint" is the term used to refer to any
@@ -92,15 +92,17 @@ message InstrumentationLibraryMetrics {
 //
 // All DataPoint types have three common fields:
 // - Labels zero or more key-value pairs associated with the data point.
-// - StartTimeUnixNano MUST be set to the start of the interval when the
-//   descriptor Temporality includes CUMULATIVE or DELTA. This field is not set
-//   for INSTANTANEOUS timeseries, where instead the TimeUnixNano field is
-//   set for individual points.
+// - StartTimeUnixNano MUST be to the start of the interval, when an aggregation
+//   was applied, but may be omitted for raw data points.
 // - TimeUnixNano MUST be set to:
-//   - the end of the interval (CUMULATIVE or DELTA)
-//   - the instantaneous time of the event (INSTANTANEOUS).
+//   - the end of the interval, if aggregation was applied
+//   - the instant of the event, if no aggregation was applied.
 message Metric {
-  // metric_descriptor describes the Metric.
+  // Descriptor describes the Metric.
+  //
+  // N.B. "Descriptor" is a reserved term in protobuf, protoc
+  // generates a field named "Descriptor_" thus we use
+  // "metric_descriptor".
   MetricDescriptor metric_descriptor = 1;
 
   // Data is a list of one or more DataPoints for a single metric. Only one of the
@@ -110,76 +112,79 @@ message Metric {
   repeated DoubleDataPoint double_data_points = 3;
   repeated HistogramDataPoint histogram_data_points = 4;
   repeated SummaryDataPoint summary_data_points = 5;
+
+  // TODO(#159) Use for exemplars of aggregated metrics or for
+  // RAW_INT64 or RAW_DOUBLE metrics:
+  //   repeated RawDataPoint raw_data_points = 3;
 }
 
 // Defines a metric type and its schema.
 message MetricDescriptor {
-  // name of the metric, including its DNS name prefix. It must be unique.
+  // Name of the metric, including its DNS name prefix. It must be unique.
   string name = 1;
 
-  // description of the metric, which can be used in documentation.
+  // Description of the metric, which can be used in documentation.
   string description = 2;
 
-  // unit in which the metric value is reported. Follows the format
+  // Unit in which the metric value is reported. Follows the format
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // Type is the type of values a metric has.
-  enum Type {
-    // INVALID_TYPE is the default Type, it MUST not be used.
-    INVALID_TYPE = 0;
+  // ValueType is the type of value(s) a metric represents.  ValueType
+  // determines which field of the DataPoint will be used for Metrics
+  // with this descriptor.  See the definition of Kind for detail on
+  // which aggregations may be expressed for which instruments using
+  // which value types.
+  //
+  // ValueTypes are distinguished by whether a data point of its type
+  // can _possibly_ represent more than one individual input
+  // measurement.  Single-value data points have a definite one-to-one
+  // relationship with input measurements.  Multi-value data points,
+  // by contrast, represent one or more input measurements.
+  //
+  // ValueTypes are also distinguished by whether the value supports
+  // subtraction.  Not all value types support subtraction, but types
+  // which do can be converted from CUMULATIVE kind into DELTA kind.
+  enum ValueType {
+    // INVALID_TYPE is the default ValueType, it MUST not be used.
+    INVALID_VALUE_TYPE = 0;
 
-    // INT64 values are signed 64-bit integers.
-    //
-    // A Metric of this Type MUST store its values as Int64DataPoint.
-    INT64 = 1;
+    // ScalarInt64 implies that the value is found in
+    // Metric.int64_data_points[].value.  This indicates a
+    // single-value data point.  Supports subtraction when the Kind is
+    // ADDING or ADDING_MONOTONIC.
+    SCALAR_INT64 = 1;
 
-    // MONOTONIC_INT64 values are monotonically increasing signed 64-bit
-    // integers.
-    //
-    // A Metric of this Type MUST store its values as Int64DataPoint.
-    MONOTONIC_INT64 = 2;
+    // ScalarDouble implies that the value is found in
+    // Metric.double_data_points[].value.  This indicates a
+    // single-value data point.  Supports subtraction when the Kind is
+    // ADDING or ADDING_MONOTONIC.
+    SCALAR_DOUBLE = 2;
 
-    // DOUBLE values are double-precision floating-point numbers.
-    //
-    // A Metric of this Type MUST store its values as DoubleDataPoint.
-    DOUBLE = 3;
+    // Histogram implies that the value is found in
+    // Metric.histogram_data_points[].histogram.  This indicates a
+    // multi-value data point.  Supports subtraction for Kinds.
+    HISTOGRAM = 3;
 
-    // MONOTONIC_DOUBLE values are monotonically increasing double-precision
-    // floating-point numbers.
-    //
-    // A Metric of this Type MUST store its values as DoubleDataPoint.
-    MONOTONIC_DOUBLE = 4;
+    // Summary implies that the value is found in
+    // Metric.summary_data_points[].summary.  This indicates a
+    // multi-value data point.  Does not support subtraction.
+    SUMMARY = 4;
 
-    // Histogram measurement.
-    // Corresponding values are stored in HistogramDataPoint.
-    HISTOGRAM = 5;
-
-    // Summary value. Some frameworks implemented Histograms as a summary of observations
-    // (usually things like request durations and response sizes). While it
-    // also provides a total count of observations and a sum of all observed
-    // values, it calculates configurable quantiles over a sliding time
-    // window.
-    // Corresponding values are stored in SummaryDataPoint.
-    SUMMARY = 6;
+    // TODO(#159): add RAW_INT64 and RAW_DOUBLE value types.  These
+    // indicate single-value data points.
   }
 
-  // type is the type of values this metric has.
-  Type type = 4;
+  // ValueType is the type of values this metric has.
+  ValueType value_type = 4;
 
-  // Temporality is the temporal quality values of a metric have. It
-  // describes how those values relate to the time interval over which they
-  // are reported.
+  // Temporality is the temporal quality of a metric, indicating the
+  // time interval over which they are reported.
   enum Temporality {
-    // INVALID_TEMPORALITY is the default Temporality, it MUST not be
-    // used.
+    // INVALID_TEMPORALITY is not used.
     INVALID_TEMPORALITY = 0;
 
-    // INSTANTANEOUS is a metric whose values are measured at a particular
-    // instant. The values are not aggregated over any time interval and are
-    // unique per timestamp. As such, these metrics are not expected to have
-    // an associated start time.
-    INSTANTANEOUS = 1;
+    // One of the Temporality kind elements MUST be set.
 
     // DELTA is a metric whose values are the aggregation of measurements
     // made over a time interval. Successive metrics contain aggregation of
@@ -205,7 +210,7 @@ message MetricDescriptor {
     //   8. The 1 second collection cycle ends. A metric is exported for the
     //      number of requests received over the interval of time t_0+1 to
     //      t_0+2 with a value of 2.
-    DELTA = 2;
+    DELTA = 1;
 
     // CUMULATIVE is a metric whose values are the aggregation of
     // successively made measurements from a fixed start time until the last
@@ -238,11 +243,146 @@ message MetricDescriptor {
     //   12. The 1 second collection cycle ends. A metric is exported for the
     //      number of requests received over the interval of time t_1 to
     //      t_0+1 with a value of 1.
-    CUMULATIVE = 3;
+    //
+    // Note that the first value in a sequence of CUMULATIVE metrics
+    // after a reset is equivalent in value to a DELTA metric for the
+    // period since the reset.  Although a CUMULATIVE metric could
+    // technically be reset after every collection event and still be
+    // described as CUMULATIVE, exporters should use DELTA if there is
+    // no intention of repeating the StartTimeUnixNano timestamp.
+    CUMULATIVE = 2;
   }
 
-  // temporality is the Temporality of values this metric has.
+  // Structure is the structural quality of a metric, indicating
+  // whether the input measurements represent part of an individual
+  // sum or are considered individual measurements.
+  enum Structure {
+    // INVALID_STRUCTURE is not used.
+    INVALID_STRUCTURE = 0;
+
+    // One of the Structure kind elements MUST be set.
+
+    // GROUPING structure means the value has been computed from
+    // individual input values considered part of a distribution.
+    // GROUPING structure implies the sum of measurements is not
+    // necessarily meaningful.
+    //
+    // Value of this kind are defined as a current measurement of the
+    // metric when represented by single-value data points.
+    GROUPING = 1;
+
+    // ADDING_MONOTONIC structure means the measurement determines a
+    // sum.  For DELTA kind this is expressed as the change in sum
+    // since the last collection.  For CUMULATIVE kind this is
+    // expressed as the last collected value of the sum since
+    // reporting began.
+    //
+    // ADDING_MONOTONIC indicates that the calculated sum is
+    // non-decreasing, therefore can be monitored as a non-negative
+    // rate of change.
+    ADDING_MONOTONIC = 3;
+
+    // ADDING structure means the measurement determines a sum.  For
+    // DELTA kind this is expressed as the change in sum since the
+    // last collection.  For CUMULATIVE kind this is expressed as the
+    // last collected value of the sum since reporting began.
+    ADDING = 2;
+  }
+
+  // Continuity describes how the measurement was captured,
+  // indicating whether measurements represent application-level
+  // events or were generated through a callback invoked by the SDK.
+  enum Continuity {
+    // INVALID_CONTINUITY is not used.
+    INVALID_CONTINUITY = 0;
+
+    // CONTINUOUS implies the event originated from the application
+    // calling the SDK with a measurement and possibly a tracing
+    // context.
+    CONTINUOUS = 1;
+
+    // SNAPSHOT may be set for any kind of metric, indicating it
+    // was generated through a callback invoked deliberately by the
+    // SDK.  In SNAPSHOT measurements, TimeUnixNano values depend
+    // on the SDK's decision to collect, not the application.
+    //
+    // SNAPSHOT measurements may be used to define point-in-time
+    // ratios, as data points from the same callback execution MUST
+    // share a single logical timestamp.
+    SNAPSHOT = 2;
+  }
+
+  // Temporality is DELTA or CUMULATIVE.  A value MUST be set.
   Temporality temporality = 5;
+
+  // Structure is ADDING_MONOTONIC, ADDING, or GROUPING.
+  Structure structure = 6;
+
+  // Continuity is CONTINUOUS or SNAPSHOT.
+  Continuity continuity = 7;
+  
+  // All 12 combinations of Temporality, Structure, and Coninuity
+  // describe a meaningful expression of metric data.  Users familiar
+  // with the user-facing OpenTelemetry Metrics API will recognize
+  // these 12 values as comprised of 6 kinds of instrument combined
+  // with 2 values for temporality.  Structure and Continuity form the
+  // semantic basis of the various metric instruments, corresponding
+  // with the API Specification, while Temporality is an orthogonal
+  // concept.  The instrument mapping:
+  //
+  //   Instrument         Structure        Continuity
+  //   ----------------------------------------------
+  //   Counter            ADDING_MONOTONIC CONTINUOUS
+  //   UpDownCounter      ADDING           CONTINUOUS
+  //   ValueRecorder      GROUPING         CONTINUOUS
+  //   SumObserver        ADDING_MONOTONIC SNAPSHOT
+  //   UpDownSumObserver  ADDING           SNAPSHOT
+  //   ValueObserver      GROUPING         SNAPSHOT
+  //
+  // Several observations help simplify our understanding of
+  // Temporality and Structure.
+  //
+  // About Temporality:
+  //
+  //   DELTA and CUMULATIVE temporalities are practically identical in
+  //   interpretation, though they differ in intention.  In both
+  //   cases, the data point represents part or all of the data
+  //   collected across an interval of time.  The CUMULATIVE kind
+  //   indicates that the client does not "reset" and that
+  //   StartTimeUnixNano will be held as a constant across data points
+  //   for a single process.
+  //
+  // About Structure:
+  //
+  //   ADDING_MONOTONIC and ADDING structures are practically
+  //   identical in form, but commonly differ in interpretation.  In
+  //   both cases, individual data points are meant to be combined
+  //   into a sum.  In both cases, knowing the Metric is a sum
+  //   indicates the variable may be monitored as a rate of change.
+  //   In the monotonic case, the sum has a useful non-negative rate.
+  //
+  //   GROUPING structure data points represent individual
+  //   measurements, meant to be combined into a distribution.  The
+  //   sum of these data may be meaningful, but individual
+  //   measurements are the focus of these metrics.
+  //
+  // About Continuity:
+  //
+  //   CONTINUOUS kind data points result directly from
+  //   application-level events, therefore the count of events defines
+  //   a meaningful rate to the user.  Identical CONTINUOUS data
+  //   points (with the same Resource and TimeUnixNano) are considered
+  //   conincidental.
+  //
+  //   SNAPSHOT kind data points result from callbacks invoked by the
+  //   SDK, therefore are called in SDK context (i.e., not traced) and
+  //   the rate of measurements does not define a meaningful rate to
+  //   the user.  Identical SNAPSHOT data points (with the same
+  //   Resource and TimeUnixNano) are considered invalid, as only one
+  //   Snapshot can be taken per instant per SDK.  Measurements of a
+  //   SNAPSHOT metric are recorded for all label sets at the same
+  //   logical time, therefore can be used to calculate meaningful
+  //   point-in-time ratios.
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
@@ -251,19 +391,19 @@ message Int64DataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
-  // This is used for Counter type only. For Gauge the value is not specified and
-  // defaults to 0.
+  // StartTimeUnixNano is the moment when aggregation began over a
+  // period of time to compute the data point.  When this value is
+  // omitted it implies no aggregation was applied, in which case the
+  // start time may also be considered equal to TimeUnixNano.
   //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
+  // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
+  // 1 January 1970.
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this value was recorded.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
+  // 1 January 1970.
   fixed64 time_unix_nano = 3;
 
   // value itself.
@@ -276,19 +416,19 @@ message DoubleDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
-  // This is used for Counter type only. For Gauge the value is not specified and
-  // defaults to 0.
+  // StartTimeUnixNano is the moment when aggregation began over a
+  // period of time to compute the data point.  When this value is
+  // omitted it implies no aggregation was applied, in which case the
+  // start time may also be considered equal to TimeUnixNano.
   //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
+  // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
+  // 1 January 1970.
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this value was recorded.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
+  // 1 January 1970.
   fixed64 time_unix_nano = 3;
 
   // value itself.
@@ -302,18 +442,19 @@ message HistogramDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
+  // StartTimeUnixNano is the moment when aggregation began over a
+  // period of time to compute the data point.  When this value is
+  // omitted it implies no aggregation was applied, in which case the
+  // start time may also be considered equal to TimeUnixNano.
   //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
-  // Note: this field is always unspecified and ignored if MetricDescriptor.type==GAUGE_HISTOGRAM.
+  // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
+  // 1 January 1970.
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this value was recorded.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
+  // 1 January 1970.
   fixed64 time_unix_nano = 3;
 
   // count is the number of values in the population. Must be non-negative. This value
@@ -396,17 +537,19 @@ message SummaryDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
+  // StartTimeUnixNano is the moment when aggregation began over a
+  // period of time to compute the data point.  When this value is
+  // omitted it implies no aggregation was applied, in which case the
+  // start time may also be considered equal to TimeUnixNano.
   //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
+  // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
+  // 1 January 1970.
   fixed64 start_time_unix_nano = 2;
 
   // time_unix_nano is the moment when this value was recorded.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  //
+  // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
+  // 1 January 1970.
   fixed64 time_unix_nano = 3;
 
   // The total number of recorded values since start_time. Optional since
