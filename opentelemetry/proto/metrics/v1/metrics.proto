@@ -44,7 +44,7 @@ message InstrumentationLibraryMetrics {
   repeated Metric metrics = 2;
 }
 
-// Metric contains one or more timeseries.
+// Defines a Metric which has one or more timeseries.
 //
 // The data model and relation between entities is shown in the
 // diagram below. Here, "DataPoint" is the term used to refer to any
@@ -98,7 +98,7 @@ message InstrumentationLibraryMetrics {
 //   - the end of the interval, if aggregation was applied
 //   - the instant of the event, if no aggregation was applied.
 message Metric {
-  // Descriptor describes the Metric.
+  // metric_descriptor describes the Metric.
   //
   // N.B. "Descriptor" is a reserved term in protobuf, protoc
   // generates a field named "Descriptor_" thus we use
@@ -112,41 +112,37 @@ message Metric {
   repeated DoubleDataPoint double_data_points = 3;
   repeated HistogramDataPoint histogram_data_points = 4;
   repeated SummaryDataPoint summary_data_points = 5;
-
-  // TODO(#159) Use for exemplars of aggregated metrics or for
-  // RAW_INT64 or RAW_DOUBLE metrics:
-  //   repeated RawDataPoint raw_data_points = 3;
 }
 
 // Defines a metric type and its schema.
 message MetricDescriptor {
-  // Name of the metric, including its DNS name prefix. It must be unique.
+  // name of the metric, including its DNS name prefix. It must be unique.
   string name = 1;
 
-  // Description of the metric, which can be used in documentation.
+  // description of the metric, which can be used in documentation.
   string description = 2;
 
-  // Unit in which the metric value is reported. Follows the format
+  // unit in which the metric value is reported. Follows the format
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // ValueType is the type of value(s) a metric represents.  ValueType
+  // Type is the type of value(s) a metric represents.  Type
   // determines which field of the DataPoint will be used for Metrics
   // with this descriptor.  See the definition of Kind for detail on
   // which aggregations may be expressed for which instruments using
   // which value types.
   //
-  // ValueTypes are distinguished by whether a data point of its type
+  // Types are distinguished by whether a data point of its type
   // can _possibly_ represent more than one individual input
   // measurement.  Single-value data points have a definite one-to-one
   // relationship with input measurements.  Multi-value data points,
   // by contrast, represent one or more input measurements.
   //
-  // ValueTypes are also distinguished by whether the value supports
+  // Types are also distinguished by whether the value supports
   // subtraction.  Not all value types support subtraction, but types
   // which do can be converted from CUMULATIVE kind into DELTA kind.
-  enum ValueType {
-    // INVALID_TYPE is the default ValueType, it MUST not be used.
+  enum Type {
+    // INVALID_TYPE is the default Type, it MUST not be used.
     INVALID_VALUE_TYPE = 0;
 
     // ScalarInt64 implies that the value is found in
@@ -175,16 +171,16 @@ message MetricDescriptor {
     // indicate single-value data points.
   }
 
-  // ValueType is the type of values this metric has.
-  ValueType value_type = 4;
+  // Type is the type of values this metric has.
+  Type value_type = 4;
 
-  // Temporality is the temporal quality of a metric, indicating the
-  // time interval over which they are reported.
+  // Temporality is the temporal quality values of a metric have. It
+  // describes how those values relate to the time interval over which they
+  // are reported.
   enum Temporality {
-    // INVALID_TEMPORALITY is not used.
+    // INVALID_TEMPORALITY is the default Temporality, it MUST not be
+    // used.
     INVALID_TEMPORALITY = 0;
-
-    // One of the Temporality kind elements MUST be set.
 
     // DELTA is a metric whose values are the aggregation of measurements
     // made over a time interval. Successive metrics contain aggregation of
@@ -257,10 +253,9 @@ message MetricDescriptor {
   // whether the input measurements represent part of an individual
   // sum or are considered individual measurements.
   enum Structure {
-    // INVALID_STRUCTURE is not used.
+    // INVALID_STRUCTURE is the default Structure, it MUST not be
+    // used.
     INVALID_STRUCTURE = 0;
-
-    // One of the Structure kind elements MUST be set.
 
     // GROUPING structure means the value has been computed from
     // individual input values considered part of a distribution.
@@ -280,20 +275,21 @@ message MetricDescriptor {
     // ADDING_MONOTONIC indicates that the calculated sum is
     // non-decreasing, therefore can be monitored as a non-negative
     // rate of change.
-    ADDING_MONOTONIC = 3;
+    ADDING_MONOTONIC = 2;
 
     // ADDING structure means the measurement determines a sum.  For
     // DELTA kind this is expressed as the change in sum since the
     // last collection.  For CUMULATIVE kind this is expressed as the
     // last collected value of the sum since reporting began.
-    ADDING = 2;
+    ADDING = 3;
   }
 
   // Continuity describes how the measurement was captured,
   // indicating whether measurements represent application-level
   // events or were generated through a callback invoked by the SDK.
   enum Continuity {
-    // INVALID_CONTINUITY is not used.
+    // INVALID_CONTINUITY is the default Continuity, it MUST not be
+    // used.
     INVALID_CONTINUITY = 0;
 
     // CONTINUOUS implies the event originated from the application
@@ -315,10 +311,10 @@ message MetricDescriptor {
   // Temporality is DELTA or CUMULATIVE.  A value MUST be set.
   Temporality temporality = 5;
 
-  // Structure is ADDING_MONOTONIC, ADDING, or GROUPING.
+  // Structure is ADDING_MONOTONIC, ADDING, or GROUPING.  A value MUST be set.
   Structure structure = 6;
 
-  // Continuity is CONTINUOUS or SNAPSHOT.
+  // Continuity is CONTINUOUS or SNAPSHOT.  A value MUST be set.
   Continuity continuity = 7;
   
   // All 12 combinations of Temporality, Structure, and Coninuity
