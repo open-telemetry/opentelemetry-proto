@@ -411,9 +411,7 @@ message HistogramDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // StartTimeUnixNano is the moment when aggregation began over a
-  // period of time to compute the data point.  When this value is
-  // omitted it implies no aggregation was applied, in which case the
-  // start time may also be considered equal to TimeUnixNano.
+  // period of time to compute the data point.  This MUST be set.
   //
   // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
   // 1 January 1970.
@@ -506,9 +504,7 @@ message SummaryDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // StartTimeUnixNano is the moment when aggregation began over a
-  // period of time to compute the data point.  When this value is
-  // omitted it implies no aggregation was applied, in which case the
-  // start time may also be considered equal to TimeUnixNano.
+  // period of time to compute the data point.  This MUST be set.
   //
   // The value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on
   // 1 January 1970.
