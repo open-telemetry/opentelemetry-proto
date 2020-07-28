@@ -171,8 +171,8 @@ message MetricDescriptor {
     // indicate single-value data points.
   }
 
-  // Type is the type of values this metric has.
-  Type value_type = 4;
+  // type is the type of values this metric has.
+  Type type = 4;
 
   // Temporality is the temporal quality values of a metric have. It
   // describes how those values relate to the time interval over which they
@@ -239,13 +239,6 @@ message MetricDescriptor {
     //   12. The 1 second collection cycle ends. A metric is exported for the
     //      number of requests received over the interval of time t_1 to
     //      t_0+1 with a value of 1.
-    //
-    // Note that the first value in a sequence of CUMULATIVE metrics
-    // after a reset is equivalent in value to a DELTA metric for the
-    // period since the reset.  Although a CUMULATIVE metric could
-    // technically be reset after every collection event and still be
-    // described as CUMULATIVE, exporters should use DELTA if there is
-    // no intention of repeating the StartTimeUnixNano timestamp.
     CUMULATIVE = 2;
   }
 
@@ -308,13 +301,13 @@ message MetricDescriptor {
     SNAPSHOT = 2;
   }
 
-  // Temporality is DELTA or CUMULATIVE.  A value MUST be set.
+  // temporality is the Temporality of values this metric has.
   Temporality temporality = 5;
 
-  // Structure is ADDING_MONOTONIC, ADDING, or GROUPING.  A value MUST be set.
+  // structure is the Structure of values this metric has.
   Structure structure = 6;
 
-  // Continuity is CONTINUOUS or SNAPSHOT.  A value MUST be set.
+  // continuity is the Continuity of values this metric has.
   Continuity continuity = 7;
   
   // All 12 combinations of Temporality, Structure, and Coninuity
