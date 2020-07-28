@@ -99,10 +99,6 @@ message InstrumentationLibraryMetrics {
 //   - the instant of the event, if no aggregation was applied.
 message Metric {
   // metric_descriptor describes the Metric.
-  //
-  // N.B. "Descriptor" is a reserved term in protobuf, protoc
-  // generates a field named "Descriptor_" thus we use
-  // "metric_descriptor".
   MetricDescriptor metric_descriptor = 1;
 
   // Data is a list of one or more DataPoints for a single metric. Only one of the
@@ -126,49 +122,32 @@ message MetricDescriptor {
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // Type is the type of value(s) a metric represents.  Type
-  // determines which field of the DataPoint will be used for Metrics
-  // with this descriptor.  See the definition of Kind for detail on
-  // which aggregations may be expressed for which instruments using
-  // which value types.
-  //
-  // Types are distinguished by whether a data point of its type
-  // can _possibly_ represent more than one individual input
-  // measurement.  Single-value data points have a definite one-to-one
-  // relationship with input measurements.  Multi-value data points,
-  // by contrast, represent one or more input measurements.
-  //
-  // Types are also distinguished by whether the value supports
-  // subtraction.  Not all value types support subtraction, but types
-  // which do can be converted from CUMULATIVE kind into DELTA kind.
+  // Type is the type of values a metric has.
   enum Type {
     // INVALID_TYPE is the default Type, it MUST not be used.
-    INVALID_VALUE_TYPE = 0;
+    INVALID_TYPE = 0;
 
-    // ScalarInt64 implies that the value is found in
-    // Metric.int64_data_points[].value.  This indicates a
-    // single-value data point.  Supports subtraction when the Kind is
-    // ADDING or ADDING_MONOTONIC.
-    SCALAR_INT64 = 1;
+    // INT64 values are signed 64-bit integers.
+    //
+    // A Metric of this Type MUST store its values as Int64DataPoint.
+    INT64 = 1;
 
-    // ScalarDouble implies that the value is found in
-    // Metric.double_data_points[].value.  This indicates a
-    // single-value data point.  Supports subtraction when the Kind is
-    // ADDING or ADDING_MONOTONIC.
-    SCALAR_DOUBLE = 2;
+    // DOUBLE values are double-precision floating-point numbers.
+    //
+    // A Metric of this Type MUST store its values as DoubleDataPoint.
+    DOUBLE = 2;
 
-    // Histogram implies that the value is found in
-    // Metric.histogram_data_points[].histogram.  This indicates a
-    // multi-value data point.  Supports subtraction for Kinds.
+    // Histogram measurement.
+    // Corresponding values are stored in HistogramDataPoint.
     HISTOGRAM = 3;
 
-    // Summary implies that the value is found in
-    // Metric.summary_data_points[].summary.  This indicates a
-    // multi-value data point.  Does not support subtraction.
+    // Summary value. Some frameworks implemented Histograms as a summary of observations
+    // (usually things like request durations and response sizes). While it
+    // also provides a total count of observations and a sum of all observed
+    // values, it calculates configurable quantiles over a sliding time
+    // window.
+    // Corresponding values are stored in SummaryDataPoint.
     SUMMARY = 4;
-
-    // TODO(#159): add RAW_INT64 and RAW_DOUBLE value types.  These
-    // indicate single-value data points.
   }
 
   // type is the type of values this metric has.
