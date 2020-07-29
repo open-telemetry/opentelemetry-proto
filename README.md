@@ -12,9 +12,9 @@ Component                | Maturity |
 -------------------------|----------|
 collector/metrics/*      | Alpha    |
 collector/trace/*        | Stable   |
-common/*                 | Beta     |
+common/*                 | Stable   |
 metrics/*                | Alpha    |
-resource/*               | Beta     |
+resource/*               | Stable   |
 trace/trace.proto        | Stable   |
 trace/trace_config.proto | Alpha    |
 
