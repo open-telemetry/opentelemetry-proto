@@ -126,6 +126,9 @@ message MetricDescriptor {
   string unit = 3;
 
   // MeasurementValueType determines the value type for a measurement.
+  // TODO: There is an open question about whether this should control int64 vs
+  // double for Histogram and Summary. There are good arguments on both sides of
+  // this.
   enum MeasurementValueType {
     // INVALID_SCALAR_VALUE_TYPE is the default ScalarValueType, it MUST not be
     // used.
@@ -138,7 +141,8 @@ message MetricDescriptor {
 
   // TODO: Decide if support for RawMeasurements (measurements recorded using
   // the synchronous instruments) is necessary. It can be used to delegate the
-  // aggregation from the application to the agent/collector.
+  // aggregation from the application to the agent/collector. See
+  // https://github.com/open-telemetry/opentelemetry-specification/issues/617
 
   // Represents the type of a scalar metric that always exports the "current
   // value" for every data point. It can be used when an "unknown" aggregation.
@@ -181,8 +185,8 @@ message MetricDescriptor {
     // If "true" means that the sum is monotonic.
     bool is_monotonic = 3;
 
-    // TODO: Decide if knowing that the aggregated measurements are raw
-    // measurements is important or not. Equivalent of "Snapshot" in #162.
+    // TODO: Decide if knowing that the metric values are aggregated from raw
+    // measurements is important.
   }
 
   // Represents the type of a metric that is calculated by aggregating as a
@@ -199,8 +203,8 @@ message MetricDescriptor {
     // Temporality is the temporal quality values of a metric have.
     Temporality temporality = 2;
 
-    // TODO: Decide if knowing that the aggregated measurements are raw
-    // measurements is important or not. Equivalent of "Snapshot" in #162.
+    // TODO: Decide if knowing that the metric values are aggregated from raw
+    // measurements is important.
 
     // TODO: Decide if knowing that the Sum is monotonic is important or not,
     // may be derived from the buckets definition.
@@ -220,8 +224,8 @@ message MetricDescriptor {
     // Temporality is the temporal quality values of a metric have.
     Temporality temporality = 2;
 
-    // TODO: Decide if knowing that the aggregated measurements are raw
-    // measurements is important or not. Equivalent of "Snapshot" in #162.
+    // TODO: Decide if knowing that the metric values are aggregated from raw
+    // measurements is important.
 
     // TODO: Decide if knowing that the Sum is monotonic is important or not,
     // may be derived from the buckets definition.
