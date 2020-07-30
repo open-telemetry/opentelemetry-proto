@@ -163,7 +163,7 @@ message MetricDescriptor {
     MeasurementValueType measurement_value_type = 1;
   }
 
-  // Represents the type of a numeric scalar metric that is calculated as a sum
+  // Sum represents the type of a numeric scalar metric that is calculated as a sum
   // of all reported measurements over a time interval.
   //
   // TODO: Decide if this should support only MonotonicSum
