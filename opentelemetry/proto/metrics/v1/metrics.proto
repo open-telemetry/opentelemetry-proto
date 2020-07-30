@@ -147,9 +147,9 @@ message MetricDescriptor {
   // Represents the type of a scalar metric that always exports the "current
   // value" for every data point. It should be used for an "unknown" aggregation.
   // 
-  // It does not contain a temporality field (even if it may be known) because
-  // the aggregation is unknown so points cannot be combined using the same
-  // aggregation to aggregate over different time window. Because of this
+  // A Gauge does not track temporality. Given the aggregation is unknown, points cannot be
+  // combined using the same aggregation, regardless of temporality. Therefore, temporality is
+  // not included. Consequently, this also means
   // "StartTimeUnixNano" is ignored for all data points.
   //
   // A Metric of this Type MUST store its values as Int64DataPoint or
