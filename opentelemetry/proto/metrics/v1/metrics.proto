@@ -237,7 +237,7 @@ message MetricDescriptor {
   //
   // TODO: Update table after the decision on:
   // https://github.com/open-telemetry/opentelemetry-specification/issues/731.
-  // Be default metrics recording using the OpenTelemetry API are exported as
+  // By default, metrics recording using the OpenTelemetry API are exported as
   // (the table does not include MeasurementValueType to avoid extra rows):
   //
   //   Instrument         Type
