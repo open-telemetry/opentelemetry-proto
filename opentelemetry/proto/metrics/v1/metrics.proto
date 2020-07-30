@@ -130,7 +130,7 @@ message MetricDescriptor {
   // double for Histogram and Summary. There are good arguments on both sides of
   // this.
   enum MeasurementValueType {
-    // INVALID_SCALAR_VALUE_TYPE is the default ScalarValueType, it MUST not be
+    // INVALID_MEASUREMENT_VALUE_TYPE is the default MeasurementValueType, it MUST not be
     // used.
     INVALID_MEASUREMENT_VALUE_TYPE = 0;
     // The scalar value type is an int64.
