@@ -144,7 +144,7 @@ message MetricDescriptor {
   // aggregation from the application to the agent/collector. See
   // https://github.com/open-telemetry/opentelemetry-specification/issues/617
 
-  // Represents the type of a scalar metric that always exports the "current
+  // Gauge represents the type of a scalar metric that always exports the "current
   // value" for every data point. It should be used for an "unknown" aggregation.
   // 
   // A Gauge does not track temporality. Given the aggregation is unknown, points cannot be
