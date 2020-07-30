@@ -144,13 +144,14 @@ message MetricDescriptor {
   // aggregation from the application to the agent/collector. See
   // https://github.com/open-telemetry/opentelemetry-specification/issues/617
 
-  // Gauge represents the type of a scalar metric that always exports the "current
-  // value" for every data point. It should be used for an "unknown" aggregation.
+  // Gauge represents the type of a scalar metric that always exports the
+  // "current value" for every data point. It should be used for an "unknown"
+  // aggregation.
   // 
-  // A Gauge does not track temporality. Given the aggregation is unknown, points cannot be
-  // combined using the same aggregation, regardless of temporality. Therefore, temporality is
-  // not included. Consequently, this also means
-  // "StartTimeUnixNano" is ignored for all data points.
+  // A Gauge does not track temporality. Given the aggregation is unknown,
+  // points cannot be combined using the same aggregation, regardless of
+  // temporality. Therefore, temporality is not included. Consequently, this
+  // also means "StartTimeUnixNano" is ignored for all data points.
   //
   // A Metric of this Type MUST store its values as Int64DataPoint or
   // DoubleDataPoint.
@@ -163,8 +164,8 @@ message MetricDescriptor {
     MeasurementValueType measurement_value_type = 1;
   }
 
-  // Sum represents the type of a numeric scalar metric that is calculated as a sum
-  // of all reported measurements over a time interval.
+  // Sum represents the type of a numeric scalar metric that is calculated as a
+  // sum of all reported measurements over a time interval.
   //
   // TODO: Decide if this should support only MonotonicSum
   // https://github.com/open-telemetry/opentelemetry-specification/issues/725.
@@ -231,9 +232,9 @@ message MetricDescriptor {
     // may be derived from the buckets definition.
   }
 
-  // Type is the type of the metric and determines what are the type of the
-  // reported value, as well as the relatationship to the time interval over
-  // which they are reported.
+  // Type determines the aggregation type (if any) of the metric, what is the
+  // reported value type for the data points, as well as the relatationship to
+  // the time interval over which they are reported.
   //
   // TODO: Update table after the decision on:
   // https://github.com/open-telemetry/opentelemetry-specification/issues/731.
