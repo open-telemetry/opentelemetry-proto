@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package opentelemetry.proto.collector.trace.v1;
 
-import "opentelemetry/proto/trace/v1/trace.proto";
+import "opentelemetry/proto/traces/v1/traces.proto";
 
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.collector.trace.v1";
@@ -38,7 +38,7 @@ message ExportTraceServiceRequest {
   // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
   // data from multiple origins typically batch the data before forwarding further and
   // in that case this array will contain multiple elements.
-  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1;
+  repeated opentelemetry.proto.traces.v1.ResourceSpans resource_spans = 1;
 }
 
 message ExportTraceServiceResponse {

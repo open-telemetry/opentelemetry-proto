@@ -14,15 +14,15 @@
 
 syntax = "proto3";
 
-package opentelemetry.proto.trace.v1;
+package opentelemetry.proto.traces.v1;
 
 import "opentelemetry/proto/common/v1/common.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
-option java_package = "io.opentelemetry.proto.trace.v1";
-option java_outer_classname = "TraceProto";
-option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/trace/v1";
+option java_package = "io.opentelemetry.proto.traces.v1";
+option java_outer_classname = "TracesProto";
+option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/traces/v1";
 
 // A collection of InstrumentationLibrarySpans from a Resource.
 message ResourceSpans {
