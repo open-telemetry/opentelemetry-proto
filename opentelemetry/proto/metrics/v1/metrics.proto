@@ -340,19 +340,24 @@ message Int64DataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
-  // This is used for Counter type only. For Gauge the value is not specified and
-  // defaults to 0.
+  // start_time_unix_nano is the last time when the aggregation value was reset
+  // to "zero". For some metric types this is ignored, see MetricsDescriptor
+  // types for more details.
   //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // The aggregation value is over the time interval (start_time_unix_nano,
+  // time_unix_nano].
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
+  // Value of 0 indicates that the timestamp is unspecified. In that case the
+  // timestamp may be decided by the backend.
   fixed64 start_time_unix_nano = 2;
 
-  // time_unix_nano is the moment when this value was recorded.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // time_unix_nano is the moment when this aggregation value was reported.
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 time_unix_nano = 3;
 
   // value itself.
@@ -365,19 +370,24 @@ message DoubleDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
-  // This is used for Counter type only. For Gauge the value is not specified and
-  // defaults to 0.
+  // start_time_unix_nano is the last time when the aggregation value was reset
+  // to "zero". For some metric types this is ignored, see MetricsDescriptor
+  // types for more details.
   //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // The aggregation value is over the time interval (start_time_unix_nano,
+  // time_unix_nano].
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
+  // Value of 0 indicates that the timestamp is unspecified. In that case the
+  // timestamp may be decided by the backend.
   fixed64 start_time_unix_nano = 2;
 
-  // time_unix_nano is the moment when this value was recorded.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // time_unix_nano is the moment when this aggregation value was reported.
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 time_unix_nano = 3;
 
   // value itself.
@@ -391,18 +401,24 @@ message HistogramDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
+  // start_time_unix_nano is the last time when the aggregation value was reset
+  // to "zero". For some metric types this is ignored, see MetricsDescriptor
+  // types for more details.
   //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // The aggregation value is over the time interval (start_time_unix_nano,
+  // time_unix_nano].
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
-  // Note: this field is always unspecified and ignored if MetricDescriptor.type==GAUGE_HISTOGRAM.
+  // Value of 0 indicates that the timestamp is unspecified. In that case the
+  // timestamp may be decided by the backend.
   fixed64 start_time_unix_nano = 2;
 
-  // time_unix_nano is the moment when this value was recorded.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // time_unix_nano is the moment when this aggregation value was reported.
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 time_unix_nano = 3;
 
   // count is the number of values in the population. Must be non-negative. This value
@@ -485,17 +501,24 @@ message SummaryDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
-  // start_time_unix_nano is the time when the cumulative value was reset to zero.
+  // start_time_unix_nano is the last time when the aggregation value was reset
+  // to "zero". For some metric types this is ignored, see MetricsDescriptor
+  // types for more details.
   //
-  // The cumulative value is over the time interval (start_time_unix_nano, time_unix_nano].
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // The aggregation value is over the time interval (start_time_unix_nano,
+  // time_unix_nano].
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the timestamp
-  // may be decided by the backend.
+  // Value of 0 indicates that the timestamp is unspecified. In that case the
+  // timestamp may be decided by the backend.
   fixed64 start_time_unix_nano = 2;
 
-  // time_unix_nano is the moment when this value was recorded.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // time_unix_nano is the moment when this aggregation value was reported.
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 time_unix_nano = 3;
 
   // The total number of recorded values since start_time. Optional since
