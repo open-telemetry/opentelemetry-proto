@@ -48,19 +48,17 @@ message InstrumentationLibraryMetrics {
 // on how the measurement was sampled, as well as a span ID and trace ID of the
 // active span when the measurement was recorded
 message RawValue {
-  // Numerical value of the measurement that was recorded. Only one of these 
-  // two fields is used for the data, based on MetricDescriptor.measurement_type
-  double double_value = 1;
-  int64 int64_value = 2;
-  
-  // Exact time that the measurement was recorded
-  fixed64 time_unix_nano = 3;
-
-  // For RawValue data points, this is the set of labels that uniquely identify this timeseries.
-  // Only labels kept by the aggregator (and not dropped labels) should be included.
-  // For exemplars, this is the set of labels that were dropped by the aggregator, but recorded
+  // The set of labels that were dropped by the aggregator, but recorded
   // alongside the original measurement. Only labels that were dropped by the aggregator should be included
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 4;
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
+
+  // Exact time that the measurement was recorded
+  fixed64 time_unix_nano = 2;
+
+  // Numerical value of the measurement that was recorded. Only one of these 
+  // two fields is used for the data, based on MetricDescriptor.measurement_value_type
+  double double_value = 3;
+  int64 int64_value = 4;
 
   // (Optional) Span ID of the current trace
   bytes span_id = 5;
@@ -140,7 +138,6 @@ message Metric {
   repeated DoubleDataPoint double_data_points = 3;
   repeated HistogramDataPoint histogram_data_points = 4;
   repeated SummaryDataPoint summary_data_points = 5;
-  repeated RawValue raw_data_points = 6;
 }
 
 // Defines a metric type and its schema.
