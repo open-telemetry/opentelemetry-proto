@@ -185,9 +185,6 @@ message MetricDescriptor {
 
     // If "true" means that the sum is monotonic.
     bool is_monotonic = 3;
-
-    // TODO: Decide if knowing that the metric values are aggregated from raw
-    // measurements is important.
   }
 
   // Represents the type of a metric that is calculated by aggregating as a
@@ -203,12 +200,6 @@ message MetricDescriptor {
 
     // Temporality is the temporal quality values of a metric have.
     Temporality temporality = 2;
-
-    // TODO: Decide if knowing that the metric values are aggregated from raw
-    // measurements is important.
-
-    // TODO: Decide if knowing that the Sum is monotonic is important or not,
-    // may be derived from the buckets definition.
   }
 
   // Represents the type of a metric that is calculated by computing a summary
@@ -224,12 +215,6 @@ message MetricDescriptor {
 
     // Temporality is the temporal quality values of a metric have.
     Temporality temporality = 2;
-
-    // TODO: Decide if knowing that the metric values are aggregated from raw
-    // measurements is important.
-
-    // TODO: Decide if knowing that the Sum is monotonic is important or not,
-    // may be derived from the buckets definition.
   }
 
   // Type determines the aggregation type (if any) of the metric, what is the
