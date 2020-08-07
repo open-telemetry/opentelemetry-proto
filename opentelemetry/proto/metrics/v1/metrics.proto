@@ -94,11 +94,11 @@ message InstrumentationLibraryMetrics {
 // All DataPoint types have three common fields:
 // - Labels zero or more key-value pairs associated with the data point.
 // - StartTimeUnixNano MUST be set to the start of the interval when the
-//   descriptor Temporality includes CUMULATIVE or DELTA. This field is not set
-//   for INSTANTANEOUS timeseries, where instead the TimeUnixNano field is
-//   set for individual points.
+//   descriptor's type includes an AggregationTemporality. This field is not set
+//   otherwise.
 // - TimeUnixNano MUST be set to:
-//   - the end of the interval (CUMULATIVE or DELTA)
+//   - the moment when an aggregation is reported (independent of the
+//     aggregation temporality).
 //   - the instantaneous time of the event.
 message Metric {
   // metric_descriptor describes the Metric.
@@ -148,10 +148,11 @@ message MetricDescriptor {
   // "current value" for every data point. It should be used for an "unknown"
   // aggregation.
   // 
-  // A Gauge does not track temporality. Given the aggregation is unknown,
-  // points cannot be combined using the same aggregation, regardless of
-  // temporality. Therefore, temporality is not included. Consequently, this
-  // also means "StartTimeUnixNano" is ignored for all data points.
+  // A Gauge does not support different aggregation temporalities. Given the
+  // aggregation is unknown, points cannot be combined using the same
+  // aggregation, regardless of aggregation temporalities. Therefore,
+  // AggregationTemporality is not included. Consequently, this also means
+  // "StartTimeUnixNano" is ignored for all data points.
   //
   // A Metric of this Type MUST store its values as Int64DataPoint or
   // DoubleDataPoint.
@@ -180,14 +181,12 @@ message MetricDescriptor {
     // as the value type of the exemplars.
     MeasurementValueType measurement_value_type = 1;
 
-    // Temporality is the temporal quality values of a metric have.
-    Temporality temporality = 2;
+    // aggregation_temporality describes if the aggregator reports delta changes
+    // since last report time, or cumulative changes since a fixed start time.
+    AggregationTemporality aggregation_temporality = 2;
 
     // If "true" means that the sum is monotonic.
     bool is_monotonic = 3;
-
-    // TODO: Decide if knowing that the metric values are aggregated from raw
-    // measurements is important.
   }
 
   // Represents the type of a metric that is calculated by aggregating as a
@@ -201,14 +200,9 @@ message MetricDescriptor {
     // Determines the value type of the exemplars.
     MeasurementValueType measurement_value_type = 1;
 
-    // Temporality is the temporal quality values of a metric have.
-    Temporality temporality = 2;
-
-    // TODO: Decide if knowing that the metric values are aggregated from raw
-    // measurements is important.
-
-    // TODO: Decide if knowing that the Sum is monotonic is important or not,
-    // may be derived from the buckets definition.
+    // aggregation_temporality describes if the aggregator reports delta changes
+    // since last report time, or cumulative changes since a fixed start time.
+    AggregationTemporality aggregation_temporality = 2;
   }
 
   // Represents the type of a metric that is calculated by computing a summary
@@ -222,14 +216,9 @@ message MetricDescriptor {
     // Determines the value type of the exemplars.
     MeasurementValueType measurement_value_type = 1;
 
-    // Temporality is the temporal quality values of a metric have.
-    Temporality temporality = 2;
-
-    // TODO: Decide if knowing that the metric values are aggregated from raw
-    // measurements is important.
-
-    // TODO: Decide if knowing that the Sum is monotonic is important or not,
-    // may be derived from the buckets definition.
+    // aggregation_temporality describes if the aggregator reports delta changes
+    // since last report time, or cumulative changes since a fixed start time.
+    AggregationTemporality aggregation_temporality = 2;
   }
 
   // Type determines the aggregation type (if any) of the metric, what is the
@@ -243,11 +232,11 @@ message MetricDescriptor {
   //
   //   Instrument         Type
   //   ----------------------------------------------
-  //   Counter            Sum(temporality=delta;is_monotonic=true)
-  //   UpDownCounter      Sum(temporality=delta;is_monotonic=false)
-  //   ValueRecorder      Summary(temporality=delta)
-  //   SumObserver        Sum(temporality=cumulative;is_monotonic=true)
-  //   UpDownSumObserver  Sum(temporality=cumulative;is_monotonic=false)
+  //   Counter            Sum(aggregation_temporality=delta;is_monotonic=true)
+  //   UpDownCounter      Sum(aggregation_temporality=delta;is_monotonic=false)
+  //   ValueRecorder      Summary(aggregation_temporality=delta)
+  //   SumObserver        Sum(aggregation_temporality=cumulative;is_monotonic=true)
+  //   UpDownSumObserver  Sum(aggregation_temporality=cumulative;is_monotonic=false)
   //   ValueObserver      Gauge()
   oneof type {
     // TODO: Determine if encoding all possible values in a uint64 bitset
@@ -258,23 +247,16 @@ message MetricDescriptor {
     Summary summary = 7;
   }
 
-  // Temporality is the temporal quality values of a metric have. It
-  // describes how those values relate to the time interval over which they
-  // are reported.
-  enum Temporality {
-    // INVALID_TEMPORALITY is the default Temporality, it MUST not be
-    // used.
-    INVALID_TEMPORALITY = 0;
+  // AggregationTemporality defines how a metric aggregator reports aggregated
+  // values. It describes how those values relate to the time interval over
+  // which they are aggregated.
+  enum AggregationTemporality {
+    // INVALID_AGGREGATION_TEMPORALITY is the default AggregationTemporality, it MUST
+    // not be used.
+    INVALID_AGGREGATION_TEMPORALITY = 0;
 
-    // TODO: Re-evaluate if this is still needed.
-    // INSTANTANEOUS is a metric whose values are measured at a particular
-    // instant. The values are not aggregated over any time interval and are
-    // unique per timestamp. As such, these metrics are not expected to have
-    // an associated start time.
-    INSTANTANEOUS = 1;
-
-    // DELTA is a metric whose values are the aggregation of measurements
-    // made over a time interval. Successive metrics contain aggregation of
+    // DELTA is an AggregationTemporality for a metric aggregator which reports
+    // changes since last report time. Successive metrics contain aggregation of
     // values from continuous and non-overlapping intervals.
     //
     // The values for a DELTA metric are based only on the time interval
@@ -297,14 +279,13 @@ message MetricDescriptor {
     //   8. The 1 second collection cycle ends. A metric is exported for the
     //      number of requests received over the interval of time t_0+1 to
     //      t_0+2 with a value of 2.
-    DELTA = 2;
+    DELTA = 1;
 
-    // CUMULATIVE is a metric whose values are the aggregation of
-    // successively made measurements from a fixed start time until the last
-    // reported measurement. This means that current values of a CUMULATIVE
-    // metric depend on all previous measurements since the start time.
-    // Because of this, the sender is required to retain this state in some
-    // form. If this state is lost or invalidated, the CUMULATIVE metric
+    // CUMULATIVE is an AggregationTemporality for a metic aggregator which
+    // reports changes since a fixed start time. This means that current values
+    // of a CUMULATIVE metric depend on all previous measurements since the
+    // start time. Because of this, the sender is required to retain this state
+    // in some form. If this state is lost or invalidated, the CUMULATIVE metric
     // values MUST be reset and a new fixed start time following the last
     // reported measurement time sent MUST be used.
     //
@@ -330,7 +311,12 @@ message MetricDescriptor {
     //   12. The 1 second collection cycle ends. A metric is exported for the
     //      number of requests received over the interval of time t_1 to
     //      t_0+1 with a value of 1.
-    CUMULATIVE = 3;
+    //
+    // Note: Even though, when reporting changes since last report time, using 
+    // CUMULATIVE is valid, it is not recommended. This may cause problems for
+    // systems that do not use start_time to determine when the aggregation
+    // value was reset (e.g. Prometheus).
+    CUMULATIVE = 2;
   }
 }
 
