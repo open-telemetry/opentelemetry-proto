@@ -130,13 +130,14 @@ message MetricDescriptor {
   // double for Histogram and Summary. There are good arguments on both sides of
   // this.
   enum MeasurementValueType {
-    // INVALID_MEASUREMENT_VALUE_TYPE is the default MeasurementValueType, it MUST not be
+    // UNSPECIFIED is the default MeasurementValueType, it MUST not be
     // used.
-    INVALID_MEASUREMENT_VALUE_TYPE = 0;
-    // The scalar value type is an int64.
-    INT64 = 1;
-    // The scalar value type is a floating point number.
-    DOUBLE = 2;
+    MEASUREMENT_VALUE_TYPE_UNSPECIFIED = 0;
+    // INT64 is the MeasurementValueType used when the measurements are int64.
+    MEASUREMENT_VALUE_TYPE_INT64 = 1;
+    // DOUBLE is the MeasurementValueType used when the measurements are
+    // floating point numbers.
+    MEASUREMENT_VALUE_TYPE_DOUBLE = 2;
   }
 
   // TODO: Decide if support for RawMeasurements (measurements recorded using
@@ -251,9 +252,8 @@ message MetricDescriptor {
   // values. It describes how those values relate to the time interval over
   // which they are aggregated.
   enum AggregationTemporality {
-    // INVALID_AGGREGATION_TEMPORALITY is the default AggregationTemporality, it MUST
-    // not be used.
-    INVALID_AGGREGATION_TEMPORALITY = 0;
+    // UNSPECIFIED is the default AggregationTemporality, it MUST not be used.
+    AGGREGATION_TEMPORALITY_UNSPECIFIED = 0;
 
     // DELTA is an AggregationTemporality for a metric aggregator which reports
     // changes since last report time. Successive metrics contain aggregation of
@@ -279,7 +279,7 @@ message MetricDescriptor {
     //   8. The 1 second collection cycle ends. A metric is exported for the
     //      number of requests received over the interval of time t_0+1 to
     //      t_0+2 with a value of 2.
-    DELTA = 1;
+    AGGREGATION_TEMPORALITY_DELTA = 1;
 
     // CUMULATIVE is an AggregationTemporality for a metic aggregator which
     // reports changes since a fixed start time. This means that current values
@@ -316,7 +316,7 @@ message MetricDescriptor {
     // CUMULATIVE is valid, it is not recommended. This may cause problems for
     // systems that do not use start_time to determine when the aggregation
     // value was reset (e.g. Prometheus).
-    CUMULATIVE = 2;
+    AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
   }
 }
 
