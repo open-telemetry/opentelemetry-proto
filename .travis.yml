@@ -2,8 +2,5 @@ sudo: required
 dist: xenial
 language: go
 
-install:
-  -  ./install-proto.sh
-
 script:
   - make ci
