@@ -46,37 +46,38 @@ message InstrumentationLibraryLogs {
 
 // Possible values for LogRecord.SeverityNumber.
 enum SeverityNumber {
-    UNDEFINED_SEVERITY_NUMBER = 0;
-    TRACE  = 1;
-    TRACE2 = 2;
-    TRACE3 = 3;
-    TRACE4 = 4;
-    DEBUG  = 5;
-    DEBUG2 = 6;
-    DEBUG3 = 7;
-    DEBUG4 = 8;
-    INFO   = 9;
-    INFO2  = 10;
-    INFO3  = 11;
-    INFO4  = 12;
-    WARN   = 13;
-    WARN2  = 14;
-    WARN3  = 15;
-    WARN4  = 16;
-    ERROR  = 17;
-    ERROR2 = 18;
-    ERROR3 = 19;
-    ERROR4 = 20;
-    FATAL  = 21;
-    FATAL2 = 22;
-    FATAL3 = 23;
-    FATAL4 = 24;
+    // UNSPECIFIED is the default SeverityNumber, it MUST not be used.
+    SEVERITY_NUMBER_UNSPECIFIED = 0;
+    SEVERITY_NUMBER_TRACE  = 1;
+    SEVERITY_NUMBER_TRACE2 = 2;
+    SEVERITY_NUMBER_TRACE3 = 3;
+    SEVERITY_NUMBER_TRACE4 = 4;
+    SEVERITY_NUMBER_DEBUG  = 5;
+    SEVERITY_NUMBER_DEBUG2 = 6;
+    SEVERITY_NUMBER_DEBUG3 = 7;
+    SEVERITY_NUMBER_DEBUG4 = 8;
+    SEVERITY_NUMBER_INFO   = 9;
+    SEVERITY_NUMBER_INFO2  = 10;
+    SEVERITY_NUMBER_INFO3  = 11;
+    SEVERITY_NUMBER_INFO4  = 12;
+    SEVERITY_NUMBER_WARN   = 13;
+    SEVERITY_NUMBER_WARN2  = 14;
+    SEVERITY_NUMBER_WARN3  = 15;
+    SEVERITY_NUMBER_WARN4  = 16;
+    SEVERITY_NUMBER_ERROR  = 17;
+    SEVERITY_NUMBER_ERROR2 = 18;
+    SEVERITY_NUMBER_ERROR3 = 19;
+    SEVERITY_NUMBER_ERROR4 = 20;
+    SEVERITY_NUMBER_FATAL  = 21;
+    SEVERITY_NUMBER_FATAL2 = 22;
+    SEVERITY_NUMBER_FATAL3 = 23;
+    SEVERITY_NUMBER_FATAL4 = 24;
 }
 
 // Masks for LogRecord.flags field.
 enum LogRecordFlags {
-    UNDEFINED_LOG_RECORD_FLAG = 0;
-    TRACE_FLAGS_MASK = 0x000000FF;
+    LOG_RECORD_FLAG_UNSPECIFIED = 0;
+    LOG_RECORD_FLAG_TRACE_FLAGS_MASK = 0x000000FF;
 }
 
 // A log record according to OpenTelemetry Log Data Model:

@@ -107,25 +107,25 @@ message Span {
 
     // Indicates that the span represents an internal operation within an application,
     // as opposed to an operations happening at the boundaries. Default value.
-    INTERNAL = 1;
+    SPAN_KIND_INTERNAL = 1;
 
     // Indicates that the span covers server-side handling of an RPC or other
     // remote network request.
-    SERVER = 2;
+    SPAN_KIND_SERVER = 2;
 
     // Indicates that the span describes a request to some remote service.
-    CLIENT = 3;
+    SPAN_KIND_CLIENT = 3;
 
     // Indicates that the span describes a producer sending a message to a broker.
     // Unlike CLIENT and SERVER, there is often no direct critical path latency relationship
     // between producer and consumer spans. A PRODUCER span ends when the message was accepted
     // by the broker while the logical processing of the message might span a much longer time.
-    PRODUCER = 4;
+    SPAN_KIND_PRODUCER = 4;
 
     // Indicates that the span describes consumer receiving a message from a broker.
     // Like the PRODUCER kind, there is often no direct critical path latency relationship
     // between producer and consumer spans.
-    CONSUMER = 5;
+    SPAN_KIND_CONSUMER = 5;
   }
 
   // Distinguishes between spans generated in a particular context. For example,
@@ -233,23 +233,23 @@ message Status {
   // StatusCode mirrors the codes defined at
   // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#statuscanonicalcode
   enum StatusCode {
-    Ok                 = 0;
-    Cancelled          = 1;
-    UnknownError       = 2;
-    InvalidArgument    = 3;
-    DeadlineExceeded   = 4;
-    NotFound           = 5;
-    AlreadyExists      = 6;
-    PermissionDenied   = 7;
-    ResourceExhausted  = 8;
-    FailedPrecondition = 9;
-    Aborted            = 10;
-    OutOfRange         = 11;
-    Unimplemented      = 12;
-    InternalError      = 13;
-    Unavailable        = 14;
-    DataLoss           = 15;
-    Unauthenticated    = 16;
+    STATUS_CODE_OK                  = 0;
+    STATUS_CODE_CANCELLED           = 1;
+    STATUS_CODE_UNKNOWN_ERROR       = 2;
+    STATUS_CODE_INVALID_ARGUMENT    = 3;
+    STATUS_CODE_DEADLINE_EXCEEDED   = 4;
+    STATUS_CODE_NOT_FOUND           = 5;
+    STATUS_CODE_ALREADY_EXISTS      = 6;
+    STATUS_CODE_PERMISSION_DENIED   = 7;
+    STATUS_CODE_RESOURCE_EXHAUSTED  = 8;
+    STATUS_CODE_FAILED_PRECONDITION = 9;
+    STATUS_CODE_ABORTED             = 10;
+    STATUS_CODE_OUT_OF_RANGE        = 11;
+    STATUS_CODE_UNIMPLEMENTED       = 12;
+    STATUS_CODE_INTERNAL_ERROR      = 13;
+    STATUS_CODE_UNAVAILABLE         = 14;
+    STATUS_CODE_DATA_LOSS           = 15;
+    STATUS_CODE_UNAUTHENTICATED     = 16;
   };
 
   // The status code. This is optional field. It is safe to assume 0 (OK)
