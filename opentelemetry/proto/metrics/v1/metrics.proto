@@ -44,6 +44,33 @@ message InstrumentationLibraryMetrics {
   repeated Metric metrics = 2;
 }
 
+// A representation of an exemplar, which is a sample input measurement.
+// Exemplars also hold information about the environment when the measurement was recorded,
+// for example the span and trace ID of the active span when the exemplar was recorded.
+message Exemplar {
+  // The set of labels that were dropped by the aggregator, but recorded
+  // alongside the original measurement. Only labels that were dropped by the aggregator should be included
+  repeated opentelemetry.proto.common.v1.StringKeyValue dropped_labels = 1;
+
+  // time_unix_nano is the exact time when this exemplar was recorded
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  fixed64 time_unix_nano = 2;
+
+  // Numerical value of the measurement that was recorded. Only one of these
+  // two fields is used for the data, based on MetricDescriptor.measurement_value_type
+  double double_value = 3;
+  int64 int64_value = 4;
+
+  // (Optional) Span ID of the current trace.
+  // span_id may be missing if the measurement is not recorded inside a trace or if the trace is not sampled.
+  bytes span_id = 5;
+
+  // (Optional) Trace ID of the current trace.
+  // trace_id may be missing if the measurement is not recorded inside a trace or if the trace is not sampled.
+  bytes trace_id = 6;
+}
+
 // Defines a Metric which has one or more timeseries.
 //
 // The data model and relation between entities is shown in the
@@ -348,6 +375,10 @@ message Int64DataPoint {
 
   // value itself.
   int64 value = 4;
+
+  // (Optional) List of exemplars collected from
+  // measurements that were used to form the data point
+  repeated Exemplar exemplars = 5;
 }
 
 // DoubleDataPoint is a single data point in a timeseries that describes the time-varying
@@ -378,6 +409,10 @@ message DoubleDataPoint {
 
   // value itself.
   double value = 4;
+
+  // (Optional) List of exemplars collected from
+  // measurements that were used to form the data point
+  repeated Exemplar exemplars = 5;
 }
 
 // HistogramDataPoint is a single data point in a timeseries that describes the time-varying
@@ -448,6 +483,10 @@ message HistogramDataPoint {
   // If we decide to also support (a, b] intervals we should add support for these by defining
   // a boolean value which decides what type of intervals to use.
   repeated double explicit_bounds = 7;
+
+  // (Optional) List of exemplars collected from
+  // measurements that were used to form the data point
+  repeated Exemplar exemplars = 8;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the time-varying
@@ -504,4 +543,8 @@ message SummaryDataPoint {
   // A list of values at different quantiles of the distribution calculated
   // from the current snapshot. The quantiles must be strictly increasing.
   repeated ValueAtQuantile quantile_values = 6;
+
+  // (Optional) List of exemplars collected from
+  // measurements that were used to form the data point
+  repeated Exemplar exemplars = 7;
 }
