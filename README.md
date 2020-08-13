@@ -13,6 +13,7 @@ Component                | Maturity |
 collector/metrics/*      | Alpha    |
 collector/trace/*        | Stable   |
 common/*                 | Stable   |
+experimental/*           | Pre-Alpha|
 metrics/*                | Alpha    |
 resource/*               | Stable   |
 trace/trace.proto        | Stable   |
