@@ -14,14 +14,14 @@
 
 syntax = "proto3";
 
-package opentelemetry.proto.experimental.metrics.configservice;
+package opentelemetry.proto.metrics.experimental;
 
 import "opentelemetry/proto/resource/v1/resource.proto";
 
 option java_multiple_files = true;
-option java_package = "io.opentelemetry.proto.experimental.metrics.configservice";
+option java_package = "io.opentelemetry.proto.metrics.experimental";
 option java_outer_classname = "MetricConfigServiceProto";
-option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/experimental/metrics/configservice";
+option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metrics/experimental";
 
 // MetricConfig is a service that enables updating metric schedules, trace
 // parameters, and other configurations on the SDK without having to restart the
