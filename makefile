@@ -3,7 +3,7 @@ GENDIR := gen
 GOPATH_GENDIR := $(GOPATH_DIR)/$(GENDIR)
 
 # Find all .proto files.
-PROTO_FILES := $(wildcard opentelemetry/proto/*/v1/*.proto opentelemetry/proto/collector/*/v1/*.proto opentelemetry/proto/experimental/*/*.proto)
+PROTO_FILES := $(wildcard opentelemetry/proto/*/v1/*.proto opentelemetry/proto/collector/*/v1/*.proto opentelemetry/proto/experimental/metrics/*/*.proto)
 
 # Function to execute a command. Note the empty line before endef to make sure each command
 # gets executed separately instead of concatenated with previous one.
