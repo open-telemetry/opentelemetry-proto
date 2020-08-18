@@ -44,33 +44,6 @@ message InstrumentationLibraryMetrics {
   repeated Metric metrics = 2;
 }
 
-// A representation of an exemplar, which is a sample input measurement.
-// Exemplars also hold information about the environment when the measurement was recorded,
-// for example the span and trace ID of the active span when the exemplar was recorded.
-message Exemplar {
-  // The set of labels that were dropped by the aggregator, but recorded
-  // alongside the original measurement. Only labels that were dropped by the aggregator should be included
-  repeated opentelemetry.proto.common.v1.StringKeyValue dropped_labels = 1;
-
-  // time_unix_nano is the exact time when this exemplar was recorded
-  //
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  fixed64 time_unix_nano = 2;
-
-  // Numerical value of the measurement that was recorded. Only one of these
-  // two fields is used for the data, based on MetricDescriptor.measurement_value_type
-  double double_value = 3;
-  int64 int64_value = 4;
-
-  // (Optional) Span ID of the current trace.
-  // span_id may be missing if the measurement is not recorded inside a trace or if the trace is not sampled.
-  bytes span_id = 5;
-
-  // (Optional) Trace ID of the current trace.
-  // trace_id may be missing if the measurement is not recorded inside a trace or if the trace is not sampled.
-  bytes trace_id = 6;
-}
-
 // Defines a Metric which has one or more timeseries.
 //
 // The data model and relation between entities is shown in the
@@ -78,69 +51,58 @@ message Exemplar {
 // one of the specific data point value types, and "points" is the term used
 // to refer to any one of the lists of points contained in the Metric.
 //
-// - Metric is composed of a MetricDescriptor and a list of data points.
-// - MetricDescriptor contains a name, description, unit, and type.
-// - Points is a list of DataPoints (shown vertically).
+// - Metric is composed of a metadata and data.
+// - Metadata part contains a name, description, unit.
+// - Data is one of the possible types (Gauge, Sum, Histogram, etc.).
 // - DataPoint contains timestamps, labels, and one of the possible value type
 //   fields.
 //
 //     Metric
-//  +----------+         +------------------------+
-//  |descriptor|-------->| MetricDescriptor       |
-//  |          |         | name                   |
-//  |          |         | description            |
-//  |          |         | unit                   |
-//  |    points|--+      | type                   |
-//  +----------+  |      +------------------------+
-//                |
-//                |
-//                |      +---------------------------+
-//                |      |DataPoint 1                |
-//                v      |+------+------+   +------+ |
-//             +-----+   ||label |label |...|label | |
-//             |  1  |-->||value1|value2|...|valueN| |
-//             +-----+   |+------+------+   +------+ |
-//             |  .  |   |+-----+                    |
-//             |  .  |   ||value|                    |
-//             |  .  |   |+-----+                    |
-//             |  .  |   +---------------------------+
-//             |  .  |                   .
-//             |  .  |                   .
-//             |  .  |                   .
-//             |  .  |   +---------------------------+
-//             |  .  |   |DataPoint M                |
-//             +-----+   |+------+------+   +------+ |
-//             |  M  |-->||label |label |...|label | |
-//             +-----+   ||value1|value2|...|valueN| |
-//                       |+------+------+   +------+ |
-//                       |+-----+                    |
-//                       ||value|                    |
-//                       |+-----+                    |
-//                       +---------------------------+
+//  +------------+
+//  |name        |
+//  |description |
+//  |unit        |     +---------------------------+
+//  |data        |---> |Gauge, Sum, Histogram, ... |
+//  +------------+     +---------------------------+ 
+//
+//    Data [One of Gauge, Sum, Histogram, ...]
+//  +-----------+
+//  |...        |  // Metadata about the Data.
+//  |points     |--+
+//  +-----------+  |
+//                 |      +---------------------------+
+//                 |      |DataPoint 1                |
+//                 v      |+------+------+   +------+ |
+//              +-----+   ||label |label |...|label | |
+//              |  1  |-->||value1|value2|...|valueN| |
+//              +-----+   |+------+------+   +------+ |
+//              |  .  |   |+-----+                    |
+//              |  .  |   ||value|                    |
+//              |  .  |   |+-----+                    |
+//              |  .  |   +---------------------------+
+//              |  .  |                   .
+//              |  .  |                   .
+//              |  .  |                   .
+//              |  .  |   +---------------------------+
+//              |  .  |   |DataPoint M                |
+//              +-----+   |+------+------+   +------+ |
+//              |  M  |-->||label |label |...|label | |
+//              +-----+   ||value1|value2|...|valueN| |
+//                        |+------+------+   +------+ |
+//                        |+-----+                    |
+//                        ||value|                    |
+//                        |+-----+                    |
+//                        +---------------------------+
 //
 // All DataPoint types have three common fields:
 // - Labels zero or more key-value pairs associated with the data point.
-// - StartTimeUnixNano MUST be set to the start of the interval when the
-//   descriptor's type includes an AggregationTemporality. This field is not set
-//   otherwise.
+// - StartTimeUnixNano MUST be set to the start of the interval when the data's
+//   type includes an AggregationTemporality. This field is not set otherwise.
 // - TimeUnixNano MUST be set to:
 //   - the moment when an aggregation is reported (independent of the
 //     aggregation temporality).
 //   - the instantaneous time of the event.
 message Metric {
-  // metric_descriptor describes the Metric.
-  MetricDescriptor metric_descriptor = 1;
-
-  // Data is a list of one or more DataPoints for a single metric. Only one of the
-  // following fields is used for the data, depending on the type of the metric defined
-  // by MetricDescriptor.type field.
-  repeated Int64DataPoint int64_data_points = 2;
-  repeated DoubleDataPoint double_data_points = 3;
-  repeated HistogramDataPoint histogram_data_points = 4;
-}
-
-// Defines a metric type and its schema.
-message MetricDescriptor {
   // name of the metric, including its DNS name prefix. It must be unique.
   string name = 1;
 
@@ -151,82 +113,12 @@ message MetricDescriptor {
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // MeasurementValueType determines the value type for a measurement.
-  enum MeasurementValueType {
-    // UNSPECIFIED is the default MeasurementValueType, it MUST not be
-    // used.
-    MEASUREMENT_VALUE_TYPE_UNSPECIFIED = 0;
-    // INT64 is the MeasurementValueType used when the measurements are int64.
-    MEASUREMENT_VALUE_TYPE_INT64 = 1;
-    // DOUBLE is the MeasurementValueType used when the measurements are
-    // floating point numbers.
-    MEASUREMENT_VALUE_TYPE_DOUBLE = 2;
-  }
-
   // TODO: Decide if support for RawMeasurements (measurements recorded using
   // the synchronous instruments) is necessary. It can be used to delegate the
   // aggregation from the application to the agent/collector. See
   // https://github.com/open-telemetry/opentelemetry-specification/issues/617
 
-  // Gauge represents the type of a scalar metric that always exports the
-  // "current value" for every data point. It should be used for an "unknown"
-  // aggregation.
-  // 
-  // A Gauge does not support different aggregation temporalities. Given the
-  // aggregation is unknown, points cannot be combined using the same
-  // aggregation, regardless of aggregation temporalities. Therefore,
-  // AggregationTemporality is not included. Consequently, this also means
-  // "StartTimeUnixNano" is ignored for all data points.
-  //
-  // A Metric of this Type MUST store its values as Int64DataPoint or
-  // DoubleDataPoint.
-  message Gauge {
-    // It describes the value type of the measurement used to build this
-    // aggregation.
-    //
-    // Determines if the points are Int64DataPoint or DoubleDataPoint, as well
-    // as the value type of the exemplars.
-    MeasurementValueType measurement_value_type = 1;
-  }
-
-  // Sum represents the type of a numeric scalar metric that is calculated as a
-  // sum of all reported measurements over a time interval.
-  //
-  // A Metric of this Type MUST store its values as Int64DataPoint or
-  // DoubleDataPoint.
-  message Sum {
-    // It describes the value type of the measurement used to build this
-    // aggregation.
-    //
-    // Determines if the points are Int64DataPoint or DoubleDataPoint, as well
-    // as the value type of the exemplars.
-    MeasurementValueType measurement_value_type = 1;
-
-    // aggregation_temporality describes if the aggregator reports delta changes
-    // since last report time, or cumulative changes since a fixed start time.
-    AggregationTemporality aggregation_temporality = 2;
-
-    // If "true" means that the sum is monotonic.
-    bool is_monotonic = 3;
-  }
-
-  // Represents the type of a metric that is calculated by aggregating as a
-  // Histogram of all reported measurements over a time interval.
-  //
-  // A Metric of this Type MUST store its values as HistogramDataPoint.
-  message Histogram {
-    // It describes the value type of the measurement used to build this
-    // aggregation.
-    //
-    // Determines the value type of the exemplars.
-    MeasurementValueType measurement_value_type = 1;
-
-    // aggregation_temporality describes if the aggregator reports delta changes
-    // since last report time, or cumulative changes since a fixed start time.
-    AggregationTemporality aggregation_temporality = 2;
-  }
-
-  // Type determines the aggregation type (if any) of the metric, what is the
+  // Data determines the aggregation type (if any) of the metric, what is the
   // reported value type for the data points, as well as the relatationship to
   // the time interval over which they are reported.
   //
@@ -243,84 +135,159 @@ message MetricDescriptor {
   //   SumObserver        Sum(aggregation_temporality=cumulative;is_monotonic=true)
   //   UpDownSumObserver  Sum(aggregation_temporality=cumulative;is_monotonic=false)
   //   ValueObserver      Gauge()
-  oneof type {
-    // TODO: Determine if encoding all possible values in a uint64 bitset
-    // improves performance significantly and propose that if that is the case.
+  oneof data {
     Gauge gauge = 4;
     Sum sum = 5;
-    Histogram histogram = 6;
+    Histogram histogram = 6;  
   }
+}
 
-  // AggregationTemporality defines how a metric aggregator reports aggregated
-  // values. It describes how those values relate to the time interval over
-  // which they are aggregated.
-  enum AggregationTemporality {
-    // UNSPECIFIED is the default AggregationTemporality, it MUST not be used.
-    AGGREGATION_TEMPORALITY_UNSPECIFIED = 0;
+// Gauge represents the type of a scalar metric that always exports the
+// "current value" for every data point. It should be used for an "unknown"
+// aggregation.
+// 
+// A Gauge does not support different aggregation temporalities. Given the
+// aggregation is unknown, points cannot be combined using the same
+// aggregation, regardless of aggregation temporalities. Therefore,
+// AggregationTemporality is not included. Consequently, this also means
+// "StartTimeUnixNano" is ignored for all data points.
+//
+// A Metric of this Type MUST store its values as Int64DataPoint or
+// DoubleDataPoint.
+message Gauge {
+  repeated Int64DataPoint int64_data_points = 1;
+  repeated DoubleDataPoint double_data_points = 2;
 
-    // DELTA is an AggregationTemporality for a metric aggregator which reports
-    // changes since last report time. Successive metrics contain aggregation of
-    // values from continuous and non-overlapping intervals.
-    //
-    // The values for a DELTA metric are based only on the time interval
-    // associated with one measurement cycle. There is no dependency on
-    // previous measurements like is the case for CUMULATIVE metrics.
-    //
-    // For example, consider a system measuring the number of requests that
-    // it receives and reports the sum of these requests every second as a
-    // DELTA metric:
-    //
-    //   1. The system starts receiving at time=t_0.
-    //   2. A request is received, the system measures 1 request.
-    //   3. A request is received, the system measures 1 request.
-    //   4. A request is received, the system measures 1 request.
-    //   5. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_0 to
-    //      t_0+1 with a value of 3.
-    //   6. A request is received, the system measures 1 request.
-    //   7. A request is received, the system measures 1 request.
-    //   8. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_0+1 to
-    //      t_0+2 with a value of 2.
-    AGGREGATION_TEMPORALITY_DELTA = 1;
+  // It describes the value type of the measurement used to build this
+  // aggregation.
+  //
+  // Determines if the points are Int64DataPoint or DoubleDataPoint, as well
+  // as the value type of the exemplars.
+  MeasurementValueType measurement_value_type = 3;
+}
 
-    // CUMULATIVE is an AggregationTemporality for a metic aggregator which
-    // reports changes since a fixed start time. This means that current values
-    // of a CUMULATIVE metric depend on all previous measurements since the
-    // start time. Because of this, the sender is required to retain this state
-    // in some form. If this state is lost or invalidated, the CUMULATIVE metric
-    // values MUST be reset and a new fixed start time following the last
-    // reported measurement time sent MUST be used.
-    //
-    // For example, consider a system measuring the number of requests that
-    // it receives and reports the sum of these requests every second as a
-    // CUMULATIVE metric:
-    //
-    //   1. The system starts receiving at time=t_0.
-    //   2. A request is received, the system measures 1 request.
-    //   3. A request is received, the system measures 1 request.
-    //   4. A request is received, the system measures 1 request.
-    //   5. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_0 to
-    //      t_0+1 with a value of 3.
-    //   6. A request is received, the system measures 1 request.
-    //   7. A request is received, the system measures 1 request.
-    //   8. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_0 to
-    //      t_0+2 with a value of 5.
-    //   9. The system experiences a fault and loses state.
-    //   10. The system recovers and resumes receiving at time=t_1.
-    //   11. A request is received, the system measures 1 request.
-    //   12. The 1 second collection cycle ends. A metric is exported for the
-    //      number of requests received over the interval of time t_1 to
-    //      t_0+1 with a value of 1.
-    //
-    // Note: Even though, when reporting changes since last report time, using 
-    // CUMULATIVE is valid, it is not recommended. This may cause problems for
-    // systems that do not use start_time to determine when the aggregation
-    // value was reset (e.g. Prometheus).
-    AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
-  }
+// Sum represents the type of a numeric scalar metric that is calculated as a
+// sum of all reported measurements over a time interval.
+//
+// A Metric of this Type MUST store its values as Int64DataPoint or
+// DoubleDataPoint.
+message Sum {
+  repeated Int64DataPoint int64_data_points = 1;
+  repeated DoubleDataPoint double_data_points = 2;
+
+  // It describes the value type of the measurement used to build this
+  // aggregation.
+  //
+  // Determines if the points are Int64DataPoint or DoubleDataPoint, as well
+  // as the value type of the exemplars.
+  MeasurementValueType measurement_value_type = 3;
+  
+  // aggregation_temporality describes if the aggregator reports delta changes
+  // since last report time, or cumulative changes since a fixed start time.
+  AggregationTemporality aggregation_temporality = 4;
+
+  // If "true" means that the sum is monotonic.
+  bool is_monotonic = 5;
+}
+
+// Represents the type of a metric that is calculated by aggregating as a
+// Histogram of all reported measurements over a time interval.
+//
+// A Metric of this Type MUST store its values as HistogramDataPoint.
+message Histogram {
+  repeated HistogramDataPoint histogram_data_points = 1;
+
+  // It describes the value type of the measurement used to build this
+  // aggregation.
+  //
+  // Determines the value type of the exemplars.
+  MeasurementValueType measurement_value_type = 2;
+
+  // aggregation_temporality describes if the aggregator reports delta changes
+  // since last report time, or cumulative changes since a fixed start time.
+  AggregationTemporality aggregation_temporality = 3;
+}
+
+// MeasurementValueType determines the value type for a measurement.
+enum MeasurementValueType {
+  // UNSPECIFIED is the default MeasurementValueType, it MUST not be used.
+  MEASUREMENT_VALUE_TYPE_UNSPECIFIED = 0;
+  // INT64 is the MeasurementValueType used when the measurements are int64.
+  MEASUREMENT_VALUE_TYPE_INT64 = 1;
+  // DOUBLE is the MeasurementValueType used when the measurements are
+  // floating point numbers.
+  MEASUREMENT_VALUE_TYPE_DOUBLE = 2;
+}
+
+// AggregationTemporality defines how a metric aggregator reports aggregated
+// values. It describes how those values relate to the time interval over
+// which they are aggregated.
+enum AggregationTemporality {
+  // UNSPECIFIED is the default AggregationTemporality, it MUST not be used.
+  AGGREGATION_TEMPORALITY_UNSPECIFIED = 0;
+
+  // DELTA is an AggregationTemporality for a metric aggregator which reports
+  // changes since last report time. Successive metrics contain aggregation of
+  // values from continuous and non-overlapping intervals.
+  //
+  // The values for a DELTA metric are based only on the time interval
+  // associated with one measurement cycle. There is no dependency on
+  // previous measurements like is the case for CUMULATIVE metrics.
+  //
+  // For example, consider a system measuring the number of requests that
+  // it receives and reports the sum of these requests every second as a
+  // DELTA metric:
+  //
+  //   1. The system starts receiving at time=t_0.
+  //   2. A request is received, the system measures 1 request.
+  //   3. A request is received, the system measures 1 request.
+  //   4. A request is received, the system measures 1 request.
+  //   5. The 1 second collection cycle ends. A metric is exported for the
+  //      number of requests received over the interval of time t_0 to
+  //      t_0+1 with a value of 3.
+  //   6. A request is received, the system measures 1 request.
+  //   7. A request is received, the system measures 1 request.
+  //   8. The 1 second collection cycle ends. A metric is exported for the
+  //      number of requests received over the interval of time t_0+1 to
+  //      t_0+2 with a value of 2.
+  AGGREGATION_TEMPORALITY_DELTA = 1;
+
+  // CUMULATIVE is an AggregationTemporality for a metic aggregator which
+  // reports changes since a fixed start time. This means that current values
+  // of a CUMULATIVE metric depend on all previous measurements since the
+  // start time. Because of this, the sender is required to retain this state
+  // in some form. If this state is lost or invalidated, the CUMULATIVE metric
+  // values MUST be reset and a new fixed start time following the last
+  // reported measurement time sent MUST be used.
+  //
+  // For example, consider a system measuring the number of requests that
+  // it receives and reports the sum of these requests every second as a
+  // CUMULATIVE metric:
+  //
+  //   1. The system starts receiving at time=t_0.
+  //   2. A request is received, the system measures 1 request.
+  //   3. A request is received, the system measures 1 request.
+  //   4. A request is received, the system measures 1 request.
+  //   5. The 1 second collection cycle ends. A metric is exported for the
+  //      number of requests received over the interval of time t_0 to
+  //      t_0+1 with a value of 3.
+  //   6. A request is received, the system measures 1 request.
+  //   7. A request is received, the system measures 1 request.
+  //   8. The 1 second collection cycle ends. A metric is exported for the
+  //      number of requests received over the interval of time t_0 to
+  //      t_0+2 with a value of 5.
+  //   9. The system experiences a fault and loses state.
+  //   10. The system recovers and resumes receiving at time=t_1.
+  //   11. A request is received, the system measures 1 request.
+  //   12. The 1 second collection cycle ends. A metric is exported for the
+  //      number of requests received over the interval of time t_1 to
+  //      t_0+1 with a value of 1.
+  //
+  // Note: Even though, when reporting changes since last report time, using 
+  // CUMULATIVE is valid, it is not recommended. This may cause problems for
+  // systems that do not use start_time to determine when the aggregation
+  // value was reset (e.g. Prometheus).
+  AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
 // Int64DataPoint is a single data point in a timeseries that describes the time-varying
@@ -330,8 +297,8 @@ message Int64DataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // start_time_unix_nano is the last time when the aggregation value was reset
-  // to "zero". For some metric types this is ignored, see MetricsDescriptor
-  // types for more details.
+  // to "zero". For some metric types this is ignored, see data types for more
+  // details.
   //
   // The aggregation value is over the time interval (start_time_unix_nano,
   // time_unix_nano].
@@ -364,8 +331,8 @@ message DoubleDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // start_time_unix_nano is the last time when the aggregation value was reset
-  // to "zero". For some metric types this is ignored, see MetricsDescriptor
-  // types for more details.
+  // to "zero". For some metric types this is ignored, see data types for more
+  // details.
   //
   // The aggregation value is over the time interval (start_time_unix_nano,
   // time_unix_nano].
@@ -399,8 +366,8 @@ message HistogramDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // start_time_unix_nano is the last time when the aggregation value was reset
-  // to "zero". For some metric types this is ignored, see MetricsDescriptor
-  // types for more details.
+  // to "zero". For some metric types this is ignored, see data types for more
+  // details.
   //
   // The aggregation value is over the time interval (start_time_unix_nano,
   // time_unix_nano].
@@ -463,4 +430,35 @@ message HistogramDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 8;
+}
+
+// A representation of an exemplar, which is a sample input measurement.
+// Exemplars also hold information about the environment when the measurement
+// was recorded, for example the span and trace ID of the active span when the
+// exemplar was recorded.
+message Exemplar {
+  // The set of labels that were dropped by the aggregator, but recorded
+  // alongside the original measurement. Only labels that were dropped by the
+  // aggregator should be included
+  repeated opentelemetry.proto.common.v1.StringKeyValue dropped_labels = 1;
+
+  // time_unix_nano is the exact time when this exemplar was recorded
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  fixed64 time_unix_nano = 2;
+
+  // Numerical value of the measurement that was recorded. Only one of these
+  // two fields is used for the data, based on MeasurementValueType.
+  double double_value = 3;
+  int64 int64_value = 4;
+
+  // (Optional) Span ID of the exemplar trace.
+  // span_id may be missing if the measurement is not recorded inside a trace
+  // or if the trace is not sampled.
+  bytes span_id = 5;
+
+  // (Optional) Trace ID of the exemplar trace.
+  // trace_id may be missing if the measurement is not recorded inside a trace
+  // or if the trace is not sampled.
+  bytes trace_id = 6;
 }
