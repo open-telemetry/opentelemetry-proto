@@ -137,7 +137,6 @@ message Metric {
   repeated Int64DataPoint int64_data_points = 2;
   repeated DoubleDataPoint double_data_points = 3;
   repeated HistogramDataPoint histogram_data_points = 4;
-  repeated SummaryDataPoint summary_data_points = 5;
 }
 
 // Defines a metric type and its schema.
@@ -154,8 +153,7 @@ message MetricDescriptor {
 
   // MeasurementValueType determines the value type for a measurement.
   // TODO: There is an open question about whether this should control int64 vs
-  // double for Histogram and Summary. There are good arguments on both sides of
-  // this.
+  // double for Histogram. There are good arguments on both sides of this.
   enum MeasurementValueType {
     // UNSPECIFIED is the default MeasurementValueType, it MUST not be
     // used.
@@ -196,9 +194,6 @@ message MetricDescriptor {
   // Sum represents the type of a numeric scalar metric that is calculated as a
   // sum of all reported measurements over a time interval.
   //
-  // TODO: Decide if this should support only MonotonicSum
-  // https://github.com/open-telemetry/opentelemetry-specification/issues/725.
-  //
   // A Metric of this Type MUST store its values as Int64DataPoint or
   // DoubleDataPoint.
   message Sum {
@@ -233,22 +228,6 @@ message MetricDescriptor {
     AggregationTemporality aggregation_temporality = 2;
   }
 
-  // Represents the type of a metric that is calculated by computing a summary
-  // of all reported measurements over a time interval.
-  //
-  // A Metric of this Type MUST store its values as SummaryDataPoint.
-  message Summary {
-    // It describes the value type of the measurement used to build this
-    // aggregation.
-    //
-    // Determines the value type of the exemplars.
-    MeasurementValueType measurement_value_type = 1;
-
-    // aggregation_temporality describes if the aggregator reports delta changes
-    // since last report time, or cumulative changes since a fixed start time.
-    AggregationTemporality aggregation_temporality = 2;
-  }
-
   // Type determines the aggregation type (if any) of the metric, what is the
   // reported value type for the data points, as well as the relatationship to
   // the time interval over which they are reported.
@@ -262,7 +241,7 @@ message MetricDescriptor {
   //   ----------------------------------------------
   //   Counter            Sum(aggregation_temporality=delta;is_monotonic=true)
   //   UpDownCounter      Sum(aggregation_temporality=delta;is_monotonic=false)
-  //   ValueRecorder      Summary(aggregation_temporality=delta)
+  //   ValueRecorder      TBD
   //   SumObserver        Sum(aggregation_temporality=cumulative;is_monotonic=true)
   //   UpDownSumObserver  Sum(aggregation_temporality=cumulative;is_monotonic=false)
   //   ValueObserver      Gauge()
@@ -272,7 +251,6 @@ message MetricDescriptor {
     Gauge gauge = 4;
     Sum sum = 5;
     Histogram histogram = 6;
-    Summary summary = 7;
   }
 
   // AggregationTemporality defines how a metric aggregator reports aggregated
@@ -487,64 +465,4 @@ message HistogramDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 8;
-}
-
-// SummaryDataPoint is a single data point in a timeseries that describes the time-varying
-// values of a Summary metric.
-message SummaryDataPoint {
-  // The set of labels that uniquely identify this timeseries.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
-
-  // start_time_unix_nano is the last time when the aggregation value was reset
-  // to "zero". For some metric types this is ignored, see MetricsDescriptor
-  // types for more details.
-  //
-  // The aggregation value is over the time interval (start_time_unix_nano,
-  // time_unix_nano].
-  // 
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
-  // 1970.
-  //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the
-  // timestamp may be decided by the backend.
-  fixed64 start_time_unix_nano = 2;
-
-  // time_unix_nano is the moment when this aggregation value was reported.
-  // 
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
-  // 1970.
-  fixed64 time_unix_nano = 3;
-
-  // The total number of recorded values since start_time. Optional since
-  // some systems don't expose this.
-  uint64 count = 4;
-
-  // The total sum of recorded values since start_time. Optional since some
-  // systems don't expose this. If count is zero then this field must be zero.
-  double sum = 5;
-
-  // Represents the value at a given quantile of a distribution.
-  //
-  // To record Min and Max values following conventions are used:
-  // - The 1.0 quantile is equivalent to the maximum value observed.
-  // - The 0.0 quantile is equivalent to the minimum value observed.
-  //
-  // See the following issue for more context:
-  // https://github.com/open-telemetry/opentelemetry-proto/issues/125
-  message ValueAtQuantile {
-    // The quantile of a distribution. Must be in the interval
-    // [0.0, 1.0].
-    double quantile = 1;
-
-    // The value at the given quantile of a distribution.
-    double value = 2;
-  }
-
-  // A list of values at different quantiles of the distribution calculated
-  // from the current snapshot. The quantiles must be strictly increasing.
-  repeated ValueAtQuantile quantile_values = 6;
-
-  // (Optional) List of exemplars collected from
-  // measurements that were used to form the data point
-  repeated Exemplar exemplars = 7;
 }
