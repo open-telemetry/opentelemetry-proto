@@ -152,8 +152,6 @@ message MetricDescriptor {
   string unit = 3;
 
   // MeasurementValueType determines the value type for a measurement.
-  // TODO: There is an open question about whether this should control int64 vs
-  // double for Histogram. There are good arguments on both sides of this.
   enum MeasurementValueType {
     // UNSPECIFIED is the default MeasurementValueType, it MUST not be
     // used.
