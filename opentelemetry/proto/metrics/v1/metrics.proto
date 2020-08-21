@@ -152,36 +152,34 @@ message Metric {
 // AggregationTemporality is not included. Consequently, this also means
 // "StartTimeUnixNano" is ignored for all data points.
 message Gauge {
-  repeated Int64DataPoint int64_data_points = 1;
-  repeated DoubleDataPoint double_data_points = 2;
+  repeated ScalarDataPoint data_points = 1;
 
   // It describes the value type of the measurement used to build this
   // aggregation.
   //
   // Determines if the points are Int64DataPoint or DoubleDataPoint, as well
   // as the value type of the exemplars.
-  MeasurementValueType measurement_value_type = 3;
+  MeasurementValueType measurement_value_type = 2;
 }
 
 // Sum represents the type of a numeric scalar metric that is calculated as a
 // sum of all reported measurements over a time interval.
 message Sum {
-  repeated Int64DataPoint int64_data_points = 1;
-  repeated DoubleDataPoint double_data_points = 2;
+  repeated ScalarDataPoint data_points = 1;
 
   // It describes the value type of the measurement used to build this
   // aggregation.
   //
   // Determines if the points are Int64DataPoint or DoubleDataPoint, as well
   // as the value type of the exemplars.
-  MeasurementValueType measurement_value_type = 3;
+  MeasurementValueType measurement_value_type = 2;
   
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
-  AggregationTemporality aggregation_temporality = 4;
+  AggregationTemporality aggregation_temporality = 3;
 
   // If "true" means that the sum is monotonic.
-  bool is_monotonic = 5;
+  bool is_monotonic = 4;
 }
 
 // Represents the type of a metric that is calculated by aggregating as a
@@ -282,9 +280,9 @@ enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
-// Int64DataPoint is a single data point in a timeseries that describes the time-varying
-// values of a int64 metric.
-message Int64DataPoint {
+// ScalarDataPoint is a single data point in a timeseries that describes the
+// time-varying values of a scalar metric.
+message ScalarDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
@@ -309,45 +307,12 @@ message Int64DataPoint {
   fixed64 time_unix_nano = 3;
 
   // value itself.
-  int64 value = 4;
+  double double_value = 4;
+  int64 int64_value = 5;
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated Exemplar exemplars = 5;
-}
-
-// DoubleDataPoint is a single data point in a timeseries that describes the time-varying
-// value of a double metric.
-message DoubleDataPoint {
-  // The set of labels that uniquely identify this timeseries.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
-
-  // start_time_unix_nano is the last time when the aggregation value was reset
-  // to "zero". For some metric types this is ignored, see data types for more
-  // details.
-  //
-  // The aggregation value is over the time interval (start_time_unix_nano,
-  // time_unix_nano].
-  // 
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
-  // 1970.
-  //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the
-  // timestamp may be decided by the backend.
-  fixed64 start_time_unix_nano = 2;
-
-  // time_unix_nano is the moment when this aggregation value was reported.
-  // 
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
-  // 1970.
-  fixed64 time_unix_nano = 3;
-
-  // value itself.
-  double value = 4;
-
-  // (Optional) List of exemplars collected from
-  // measurements that were used to form the data point
-  repeated Exemplar exemplars = 5;
+  repeated Exemplar exemplars = 6;
 }
 
 // HistogramDataPoint is a single data point in a timeseries that describes the time-varying
@@ -382,9 +347,11 @@ message HistogramDataPoint {
   uint64 count = 4;
 
   // sum of the values in the population. If count is zero then this field
-  // must be zero. This value must be equal to the sum of the "sum" fields in buckets if
-  // a histogram is provided.
-  double sum = 5;
+  // must be zero. This value must be equal to the sum of the "sum" fields in
+  // buckets if a histogram is provided. Only one of these two fields is used
+  // for the data, based on MeasurementValueType.
+  int64 int_sum = 5;
+  double double_sum = 6;
 
   // bucket_counts is an optional field contains the count values of histogram
   // for each bucket.
@@ -393,7 +360,7 @@ message HistogramDataPoint {
   //
   // The number of elements in bucket_counts array must be by one greater than
   // the number of elements in explicit_bounds array.
-  repeated uint64 bucket_counts = 6;
+  repeated uint64 bucket_counts = 7;
 
   // A histogram may optionally contain the distribution of the values in the population.
   // In that case one of the option fields below and "buckets" field both must be defined.
@@ -417,11 +384,11 @@ message HistogramDataPoint {
   // Note: only [a, b) intervals are currently supported for each bucket except the first one.
   // If we decide to also support (a, b] intervals we should add support for these by defining
   // a boolean value which decides what type of intervals to use.
-  repeated double explicit_bounds = 7;
+  repeated double explicit_bounds = 8;
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated Exemplar exemplars = 8;
+  repeated Exemplar exemplars = 9;
 }
 
 // A representation of an exemplar, which is a sample input measurement.
