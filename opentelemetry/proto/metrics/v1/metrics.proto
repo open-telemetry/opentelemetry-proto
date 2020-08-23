@@ -151,9 +151,6 @@ message Metric {
 // aggregation, regardless of aggregation temporalities. Therefore,
 // AggregationTemporality is not included. Consequently, this also means
 // "StartTimeUnixNano" is ignored for all data points.
-//
-// A Metric of this Type MUST store its values as Int64DataPoint or
-// DoubleDataPoint.
 message Gauge {
   repeated Int64DataPoint int64_data_points = 1;
   repeated DoubleDataPoint double_data_points = 2;
@@ -168,9 +165,6 @@ message Gauge {
 
 // Sum represents the type of a numeric scalar metric that is calculated as a
 // sum of all reported measurements over a time interval.
-//
-// A Metric of this Type MUST store its values as Int64DataPoint or
-// DoubleDataPoint.
 message Sum {
   repeated Int64DataPoint int64_data_points = 1;
   repeated DoubleDataPoint double_data_points = 2;
@@ -192,10 +186,8 @@ message Sum {
 
 // Represents the type of a metric that is calculated by aggregating as a
 // Histogram of all reported measurements over a time interval.
-//
-// A Metric of this Type MUST store its values as HistogramDataPoint.
 message Histogram {
-  repeated HistogramDataPoint histogram_data_points = 1;
+  repeated HistogramDataPoint data_points = 1;
 
   // It describes the value type of the measurement used to build this
   // aggregation.
