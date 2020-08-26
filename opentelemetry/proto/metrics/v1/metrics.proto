@@ -429,10 +429,10 @@ message HistogramDataPoint {
 // was recorded, for example the span and trace ID of the active span when the
 // exemplar was recorded.
 message Exemplar {
-  // The set of labels that were dropped by the aggregator, but recorded
-  // alongside the original measurement. Only labels that were dropped by the
-  // aggregator should be included
-  repeated opentelemetry.proto.common.v1.StringKeyValue dropped_labels = 1;
+  // The set of labels that were filtered out by the aggregator, but recorded
+  // alongside the original measurement. Only labels that were filtered out
+  // by the aggregator should be included
+  repeated opentelemetry.proto.common.v1.StringKeyValue filtered_labels = 1;
 
   // time_unix_nano is the exact time when this exemplar was recorded
   //
