@@ -315,7 +315,7 @@ message IntDataPoint {
   fixed64 time_unix_nano = 3;
 
   // value itself.
-  int64 value = 4;
+  sfixed64 value = 4;
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
@@ -387,12 +387,12 @@ message IntHistogramDataPoint {
   // count is the number of values in the population. Must be non-negative. This
   // value must be equal to the sum of the "count" fields in buckets if a
   // histogram is provided.
-  uint64 count = 4;
+  fixed64 count = 4;
 
   // sum of the values in the population. If count is zero then this field
   // must be zero. This value must be equal to the sum of the "sum" fields in
   // buckets if a histogram is provided.
-  int64 sum = 5;
+  sfixed64 sum = 5;
 
   // bucket_counts is an optional field contains the count values of histogram
   // for each bucket.
@@ -401,7 +401,7 @@ message IntHistogramDataPoint {
   //
   // The number of elements in bucket_counts array must be by one greater than
   // the number of elements in explicit_bounds array.
-  repeated uint64 bucket_counts = 6;
+  repeated fixed64 bucket_counts = 6;
 
   // A histogram may optionally contain the distribution of the values in the population.
   // In that case one of the option fields below and "buckets" field both must be defined.
@@ -463,7 +463,7 @@ message DoubleHistogramDataPoint {
   // count is the number of values in the population. Must be non-negative. This
   // value must be equal to the sum of the "count" fields in buckets if a
   // histogram is provided.
-  uint64 count = 4;
+  fixed64 count = 4;
 
   // sum of the values in the population. If count is zero then this field
   // must be zero. This value must be equal to the sum of the "sum" fields in
@@ -477,7 +477,7 @@ message DoubleHistogramDataPoint {
   //
   // The number of elements in bucket_counts array must be by one greater than
   // the number of elements in explicit_bounds array.
-  repeated uint64 bucket_counts = 6;
+  repeated fixed64 bucket_counts = 6;
 
   // A histogram may optionally contain the distribution of the values in the population.
   // In that case one of the option fields below and "buckets" field both must be defined.
@@ -525,7 +525,7 @@ message IntExemplar {
   fixed64 time_unix_nano = 2;
 
   // Numerical int value of the measurement that was recorded.
-  int64 value = 3;
+  sfixed64 value = 3;
 
   // (Optional) Span ID of the exemplar trace.
   // span_id may be missing if the measurement is not recorded inside a trace
