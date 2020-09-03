@@ -48,7 +48,7 @@ message ExportLogsServiceRequest {
   // events.
   //
   // OTLP clients SHOULD include a randomly generated idempotency key.
-  // Values of size less than 8 bytes are invalid and must be ignored.
+  // Values of size less than 8 bytes are invalid and MUST be ignored.
   //
   // [V4 UUID]([RFC 4122](https://tools.ietf.org/html/rfc4122)) is the
   // recommended idempotency key format.
