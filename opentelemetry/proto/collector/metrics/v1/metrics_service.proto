@@ -40,13 +40,16 @@ message ExportMetricsServiceRequest {
   // in that case this array will contain multiple elements.
   repeated opentelemetry.proto.metrics.v1.ResourceMetrics resource_metrics = 1;
 
-  // An idempotency key is optional information used in a server bytes used to
-  // detect retried requests and avoid duplicate counting.  This is especially
-  // important for metrics exported with AggregationTemporality=DELTA.
+  // An idempotency key is optional information used in a server to
+  // detect retried requests and avoid double-counting of metric
+  // events.
   //
-  // OTLP clients SHOULD include a randomly generated idempotency key.  The recommended
-  // size for an idempotency key is 8 bytes.
-  optional bytes idempotency_key = 2;
+  // OTLP clients SHOULD include a randomly generated idempotency key.
+  // Values of size less than 8 bytes are invalid and must be ignored.
+  //
+  // [V4 UUID]([RFC 4122](https://tools.ietf.org/html/rfc4122)) is the
+  // recommended idempotency key format.
+  string idempotency_key = 2;
 }
 
 message ExportMetricsServiceResponse {

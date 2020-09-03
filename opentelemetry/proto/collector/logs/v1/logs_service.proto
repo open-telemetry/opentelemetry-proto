@@ -42,6 +42,17 @@ message ExportLogsServiceRequest {
   // data from multiple origins typically batch the data before forwarding further and
   // in that case this array will contain multiple elements.
   repeated opentelemetry.proto.logs.v1.ResourceLogs resource_logs = 1;
+
+  // An idempotency key is optional information used in a server to
+  // detect retried requests and avoid double-counting of logging
+  // events.
+  //
+  // OTLP clients SHOULD include a randomly generated idempotency key.
+  // Values of size less than 8 bytes are invalid and must be ignored.
+  //
+  // [V4 UUID]([RFC 4122](https://tools.ietf.org/html/rfc4122)) is the
+  // recommended idempotency key format.
+  string idempotency_key = 2;
 }
 
 message ExportLogsServiceResponse {
