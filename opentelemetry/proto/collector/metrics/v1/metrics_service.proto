@@ -44,12 +44,11 @@ message ExportMetricsServiceRequest {
   // detect retried requests and avoid double-counting of metric
   // events.
   //
-  // OTLP clients SHOULD include a randomly generated idempotency key.
-  // Values of size less than 8 bytes are invalid and MUST be ignored.
-  //
-  // [V4 UUID]([RFC 4122](https://tools.ietf.org/html/rfc4122)) is the
+  // OTLP clients SHOULD include an idempotency key.  Empty
+  // idempotency keys are invalid and MUST be ignored.  A 128-bit [V4
+  // UUID]([RFC 4122](https://tools.ietf.org/html/rfc4122)) is the
   // recommended idempotency key format.
-  string idempotency_key = 2;
+  bytes idempotency_key = 2;
 }
 
 message ExportMetricsServiceResponse {
