@@ -48,8 +48,8 @@ message ExportLogsServiceRequest {
   // events.
   //
   // OTLP clients SHOULD include an idempotency key.  Empty
-  // idempotency keys are invalid and MUST be ignored.  A 128-bit [V4
-  // UUID]([RFC 4122](https://tools.ietf.org/html/rfc4122)) is the
+  // idempotency keys are invalid and MUST be ignored.  A 128-bit V4
+  // UUID (https://tools.ietf.org/html/rfc4122) is the
   // recommended idempotency key format.
   bytes idempotency_key = 2;
 }
