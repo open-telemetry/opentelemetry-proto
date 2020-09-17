@@ -221,8 +221,8 @@ message Span {
   uint32 dropped_links_count = 14;
 
   // An optional final status for this span. Semantically when Status
-  // wasn't set it is means span ended without errors and assume
-  // Status.Ok (code = 0).
+  // wasn't set it means span's status code is not specifically set and assume
+  // STATUS_CODE_UNSET (code = 0).
   Status status = 15;
 }
 
@@ -230,32 +230,25 @@ message Span {
 // programming environments, including REST APIs and RPC APIs.
 message Status {
 
-  // StatusCode mirrors the codes defined at
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#statuscanonicalcode
   enum StatusCode {
-    STATUS_CODE_OK                  = 0;
-    STATUS_CODE_CANCELLED           = 1;
-    STATUS_CODE_UNKNOWN_ERROR       = 2;
-    STATUS_CODE_INVALID_ARGUMENT    = 3;
-    STATUS_CODE_DEADLINE_EXCEEDED   = 4;
-    STATUS_CODE_NOT_FOUND           = 5;
-    STATUS_CODE_ALREADY_EXISTS      = 6;
-    STATUS_CODE_PERMISSION_DENIED   = 7;
-    STATUS_CODE_RESOURCE_EXHAUSTED  = 8;
-    STATUS_CODE_FAILED_PRECONDITION = 9;
-    STATUS_CODE_ABORTED             = 10;
-    STATUS_CODE_OUT_OF_RANGE        = 11;
-    STATUS_CODE_UNIMPLEMENTED       = 12;
-    STATUS_CODE_INTERNAL_ERROR      = 13;
-    STATUS_CODE_UNAVAILABLE         = 14;
-    STATUS_CODE_DATA_LOSS           = 15;
-    STATUS_CODE_UNAUTHENTICATED     = 16;
+    // UNSET is the default status code.
+    STATUS_CODE_UNSET       = 0;
+
+    // OK represents a span which has been explicitly marked as being free of errors,
+    // and should not be counted against an error budget. Note that only end users should
+    // set this status. Instead, instrumentation should leave the status as UNSET for
+    // operations that do not generate an error.
+    STATUS_CODE_OK          = 1;
+
+    // ERROR represents all error types.
+    STATUS_CODE_ERROR       = 2;
   };
 
   // The status code. This is optional field. It is safe to assume 0 (OK)
   // when not set.
   StatusCode code = 1;
 
-  // A developer-facing human readable error message.
+  // A developer-facing human readable error message. This field should only be set
+  // when code==STATUS_CODE_ERROR.
   string message = 2;
 }
