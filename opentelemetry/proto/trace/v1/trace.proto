@@ -220,9 +220,8 @@ message Span {
   // enforced. If this value is 0, then no links were dropped.
   uint32 dropped_links_count = 14;
 
-  // An optional final status for this span. Semantically when Status
-  // wasn't set it is means span ended without errors and assume
-  // Status.Ok (code = 0).
+  // An optional final status for this span. Semantically when Status isn't set it means
+  // span's status code is unset, i.e. assume STATUS_CANONICAL_CODE_UNSET (code = 0).
   Status status = 15;
 }
 
@@ -230,32 +229,88 @@ message Span {
 // programming environments, including REST APIs and RPC APIs.
 message Status {
 
-  // StatusCode mirrors the codes defined at
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/api-tracing.md#statuscanonicalcode
-  enum StatusCode {
-    STATUS_CODE_OK                  = 0;
-    STATUS_CODE_CANCELLED           = 1;
-    STATUS_CODE_UNKNOWN_ERROR       = 2;
-    STATUS_CODE_INVALID_ARGUMENT    = 3;
-    STATUS_CODE_DEADLINE_EXCEEDED   = 4;
-    STATUS_CODE_NOT_FOUND           = 5;
-    STATUS_CODE_ALREADY_EXISTS      = 6;
-    STATUS_CODE_PERMISSION_DENIED   = 7;
-    STATUS_CODE_RESOURCE_EXHAUSTED  = 8;
-    STATUS_CODE_FAILED_PRECONDITION = 9;
-    STATUS_CODE_ABORTED             = 10;
-    STATUS_CODE_OUT_OF_RANGE        = 11;
-    STATUS_CODE_UNIMPLEMENTED       = 12;
-    STATUS_CODE_INTERNAL_ERROR      = 13;
-    STATUS_CODE_UNAVAILABLE         = 14;
-    STATUS_CODE_DATA_LOSS           = 15;
-    STATUS_CODE_UNAUTHENTICATED     = 16;
+  enum DeprecatedStatusCode {
+    DEPRECATED_STATUS_CODE_OK                  = 0;
+    DEPRECATED_STATUS_CODE_CANCELLED           = 1;
+    DEPRECATED_STATUS_CODE_UNKNOWN_ERROR       = 2;
+    DEPRECATED_STATUS_CODE_INVALID_ARGUMENT    = 3;
+    DEPRECATED_STATUS_CODE_DEADLINE_EXCEEDED   = 4;
+    DEPRECATED_STATUS_CODE_NOT_FOUND           = 5;
+    DEPRECATED_STATUS_CODE_ALREADY_EXISTS      = 6;
+    DEPRECATED_STATUS_CODE_PERMISSION_DENIED   = 7;
+    DEPRECATED_STATUS_CODE_RESOURCE_EXHAUSTED  = 8;
+    DEPRECATED_STATUS_CODE_FAILED_PRECONDITION = 9;
+    DEPRECATED_STATUS_CODE_ABORTED             = 10;
+    DEPRECATED_STATUS_CODE_OUT_OF_RANGE        = 11;
+    DEPRECATED_STATUS_CODE_UNIMPLEMENTED       = 12;
+    DEPRECATED_STATUS_CODE_INTERNAL_ERROR      = 13;
+    DEPRECATED_STATUS_CODE_UNAVAILABLE         = 14;
+    DEPRECATED_STATUS_CODE_DATA_LOSS           = 15;
+    DEPRECATED_STATUS_CODE_UNAUTHENTICATED     = 16;
   };
 
-  // The status code. This is optional field. It is safe to assume 0 (OK)
-  // when not set.
-  StatusCode code = 1;
+  // The deprecated status code. This is an optional field.
+  //
+  // This field is deprecated and is replaced by `code` field below. See backward
+  // compatibility notes below. According to our stability guarantees this field
+  // will be removed in 12 months, on Sep 26, 2021. All usage of old senders and
+  // receivers that do not understand the `code` field MUST be phased out by then.
+  DeprecatedStatusCode deprecated_code = 1 [deprecated=true];
 
   // A developer-facing human readable error message.
   string message = 2;
+
+  // For the semantics of status codes see
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#statuscanonicalcode
+  enum StatusCanonicalCode {
+    // The default status.
+    STATUS_CANONICAL_CODE_UNSET               = 0;
+    // The Span has been validated by an Application developers or Operator to have
+    // completed successfully.
+    STATUS_CANONICAL_CODE_OK                  = 1;
+    // The Span contains an error.
+    STATUS_CANONICAL_CODE_ERROR               = 2;
+  };
+
+  // The status code.
+  StatusCanonicalCode code = 3;
+
+  // IMPORTANT: Backward compatibility notes:
+  //
+  // To ensure any two pair of senders and receivers continues to correctly signal and
+  // interpret erroneous situation the senders and receivers SHOULD follow these rules:
+  //
+  // 1. Old senders and receives that are not aware of `code` field will continue using
+  // `deprecated_code` field to signal and interpret erroneous situation.
+  //
+  // 2. New senders, which are aware of `code` field should set both `deprecated_code`
+  // and `code` fields according to the following rules:
+  //
+  //   if code==STATUS_CANONICAL_CODE_UNSET then `deprecated_code` must be
+  //   set to DEPRECATED_STATUS_CODE_OK.
+  //
+  //   if code==STATUS_CANONICAL_CODE_ERROR then `deprecated_code` must be
+  //   set to DEPRECATED_STATUS_CODE_UNKNOWN_ERROR.
+  //
+  //   if code==STATUS_CANONICAL_CODE_OK then `deprecated_code` must be
+  //   set to DEPRECATED_STATUS_CODE_OK.
+  //
+  // These rules allow old receivers to correctly interpret data received from new senders.
+  //
+  // 3. New receivers should look both at `code` and `deprecated_code` fields in order
+  // to interpret the overall status:
+  //
+  //   If code==STATUS_CANONICAL_CODE_UNSET then the value of `deprecated_code` is the
+  //   carrier of the overall status according to these rules:
+  //
+  //     if deprecated_code==DEPRECATED_STATUS_CODE_OK then the receiver should interpret
+  //     the overall status to be STATUS_CANONICAL_CODE_UNSET.
+  //
+  //     if deprecated_code!=DEPRECATED_STATUS_CODE_OK then the receiver should interpret
+  //     the overall status to be STATUS_CANONICAL_CODE_ERROR.
+  //
+  //   If code!=STATUS_CANONICAL_CODE_UNSET then the value of `deprecated_code` should be
+  //   ignored, the `code` field is the sole carrier of status.
+  //
+  // These rules allow new receivers to correctly interpret data received from old senders.
 }
