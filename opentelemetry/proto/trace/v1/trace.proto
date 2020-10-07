@@ -221,7 +221,7 @@ message Span {
   uint32 dropped_links_count = 14;
 
   // An optional final status for this span. Semantically when Status isn't set, it means
-  // span's status code is unset, i.e. assume STATUS_CANONICAL_CODE_UNSET (code = 0).
+  // span's status code is unset, i.e. assume STATUS_CANONICAL_CODE_UNSET (canonical_code = 0).
   Status status = 15;
 }
 
@@ -229,33 +229,34 @@ message Span {
 // programming environments, including REST APIs and RPC APIs.
 message Status {
 
-  enum DeprecatedStatusCode {
-    DEPRECATED_STATUS_CODE_OK                  = 0;
-    DEPRECATED_STATUS_CODE_CANCELLED           = 1;
-    DEPRECATED_STATUS_CODE_UNKNOWN_ERROR       = 2;
-    DEPRECATED_STATUS_CODE_INVALID_ARGUMENT    = 3;
-    DEPRECATED_STATUS_CODE_DEADLINE_EXCEEDED   = 4;
-    DEPRECATED_STATUS_CODE_NOT_FOUND           = 5;
-    DEPRECATED_STATUS_CODE_ALREADY_EXISTS      = 6;
-    DEPRECATED_STATUS_CODE_PERMISSION_DENIED   = 7;
-    DEPRECATED_STATUS_CODE_RESOURCE_EXHAUSTED  = 8;
-    DEPRECATED_STATUS_CODE_FAILED_PRECONDITION = 9;
-    DEPRECATED_STATUS_CODE_ABORTED             = 10;
-    DEPRECATED_STATUS_CODE_OUT_OF_RANGE        = 11;
-    DEPRECATED_STATUS_CODE_UNIMPLEMENTED       = 12;
-    DEPRECATED_STATUS_CODE_INTERNAL_ERROR      = 13;
-    DEPRECATED_STATUS_CODE_UNAVAILABLE         = 14;
-    DEPRECATED_STATUS_CODE_DATA_LOSS           = 15;
-    DEPRECATED_STATUS_CODE_UNAUTHENTICATED     = 16;
+  enum StatusCode {
+    STATUS_CODE_OK                  = 0;
+    STATUS_CODE_CANCELLED           = 1;
+    STATUS_CODE_UNKNOWN_ERROR       = 2;
+    STATUS_CODE_INVALID_ARGUMENT    = 3;
+    STATUS_CODE_DEADLINE_EXCEEDED   = 4;
+    STATUS_CODE_NOT_FOUND           = 5;
+    STATUS_CODE_ALREADY_EXISTS      = 6;
+    STATUS_CODE_PERMISSION_DENIED   = 7;
+    STATUS_CODE_RESOURCE_EXHAUSTED  = 8;
+    STATUS_CODE_FAILED_PRECONDITION = 9;
+    STATUS_CODE_ABORTED             = 10;
+    STATUS_CODE_OUT_OF_RANGE        = 11;
+    STATUS_CODE_UNIMPLEMENTED       = 12;
+    STATUS_CODE_INTERNAL_ERROR      = 13;
+    STATUS_CODE_UNAVAILABLE         = 14;
+    STATUS_CODE_DATA_LOSS           = 15;
+    STATUS_CODE_UNAUTHENTICATED     = 16;
   };
 
   // The deprecated status code. This is an optional field.
   //
-  // This field is deprecated and is replaced by the `code` field below. See backward
-  // compatibility notes below. According to our stability guarantees this field
+  // This field is deprecated and is replaced by the `canonical_code` field below. See
+  // backward compatibility notes below. According to our stability guarantees this field
   // will be removed in 12 months, on Sep 26, 2021. All usage of old senders and
-  // receivers that do not understand the `code` field MUST be phased out by then.
-  DeprecatedStatusCode deprecated_code = 1 [deprecated=true];
+  // receivers that do not understand the `canonical_code` field MUST be phased out
+  // by then.
+  StatusCode code = 1 [deprecated=true];
 
   // A developer-facing human readable error message.
   string message = 2;
@@ -272,45 +273,45 @@ message Status {
     STATUS_CANONICAL_CODE_ERROR               = 2;
   };
 
-  // The status code.
-  StatusCanonicalCode code = 3;
+  // The new status canonical_code.
+  StatusCanonicalCode canonical_code = 3;
 
   // IMPORTANT: Backward compatibility notes:
   //
   // To ensure any pair of senders and receivers continues to correctly signal and
   // interpret erroneous situations, the senders and receivers SHOULD follow these rules:
   //
-  // 1. Old senders and receivers that are not aware of `code` field will continue using
-  // the `deprecated_code` field to signal and interpret erroneous situation.
+  // 1. Old senders and receivers that are not aware of `canonical_code` field will
+  // continue using the `code` field to signal and interpret erroneous situation.
   //
-  // 2. New senders, which are aware of the `code` field SHOULD set both the
-  // `deprecated_code` and `code` fields according to the following rules:
+  // 2. New senders, which are aware of the `canonical_code` field SHOULD set both the
+  // `code` and `canonical_code` fields according to the following rules:
   //
-  //   if code==STATUS_CANONICAL_CODE_UNSET then `deprecated_code` MUST be
-  //   set to DEPRECATED_STATUS_CODE_OK.
+  //   if canonical_code==STATUS_CANONICAL_CODE_UNSET then `code` MUST be
+  //   set to STATUS_CODE_OK.
   //
-  //   if code==STATUS_CANONICAL_CODE_OK then `deprecated_code` MUST be
-  //   set to DEPRECATED_STATUS_CODE_OK.
+  //   if canonical_code==STATUS_CANONICAL_CODE_OK then `code` MUST be
+  //   set to STATUS_CODE_OK.
   //
-  //   if code==STATUS_CANONICAL_CODE_ERROR then `deprecated_code` MUST be
-  //   set to DEPRECATED_STATUS_CODE_UNKNOWN_ERROR.
+  //   if canonical_code==STATUS_CANONICAL_CODE_ERROR then `code` MUST be
+  //   set to STATUS_CODE_UNKNOWN_ERROR.
   //
   // These rules allow old receivers to correctly interpret data received from new senders.
   //
-  // 3. New receivers should look at both the `code` and `deprecated_code` fields in order
+  // 3. New receivers should look at both the `canonical_code` and `code` fields in order
   // to interpret the overall status:
   //
-  //   If code==STATUS_CANONICAL_CODE_UNSET then the value of `deprecated_code` is the
+  //   If canonical_code==STATUS_CANONICAL_CODE_UNSET then the value of `code` is the
   //   carrier of the overall status according to these rules:
   //
-  //     if deprecated_code==DEPRECATED_STATUS_CODE_OK then the receiver should interpret
+  //     if code==STATUS_CODE_OK then the receiver should interpret
   //     the overall status to be STATUS_CANONICAL_CODE_UNSET.
   //
-  //     if deprecated_code!=DEPRECATED_STATUS_CODE_OK then the receiver should interpret
+  //     if code!=STATUS_CODE_OK then the receiver should interpret
   //     the overall status to be STATUS_CANONICAL_CODE_ERROR.
   //
-  //   If code!=STATUS_CANONICAL_CODE_UNSET then the value of `deprecated_code` should be
-  //   ignored, the `code` field is the sole carrier of the status.
+  //   If canonical_code!=STATUS_CANONICAL_CODE_UNSET then the value of `code` should be
+  //   ignored, the `canonical_code` field is the sole carrier of the status.
   //
   // These rules allow new receivers to correctly interpret data received from old senders.
 }
