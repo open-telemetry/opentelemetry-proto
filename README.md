@@ -24,6 +24,13 @@ All messages                         | Alpha    |
 (See [maturity-matrix.yaml](https://github.com/open-telemetry/community/blob/47813530864b9fe5a5146f466a58bd2bb94edc72/maturity-matrix.yaml#L57)
 for definition of maturity levels).
 
+Note that maturity guarantees apply only to wire-level compatibility. Message, field, enum
+names of Protobuf messages are not visible on the wire and are not considered part of the
+guarantees. We are free to make change to the names.
+
+In the future when OTLP/JSON is declared stable field names will also become part of
+the maturity guarantees since field names are visible on the wire for JSON encoding.
+
 ## Experiments
 
 In some cases we are trying to experiment with different features. In this case
