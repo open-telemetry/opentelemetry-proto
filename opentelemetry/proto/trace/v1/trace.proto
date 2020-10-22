@@ -253,7 +253,7 @@ message Status {
   //
   // This field is deprecated and is replaced by the `code` field below. See backward
   // compatibility notes below. According to our stability guarantees this field
-  // will be removed in 12 months, on Sep 26, 2021. All usage of old senders and
+  // will be removed in 12 months, on Oct 22, 2021. All usage of old senders and
   // receivers that do not understand the `code` field MUST be phased out by then.
   DeprecatedStatusCode deprecated_code = 1 [deprecated=true];
 
