@@ -221,7 +221,7 @@ message Span {
   uint32 dropped_links_count = 14;
 
   // An optional final status for this span. Semantically when Status isn't set, it means
-  // span's status code is unset, i.e. assume CODE_VALUE_UNSET (code_value = 0).
+  // span's status code is unset, i.e. assume STATUS_CANONICAL_CODE_UNSET (canonical_code = 0).
   Status status = 15;
 }
 
@@ -251,10 +251,10 @@ message Status {
 
   // The deprecated status code. This is an optional field.
   //
-  // This field is deprecated and is replaced by the `code_value` field below. See
+  // This field is deprecated and is replaced by the `canonical_code` field below. See
   // backward compatibility notes below. According to our stability guarantees this field
   // will be removed in 12 months, on Sep 26, 2021. All usage of old senders and
-  // receivers that do not understand the `code_value` field MUST be phased out
+  // receivers that do not understand the `canonical_code` field MUST be phased out
   // by then.
   StatusCode code = 1 [deprecated=true];
 
@@ -263,52 +263,55 @@ message Status {
 
   // For the semantics of status codes see
   // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#statuscanonicalcode
-  enum CodeValue {
+  enum StatusCanonicalCode {
     // The default status.
-    CODE_VALUE_UNSET = 0;
+    STATUS_CANONICAL_CODE_UNSET               = 0;
     // The Span has been validated by an Application developers or Operator to have
     // completed successfully.
-    CODE_VALUE_OK    = 1;
+    STATUS_CANONICAL_CODE_OK                  = 1;
     // The Span contains an error.
-    CODE_VALUE_ERROR = 2;
+    STATUS_CANONICAL_CODE_ERROR               = 2;
   };
 
-  // The new status code value.
-  CodeValue code_value = 3;
+  // The new status canonical_code.
+  StatusCanonicalCode canonical_code = 3;
 
   // IMPORTANT: Backward compatibility notes:
   //
   // To ensure any pair of senders and receivers continues to correctly signal and
   // interpret erroneous situations, the senders and receivers SHOULD follow these rules:
   //
-  // 1. Old senders and receivers that are not aware of `code_value` field will
+  // 1. Old senders and receivers that are not aware of `canonical_code` field will
   // continue using the `code` field to signal and interpret erroneous situation.
   //
-  // 2. New senders, which are aware of the `code_value` field SHOULD set both the
-  // `code` and `code_value` fields according to the following rules:
+  // 2. New senders, which are aware of the `canonical_code` field SHOULD set both the
+  // `code` and `canonical_code` fields according to the following rules:
   //
-  //   if code_value==CODE_VALUE_UNSET then `code` MUST be set to STATUS_CODE_OK.
+  //   if canonical_code==STATUS_CANONICAL_CODE_UNSET then `code` MUST be
+  //   set to STATUS_CODE_OK.
   //
-  //   if code_value==CODE_VALUE_OK then `code` MUST be set to STATUS_CODE_OK.
+  //   if canonical_code==STATUS_CANONICAL_CODE_OK then `code` MUST be
+  //   set to STATUS_CODE_OK.
   //
-  //   if code_value==CODE_VALUE_ERROR then `code` MUST be set to STATUS_CODE_UNKNOWN_ERROR.
+  //   if canonical_code==STATUS_CANONICAL_CODE_ERROR then `code` MUST be
+  //   set to STATUS_CODE_UNKNOWN_ERROR.
   //
   // These rules allow old receivers to correctly interpret data received from new senders.
   //
-  // 3. New receivers should look at both the `code_value` and `code` fields in order
+  // 3. New receivers should look at both the `canonical_code` and `code` fields in order
   // to interpret the overall status:
   //
-  //   If code_value==CODE_VALUE_UNSET then the value of `code` is the
+  //   If canonical_code==STATUS_CANONICAL_CODE_UNSET then the value of `code` is the
   //   carrier of the overall status according to these rules:
   //
   //     if code==STATUS_CODE_OK then the receiver should interpret
-  //     the overall status to be CODE_UNSET.
+  //     the overall status to be STATUS_CANONICAL_CODE_UNSET.
   //
   //     if code!=STATUS_CODE_OK then the receiver should interpret
-  //     the overall status to be CODE_ERROR.
+  //     the overall status to be STATUS_CANONICAL_CODE_ERROR.
   //
-  //   If code_value!=CODE_VALUE_UNSET then the value of `code` should be
-  //   ignored, the `code_value` field is the sole carrier of the status.
+  //   If canonical_code!=STATUS_CANONICAL_CODE_UNSET then the value of `code` should be
+  //   ignored, the `canonical_code` field is the sole carrier of the status.
   //
   // These rules allow new receivers to correctly interpret data received from old senders.
 }
