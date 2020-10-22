@@ -221,7 +221,7 @@ message Span {
   uint32 dropped_links_count = 14;
 
   // An optional final status for this span. Semantically when Status isn't set, it means
-  // span's status code is unset, i.e. assume STATUS_CANONICAL_CODE_UNSET (code = 0).
+  // span's status code is unset, i.e. assume STATUS_CODE_UNSET (code = 0).
   Status status = 15;
 }
 
@@ -261,19 +261,19 @@ message Status {
   string message = 2;
 
   // For the semantics of status codes see
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#statuscanonicalcode
-  enum StatusCanonicalCode {
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#set-status
+  enum StatusCode {
     // The default status.
-    STATUS_CANONICAL_CODE_UNSET               = 0;
+    STATUS_CODE_UNSET               = 0;
     // The Span has been validated by an Application developers or Operator to have
     // completed successfully.
-    STATUS_CANONICAL_CODE_OK                  = 1;
+    STATUS_CODE_OK                  = 1;
     // The Span contains an error.
-    STATUS_CANONICAL_CODE_ERROR               = 2;
+    STATUS_CODE_ERROR               = 2;
   };
 
   // The status code.
-  StatusCanonicalCode code = 3;
+  StatusCode code = 3;
 
   // IMPORTANT: Backward compatibility notes:
   //
@@ -286,13 +286,13 @@ message Status {
   // 2. New senders, which are aware of the `code` field SHOULD set both the
   // `deprecated_code` and `code` fields according to the following rules:
   //
-  //   if code==STATUS_CANONICAL_CODE_UNSET then `deprecated_code` MUST be
+  //   if code==STATUS_CODE_UNSET then `deprecated_code` MUST be
   //   set to DEPRECATED_STATUS_CODE_OK.
   //
-  //   if code==STATUS_CANONICAL_CODE_OK then `deprecated_code` MUST be
+  //   if code==STATUS_CODE_OK then `deprecated_code` MUST be
   //   set to DEPRECATED_STATUS_CODE_OK.
   //
-  //   if code==STATUS_CANONICAL_CODE_ERROR then `deprecated_code` MUST be
+  //   if code==STATUS_CODE_ERROR then `deprecated_code` MUST be
   //   set to DEPRECATED_STATUS_CODE_UNKNOWN_ERROR.
   //
   // These rules allow old receivers to correctly interpret data received from new senders.
@@ -300,16 +300,16 @@ message Status {
   // 3. New receivers should look at both the `code` and `deprecated_code` fields in order
   // to interpret the overall status:
   //
-  //   If code==STATUS_CANONICAL_CODE_UNSET then the value of `deprecated_code` is the
+  //   If code==STATUS_CODE_UNSET then the value of `deprecated_code` is the
   //   carrier of the overall status according to these rules:
   //
   //     if deprecated_code==DEPRECATED_STATUS_CODE_OK then the receiver should interpret
-  //     the overall status to be STATUS_CANONICAL_CODE_UNSET.
+  //     the overall status to be STATUS_CODE_UNSET.
   //
   //     if deprecated_code!=DEPRECATED_STATUS_CODE_OK then the receiver should interpret
-  //     the overall status to be STATUS_CANONICAL_CODE_ERROR.
+  //     the overall status to be STATUS_CODE_ERROR.
   //
-  //   If code!=STATUS_CANONICAL_CODE_UNSET then the value of `deprecated_code` should be
+  //   If code!=STATUS_CODE_UNSET then the value of `deprecated_code` should be
   //   ignored, the `code` field is the sole carrier of the status.
   //
   // These rules allow new receivers to correctly interpret data received from old senders.
