@@ -188,7 +188,7 @@ message IntSum {
 // as a sum of all reported measurements over a time interval.
 message DoubleSum {
   repeated DoubleDataPoint data_points = 1;
-  
+
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
   AggregationTemporality aggregation_temporality = 2;
@@ -504,18 +504,17 @@ message DoubleHistogramDataPoint {
   // measurements that were used to form the data point
   repeated DoubleExemplar exemplars = 8;
 
-  // When bounds have a pattern, an alternate method may be used to encode them, reducing message size.
-  // Only one of explicit_bounds, linear_bounds, exponential_bounds should be defined.
-  // For performance reason, "oneof" is not used. When more than one methods are defined,
-  // the consumer will use only one in the precedence of:
-  //     explicit_bounds, linear_bounds, exponential_bounds
-
+  // When bounds have a pattern, an alternate encoding method may be used.
+  // Only one method should be defined. For performance reason, "oneof" is not used.
+  // When more than one methods are defined, the receiver will use only one in the precedence of:
+  //     explicit_bounds, linear_bounds, exponential_bounds, log_linear_bounds
   LinearBounds linear_bounds = 9;
   ExponentialBounds exponential_bounds = 10;
+  LogLinearBounds log_linear_bounds = 11;
 
   // LinearBounds. Bounds can be generated via
   // for (int i = 0; i < num_of_bounds; i++)
-  //     bounds[i] = offset + width * i
+  //     boundList.add(offset + width * i);
   message LinearBounds {
     double offset = 1;
     double width = 2;
@@ -523,75 +522,83 @@ message DoubleHistogramDataPoint {
   }
 
   // ExponentialBounds. Bounds are on log scale.
-  // The bound sequence is stitched together with negative bounds, zero bound, and positive bounds.
-  // Formula to generate explicit bounds from exponential bounds here are for demonstration purpose only.
-  // If the message receiver natively understands exponential histograms, it will not need to generate every bound.
+  // The bound sequence is stitched together using negative bounds, zero bound, and positive bounds.
+  // The formula to generate explicit bounds here are for demonstration purpose only.
+  // If the message receiver natively stores exponential histograms, it will not need to generate explicit bound.
   // It will only need to convert exponential bound parameters to its native parameters.
   message ExponentialBounds {
     double reference = 1;
     double base = 2;
 
     // The bound sequence starts with negative values generated via:
-    // for (int i = index_offset_for_negative_numbers + num_of_bounds_for_negative_numbers - 1;
-    //      i <= index_offset_for_negative_numbers;
-    //      i--)
-    //    bound[i] = -1 * reference * (base ^ i)
+    // for (int i = num_of_bounds_for_negative_numbers - 1; i >= 0; i--)
+    //    int exponent = i + index_offset_for_negative_numbers;
+    //    boundList.add( -1 * reference * power(base, exponent));
     //
     // Example of reference=1, base=2, index_offset_for_negative_numbers=-2, num_of_bounds_for_negative_numbers=6
-    // bounds: -8 -4 -2 -1 -.5 -.25
-    // i:       3  2  1  0 -1  -2
+    // bounds:    -8 -4 -2 -1 -.5 -.25
+    // exponent:   3  2  1  0 -1  -2
     // Note that the loop on i goes down, so that negative numbers with larger absolute values
-    // (but smaller arithmetic values) come first.
-    // num_of_bounds_for_negative_numbers may be zero if there are no negative numbers.
+    // (but smaller arithmetic values) are added first.
 
     sint32 index_offset_for_negative_numbers = 3;
     uint32 num_of_bounds_for_negative_numbers = 4;
 
-    // If has_counter_for_zero is true, a bound of zero follows the negative bounds.
+    // If has_counter_for_zero is true, add a bound of zero using:
+    //    boundList.add(0);
     bool has_counter_for_zero = 5;
 
     // Positive bounds follow the zero bound. Positive bounds are generated via:
-    // for (int i = index_offset_for_positive_numbers;
-    //      i <= index_offset_for_positive_numbers + num_of_bounds_for_positive_numbers - 1;
-    //      i++)
-    //    bound[i] = reference * (base ^ i)
+    // for (int i = 0; i < num_of_bounds_for_positive_numbers; i++)
+    //    int exponent = i + index_offset_for_positive_numbers;
+    //    boundList.add( reference * power(base, exponent));
     //
     // Example of reference=1, base=2, index_offset_for_positive_numbers=-3, num_of_bounds_for_positive_numbers=8
-    // bound: .125 .25 .5 1 2 4 8 16
-    // i:     -3   -2  -1 0 1 2 3 4
-    // num_of_bounds_for_positive_numbers may be zero if there are no positive numbers.
+    // bound:    .125 .25 .5 1 2 4 8 16
+    // exponent: -3   -2  -1 0 1 2 3 4
 
     sint32 index_offset_for_positive_numbers = 6;
     uint32 num_of_bounds_for_positive_numbers = 7;
+  }
 
-    // Certain histograms (such as HdrHistogram) further divide an exponential bucket
-    // into multiple linear subbuckets.
-    // num_of_linear_subbuckets at 1 or 0 (default) means no linear subbuckets.
-    // Example of reference 1, base 2 exponential buckets, with 4 linear subbuckets:
-    // bound: .5 .625 .75 .875 1 1.25 1.5 1.75 2 2.5 3 3.5 4
-    // i:     -4 -3   -2  -1   0 1    2   3    4 5   6 7   8
+  // In LogLinearBounds, each exponential bucket is divided linearly into multiple subbuckets.
+  // LogLinearBounds is an extension of ExponentialBounds. Similar to ExponentialBounds,
+  // the bound sequence is stitched together using negative bounds, zero bound, and positive bounds.
+  //
+  // Example of LogLinearBounds with num_of_linear_subbuckets=4 on ExponentialBounds of
+  //    reference=1, base=2, index_offset_for_positive_numbers=-4, num_of_bounds_for_positive_numbers=15,
+  //
+  // bound:  .5 .625 .75 .875 1 1.25 1.5 1.75 2 2.5 3 3.5 4 5 6
+  // index:  -4 -3   -2  -1   0 1    2   3    4 5   6 7   8 9 10
+  //
+  // Note: Index need not start or end on multiples of num_of_linear_subbuckets.
+  //
+  // Positive bounds are computed as:
+  // for (int count = 0; count < num_of_bounds_for_positive_numbers; count++)
+  //    int i = count + index_offset_for_positive_numbers;
+  //    int exponent;
+  //    int subbucketNumber; // In the range of [0, num_of_linear_subbuckets - 1]
+  //    if (i >= 0) {
+  //        exponent = i / num_of_linear_subbuckets;
+  //        subbucketNumber = i % num_of_linear_subbuckets;
+  //    } else {
+  //        exponent = (i - num_of_linear_subbuckets + 1) / num_of_linear_subbuckets; // Round down toward -infinity
+  //        subbucketNumber = i - exponent * num_of_linear_subbuckets;
+  //    }
+  //    double bucketStart = reference * power(base, exponent);
+  //    double bucketWidth = bucketStart * (base - 1);
+  //    // Add a fraction of bucketWidth to bucketStart to get the bound.
+  //    boundList.add( bucketStart + bucketWidth * ((double)subbucketNumber / num_of_linear_subbuckets));
+  //
+  // For negative bounds, the formula is similar, except that the index loop will go down and the bound will be converted
+  // to a negative number.
+  //
+  // If has_counter_for_zero is true, add a zero bound between negative and positive bounds.
+  // There are no subbuckets between last negative bucket and 0, or between 0 and first positive bucket.
 
-    // When num_of_linear_subbuckets is greater than 1, positive bounds are computed as:
-    // for (int i = index_offset_for_positive_numbers;
-    //      i <= index_offset_for_positive_numbers + num_of_bounds_for_positive_numbers - 1;
-    //      i++)
-    //    int exponent;
-    //    int subbucketNumber; // In the range of [0, num_of_linear_subbuckets - 1]
-    //    if (i >= 0) {
-    //        exponent = i / num_of_linear_subbuckets;
-    //        subbucketNumber = i % num_of_linear_subbuckets;
-    //    } else {
-    //        exponent = (i - num_of_linear_subbuckets + 1) / num_of_linear_subbuckets; // Round down toward -infinity
-    //        subbucketNumber = i - exponent * num_of_linear_subbuckets;
-    //    }
-    //    double bucketStart = reference * (base ^ exponent);
-    //    double bucketWidth = bucketStart * (base - 1);
-    //    bound[i] = bucketStart + bucketWidth * (subbucketNumber / num_of_linear_subbuckets)
-    //
-    // For negative bounds, the formula is similar, except that index loop will go down and bound[i] will be converted
-    // negative number.
-
-    uint32 num_of_linear_subbuckets = 8;
+  message LogLinearBounds {
+    ExponentialBounds exponential_bounds = 1;
+    uint32 num_of_linear_subbuckets = 2;
   }
 }
 
