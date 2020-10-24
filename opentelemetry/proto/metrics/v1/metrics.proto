@@ -504,9 +504,9 @@ message DoubleHistogramDataPoint {
   // measurements that were used to form the data point
   repeated DoubleExemplar exemplars = 8;
 
-  // When bounds have a pattern, an alternate encoding method may be used.
+  // When bounds have a pattern, a more efficient encoding method may be used.
   // Only one method should be defined. For performance reason, "oneof" is not used.
-  // When more than one methods are defined, the receiver will use only one in the precedence of:
+  // When more than one methods are defined, the receiver will use the first one found using this order:
   //     explicit_bounds, linear_bounds, exponential_bounds, log_linear_bounds
   LinearBounds linear_bounds = 9;
   ExponentialBounds exponential_bounds = 10;
@@ -524,8 +524,8 @@ message DoubleHistogramDataPoint {
   // ExponentialBounds. Bounds are on log scale.
   // The bound sequence is stitched together using negative bounds, zero bound, and positive bounds.
   // The formula to generate explicit bounds here are for demonstration purpose only.
-  // If the message receiver natively stores exponential histograms, it will not need to generate explicit bound.
-  // It will only need to convert exponential bound parameters to its native parameters.
+  // If the message receiver natively stores exponential histograms, it will not need to generate explicit bounds.
+  // It will only need to record the exponential bound parameters.
   message ExponentialBounds {
     double reference = 1;
     double base = 2;
@@ -585,6 +585,7 @@ message DoubleHistogramDataPoint {
   //        exponent = (i - num_of_linear_subbuckets + 1) / num_of_linear_subbuckets; // Round down toward -infinity
   //        subbucketNumber = i - exponent * num_of_linear_subbuckets;
   //    }
+  //    // Compute the exponential bucket.
   //    double bucketStart = reference * power(base, exponent);
   //    double bucketWidth = bucketStart * (base - 1);
   //    // Add a fraction of bucketWidth to bucketStart to get the bound.
