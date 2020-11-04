@@ -517,7 +517,7 @@ message DoubleHistogramDataPoint {
   repeated DoubleExemplar exemplars = 8;
 }
 
-// SummaryDataPoint is a single data point in a timeseries that describes the
+// DoubleSummaryDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a Summary metric.
 message DoubleSummaryDataPoint {
   // The set of labels that uniquely identify this timeseries.
