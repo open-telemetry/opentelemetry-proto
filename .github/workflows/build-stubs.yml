@@ -21,4 +21,5 @@ jobs:
         uses: burrunan/gradle-cache-action@v1.5
         with:
           remote-build-cache-proxy-enabled: false
+          build-root-directory: stubs/java
           arguments: build --stacktrace
