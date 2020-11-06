@@ -9,7 +9,7 @@ repositories {
 sourceSets {
     main {
         java {
-            srcDir("gen/java")
+            srcDir("../../gen/java")
         }
     }
 }
@@ -26,7 +26,7 @@ java {
 tasks {
     named("compileJava") {
         doFirst {
-            if (!file("gen/java").exists()) {
+            if (!file("../../gen/java").exists()) {
                 throw GradleException("Java generated sources not found, run 'make gen-java' first.")
             }
         }
