@@ -2,7 +2,7 @@ name: "Build language stubs"
 
 on:
   push:
-    brances:
+    branches:
       - master
 
 jobs:
@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup Java
-        uses: action/setup-java@v1
+        uses: actions/setup-java@v1
         with:
           java-version: 15
-      - name: Generated Java soruce
+      - name: Generate Java soruce
         run: make gen-java
       - name: Build Java artifact
         uses: burrunan/gradle-cache-action@v1.5
