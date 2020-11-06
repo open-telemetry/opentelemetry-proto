@@ -1,0 +1,24 @@
+name: "Build language stubs"
+
+on:
+  push:
+    brances:
+      - master
+
+jobs:
+  build_java:
+    name: Build Java
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Java
+        uses: action/setup-java@v1
+        with:
+          java-version: 15
+      - name: Generated Java soruce
+        run: make gen-java
+      - name: Build Java artifact
+        uses: burrunan/gradle-cache-action@v1.5
+        with:
+          remote-build-cache-proxy-enabled: false
+          arguments: build --stacktrace
