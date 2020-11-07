@@ -500,10 +500,6 @@ message DoubleHistogramDataPoint {
   // a boolean value which decides what type of intervals to use.
   repeated double explicit_bounds = 7;
 
-  // (Optional) List of exemplars collected from
-  // measurements that were used to form the data point
-  repeated DoubleExemplar exemplars = 8;
-
   // When bounds have a pattern, a more efficient encoding method may be used.
   // Only one method should be defined. For performance reason, "oneof" is not used.
   // When more than one methods are defined, the receiver will use the first one found using this order:
@@ -511,6 +507,10 @@ message DoubleHistogramDataPoint {
   LinearBounds linear_bounds = 9;
   ExponentialBounds exponential_bounds = 10;
   LogLinearBounds log_linear_bounds = 11;
+
+  // (Optional) List of exemplars collected from
+  // measurements that were used to form the data point
+  repeated DoubleExemplar exemplars = 8;
 
   // LinearBounds. Bounds can be generated via
   // for (int i = 0; i < num_of_bounds; i++)
