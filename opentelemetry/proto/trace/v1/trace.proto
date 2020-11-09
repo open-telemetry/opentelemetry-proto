@@ -152,11 +152,13 @@ message Span {
   // attributes is a collection of key/value pairs. The value can be a string,
   // an integer, a double or the Boolean values `true` or `false`. Note, global attributes
   // like server name can be set using the resource API. Examples of attributes:
-  //
-  //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
-  //     "/http/server_latency": 300
-  //     "abc.com/myattribute": true
-  //     "abc.com/score": 10.239
+  // 
+  // ```txt
+  // "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+  // "/http/server_latency": 300
+  // "abc.com/myattribute": true
+  // "abc.com/score": 10.239
+  // ```
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 9;
 
   // dropped_attributes_count is the number of attributes that were discarded. Attributes
@@ -239,31 +241,35 @@ message Status {
   // 2. New senders, which are aware of the `code` field MUST set both the
   // `deprecated_code` and `code` fields according to the following rules:
   //
-  //   if code==STATUS_CODE_UNSET then `deprecated_code` MUST be
-  //   set to DEPRECATED_STATUS_CODE_OK.
+  // ```txt
+  // if code==STATUS_CODE_UNSET then `deprecated_code` MUST be
+  // set to DEPRECATED_STATUS_CODE_OK.
   //
-  //   if code==STATUS_CODE_OK then `deprecated_code` MUST be
-  //   set to DEPRECATED_STATUS_CODE_OK.
+  // if code==STATUS_CODE_OK then `deprecated_code` MUST be
+  // set to DEPRECATED_STATUS_CODE_OK.
   //
-  //   if code==STATUS_CODE_ERROR then `deprecated_code` MUST be
-  //   set to DEPRECATED_STATUS_CODE_UNKNOWN_ERROR.
+  // if code==STATUS_CODE_ERROR then `deprecated_code` MUST be
+  // set to DEPRECATED_STATUS_CODE_UNKNOWN_ERROR.
+  // ```
   //
   // These rules allow old receivers to correctly interpret data received from new senders.
   //
   // 3. New receivers MUST look at both the `code` and `deprecated_code` fields in order
   // to interpret the overall status:
   //
-  //   If code==STATUS_CODE_UNSET then the value of `deprecated_code` is the
-  //   carrier of the overall status according to these rules:
+  // ```txt
+  // If code==STATUS_CODE_UNSET then the value of `deprecated_code` is the
+  // carrier of the overall status according to these rules:
   //
-  //     if deprecated_code==DEPRECATED_STATUS_CODE_OK then the receiver MUST interpret
-  //     the overall status to be STATUS_CODE_UNSET.
+  //   if deprecated_code==DEPRECATED_STATUS_CODE_OK then the receiver MUST interpret
+  //   the overall status to be STATUS_CODE_UNSET.
   //
-  //     if deprecated_code!=DEPRECATED_STATUS_CODE_OK then the receiver MUST interpret
-  //     the overall status to be STATUS_CODE_ERROR.
+  //   if deprecated_code!=DEPRECATED_STATUS_CODE_OK then the receiver MUST interpret
+  //   the overall status to be STATUS_CODE_ERROR.
   //
-  //   If code!=STATUS_CODE_UNSET then the value of `deprecated_code` MUST be
-  //   ignored, the `code` field is the sole carrier of the status.
+  // If code!=STATUS_CODE_UNSET then the value of `deprecated_code` MUST be
+  // ignored, the `code` field is the sole carrier of the status.
+  // ```
   //
   // These rules allow new receivers to correctly interpret data received from old senders.
 
