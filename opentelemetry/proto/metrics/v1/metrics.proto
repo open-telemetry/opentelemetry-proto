@@ -297,6 +297,10 @@ enum AggregationTemporality {
   // systems that do not use start_time to determine when the aggregation
   // value was reset (e.g. Prometheus).
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
+
+  // GAUGE is an AggregationTemporality for a metric of type GAUGE. Essentially
+  // it means that aggregation over time is not being used.
+  AGGREGATION_TEMPORALITY_GAUGE = 3;
 }
 
 // IntDataPoint is a single data point in a timeseries that describes the
