@@ -143,6 +143,7 @@ message Metric {
     IntHistogram int_histogram = 8;
     DoubleHistogram double_histogram = 9;
     DoubleSummary double_summary = 11;
+    DoubleGaugeHistogram double_gauge_histogram = 12;
   }
 }
 
@@ -228,6 +229,19 @@ message DoubleSummary {
   repeated DoubleSummaryDataPoint data_points = 1;
 }
 
+// DoubleGaugeHistogram represents the type of a double histogram metric that
+// always exports the "current value" for every data point. It should be used
+// for an "unknown" aggregation.
+//
+// A DoubleGaugeHistogram does not support different aggregation temporalities.
+// Given the aggregation is unknown, points cannot be combined using the same
+// aggregation, regardless of aggregation temporalities. Therefore,
+// AggregationTemporality is not included. Consequently, this also means
+// "StartTimeUnixNano" is ignored for all data points.
+message DoubleGaugeHistogram {
+  repeated DoubleHistogramDataPoint data_points = 1;
+}
+
 // AggregationTemporality defines how a metric aggregator reports aggregated
 // values. It describes how those values relate to the time interval over
 // which they are aggregated.
@@ -297,10 +311,6 @@ enum AggregationTemporality {
   // systems that do not use start_time to determine when the aggregation
   // value was reset (e.g. Prometheus).
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
-
-  // GAUGE is an AggregationTemporality for a metric of type GAUGE. Essentially
-  // it means that aggregation over time is not being used.
-  AGGREGATION_TEMPORALITY_GAUGE = 3;
 }
 
 // IntDataPoint is a single data point in a timeseries that describes the
