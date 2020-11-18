@@ -17,7 +17,7 @@ endef
 .PHONY: ci
 ci: gen-go gen-java gen-python gen-swagger
 
-OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:latest
+OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.1.0
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 PROTO_INCLUDES := -I/usr/include/github.com/gogo/protobuf
 
@@ -25,6 +25,11 @@ PROTO_GEN_GO_DIR ?= $(GENDIR)/go
 PROTO_GEN_JAVA_DIR ?= $(GENDIR)/java
 PROTO_GEN_PYTHON_DIR ?= $(GENDIR)/python
 PROTO_GEN_SWAGGER_OUTDIR ?= $(GENDIR)/openapi
+
+# Docker pull image.
+.PHONY: docker-pull
+docker-pull:
+	docker pull $(OTEL_DOCKER_PROTOBUF)
 
 # Generate ProtoBuf implementation for Go.
 .PHONY: gen-go
