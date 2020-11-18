@@ -1,0 +1,42 @@
+name: Build Check
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  docker-pull:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: make docker-pull
+  
+  gen-go:
+    needs: docker-pull
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: make gen-go
+
+  gen-java:
+    needs: docker-pull
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: make gen-java
+
+  gen-python:
+    needs: docker-pull
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: make gen-python
+
+  gen-swagger:
+    needs: docker-pull
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: make gen-swagger
