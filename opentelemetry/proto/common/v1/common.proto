@@ -72,6 +72,8 @@ message StringKeyValue {
 // InstrumentationLibrary is a message representing the instrumentation library information
 // such as the fully qualified name and version. 
 message InstrumentationLibrary {
+  // An empty instrumentation library name is equivalent with an "unknown" 
+  // instrumentation library.
   string name = 1;
   string version = 2;
 }
