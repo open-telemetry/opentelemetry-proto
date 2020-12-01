@@ -11,11 +11,11 @@ See [contribution guidelines](CONTRIBUTING.md) if you would like to make any cha
 Component                            | Maturity |
 -------------------------------------|----------|
 **Binary Protobuf Encoding**         |          |
-collector/metrics/*                  | Alpha    |
+collector/metrics/*                  | Beta     |
 collector/trace/*                    | Stable   |
 collector/logs/*                     | Alpha    |
 common/*                             | Stable   |
-metrics/*                            | Alpha    |
+metrics/*                            | Beta     |
 resource/*                           | Stable   |
 trace/trace.proto                    | Stable   |
 trace/trace_config.proto             | Alpha    |
