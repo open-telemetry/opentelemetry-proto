@@ -1,5 +1,7 @@
 # Language Independent Interface Types For OpenTelemetry
 
+[![Build Check](https://github.com/open-telemetry/opentelemetry-proto/workflows/Build%20Check/badge.svg?branch=master)](https://github.com/open-telemetry/opentelemetry-proto/actions?query=workflow%3A%22Build+Check%22+branch%3Amaster)
+
 The proto files can be consumed as GIT submodule or copied over and built directly in the consumer project.
 
 The compiled files are published to central repositories (Maven, NPM...) from OpenTelemetry client libraries.
