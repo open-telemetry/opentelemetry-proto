@@ -500,14 +500,14 @@ message DoubleHistogramDataPoint {
   // a boolean value which decides what type of intervals to use.
   repeated double explicit_bounds = 7;
 
-  // When bounds have a pattern, a more efficient encoding method may be used.
-  // Only one method should be defined. For performance reason, "oneof" is not used.
-  // When more than one methods are defined, the receiver will use the first one found using this order:
-  //     explicit_bounds, linear_bounds, exponential_bounds, log_linear_bounds
-  LinearBounds linear_bounds = 9;
-  ExponentialBounds exponential_bounds = 10;
-  LogLinearBounds log_linear_bounds = 11;
-
+  // Multiple ways to define the bound sequence is supported. While explicit_bounds is one of the ways,
+  // for backward compatibility reason, it is not included in "oneof bound_type".
+  // Only one of explicit_bounds or bound_type should be present. When both are present, bound_type is ignored.
+  oneof bound_type {
+    LinearBounds linear_bounds = 9;
+    ExponentialBounds exponential_bounds = 10;
+    LogLinearBounds log_linear_bounds = 11;
+  }
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated DoubleExemplar exemplars = 8;
