@@ -523,11 +523,17 @@ message DoubleHistogramDataPoint {
 
   // ExponentialBounds. Bounds are on log scale.
   // The bound sequence is stitched together using negative bounds, zero bound, and positive bounds.
+  // The general rules is: bound = reference * power(base, exponent)
+  // Reference and base are constants. Exponent is integer index of histogram buckets.
+  // Reference defaults to 1. Base should be greater than 1.
+  // Negative index is allowed. It results in a bound between 0 and the reference.
+  // Two sections are specified, one for positive numbers, one for negative numbers.
+  // A special field is used to specify if a bound of zero exists.
   // The formula to generate explicit bounds here are for demonstration purpose only.
   // If the message receiver natively stores exponential histograms, it will not need to generate explicit bounds.
   // It will only need to record the exponential bound parameters.
   message ExponentialBounds {
-    double reference = 1;
+    double reference = 1; // If not present, 1 is assumed.
     double base = 2;
 
     // The bound sequence starts with negative values generated via:
@@ -578,6 +584,23 @@ message DoubleHistogramDataPoint {
   //    int i = count + index_offset_for_positive_numbers;
   //    int exponent;
   //    int subbucketNumber; // In the range of [0, num_of_linear_subbuckets - 1]
+  //
+  //    // i is the bucket index. We need to derive "major" bucket number (ie. exponent) and "minor" bucket number
+  //    // (ie. subbucketNumber) from it. An example of num_of_linear_subbuckets=4:
+  //    // index:           -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4   5   6   7   8
+  //    // exponent:        -2  -2  -2  -2  -1  -1  -1  -1   0   0   0   0   1   1   1   1   2
+  //    // subbucketNumber:  0   1   2   3   0   1   2   3   0   1   2   3   0   1   2   3   0
+  //    // At index 0, exponent=0, subbucketNumber=0.
+  //    // Exponent increases by 1 on every num_of_linear_subbuckets indexes.
+  //    // subbucketNumber cycles from 0 to num_of_linear_subbuckets - 1.
+  //    // For index >= 0, simple division and mod will do the work.
+  //    // For negative indexes, we need some special logic to make division round toward -infinity.
+  //    // In most platforms (such as Java), integer division on negative numbers round toward 0.
+  //    // Toward 0:         -5 / 4 = -1.25 = -1
+  //    // Toward -infinity: -5 / 4 = -1.25 = -2
+  //    // Similarly, some special logic is needed on subbucketNumber to make it cycle in 0, 1, 2 ... order
+  //    // in the negative index range.
+  //
   //    if (i >= 0) {
   //        exponent = i / num_of_linear_subbuckets;
   //        subbucketNumber = i % num_of_linear_subbuckets;
