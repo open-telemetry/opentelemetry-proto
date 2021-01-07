@@ -107,7 +107,7 @@ message Span {
     SPAN_KIND_UNSPECIFIED = 0;
 
     // Indicates that the span represents an internal operation within an application,
-    // as opposed to an operations happening at the boundaries. Default value.
+    // as opposed to an operation happening at the boundaries. Default value.
     SPAN_KIND_INTERNAL = 1;
 
     // Indicates that the span covers server-side handling of an RPC or other
