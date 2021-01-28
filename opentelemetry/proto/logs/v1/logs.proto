@@ -82,7 +82,7 @@ enum LogRecordFlags {
 }
 
 // A log record according to OpenTelemetry Log Data Model:
-// https://github.com/open-telemetry/oteps/blob/master/text/logs/0097-log-data-model.md
+// https://github.com/open-telemetry/oteps/blob/main/text/logs/0097-log-data-model.md
 message LogRecord {
   // time_unix_nano is the time when the event occurred.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
