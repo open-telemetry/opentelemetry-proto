@@ -368,6 +368,23 @@ message DoubleDataPoint {
   repeated DoubleExemplar exemplars = 5;
 }
 
+// ExplicitBounds specifies buckets with explicitly defined bounds for values.
+// The bucket boundaries are described by "bounds" field.
+message ExplicitBounds {
+  // This defines size(bounds) + 1 (= N) buckets. The boundaries for bucket
+  // at index i are:
+  //
+  // (-infinity, bounds[i]) for i == 0
+  // [bounds[i-1], bounds[i]) for 0 < i < N-1
+  // [bounds[i], +infinity) for i == N-1
+  // The values in bounds array must be strictly increasing.
+  //
+  // Note: only [a, b) intervals are currently supported for each bucket except the first one.
+  // If we decide to also support (a, b] intervals we should add support for these by defining
+  // a boolean value which decides what type of intervals to use.
+  repeated double explicit_bounds = 7;
+}
+
 // IntHistogramDataPoint is a single data point in a timeseries that describes
 // the time-varying values of a Histogram of int values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain
@@ -420,24 +437,11 @@ message IntHistogramDataPoint {
   // Otherwise all option fields and "buckets" field must be omitted in which case the
   // distribution of values in the histogram is unknown and only the total count and sum are known.
 
+  repeated double deprecated_explicit_bounds = 7 [deprecated=true];
+
   // explicit_bounds is the only supported bucket option currently.
   // TODO: Add more bucket options.
-
-  // explicit_bounds specifies buckets with explicitly defined bounds for values.
-  // The bucket boundaries are described by "bounds" field.
-  //
-  // This defines size(bounds) + 1 (= N) buckets. The boundaries for bucket
-  // at index i are:
-  //
-  // (-infinity, bounds[i]) for i == 0
-  // [bounds[i-1], bounds[i]) for 0 < i < N-1
-  // [bounds[i], +infinity) for i == N-1
-  // The values in bounds array must be strictly increasing.
-  //
-  // Note: only [a, b) intervals are currently supported for each bucket except the first one.
-  // If we decide to also support (a, b] intervals we should add support for these by defining
-  // a boolean value which decides what type of intervals to use.
-  repeated double explicit_bounds = 7;
+  ExplicitBounds explicit_bounds = 9;
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
@@ -496,24 +500,11 @@ message DoubleHistogramDataPoint {
   // Otherwise all option fields and "buckets" field must be omitted in which case the
   // distribution of values in the histogram is unknown and only the total count and sum are known.
 
+  repeated double deprecated_explicit_bounds = 7 [deprecated=true];
+
   // explicit_bounds is the only supported bucket option currently.
   // TODO: Add more bucket options.
-
-  // explicit_bounds specifies buckets with explicitly defined bounds for values.
-  // The bucket boundaries are described by "bounds" field.
-  //
-  // This defines size(bounds) + 1 (= N) buckets. The boundaries for bucket
-  // at index i are:
-  //
-  // (-infinity, bounds[i]) for i == 0
-  // [bounds[i-1], bounds[i]) for 0 < i < N-1
-  // [bounds[i], +infinity) for i == N-1
-  // The values in bounds array must be strictly increasing.
-  //
-  // Note: only [a, b) intervals are currently supported for each bucket except the first one.
-  // If we decide to also support (a, b] intervals we should add support for these by defining
-  // a boolean value which decides what type of intervals to use.
-  repeated double explicit_bounds = 7;
+  ExplicitBounds explicit_bounds = 9;
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
