@@ -17,7 +17,7 @@ token](https://help.github.com/articles/creating-a-personal-access-token-for-the
 
     ```bash
     MAJOR=0 MINOR=3 PATCH=0 # Set appropriately for new release
-    git checkout -b v$MAJOR.$MINOR.x master
+    git checkout -b v$MAJOR.$MINOR.x main
     git push upstream v$MAJOR.$MINOR.x
     ```
 
@@ -80,15 +80,15 @@ or the Github [compare tool](https://github.com/open-telemetry/opentelemetry-pro
 to view a summary of all commits since last release as a reference.
 
 In addition, you can refer to
-[CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-proto/blob/master/CHANGELOG.md)
+[CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-proto/blob/main/CHANGELOG.md)
 for a list of major changes since last release.
 
 ## Update release versions in documentations and CHANGELOG files
 
 After releasing is done, you need to update
-[README.md](https://github.com/open-telemetry/opentelemetry-proto/blob/master/README.md) and
-[CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-proto/blob/master/CHANGELOG.md).
+[README.md](https://github.com/open-telemetry/opentelemetry-proto/blob/main/README.md) and
+[CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-proto/blob/main/CHANGELOG.md).
 
 Create a PR to mark the new release in
-[CHANGELOG.md](https://github.com/census-instrumentation/opencensus-java/blob/master/CHANGELOG.md)
-on master branch.
+[CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-proto/blob/main/CHANGELOG.md)
+on main branch.
