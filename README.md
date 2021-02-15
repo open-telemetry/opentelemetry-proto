@@ -8,6 +8,20 @@ The compiled files are published to central repositories (Maven, NPM...) from Op
 
 See [contribution guidelines](CONTRIBUTING.md) if you would like to make any changes.
 
+## Generate gRPC Client Libraries
+
+To generate the raw gRPC client libraries use `make gen-${LANGUAGE}`. Current supported languages are:
+
+* cpp
+* csharp
+* go
+* java
+* objc
+* openapi (swagger)
+* php
+* python
+* ruby
+
 ## Maturity Level
 
 Component                            | Maturity |
