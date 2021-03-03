@@ -143,7 +143,7 @@ message Metric {
     DoubleSum double_sum = 7;
     IntHistogram int_histogram = 8;
     DoubleHistogram double_histogram = 9;
-    Summary double_summary = 11;
+    Summary summary = 11;
   }
 }
 
