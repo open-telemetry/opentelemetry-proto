@@ -141,8 +141,14 @@ message Metric {
     DoubleGauge double_gauge = 5;
     IntSum int_sum = 6;
     DoubleSum double_sum = 7;
-    IntHistogram int_histogram = 8;
-    DoubleHistogram double_histogram = 9;
+    // This field is marked as deprecated, and it will be removed soon.
+    // 1. Old senders and receivers that are not aware of this change will
+    // continue using the `int_histogram` field.
+    // 2. New senders, which are aware of this change MUST send only `histogram`.
+    // 3. New receivers, which are aware of this change MUST convert this into
+    // `histogram` by simply converting all int64 values into float.
+    IntHistogram deprecated_int_histogram = 8;
+    Histogram histogram = 9;
     DoubleSummary double_summary = 11;
   }
 }
@@ -211,8 +217,8 @@ message IntHistogram {
 
 // Represents the type of a metric that is calculated by aggregating as a
 // Histogram of all reported double measurements over a time interval.
-message DoubleHistogram {
-  repeated DoubleHistogramDataPoint data_points = 1;
+message Histogram {
+  repeated HistogramDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
@@ -448,7 +454,7 @@ message IntHistogramDataPoint {
 // time-varying values of a Histogram of double values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain the
 // distribution of those values across a set of buckets.
-message DoubleHistogramDataPoint {
+message HistogramDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
