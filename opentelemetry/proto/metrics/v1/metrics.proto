@@ -494,7 +494,7 @@ message HistogramDataPoint {
   // mergeable, they will pass through OpenTelemetry collectors as
   // distinct Metric series, as they cannot be merged.
   oneof buckets {
-    // ExplicitBounds support encoding arbitrary boundaries and
+    // ExplicitBuckets support encoding arbitrary boundaries and
     // counts.  Histograms with these buckets are mergeable when
     // they have identical boundaries, otherwise are not mergeable.
     ExplicitBuckets explicit = 9;
@@ -506,9 +506,9 @@ message HistogramDataPoint {
 }
 
 // ExplicitBuckets is a standard way of represeting arbitrary
-// histogram data using explicit boundaries.  It simply combines an
-// array of N-1 boundaries and an arry of N counts.
-message ExplicitBounds {
+// histogram data using explicit boundaries.  It combines an
+// array of N-1 boundaries and an array of N counts.
+message ExplicitBuckets {
   // counts is an optional field contains the count values of histogram
   // for each bucket.
   //
