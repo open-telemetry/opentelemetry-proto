@@ -421,7 +421,6 @@ message IntHistogramDataPoint {
   // distribution of values in the histogram is unknown and only the total count and sum are known.
 
   // explicit_bounds is the only supported bucket option currently.
-  // TODO: Add more bucket options.
 
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
@@ -495,9 +494,6 @@ message DoubleHistogramDataPoint {
   // In that case one of the option fields below and "buckets" field both must be defined.
   // Otherwise all option fields and "buckets" field must be omitted in which case the
   // distribution of values in the histogram is unknown and only the total count and sum are known.
-
-  // explicit_bounds is the only supported bucket option currently.
-  // TODO: Add more bucket options.
 
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
@@ -633,4 +629,89 @@ message DoubleExemplar {
   // trace_id may be missing if the measurement is not recorded inside a trace
   // or if the trace is not sampled.
   bytes trace_id = 5;
+}
+
+// Deprecated DoubleHistogram => DeprecatedHistogram
+
+// Represents the type of a metric that is calculated by aggregating as a
+// Histogram of all reported double measurements over a time interval.
+message DeprecatedHistogram {
+  repeated DeprecatedHistogramDataPoint data_points = 1;
+
+  // aggregation_temporality describes if the aggregator reports delta changes
+  // since last report time, or cumulative changes since a fixed start time.
+  AggregationTemporality aggregation_temporality = 2;
+}
+
+// HistogramDataPoint is a single data point in a timeseries that describes the
+// time-varying values of a Histogram of double values. A Histogram contains
+// summary statistics for a population of values, it may optionally contain the
+// distribution of those values across a set of buckets.
+message DeprecatedHistogramDataPoint {
+  // The set of labels that uniquely identify this timeseries.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
+
+  // start_time_unix_nano is the last time when the aggregation value was reset
+  // to "zero". For some metric types this is ignored, see data types for more
+  // details.
+  //
+  // The aggregation value is over the time interval (start_time_unix_nano,
+  // time_unix_nano].
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  //
+  // Value of 0 indicates that the timestamp is unspecified. In that case the
+  // timestamp may be decided by the backend.
+  fixed64 start_time_unix_nano = 2;
+
+  // time_unix_nano is the moment when this aggregation value was reported.
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  fixed64 time_unix_nano = 3;
+
+  // count is the number of values in the population. Must be non-negative. This
+  // value must be equal to the sum of the "count" fields in buckets if a
+  // histogram is provided.
+  fixed64 count = 4;
+
+  // sum of the values in the population. If count is zero then this field
+  // must be zero. This value must be equal to the sum of the "sum" fields in
+  // buckets if a histogram is provided.
+  double sum = 5;
+
+  // bucket_counts is an optional field contains the count values of histogram
+  // for each bucket.
+  //
+  // The sum of the bucket_counts must equal the value in the count field.
+  //
+  // The number of elements in bucket_counts array must be by one greater than
+  // the number of elements in explicit_bounds array.
+  repeated fixed64 bucket_counts = 6;
+
+  // A histogram may optionally contain the distribution of the values in the population.
+  // In that case one of the option fields below and "buckets" field both must be defined.
+  // Otherwise all option fields and "buckets" field must be omitted in which case the
+  // distribution of values in the histogram is unknown and only the total count and sum are known.
+
+  // explicit_bounds specifies buckets with explicitly defined bounds for values.
+  //
+  // This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
+  // bucket at index i are:
+  //
+  // (-infinity, explicit_bounds[i]] for i == 0
+  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
+  // (explicit_bounds[i], +infinity) for i == N-1
+  // 
+  // The values in the explicit_bounds array must be strictly increasing.
+  //
+  // Histogram buckets are inclusive of their upper boundary, except the last
+  // bucket where the boundary is at infinity. This format is intentionally
+  // compatible with the OpenMetrics histogram definition.
+  repeated double explicit_bounds = 7;
+
+  // (Optional) List of exemplars collected from
+  // measurements that were used to form the data point
+  repeated DoubleExemplar exemplars = 8;
 }
