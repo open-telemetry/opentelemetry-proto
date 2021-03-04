@@ -421,8 +421,6 @@ message IntHistogramDataPoint {
   // Otherwise all option fields and "buckets" field must be omitted in which case the
   // distribution of values in the histogram is unknown and only the total count and sum are known.
 
-  // explicit_bounds is the only supported bucket option currently.
-
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
   // This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
@@ -482,39 +480,59 @@ message HistogramDataPoint {
   // buckets if a histogram is provided.
   double sum = 5;
 
-  // bucket_counts is an optional field contains the count values of histogram
-  // for each bucket.
+  // buckets are one of several defined bucketing strategies
   //
-  // The sum of the bucket_counts must equal the value in the count field.
+  // If this field is omitted, there is an implied single bucket
+  // spanning (-Inf,+Inf) containing the whole population.
   //
-  // The number of elements in bucket_counts array must be by one greater than
-  // the number of elements in explicit_bounds array.
-  repeated fixed64 bucket_counts = 6;
-
-  // A histogram may optionally contain the distribution of the values in the population.
-  // In that case one of the option fields below and "buckets" field both must be defined.
-  // Otherwise all option fields and "buckets" field must be omitted in which case the
-  // distribution of values in the histogram is unknown and only the total count and sum are known.
-
-  // explicit_bounds specifies buckets with explicitly defined bounds for values.
+  // Each of the supported buckets in the oneof below are expected
+  // to state under which circumstances buckets of that type are
+  // considered Mergeable in a non-lossy way with buckets of the same
+  // type.
   //
-  // This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-  // bucket at index i are:
-  //
-  // (-infinity, explicit_bounds[i]] for i == 0
-  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-  // (explicit_bounds[i], +infinity) for i == N-1
-  // 
-  // The values in the explicit_bounds array must be strictly increasing.
-  //
-  // Histogram buckets are inclusive of their upper boundary, except the last
-  // bucket where the boundary is at infinity. This format is intentionally
-  // compatible with the OpenMetrics histogram definition.
-  repeated double explicit_bounds = 7;
+  // When a single Metric uses Histograms with buckets of that are not
+  // mergeable, they will pass through OpenTelemetry collectors as
+  // distinct Metric series, as they cannot be merged.
+  oneof buckets {
+    // ExplicitBounds support encoding arbitrary boundaries and
+    // counts.  Histograms with these buckets are mergeable when
+    // they have identical boundaries, otherwise are not mergeable.
+    ExplicitBuckets explicit = 9;
+  }
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated DoubleExemplar exemplars = 8;
+}
+
+// ExplicitBuckets is a standard way of represeting arbitrary
+// histogram data using explicit boundaries.  It simply combines an
+// array of N-1 boundaries and an arry of N counts.
+message ExplicitBounds {
+  // counts is an optional field contains the count values of histogram
+  // for each bucket.
+  //
+  // The sum of the counts must equal the value in the count field.
+  //
+  // The number of elements in counts array must be by one greater than
+  // the number of elements in boundaries array.
+  repeated fixed64 counts = 6;
+
+  // boundaries specifies buckets with explicitly defined boundaries.
+  //
+  // This defines N = size(boundaries) + 1 buckets. The boundaries for
+  // bucket at index i are:
+  //
+  // (-infinity, boundaries[i]] for i == 0
+  // (boundaries[i-1], boundaries[i]] for 0 < i < N-1
+  // (boundaries[i], +infinity) for i == N-1
+  // 
+  // The values in the boundaries array must be strictly increasing.
+  //
+  // Histogram buckets are inclusive of their upper boundary, except the last
+  // bucket where the boundary is at infinity. This format is intentionally
+  // compatible with the OpenMetrics histogram definition.
+  repeated double boundaries = 7;
 }
 
 // DoubleSummaryDataPoint is a single data point in a timeseries that describes the
@@ -716,3 +734,4 @@ message DeprecatedHistogramDataPoint {
   // measurements that were used to form the data point
   repeated DoubleExemplar exemplars = 8;
 }
+
