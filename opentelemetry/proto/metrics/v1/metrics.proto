@@ -141,8 +141,14 @@ message Metric {
     DoubleGauge double_gauge = 5;
     IntSum int_sum = 6;
     DoubleSum double_sum = 7;
+    // IntHistogram and DoubleHistogram are DEPRECATED and will be removed soon.
+    // 1. Old senders and receivers that are not aware of this change will
+    // continue using the `int_histogram` and `double_histogram` field.
+    // 2. New senders, which are aware of this change MUST send only `histogram`.
+    // 3. New receivers, which are aware of this change MUST convert this into
+    // `histogram` by converting point values.
     IntHistogram int_histogram = 8;
-    DeprecatedHistogram deprecated_histogram = 9;
+    DoubleHistogram double_histogram = 9;
     Histogram histogram = 12;
     DoubleSummary double_summary = 11;
   }
@@ -490,9 +496,10 @@ message HistogramDataPoint {
   // considered Mergeable in a non-lossy way with buckets of the same
   // type.
   //
-  // When a single Metric uses Histograms with buckets of that are not
-  // mergeable, they will pass through OpenTelemetry collectors as
-  // distinct Metric series, as they cannot be merged.
+  // OTLP does not allow two `Metric` instances having `Histogram`s
+  // with unmergable bucket types to be merged.  These will remain
+  // disjoint `Metric` instances through any processors within
+  // OpenTelemetry.
   oneof buckets {
     // ExplicitBuckets support encoding arbitrary boundaries and
     // counts.  Histograms with these buckets are mergeable when
@@ -650,23 +657,23 @@ message DoubleExemplar {
   bytes trace_id = 5;
 }
 
-// Deprecated DoubleHistogram => DeprecatedHistogram
-
+// DoubleHistogram is DEPRECATED.
 // Represents the type of a metric that is calculated by aggregating as a
 // Histogram of all reported double measurements over a time interval.
-message DeprecatedHistogram {
-  repeated DeprecatedHistogramDataPoint data_points = 1;
+message DoubleHistogram {
+  repeated DoubleHistogramDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
   AggregationTemporality aggregation_temporality = 2;
 }
 
-// HistogramDataPoint is a single data point in a timeseries that describes the
+// DoubleHistogramDataPoint is DEPRECATED.
+// Represents a single data point in a timeseries that describes the
 // time-varying values of a Histogram of double values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain the
 // distribution of those values across a set of buckets.
-message DeprecatedHistogramDataPoint {
+message DoubleHistogramDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
