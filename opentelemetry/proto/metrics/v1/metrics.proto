@@ -143,7 +143,7 @@ message Metric {
     DoubleSum double_sum = 7;
     IntHistogram int_histogram = 8;
     DoubleHistogram double_histogram = 9;
-    DoubleSummary double_summary = 11;
+    Summary summary = 11;
   }
 }
 
@@ -219,14 +219,14 @@ message DoubleHistogram {
   AggregationTemporality aggregation_temporality = 2;
 }
 
-// DoubleSummary metric data are used to convey quantile summaries,
+// Summary metric data are used to convey quantile summaries,
 // a Prometheus (see: https://prometheus.io/docs/concepts/metric_types/#summary)
 // and OpenMetrics (see: https://github.com/OpenObservability/OpenMetrics/blob/4dbf6075567ab43296eed941037c12951faafb92/protos/prometheus.proto#L45)
 // data type. These data points cannot always be merged in a meaningful way.
 // While they can be useful in some applications, histogram data points are
 // recommended for new applications.
-message DoubleSummary {
-  repeated DoubleSummaryDataPoint data_points = 1;
+message Summary {
+  repeated SummaryDataPoint data_points = 1;
 }
 
 // AggregationTemporality defines how a metric aggregator reports aggregated
@@ -520,9 +520,9 @@ message DoubleHistogramDataPoint {
   repeated DoubleExemplar exemplars = 8;
 }
 
-// DoubleSummaryDataPoint is a single data point in a timeseries that describes the
+// SummaryDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a Summary metric.
-message DoubleSummaryDataPoint {
+message SummaryDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
