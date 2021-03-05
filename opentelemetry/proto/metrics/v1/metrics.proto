@@ -490,20 +490,9 @@ message HistogramDataPoint {
   //
   // If this field is omitted, there is an implied single bucket
   // spanning (-Inf,+Inf) containing the whole population.
-  //
-  // Each of the supported buckets in the oneof below are expected
-  // to state under which circumstances buckets of that type are
-  // considered Mergeable in a non-lossy way with buckets of the same
-  // type.
-  //
-  // OTLP does not allow two `Metric` instances having `Histogram`s
-  // with unmergable bucket types to be merged.  These will remain
-  // disjoint `Metric` instances through any processors within
-  // OpenTelemetry.
   oneof buckets {
     // ExplicitBuckets support encoding arbitrary boundaries and
-    // counts.  Histograms with these buckets are mergeable when
-    // they have identical boundaries, otherwise are not mergeable.
+    // counts.
     ExplicitBuckets explicit = 9;
   }
 
