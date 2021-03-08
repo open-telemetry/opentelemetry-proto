@@ -486,7 +486,7 @@ message HistogramDataPoint {
   // buckets if a histogram is provided.
   double sum = 5;
 
-  // buckets are one of several defined bucketing strategies
+  // buckets is one of several defined bucketing strategies
   //
   // If this field is omitted, there is an implied single bucket
   // spanning (-Inf,+Inf) containing the whole population.
@@ -501,16 +501,17 @@ message HistogramDataPoint {
   repeated DoubleExemplar exemplars = 8;
 }
 
-// ExplicitBuckets is a standard way of represeting arbitrary
+// ExplicitBuckets is a standard way of representing arbitrary
 // histogram data using explicit boundaries.  It combines an
 // array of N-1 boundaries and an array of N counts.
 message ExplicitBuckets {
   // counts is an optional field contains the count values of histogram
   // for each bucket.
   //
-  // The sum of the counts must equal the value in the count field.
+  // The sum of the counts must equal the value in the HistogramDataPoint's
+ count field.
   //
-  // The number of elements in counts array must be by one greater than
+  // The number of elements in counts array must be one greater than
   // the number of elements in boundaries array.
   repeated fixed64 counts = 6;
 
@@ -730,4 +731,3 @@ message DoubleHistogramDataPoint {
   // measurements that were used to form the data point
   repeated DoubleExemplar exemplars = 8;
 }
-
