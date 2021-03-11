@@ -509,7 +509,7 @@ message ExplicitBuckets {
   // for each bucket.
   //
   // The sum of the counts must equal the value in the HistogramDataPoint's
- count field.
+  // count field.
   //
   // The number of elements in counts array must be one greater than
   // the number of elements in boundaries array.
