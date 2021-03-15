@@ -137,14 +137,32 @@ message Metric {
   //   UpDownSumObserver  Sum(aggregation_temporality=cumulative;is_monotonic=false)
   //   ValueObserver      Gauge()
   oneof data {
+    // (int_gauge and double_gauge) and (int_sum and double_sum) are deprecated,
+    // replaced by gauge and sum fields, respectively.
     IntGauge int_gauge = 4;
     DoubleGauge double_gauge = 5;
     IntSum int_sum = 6;
     DoubleSum double_sum = 7;
+
+    Gauge gauge = 13;
+    Sum sum = 14;
     IntHistogram int_histogram = 8;
     DoubleHistogram double_histogram = 9;
     Summary summary = 11;
   }
+}
+
+// Gauge represents the type of a int scalar metric that always exports the
+// "current value" for every data point. It should be used for an "unknown"
+// aggregation.
+// 
+// A Gauge does not support different aggregation temporalities. Given the
+// aggregation is unknown, points cannot be combined using the same
+// aggregation, regardless of aggregation temporalities. Therefore,
+// AggregationTemporality is not included. Consequently, this also means
+// "StartTimeUnixNano" is ignored for all data points.
+message Gauge {
+  repeated ScalarDataPoint data_points = 1;
 }
 
 // Gauge represents the type of a int scalar metric that always exports the
@@ -171,6 +189,19 @@ message IntGauge {
 // "StartTimeUnixNano" is ignored for all data points.
 message DoubleGauge {
   repeated DoubleDataPoint data_points = 1;
+}
+
+// Sum represents the type of a numeric int scalar metric that is calculated as
+// a sum of all reported measurements over a time interval.
+message Sum {
+  repeated ScalarDataPoint data_points = 1;
+
+  // aggregation_temporality describes if the aggregator reports delta changes
+  // since last report time, or cumulative changes since a fixed start time.
+  AggregationTemporality aggregation_temporality = 2;
+
+  // If "true" means that the sum is monotonic.
+  bool is_monotonic = 3;
 }
 
 // Sum represents the type of a numeric int scalar metric that is calculated as
@@ -300,6 +331,43 @@ enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
+// ScalarDataPoint is a single data point in a timeseries that describes the
+// time-varying value of a integer or double-valued metric.
+message ScalarDataPoint {
+  // The set of labels that uniquely identify this timeseries.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
+
+  // start_time_unix_nano is the last time when the aggregation value was reset
+  // to "zero". For some metric types this is ignored, see data types for more
+  // details.
+  //
+  // The aggregation value is over the time interval (start_time_unix_nano,
+  // time_unix_nano].
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  //
+  // Value of 0 indicates that the timestamp is unspecified. In that case the
+  // timestamp may be decided by the backend.
+  fixed64 start_time_unix_nano = 2;
+
+  // time_unix_nano is the moment when this aggregation value was reported.
+  // 
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  fixed64 time_unix_nano = 3;
+
+  // value itself.
+  oneof value {
+    double double_value = 4;
+    sfixed64 int_value = 5;
+  }
+
+  // (Optional) List of exemplars collected from
+  // measurements that were used to form the data point
+  repeated Exemplar exemplars = 8;
+}
+
 // IntDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a int64 metric.
 message IntDataPoint {
@@ -365,7 +433,7 @@ message DoubleDataPoint {
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated DoubleExemplar exemplars = 5;
+  repeated Exemplar exemplars = 5;
 }
 
 // IntHistogramDataPoint is a single data point in a timeseries that describes
@@ -517,7 +585,7 @@ message DoubleHistogramDataPoint {
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated DoubleExemplar exemplars = 8;
+  repeated Exemplar exemplars = 8;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
@@ -609,7 +677,7 @@ message IntExemplar {
 // Exemplars also hold information about the environment when the measurement
 // was recorded, for example the span and trace ID of the active span when the
 // exemplar was recorded.
-message DoubleExemplar {
+message Exemplar {
   // The set of labels that were filtered out by the aggregator, but recorded
   // alongside the original measurement. Only labels that were filtered out
   // by the aggregator should be included
