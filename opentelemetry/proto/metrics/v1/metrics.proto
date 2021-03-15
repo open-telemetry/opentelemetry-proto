@@ -141,7 +141,7 @@ message Metric {
     DoubleGauge double_gauge = 5;
     IntSum int_sum = 6;
     DoubleSum double_sum = 7;
-    // This field is marked as deprecated, and it will be removed soon.
+    // IntHistogram is deprecated and will be removed soon.
     // 1. Old senders and receivers that are not aware of this change will
     // continue using the `int_histogram` field.
     // 2. New senders, which are aware of this change MUST send only `histogram`.
@@ -205,7 +205,10 @@ message DoubleSum {
   bool is_monotonic = 3;
 }
 
-// Represents the type of a metric that is calculated by aggregating as a
+// IntHistogram is deprecated, replaced by Histogram points using double-
+// valued exemplars.
+//
+// This represents the type of a metric that is calculated by aggregating as a
 // Histogram of all reported int measurements over a time interval.
 message IntHistogram {
   repeated IntHistogramDataPoint data_points = 1;
@@ -215,7 +218,7 @@ message IntHistogram {
   AggregationTemporality aggregation_temporality = 2;
 }
 
-// Represents the type of a metric that is calculated by aggregating as a
+// Histogram represents the type of a metric that is calculated by aggregating as a
 // Histogram of all reported double measurements over a time interval.
 message Histogram {
   repeated HistogramDataPoint data_points = 1;
@@ -374,7 +377,9 @@ message DoubleDataPoint {
   repeated DoubleExemplar exemplars = 5;
 }
 
-// IntHistogramDataPoint is a single data point in a timeseries that describes
+// IntHistogramDataPoint is deprecated; use DoubleHistogramDataPoint.
+//
+// This is a single data point in a timeseries that describes
 // the time-varying values of a Histogram of int values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain
 // the distribution of those values across a set of buckets.
@@ -581,7 +586,9 @@ message SummaryDataPoint {
   repeated ValueAtQuantile quantile_values = 6;
 }
 
-// A representation of an exemplar, which is a sample input int measurement.
+// IntExemplar is deprecated; use DoubleExemplar with a double value instead.
+//
+// This is a representation of an exemplar, which is a sample input int measurement.
 // Exemplars also hold information about the environment when the measurement
 // was recorded, for example the span and trace ID of the active span when the
 // exemplar was recorded.
