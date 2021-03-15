@@ -139,9 +139,16 @@ message Metric {
   oneof data {
     // (int_gauge and double_gauge) and (int_sum and double_sum) are deprecated,
     // replaced by gauge and sum fields, respectively.
+    // 1. Old senders and receivers that are not aware of this change will
+    // continue using the four original fields.
+    // 2. New senders, which are aware of this change MUST send only `gauge`
+    // and `sum` fields.
+    // 3. New receivers, which are aware of this change MUST convert this into
+    // `gauge` and `sum` by simply converting all points into Sum or Gauge
+    // metrics using ScalarDataPoint values.
     IntGauge int_gauge = 4;
     DoubleGauge double_gauge = 5;
-    IntSum int_sum = 6;
+    IntSum int_sum = 6;h
     DoubleSum double_sum = 7;
 
     Gauge gauge = 13;
@@ -165,7 +172,9 @@ message Gauge {
   repeated ScalarDataPoint data_points = 1;
 }
 
-// Gauge represents the type of a int scalar metric that always exports the
+// IntGauge is deprecated. Use Gauge with a ScalarDataPoint and the int_value field.
+//
+// This represents the type of a int scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
 // 
@@ -178,7 +187,9 @@ message IntGauge {
   repeated IntDataPoint data_points = 1;
 }
 
-// Gauge represents the type of a double scalar metric that always exports the
+// DoubleGauge is deprecated. Use Gauge with a ScalarDataPoint and the double_value field.
+//
+// This represents the type of a double scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
 // 
@@ -204,7 +215,9 @@ message Sum {
   bool is_monotonic = 3;
 }
 
-// Sum represents the type of a numeric int scalar metric that is calculated as
+// IntSum is deprecated. Use Sum with a ScalarDataPoint and the int_value field.
+//
+// This represents the type of a numeric int scalar metric that is calculated as
 // a sum of all reported measurements over a time interval.
 message IntSum {
   repeated IntDataPoint data_points = 1;
@@ -217,7 +230,9 @@ message IntSum {
   bool is_monotonic = 3;
 }
 
-// Sum represents the type of a numeric double scalar metric that is calculated
+// DoubleSum is deprecated. Use Sum with a ScalarDataPoint and the double_value field.
+//
+// This represents the type of a numeric double scalar metric that is calculated
 // as a sum of all reported measurements over a time interval.
 message DoubleSum {
   repeated DoubleDataPoint data_points = 1;
