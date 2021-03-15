@@ -524,6 +524,7 @@ message DoubleHistogramDataPoint {
   // Summary data type used with quantiles 0 and 1, respectively, when
   // paired with cumulative temporality.  This uses a fixed width that
   // SHOULD be up to 5-10 minutes or for as long as data is available.
+  // https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#summary
   
   // min is the minimum value over a recent window of time.
   //
