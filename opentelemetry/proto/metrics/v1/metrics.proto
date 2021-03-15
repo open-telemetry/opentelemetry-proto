@@ -518,6 +518,27 @@ message DoubleHistogramDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated DoubleExemplar exemplars = 8;
+
+  // Note: the definition used to for min and max fields below is
+  // based on temporality in a way meant to match the Prometheus
+  // Summary data type used with quantiles 0 and 1, respectively, when
+  // paired with cumulative temporality.  This uses a fixed width that
+  // SHOULD be up to 5-10 minutes or for as long as data is available.
+  
+  // min is the minimum value over a recent window of time.
+  //
+  // The interpretation is based on Metric's temporality.
+  // - delta temporality: the min value MUST be computed over over [start_time, end_time]
+  // - cumulative temporality: the min value SHOULD be computed over [now - WIDTH, end_time]
+  //   for WIDTH in the 5-10 minute range.
+  double min = 13;
+
+  // max is the maximum value over a recent window of time.
+  //
+  // The interpretation is based on Metric's temporality.
+  // - delta temporality: the max value MUST be computed over over [start_time, end_time]
+  // - cumulative temporality: the max value SHOULD be computed over [now - WIDTH, end_time]
+  double max = 14;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
