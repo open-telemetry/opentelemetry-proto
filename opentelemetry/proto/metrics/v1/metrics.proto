@@ -148,7 +148,7 @@ message Metric {
     // metrics using ScalarDataPoint values.
     IntGauge int_gauge = 4;
     DoubleGauge double_gauge = 5;
-    IntSum int_sum = 6;h
+    IntSum int_sum = 6;
     DoubleSum double_sum = 7;
 
     Gauge gauge = 13;
