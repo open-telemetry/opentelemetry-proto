@@ -148,13 +148,10 @@ message Metric {
     // 2. New senders, which are aware of this change MUST send only `histogram`.
     // 3. New receivers, which are aware of this change MUST convert this into
     // `histogram` by converting point values.
-    IntHistogram int_histogram = 8;
-    DoubleHistogram double_histogram = 9;
-    Histogram histogram = 12;
-    DoubleSummary double_summary = 11;
     IntHistogram int_histogram = 8 [deprecated = true];
+    DoubleHistogram double_histogram = 9 [deprecated = true];
 
-    Histogram histogram = 9;
+    Histogram histogram = 12;
     Summary summary = 11;
   }
 }
