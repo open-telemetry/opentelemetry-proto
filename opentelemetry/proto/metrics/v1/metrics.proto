@@ -147,7 +147,7 @@ message Metric {
     // 2. New senders, which are aware of this change MUST send only `histogram`.
     // 3. New receivers, which are aware of this change MUST convert this into
     // `histogram` by simply converting all int64 values into float.
-    IntHistogram deprecated_int_histogram = 8;
+    IntHistogram int_histogram = 8 [deprecated = true];
     Histogram histogram = 9;
     Summary summary = 11;
   }
@@ -211,6 +211,8 @@ message DoubleSum {
 // This represents the type of a metric that is calculated by aggregating as a
 // Histogram of all reported int measurements over a time interval.
 message IntHistogram {
+  option deprecated = true;
+
   repeated IntHistogramDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
@@ -377,13 +379,15 @@ message DoubleDataPoint {
   repeated DoubleExemplar exemplars = 5;
 }
 
-// IntHistogramDataPoint is deprecated; use DoubleHistogramDataPoint.
+// IntHistogramDataPoint is deprecated; use HistogramDataPoint.
 //
 // This is a single data point in a timeseries that describes
 // the time-varying values of a Histogram of int values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain
 // the distribution of those values across a set of buckets.
 message IntHistogramDataPoint {
+  option deprecated = true;
+
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
@@ -586,9 +590,7 @@ message SummaryDataPoint {
   repeated ValueAtQuantile quantile_values = 6;
 }
 
-// IntExemplar is deprecated; use DoubleExemplar with a double value instead.
-//
-// This is a representation of an exemplar, which is a sample input int measurement.
+// A representation of an exemplar, which is a sample input int measurement.
 // Exemplars also hold information about the environment when the measurement
 // was recorded, for example the span and trace ID of the active span when the
 // exemplar was recorded.
