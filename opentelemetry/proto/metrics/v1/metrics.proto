@@ -141,6 +141,7 @@ message Metric {
     DoubleGauge double_gauge = 5;
     IntSum int_sum = 6;
     DoubleSum double_sum = 7;
+
     // IntHistogram and DoubleHistogram are DEPRECATED and will be removed soon.
     // 1. Old senders and receivers that are not aware of this change will
     // continue using the `int_histogram` and `double_histogram` field.
@@ -151,6 +152,10 @@ message Metric {
     DoubleHistogram double_histogram = 9;
     Histogram histogram = 12;
     DoubleSummary double_summary = 11;
+    IntHistogram int_histogram = 8 [deprecated = true];
+
+    Histogram histogram = 9;
+    Summary summary = 11;
   }
 }
 
@@ -206,9 +211,14 @@ message DoubleSum {
   bool is_monotonic = 3;
 }
 
-// Represents the type of a metric that is calculated by aggregating as a
+// IntHistogram is deprecated, replaced by Histogram points using double-
+// valued exemplars.
+//
+// This represents the type of a metric that is calculated by aggregating as a
 // Histogram of all reported int measurements over a time interval.
 message IntHistogram {
+  option deprecated = true;
+
   repeated IntHistogramDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
@@ -216,7 +226,7 @@ message IntHistogram {
   AggregationTemporality aggregation_temporality = 2;
 }
 
-// Represents the type of a metric that is calculated by aggregating as a
+// Histogram represents the type of a metric that is calculated by aggregating as a
 // Histogram of all reported double measurements over a time interval.
 message Histogram {
   repeated HistogramDataPoint data_points = 1;
@@ -226,14 +236,14 @@ message Histogram {
   AggregationTemporality aggregation_temporality = 2;
 }
 
-// DoubleSummary metric data are used to convey quantile summaries,
+// Summary metric data are used to convey quantile summaries,
 // a Prometheus (see: https://prometheus.io/docs/concepts/metric_types/#summary)
 // and OpenMetrics (see: https://github.com/OpenObservability/OpenMetrics/blob/4dbf6075567ab43296eed941037c12951faafb92/protos/prometheus.proto#L45)
 // data type. These data points cannot always be merged in a meaningful way.
 // While they can be useful in some applications, histogram data points are
 // recommended for new applications.
-message DoubleSummary {
-  repeated DoubleSummaryDataPoint data_points = 1;
+message Summary {
+  repeated SummaryDataPoint data_points = 1;
 }
 
 // AggregationTemporality defines how a metric aggregator reports aggregated
@@ -375,11 +385,15 @@ message DoubleDataPoint {
   repeated DoubleExemplar exemplars = 5;
 }
 
-// IntHistogramDataPoint is a single data point in a timeseries that describes
+// IntHistogramDataPoint is deprecated; use HistogramDataPoint.
+//
+// This is a single data point in a timeseries that describes
 // the time-varying values of a Histogram of int values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain
 // the distribution of those values across a set of buckets.
 message IntHistogramDataPoint {
+  option deprecated = true;
+
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
@@ -532,9 +546,9 @@ message ExplicitBuckets {
   repeated double boundaries = 7;
 }
 
-// DoubleSummaryDataPoint is a single data point in a timeseries that describes the
+// SummaryDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a Summary metric.
-message DoubleSummaryDataPoint {
+message SummaryDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
