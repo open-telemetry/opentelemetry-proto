@@ -145,7 +145,7 @@ message Metric {
     // and `sum` fields.
     // 3. New receivers, which are aware of this change MUST convert this into
     // `gauge` and `sum` by simply converting all points into Sum or Gauge
-    // metrics using ScalarDataPoint values.
+    // metrics using NumberDataPoint values.
     IntGauge int_gauge = 4;
     DoubleGauge double_gauge = 5;
     IntSum int_sum = 6;
@@ -177,10 +177,10 @@ message Metric {
 // AggregationTemporality is not included. Consequently, this also means
 // "StartTimeUnixNano" is ignored for all data points.
 message Gauge {
-  repeated ScalarDataPoint data_points = 1;
+  repeated NumberDataPoint data_points = 1;
 }
 
-// IntGauge is deprecated. Use Gauge with a ScalarDataPoint and the int_value field.
+// IntGauge is deprecated. Use Gauge with a NumberDataPoint and the int_value field.
 //
 // This represents the type of a int scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
@@ -195,7 +195,7 @@ message IntGauge {
   repeated IntDataPoint data_points = 1;
 }
 
-// DoubleGauge is deprecated. Use Gauge with a ScalarDataPoint and the double_value field.
+// DoubleGauge is deprecated. Use Gauge with a NumberDataPoint and the double_value field.
 //
 // This represents the type of a double scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
@@ -213,7 +213,7 @@ message DoubleGauge {
 // Sum represents the type of a numeric int scalar metric that is calculated as
 // a sum of all reported measurements over a time interval.
 message Sum {
-  repeated ScalarDataPoint data_points = 1;
+  repeated NumberDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
@@ -223,7 +223,7 @@ message Sum {
   bool is_monotonic = 3;
 }
 
-// IntSum is deprecated. Use Sum with a ScalarDataPoint and the int_value field.
+// IntSum is deprecated. Use Sum with a NumberDataPoint and the int_value field.
 //
 // This represents the type of a numeric int scalar metric that is calculated as
 // a sum of all reported measurements over a time interval.
@@ -238,7 +238,7 @@ message IntSum {
   bool is_monotonic = 3;
 }
 
-// DoubleSum is deprecated. Use Sum with a ScalarDataPoint and the double_value field.
+// DoubleSum is deprecated. Use Sum with a NumberDataPoint and the double_value field.
 //
 // This represents the type of a numeric double scalar metric that is calculated
 // as a sum of all reported measurements over a time interval.
@@ -359,9 +359,9 @@ enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
-// ScalarDataPoint is a single data point in a timeseries that describes the
+// NumberDataPoint is a single data point in a timeseries that describes the
 // time-varying value of a integer or double-valued metric.
-message ScalarDataPoint {
+message NumberDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
