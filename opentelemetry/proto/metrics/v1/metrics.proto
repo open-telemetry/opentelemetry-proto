@@ -122,37 +122,18 @@ message Metric {
   // Data determines the aggregation type (if any) of the metric, what is the
   // reported value type for the data points, as well as the relatationship to
   // the time interval over which they are reported.
-  //
-  // TODO: Update table after the decision on:
-  // https://github.com/open-telemetry/opentelemetry-specification/issues/731.
-  // By default, metrics recording using the OpenTelemetry API are exported as
-  // (the table does not include MeasurementValueType to avoid extra rows):
-  //
-  //   Instrument         Type
-  //   ----------------------------------------------
-  //   Counter            Sum(aggregation_temporality=delta;is_monotonic=true)
-  //   UpDownCounter      Sum(aggregation_temporality=delta;is_monotonic=false)
-  //   ValueRecorder      TBD
-  //   SumObserver        Sum(aggregation_temporality=cumulative;is_monotonic=true)
-  //   UpDownSumObserver  Sum(aggregation_temporality=cumulative;is_monotonic=false)
-  //   ValueObserver      Gauge()
   oneof data {
-    // (int_gauge and double_gauge) and (int_sum and double_sum) are deprecated,
-    // replaced by gauge and sum fields, respectively.
+    // IntGauge and IntSum are deprecated and will be removed soon.
     // 1. Old senders and receivers that are not aware of this change will
-    // continue using the four original fields.
+    // continue using the `int_gauge` and `int_sum` fields.
     // 2. New senders, which are aware of this change MUST send only `gauge`
     // and `sum` fields.
-    // 3. New receivers, which are aware of this change MUST convert this into
-    // `gauge` and `sum` by simply converting all points into Sum or Gauge
-    // metrics using NumberDataPoint values.
-    IntGauge int_gauge = 4;
-    DoubleGauge double_gauge = 5;
-    IntSum int_sum = 6;
-    DoubleSum double_sum = 7;
-
-    Gauge gauge = 13;
-    Sum sum = 14;
+    // 3. New receivers, which are aware of this change MUST convert these into
+    // `gauge` and `sum` by using the provided as_int field in the oneof values.
+    IntGauge int_gauge = 4 [deprecated = true];
+    Gauge gauge = 5;
+    IntSum int_sum = 6 [deprecated = true];
+    Sum sum = 7;
 
     // IntHistogram is deprecated and will be removed soon.
     // 1. Old senders and receivers that are not aware of this change will
@@ -162,12 +143,28 @@ message Metric {
     // `histogram` by simply converting all int64 values into float.
     IntHistogram int_histogram = 8 [deprecated = true];
     Histogram histogram = 9;
-
     Summary summary = 11;
   }
 }
 
-// Gauge represents the type of a int scalar metric that always exports the
+// IntGauge is deprecated.  Use Gauge with an integer value in NumberDataPoint.
+//
+// IntGauge represents the type of a int scalar metric that always exports the
+// "current value" for every data point. It should be used for an "unknown"
+// aggregation.
+// 
+// A Gauge does not support different aggregation temporalities. Given the
+// aggregation is unknown, points cannot be combined using the same
+// aggregation, regardless of aggregation temporalities. Therefore,
+// AggregationTemporality is not included. Consequently, this also means
+// "StartTimeUnixNano" is ignored for all data points.
+message IntGauge {
+  option deprecated = true;
+
+  repeated IntDataPoint data_points = 1;
+}
+
+// Gauge represents the type of a double scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
 // 
@@ -180,54 +177,13 @@ message Gauge {
   repeated NumberDataPoint data_points = 1;
 }
 
-// IntGauge is deprecated. Use Gauge with a NumberDataPoint and the int_value field.
+// IntSum is deprecated.  Use Sum with an integer value in NumberDataPoint.
 //
-// This represents the type of a int scalar metric that always exports the
-// "current value" for every data point. It should be used for an "unknown"
-// aggregation.
-// 
-// A Gauge does not support different aggregation temporalities. Given the
-// aggregation is unknown, points cannot be combined using the same
-// aggregation, regardless of aggregation temporalities. Therefore,
-// AggregationTemporality is not included. Consequently, this also means
-// "StartTimeUnixNano" is ignored for all data points.
-message IntGauge {
-  repeated IntDataPoint data_points = 1;
-}
-
-// DoubleGauge is deprecated. Use Gauge with a NumberDataPoint and the double_value field.
-//
-// This represents the type of a double scalar metric that always exports the
-// "current value" for every data point. It should be used for an "unknown"
-// aggregation.
-// 
-// A Gauge does not support different aggregation temporalities. Given the
-// aggregation is unknown, points cannot be combined using the same
-// aggregation, regardless of aggregation temporalities. Therefore,
-// AggregationTemporality is not included. Consequently, this also means
-// "StartTimeUnixNano" is ignored for all data points.
-message DoubleGauge {
-  repeated DoubleDataPoint data_points = 1;
-}
-
-// Sum represents the type of a numeric int scalar metric that is calculated as
-// a sum of all reported measurements over a time interval.
-message Sum {
-  repeated NumberDataPoint data_points = 1;
-
-  // aggregation_temporality describes if the aggregator reports delta changes
-  // since last report time, or cumulative changes since a fixed start time.
-  AggregationTemporality aggregation_temporality = 2;
-
-  // If "true" means that the sum is monotonic.
-  bool is_monotonic = 3;
-}
-
-// IntSum is deprecated. Use Sum with a NumberDataPoint and the int_value field.
-//
-// This represents the type of a numeric int scalar metric that is calculated as
+// IntSum represents the type of a numeric int scalar metric that is calculated as
 // a sum of all reported measurements over a time interval.
 message IntSum {
+  option deprecated = true;
+
   repeated IntDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
@@ -238,12 +194,10 @@ message IntSum {
   bool is_monotonic = 3;
 }
 
-// DoubleSum is deprecated. Use Sum with a NumberDataPoint and the double_value field.
-//
-// This represents the type of a numeric double scalar metric that is calculated
+// Sum represents the type of a numeric double scalar metric that is calculated
 // as a sum of all reported measurements over a time interval.
-message DoubleSum {
-  repeated DoubleDataPoint data_points = 1;
+message Sum {
+  repeated NumberDataPoint data_points = 1;
   
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
@@ -359,46 +313,11 @@ enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
-// NumberDataPoint is a single data point in a timeseries that describes the
-// time-varying value of a integer or double-valued metric.
-message NumberDataPoint {
-  // The set of labels that uniquely identify this timeseries.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
-
-  // start_time_unix_nano is the last time when the aggregation value was reset
-  // to "zero". For some metric types this is ignored, see data types for more
-  // details.
-  //
-  // The aggregation value is over the time interval (start_time_unix_nano,
-  // time_unix_nano].
-  // 
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
-  // 1970.
-  //
-  // Value of 0 indicates that the timestamp is unspecified. In that case the
-  // timestamp may be decided by the backend.
-  fixed64 start_time_unix_nano = 2;
-
-  // time_unix_nano is the moment when this aggregation value was reported.
-  // 
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
-  // 1970.
-  fixed64 time_unix_nano = 3;
-
-  // value itself.
-  oneof value {
-    double double_value = 4;
-    sfixed64 int_value = 5;
-  }
-
-  // (Optional) List of exemplars collected from
-  // measurements that were used to form the data point
-  repeated Exemplar exemplars = 8;
-}
-
 // IntDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a int64 metric.
 message IntDataPoint {
+  option deprecated = true;
+
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
@@ -430,9 +349,9 @@ message IntDataPoint {
   repeated IntExemplar exemplars = 5;
 }
 
-// DoubleDataPoint is a single data point in a timeseries that describes the
+// NumberDataPoint is a single data point in a timeseries that describes the
 // time-varying value of a double metric.
-message DoubleDataPoint {
+message NumberDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
@@ -456,12 +375,15 @@ message DoubleDataPoint {
   // 1970.
   fixed64 time_unix_nano = 3;
 
-  // value itself.
-  double value = 4;
+  // The value itself.
+  oneof value {
+    double as_double = 4;
+    double as_int = 6; 
+  }
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated Exemplar exemplars = 5;
+  repeated DoubleExemplar exemplars = 5;
 }
 
 // IntHistogramDataPoint is deprecated; use HistogramDataPoint.
@@ -617,7 +539,7 @@ message HistogramDataPoint {
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated Exemplar exemplars = 8;
+  repeated DoubleExemplar exemplars = 8;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
@@ -709,7 +631,7 @@ message IntExemplar {
 // Exemplars also hold information about the environment when the measurement
 // was recorded, for example the span and trace ID of the active span when the
 // exemplar was recorded.
-message Exemplar {
+message DoubleExemplar {
   // The set of labels that were filtered out by the aggregator, but recorded
   // alongside the original measurement. Only labels that were filtered out
   // by the aggregator should be included
