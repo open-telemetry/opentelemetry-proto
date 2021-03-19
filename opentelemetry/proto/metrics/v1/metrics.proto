@@ -122,25 +122,19 @@ message Metric {
   // Data determines the aggregation type (if any) of the metric, what is the
   // reported value type for the data points, as well as the relatationship to
   // the time interval over which they are reported.
-  //
-  // TODO: Update table after the decision on:
-  // https://github.com/open-telemetry/opentelemetry-specification/issues/731.
-  // By default, metrics recording using the OpenTelemetry API are exported as
-  // (the table does not include MeasurementValueType to avoid extra rows):
-  //
-  //   Instrument         Type
-  //   ----------------------------------------------
-  //   Counter            Sum(aggregation_temporality=delta;is_monotonic=true)
-  //   UpDownCounter      Sum(aggregation_temporality=delta;is_monotonic=false)
-  //   ValueRecorder      TBD
-  //   SumObserver        Sum(aggregation_temporality=cumulative;is_monotonic=true)
-  //   UpDownSumObserver  Sum(aggregation_temporality=cumulative;is_monotonic=false)
-  //   ValueObserver      Gauge()
   oneof data {
-    IntGauge int_gauge = 4;
-    DoubleGauge double_gauge = 5;
-    IntSum int_sum = 6;
-    DoubleSum double_sum = 7;
+    // IntGauge and IntSum are deprecated and will be removed soon.
+    // 1. Old senders and receivers that are not aware of this change will
+    // continue using the `int_gauge` and `int_sum` fields.
+    // 2. New senders, which are aware of this change MUST send only `gauge`
+    // and `sum` fields.
+    // 3. New receivers, which are aware of this change MUST convert these into
+    // `gauge` and `sum` by using the provided as_int field in the oneof values.
+    IntGauge int_gauge = 4 [deprecated = true];
+    Gauge gauge = 5;
+    IntSum int_sum = 6 [deprecated = true];
+    Sum sum = 7;
+
     // IntHistogram is deprecated and will be removed soon.
     // 1. Old senders and receivers that are not aware of this change will
     // continue using the `int_histogram` field.
@@ -153,7 +147,9 @@ message Metric {
   }
 }
 
-// Gauge represents the type of a int scalar metric that always exports the
+// IntGauge is deprecated.  Use Gauge with an integer value in NumberDataPoint.
+//
+// IntGauge represents the type of a int scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
 // 
@@ -163,6 +159,8 @@ message Metric {
 // AggregationTemporality is not included. Consequently, this also means
 // "StartTimeUnixNano" is ignored for all data points.
 message IntGauge {
+  option deprecated = true;
+
   repeated IntDataPoint data_points = 1;
 }
 
@@ -175,13 +173,17 @@ message IntGauge {
 // aggregation, regardless of aggregation temporalities. Therefore,
 // AggregationTemporality is not included. Consequently, this also means
 // "StartTimeUnixNano" is ignored for all data points.
-message DoubleGauge {
-  repeated DoubleDataPoint data_points = 1;
+message Gauge {
+  repeated NumberDataPoint data_points = 1;
 }
 
-// Sum represents the type of a numeric int scalar metric that is calculated as
+// IntSum is deprecated.  Use Sum with an integer value in NumberDataPoint.
+//
+// IntSum represents the type of a numeric int scalar metric that is calculated as
 // a sum of all reported measurements over a time interval.
 message IntSum {
+  option deprecated = true;
+
   repeated IntDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
@@ -194,8 +196,8 @@ message IntSum {
 
 // Sum represents the type of a numeric double scalar metric that is calculated
 // as a sum of all reported measurements over a time interval.
-message DoubleSum {
-  repeated DoubleDataPoint data_points = 1;
+message Sum {
+  repeated NumberDataPoint data_points = 1;
   
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
@@ -314,6 +316,8 @@ enum AggregationTemporality {
 // IntDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a int64 metric.
 message IntDataPoint {
+  option deprecated = true;
+
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
@@ -345,9 +349,9 @@ message IntDataPoint {
   repeated IntExemplar exemplars = 5;
 }
 
-// DoubleDataPoint is a single data point in a timeseries that describes the
+// NumberDataPoint is a single data point in a timeseries that describes the
 // time-varying value of a double metric.
-message DoubleDataPoint {
+message NumberDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
@@ -371,8 +375,12 @@ message DoubleDataPoint {
   // 1970.
   fixed64 time_unix_nano = 3;
 
-  // value itself.
-  double value = 4;
+  // The value itself.  A point is considered invalid when one of the recognized
+  // value fields is not present inside this oneof.
+  oneof value {
+    double as_double = 4;
+    sfixed64 as_int = 6; 
+  }
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
