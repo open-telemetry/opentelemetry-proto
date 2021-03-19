@@ -13,10 +13,14 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 ** TODO: Consider (#275) as it relates to stability for the v0.8 release and clarify in which ways the following changes are considered "breaking".
 
 * :stop_sign: [DEPRECATION] Deprecate IntSum, IntGauge, and IntDataPoint (#278)
+* :stop_sign: [DEPRECATION] Deprecate IntExemplar (#281)
+* :stop_sign: [DEPRECATION] Deprecate IntHistogram (#270)
 * :stop_sign: [BREAKING] Rename DoubleGauge to Gauge (#278)
 * :stop_sign: [BREAKING] Rename DoubleSum to Sum (#278)
 * :stop_sign: [BREAKING] Rename DoubleDataPoint to NumberDataPoint (#278)
 * :stop_sign: [BREAKING] Rename DoubleSummary to Summary (#269)
+* :stop_sign: [BREAKING] Rename DoubleExemplar to Exemplar (#281)
+* :stop_sign: [BREAKING] Rename DoubleHistogram to Histogram (#270)
 * :stop_sign: [DATA MODEL CHANGE] Make explicit bounds compatible with OM/Prometheus (#262)
 
 ### Added
