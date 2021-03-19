@@ -375,7 +375,8 @@ message NumberDataPoint {
   // 1970.
   fixed64 time_unix_nano = 3;
 
-  // The value itself.
+  // The value itself.  A point is considered invalid when one of the recognized
+  // value fields is not present inside this oneof.
   oneof value {
     double as_double = 4;
     double as_int = 6; 
