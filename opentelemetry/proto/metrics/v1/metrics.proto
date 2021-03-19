@@ -379,7 +379,7 @@ message NumberDataPoint {
   // value fields is not present inside this oneof.
   oneof value {
     double as_double = 4;
-    double as_int = 6; 
+    sfixed64 as_int = 6; 
   }
 
   // (Optional) List of exemplars collected from
