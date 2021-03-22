@@ -384,7 +384,7 @@ message NumberDataPoint {
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated DoubleExemplar exemplars = 5;
+  repeated Exemplar exemplars = 5;
 }
 
 // IntHistogramDataPoint is deprecated; use HistogramDataPoint.
@@ -540,7 +540,7 @@ message HistogramDataPoint {
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated DoubleExemplar exemplars = 8;
+  repeated Exemplar exemplars = 8;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
@@ -603,6 +603,8 @@ message SummaryDataPoint {
 // was recorded, for example the span and trace ID of the active span when the
 // exemplar was recorded.
 message IntExemplar {
+  option deprecated = true;
+
   // The set of labels that were filtered out by the aggregator, but recorded
   // alongside the original measurement. Only labels that were filtered out
   // by the aggregator should be included
@@ -628,11 +630,11 @@ message IntExemplar {
   bytes trace_id = 5;
 }
 
-// A representation of an exemplar, which is a sample input double measurement.
+// A representation of an exemplar, which is a sample input measurement.
 // Exemplars also hold information about the environment when the measurement
 // was recorded, for example the span and trace ID of the active span when the
 // exemplar was recorded.
-message DoubleExemplar {
+message Exemplar {
   // The set of labels that were filtered out by the aggregator, but recorded
   // alongside the original measurement. Only labels that were filtered out
   // by the aggregator should be included
@@ -644,8 +646,13 @@ message DoubleExemplar {
   // 1970.
   fixed64 time_unix_nano = 2;
 
-  // Numerical double value of the measurement that was recorded.
-  double value = 3;
+  // Numerical value of the measurement that was recorded. An exemplar is
+  // considered invalid when one of the recognized value fields is not present
+  // inside this oneof.
+  oneof value {
+    double as_double = 3;
+    sfixed64 as_int = 7;
+  }
 
   // (Optional) Span ID of the exemplar trace.
   // span_id may be missing if the measurement is not recorded inside a trace
