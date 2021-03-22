@@ -352,8 +352,19 @@ message IntDataPoint {
 // NumberDataPoint is a single data point in a timeseries that describes the
 // time-varying value of a double metric.
 message NumberDataPoint {
-  // The set of labels that uniquely identify this timeseries.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
+  // The set of key/value pairs that uniquely identify the timeseries from 
+  // where this point belongs. The list may be empty (may contain 0 elements).
+  repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
+
+  // Labels is deprecated and will be removed soon.
+  // 1. Old senders and receivers that are not aware of this change will
+  // continue using the `labels` field.
+  // 2. New senders, which are aware of this change MUST send only `attributes`.
+  // 3. New receivers, which are aware of this change MUST convert this into
+  // `labels` by simply converting all int64 values into float.
+  //
+  // This field will be removed in ~3 months, on July 1, 2021.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];
 
   // start_time_unix_nano is the last time when the aggregation value was reset
   // to "zero". For some metric types this is ignored, see data types for more
@@ -472,8 +483,19 @@ message IntHistogramDataPoint {
 // summary statistics for a population of values, it may optionally contain the
 // distribution of those values across a set of buckets.
 message HistogramDataPoint {
-  // The set of labels that uniquely identify this timeseries.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
+  // The set of key/value pairs that uniquely identify the timeseries from 
+  // where this point belongs. The list may be empty (may contain 0 elements).
+  repeated opentelemetry.proto.common.v1.KeyValue attributes = 9;
+
+  // Labels is deprecated and will be removed soon.
+  // 1. Old senders and receivers that are not aware of this change will
+  // continue using the `labels` field.
+  // 2. New senders, which are aware of this change MUST send only `attributes`.
+  // 3. New receivers, which are aware of this change MUST convert this into
+  // `labels` by simply converting all int64 values into float.
+  //
+  // This field will be removed in ~3 months, on July 1, 2021.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];
 
   // start_time_unix_nano is the last time when the aggregation value was reset
   // to "zero". For some metric types this is ignored, see data types for more
@@ -546,8 +568,19 @@ message HistogramDataPoint {
 // SummaryDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a Summary metric.
 message SummaryDataPoint {
-  // The set of labels that uniquely identify this timeseries.
-  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
+  // The set of key/value pairs that uniquely identify the timeseries from 
+  // where this point belongs. The list may be empty (may contain 0 elements).
+  repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
+
+  // Labels is deprecated and will be removed soon.
+  // 1. Old senders and receivers that are not aware of this change will
+  // continue using the `labels` field.
+  // 2. New senders, which are aware of this change MUST send only `attributes`.
+  // 3. New receivers, which are aware of this change MUST convert this into
+  // `labels` by simply converting all int64 values into float.
+  //
+  // This field will be removed in ~3 months, on July 1, 2021.
+  repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];
 
   // start_time_unix_nano is the last time when the aggregation value was reset
   // to "zero". For some metric types this is ignored, see data types for more
@@ -635,10 +668,21 @@ message IntExemplar {
 // was recorded, for example the span and trace ID of the active span when the
 // exemplar was recorded.
 message Exemplar {
-  // The set of labels that were filtered out by the aggregator, but recorded
-  // alongside the original measurement. Only labels that were filtered out
-  // by the aggregator should be included
-  repeated opentelemetry.proto.common.v1.StringKeyValue filtered_labels = 1;
+  // The set of key/value pairs that were filtered out by the aggregator, but
+  // recorded alongside the original measurement. Only key/value pairs that were
+  // filtered out by the aggregator should be included
+  repeated opentelemetry.proto.common.v1.KeyValue filtered_attributes = 7;
+
+  // Labels is deprecated and will be removed soon.
+  // 1. Old senders and receivers that are not aware of this change will
+  // continue using the `filtered_labels` field.
+  // 2. New senders, which are aware of this change MUST send only
+  // `filtered_attributes`.
+  // 3. New receivers, which are aware of this change MUST convert this into
+  // `filtered_labels` by simply converting all int64 values into float.
+  //
+  // This field will be removed in ~3 months, on July 1, 2021.
+  repeated opentelemetry.proto.common.v1.StringKeyValue filtered_labels = 1 [deprecated = true];
 
   // time_unix_nano is the exact time when this exemplar was recorded
   //
