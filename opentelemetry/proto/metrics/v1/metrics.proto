@@ -651,7 +651,7 @@ message Exemplar {
   // inside this oneof.
   oneof value {
     double as_double = 3;
-    sfixed64 as_int = 7;
+    sfixed64 as_int = 6;
   }
 
   // (Optional) Span ID of the exemplar trace.
