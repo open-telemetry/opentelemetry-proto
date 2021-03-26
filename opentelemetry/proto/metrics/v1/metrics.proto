@@ -130,8 +130,10 @@ message Metric {
     // and `sum` fields.
     // 3. New receivers, which are aware of this change MUST convert these into
     // `gauge` and `sum` by using the provided as_int field in the oneof values.
+    // This field will be removed in ~3 months, on July 1, 2021.
     IntGauge int_gauge = 4 [deprecated = true];
     Gauge gauge = 5;
+    // This field will be removed in ~3 months, on July 1, 2021.
     IntSum int_sum = 6 [deprecated = true];
     Sum sum = 7;
 
@@ -141,6 +143,7 @@ message Metric {
     // 2. New senders, which are aware of this change MUST send only `histogram`.
     // 3. New receivers, which are aware of this change MUST convert this into
     // `histogram` by simply converting all int64 values into float.
+    // This field will be removed in ~3 months, on July 1, 2021.
     IntHistogram int_histogram = 8 [deprecated = true];
     Histogram histogram = 9;
     Summary summary = 11;
