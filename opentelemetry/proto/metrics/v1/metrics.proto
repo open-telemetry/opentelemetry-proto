@@ -442,8 +442,8 @@ message IntHistogramDataPoint {
   repeated fixed64 bucket_counts = 6;
 
   // A histogram may optionally contain the distribution of the values in the population.
-  // In that case one of the option fields below and "buckets" field both must be defined.
-  // Otherwise all option fields and "buckets" field must be omitted in which case the
+  // In that case one of the option fields below and "bucket_counts" field both must be defined.
+  // Otherwise all option fields and "bucket_counts" field must be omitted in which case the
   // distribution of values in the histogram is unknown and only the total count and sum are known.
 
   // explicit_bounds is the only supported bucket option currently.
@@ -518,8 +518,8 @@ message HistogramDataPoint {
   repeated fixed64 bucket_counts = 6;
 
   // A histogram may optionally contain the distribution of the values in the population.
-  // In that case one of the option fields below and "buckets" field both must be defined.
-  // Otherwise all option fields and "buckets" field must be omitted in which case the
+  // In that case one of the option fields below and "bucket_counts" field both must be defined.
+  // Otherwise all option fields and "bucket_counts" field must be omitted in which case the
   // distribution of values in the histogram is unknown and only the total count and sum are known.
 
   // explicit_bounds is the only supported bucket option currently.
