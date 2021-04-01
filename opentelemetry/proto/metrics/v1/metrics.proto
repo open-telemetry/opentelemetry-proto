@@ -396,6 +396,12 @@ message NumberDataPoint {
 // the time-varying values of a Histogram of int values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain
 // the distribution of those values across a set of buckets.
+//
+// If the histogram contains the distribution of values, then both
+// "explicit_bounds" and "bucket counts" fields must be defined.   
+// If the histogram does not contain the distribution of values, then both
+// "explicit_bounds" and "bucket_counts" must be omitted and only "count" and
+// "sum" are known.
 message IntHistogramDataPoint {
   option deprecated = true;
 
@@ -441,14 +447,6 @@ message IntHistogramDataPoint {
   // the number of elements in explicit_bounds array.
   repeated fixed64 bucket_counts = 6;
 
-  // A histogram may optionally contain the distribution of the values in the population.
-  // In that case one of the option fields below and "buckets" field both must be defined.
-  // Otherwise all option fields and "buckets" field must be omitted in which case the
-  // distribution of values in the histogram is unknown and only the total count and sum are known.
-
-  // explicit_bounds is the only supported bucket option currently.
-  // TODO: Add more bucket options.
-
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
   // This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
@@ -474,6 +472,12 @@ message IntHistogramDataPoint {
 // time-varying values of a Histogram of double values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain the
 // distribution of those values across a set of buckets.
+//
+// If the histogram contains the distribution of values, then both
+// "explicit_bounds" and "bucket counts" fields must be defined.   
+// If the histogram does not contain the distribution of values, then both
+// "explicit_bounds" and "bucket_counts" must be omitted and only "count" and
+// "sum" are known.
 message HistogramDataPoint {
   // The set of labels that uniquely identify this timeseries.
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
@@ -516,14 +520,6 @@ message HistogramDataPoint {
   // The number of elements in bucket_counts array must be by one greater than
   // the number of elements in explicit_bounds array.
   repeated fixed64 bucket_counts = 6;
-
-  // A histogram may optionally contain the distribution of the values in the population.
-  // In that case one of the option fields below and "buckets" field both must be defined.
-  // Otherwise all option fields and "buckets" field must be omitted in which case the
-  // distribution of values in the histogram is unknown and only the total count and sum are known.
-
-  // explicit_bounds is the only supported bucket option currently.
-  // TODO: Add more bucket options.
 
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
