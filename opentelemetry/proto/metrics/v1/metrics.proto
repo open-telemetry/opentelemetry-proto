@@ -114,11 +114,6 @@ message Metric {
   // described by http://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
-  // TODO: Decide if support for RawMeasurements (measurements recorded using
-  // the synchronous instruments) is necessary. It can be used to delegate the
-  // aggregation from the application to the agent/collector. See
-  // https://github.com/open-telemetry/opentelemetry-specification/issues/617
-
   // Data determines the aggregation type (if any) of the metric, what is the
   // reported value type for the data points, as well as the relatationship to
   // the time interval over which they are reported.
@@ -130,8 +125,10 @@ message Metric {
     // and `sum` fields.
     // 3. New receivers, which are aware of this change MUST convert these into
     // `gauge` and `sum` by using the provided as_int field in the oneof values.
+    // This field will be removed in ~3 months, on July 1, 2021.
     IntGauge int_gauge = 4 [deprecated = true];
     Gauge gauge = 5;
+    // This field will be removed in ~3 months, on July 1, 2021.
     IntSum int_sum = 6 [deprecated = true];
     Sum sum = 7;
 
@@ -141,6 +138,7 @@ message Metric {
     // 2. New senders, which are aware of this change MUST send only `histogram`.
     // 3. New receivers, which are aware of this change MUST convert this into
     // `histogram` by simply converting all int64 values into float.
+    // This field will be removed in ~3 months, on July 1, 2021.
     IntHistogram int_histogram = 8 [deprecated = true];
     Histogram histogram = 9;
     Summary summary = 11;
@@ -404,6 +402,12 @@ message NumberDataPoint {
 // the time-varying values of a Histogram of int values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain
 // the distribution of those values across a set of buckets.
+//
+// If the histogram contains the distribution of values, then both
+// "explicit_bounds" and "bucket counts" fields must be defined.   
+// If the histogram does not contain the distribution of values, then both
+// "explicit_bounds" and "bucket_counts" must be omitted and only "count" and
+// "sum" are known.
 message IntHistogramDataPoint {
   option deprecated = true;
 
@@ -449,14 +453,6 @@ message IntHistogramDataPoint {
   // the number of elements in explicit_bounds array.
   repeated fixed64 bucket_counts = 6;
 
-  // A histogram may optionally contain the distribution of the values in the population.
-  // In that case one of the option fields below and "buckets" field both must be defined.
-  // Otherwise all option fields and "buckets" field must be omitted in which case the
-  // distribution of values in the histogram is unknown and only the total count and sum are known.
-
-  // explicit_bounds is the only supported bucket option currently.
-  // TODO: Add more bucket options.
-
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
   // This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
@@ -482,6 +478,12 @@ message IntHistogramDataPoint {
 // time-varying values of a Histogram of double values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain the
 // distribution of those values across a set of buckets.
+//
+// If the histogram contains the distribution of values, then both
+// "explicit_bounds" and "bucket counts" fields must be defined.   
+// If the histogram does not contain the distribution of values, then both
+// "explicit_bounds" and "bucket_counts" must be omitted and only "count" and
+// "sum" are known.
 message HistogramDataPoint {
   // The set of key/value pairs that uniquely identify the timeseries from 
   // where this point belongs. The list may be empty (may contain 0 elements).
@@ -535,14 +537,6 @@ message HistogramDataPoint {
   // The number of elements in bucket_counts array must be by one greater than
   // the number of elements in explicit_bounds array.
   repeated fixed64 bucket_counts = 6;
-
-  // A histogram may optionally contain the distribution of the values in the population.
-  // In that case one of the option fields below and "buckets" field both must be defined.
-  // Otherwise all option fields and "buckets" field must be omitted in which case the
-  // distribution of values in the histogram is unknown and only the total count and sum are known.
-
-  // explicit_bounds is the only supported bucket option currently.
-  // TODO: Add more bucket options.
 
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
