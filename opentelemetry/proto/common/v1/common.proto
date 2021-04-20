@@ -65,6 +65,8 @@ message KeyValue {
 // StringKeyValue is a pair of key/value strings. This is the simpler (and faster) version
 // of KeyValue that only supports string values.
 message StringKeyValue {
+  option deprecated = true;
+
   string key = 1;
   string value = 2;
 }
