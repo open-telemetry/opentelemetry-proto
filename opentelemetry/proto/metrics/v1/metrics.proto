@@ -54,7 +54,7 @@ message InstrumentationLibraryMetrics {
 //
 // - Metric is composed of a metadata and data.
 // - Metadata part contains a name, description, unit.
-// - Data is one of the possible types (Sum, Gauge, Histogram, Sumary).
+// - Data is one of the possible types (Sum, Gauge, Histogram, Summary).
 // - DataPoint contains timestamps, attributes, and one of the possible value type
 //   fields.
 //
@@ -126,10 +126,10 @@ message InstrumentationLibraryMetrics {
 // is truly unknown, setting StartTimeUnixNano is strongly encouraged.
 //
 // There are two reasons that streams with AggregationTemporality are
-// reset: (1) a process restarts, and (2) the SDK "forgets" the stream
+// reset: (1) a process restarts, and (2) the process "forgets" the stream
 // and then re-initializes it.  StartTimeUnixNano is critical for
 // calculating correct rates for Monotonic Sum, Histogram, and Summary
-// data points in both of these cases
+// data points in both of these cases.
 //
 // StartTimeUnixNano may be used with Gauge instruments to indicate
 // when the measurement was captured, as opposed to the moment it was
@@ -164,7 +164,7 @@ message InstrumentationLibraryMetrics {
 //    - resetTimestamp: the first observation or the reset timestamp
 //    - previousTimestamp: the timestamp of the most recent observation
 //    - previousValue: a monotonic value
-// 2. When a new point arrives and it is the first observation:
+// 2. When a new point arrives and it is the first observation of that particular key:
 //    - in the map, set resetTimestamp to the input timestamp
 //    - in the map, set previousValue to the input value
 //    - in the map, set previousTimestamp to resetTimestamp
