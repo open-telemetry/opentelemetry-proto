@@ -119,11 +119,18 @@ message InstrumentationLibraryMetrics {
 //
 // # StartTimeUnixNano
 //
+// StartTimeUnixNano in general allows detecting when a sequence of
+// observations is unbroken.  StartTimeUnixNano is set to the
+// beginning of an unbroken sequence of observations (all point kinds
+// except with delta aggregation temporality) or the end of an
+// unbroken sequence of observations (point kinds with delta
+// temporality).
+//
 // This field indicates to consumers the start time for points with
 // cumulative and delta AggregationTemporality, and it should be
-// included whenever possible to support correct rate calculation and
-// overlap detection.  Although it may be omitted when the start time
-// is truly unknown, setting StartTimeUnixNano is strongly encouraged.
+// included whenever possible to support correct rate calculation.
+// Although it may be omitted when the start time is truly unknown,
+// setting StartTimeUnixNano is strongly encouraged.
 //
 // There are two reasons that streams with AggregationTemporality are
 // reset: (1) a process restarts, and (2) the process "forgets" the stream
@@ -131,20 +138,39 @@ message InstrumentationLibraryMetrics {
 // calculating correct rates for Monotonic Sum, Histogram, and Summary
 // data points in both of these cases.
 //
-// StartTimeUnixNano may be used with Gauge instruments to indicate
-// when the measurement was captured, as opposed to the moment it was
-// observed.
+// Another use for this information which applies to all point kinds
+// is to prevent overlap when multiple writers accidentally write to a
+// single stream.  StartTimeUnixNano MAY be used for overlap detection
+// for all point kinds.
 //
-// Another use for this information is to prevent overlap when
-// multiple writers accidentally write to a single stream--applies
-// to all data points.
+// ## StartTimeUnixNano: Sums and Histograms
+//
+// Since these two point kinds have AggregationTemporality, the use of
+// StartTimeUnixNano is strongly recommended to ensure correct rate
+// calculation and prevent overlap.
+//
+// ## StartTimeUnixNano: Gauges
+//
+// The use of StartTimeUnixNano is optional, recommended for overlap
+// protection and to express explicitly absent points.  When used,
+// StartTimeUnixNano should be set as for cumulative aggregation
+// temporality, to the starting timestamp in an unbroken sequence of
+// observations.
+//
+// ## StartTimeUnixNano: Summaries
+//
+// Summary points are treated the same as for cumulative aggregation
+// temporality, by convention.  StartTimeUnixNano should be set to the
+// starting timestamp in an unbroken sequence of observations.
 //
 // # Unknown StartTimeUnixNano
 //
 // This protocol adopts the Prometheus heuristic for reset detection,
 // and with it prescribes a solution for filling in StartTimeUnixNanos
 // with as much information as possible to assist consumers with
-// calculating rates and detecting overlap.
+// calculating rates and detecting overlap.  This process can be
+// applied to Sum and Histogram points with cumulative aggregation
+// temporality, Gauge, and Summary points.
 //
 // The Prometheus heuristic indicates that a reset must have occured
 // in a monotonic series whenever the value descends from one value to
