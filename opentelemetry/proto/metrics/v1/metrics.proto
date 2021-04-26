@@ -156,25 +156,33 @@ message InstrumentationLibraryMetrics {
 //
 // ## Filling in StartTimeUnixNano
 //
-// To import a sequence of non-overlapping measurements into into OTLP
-// using a stateful processor:
+// Note: This is meant to provide guidance in importing data into OTLP
+// that does not have start time and there is no other form of reset
+// detection.
 //
-// 1. Keep a map, using the metric name and attributes as the key, containing
-//    a struct of three parts:
+// To import timestamped cumulative measurements into into OTLP using
+// a stateful processor, the input must be processed in order.  A
+// series of points that formed the beginning of the sequence,
+// including an unknown number of resets, are assumed to be lost or
+// previously recorded when the processor begins observing points.
+// Then:
+//
+// 1. Keep a map, using the metric name, resource, and attributes as
+//    the key, containing a struct of three parts:
 //    - resetTimestamp: the first observation or the reset timestamp
 //    - previousTimestamp: the timestamp of the most recent observation
 //    - previousValue: a monotonic value
 // 2. When a new point arrives and it is the first observation of that particular key:
-//    - in the map, set resetTimestamp to the input timestamp
-//    - in the map, set previousValue to the input value
-//    - in the map, set previousTimestamp to resetTimestamp
-//    - in the output, set StartTimeUnixNano to resetTimestamp
+//    - in the map, set resetTimestamp to the arriving timestamp
+//    - in the map, set previousTimestamp to the arriving timestamp
+//    - in the map, set previousValue to the arriving value
+//    - in the output, set StartTimeUnixNano to the (new) resetTimestamp
 // 3. For each subsequent point that arrives in the sequence:
 //    - if the sample value is less than previousValue,
 //      then set resetTimestamp to previousTimestamp
-//    - set previousValue to the input value
-//    - set previousTimestamp to the input timestamp
-//    - in the output, set StartTimeUnixNano to resetTimestamp
+//    - set previousValue to the arriving value
+//    - set previousTimestamp to the arriving timestamp
+//    - in the output, set StartTimeUnixNano to (current) resetTimestamp
 //
 // This technique ensures that all output points have a meaningful
 // StartTimeUnixNano.  The first point the stream written by this
@@ -191,7 +199,9 @@ message InstrumentationLibraryMetrics {
 // while translating into OTLP, to avoid producing data points with
 // AggregationTemporality and unknown StartTimeUnixNano.
 //
-// The map can be cleared periodically, in effect resetting streams.
+// Enties can safely be removed from the map, after they appear no
+// longer used.  This has the effect of entering a gap stream where
+// the processor reset its memory of the start time.
 message Metric {
   // name of the metric, including its DNS name prefix. It must be unique.
   string name = 1;
@@ -410,9 +420,15 @@ message IntDataPoint {
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
   // the detiled comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 start_time_unix_nano = 2;
 
   // TimeUnixNano is required, see the detailed comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 time_unix_nano = 3;
 
   // value itself.
@@ -442,9 +458,15 @@ message NumberDataPoint {
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
   // the detiled comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 start_time_unix_nano = 2;
 
   // TimeUnixNano is required, see the detailed comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 time_unix_nano = 3;
 
   // The value itself.  A point is considered invalid when one of the recognized
@@ -479,9 +501,15 @@ message IntHistogramDataPoint {
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
   // the detiled comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 start_time_unix_nano = 2;
 
   // TimeUnixNano is required, see the detailed comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 time_unix_nano = 3;
 
   // count is the number of values in the population. Must be non-negative. This
@@ -551,9 +579,15 @@ message HistogramDataPoint {
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
   // the detiled comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 start_time_unix_nano = 2;
 
   // TimeUnixNano is required, see the detailed comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 time_unix_nano = 3;
 
   // count is the number of values in the population. Must be non-negative. This
@@ -615,9 +649,15 @@ message SummaryDataPoint {
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
   // the detiled comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 start_time_unix_nano = 2;
 
   // TimeUnixNano is required, see the detailed comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
   fixed64 time_unix_nano = 3;
 
   // count is the number of values in the population. Must be non-negative.
