@@ -153,9 +153,10 @@ message InstrumentationLibraryMetrics {
 //
 // The use of StartTimeUnixNano is optional, recommended for overlap
 // protection and to express explicitly absent points.  When used,
-// StartTimeUnixNano should be set as for cumulative aggregation
-// temporality, to the starting timestamp in an unbroken sequence of
-// observations.
+// StartTimeUnixNano should be set as for either cumulative or delta
+// aggregation temporality, meaning the start timestamp can be set to
+// the previous point's `StartTimeUnixNano` or the previous point's
+// `TimeUnixNano` to encode an unbroken sequence of Gauge observations.
 //
 // ## StartTimeUnixNano: Summaries
 //
