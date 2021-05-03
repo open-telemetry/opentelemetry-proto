@@ -151,12 +151,12 @@ message InstrumentationLibraryMetrics {
 //
 // ## StartTimeUnixNano: Gauges
 //
-// The use of StartTimeUnixNano is optional, recommended for overlap
-// protection and to express explicitly absent points.  When used,
-// StartTimeUnixNano should be set as for either cumulative or delta
-// aggregation temporality, meaning the start timestamp can be set to
-// the previous point's `StartTimeUnixNano` or the previous point's
-// `TimeUnixNano` to encode an unbroken sequence of Gauge observations.
+// The use of StartTimeUnixNano is optional for Gauge points.  This is
+// recommended in cases where there is a risk of mis-interpretion caused
+// by overlapping points (by a violation of the single-writer principle).
+//
+// When used, StartTimeUnixNano should be set to the start time of the
+// process or the timestamp when the Gauge was first set.
 //
 // ## StartTimeUnixNano: Summaries
 //
@@ -185,14 +185,15 @@ message InstrumentationLibraryMetrics {
 //
 // Note: This is meant to provide guidance in importing data into OTLP
 // that does not have start time and there is no other form of reset
-// detection.
+// detection.  This applies to points with cumulative aggregation
+// temporality and Gauge points but cannot be applied to points with
+// delta aggregation temporality.
 //
-// To import timestamped cumulative measurements into into OTLP using
-// a stateful processor, the input must be processed in order.  A
-// series of points that formed the beginning of the sequence,
-// including an unknown number of resets, are assumed to be lost or
-// previously recorded when the processor begins observing points.
-// Then:
+// To import timestamped measurements into into OTLP using a stateful
+// processor, the input must be processed in order.  A series of
+// points that formed the beginning of the sequence, including an
+// unknown number of resets, are assumed to be lost or previously
+// recorded when the processor begins observing points.  Then:
 //
 // 1. Keep a map, using the metric name, resource, and attributes as
 //    the key, containing a struct of three parts:
@@ -205,8 +206,8 @@ message InstrumentationLibraryMetrics {
 //    - in the map, set previousValue to the arriving value
 //    - in the output, set StartTimeUnixNano to the (new) resetTimestamp
 // 3. For each subsequent point that arrives in the sequence:
-//    - if the sample value is less than previousValue,
-//      then set resetTimestamp to previousTimestamp
+//    - for monotonic sum points, if the sample value is less than
+//      previousValue, then set resetTimestamp to previousTimestamp
 //    - set previousValue to the arriving value
 //    - set previousTimestamp to the arriving timestamp
 //    - in the output, set StartTimeUnixNano to (current) resetTimestamp
