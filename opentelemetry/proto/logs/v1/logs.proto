@@ -33,9 +33,9 @@ message ResourceLogs {
   // A list of InstrumentationLibraryLogs that originate from a resource.
   repeated InstrumentationLibraryLogs instrumentation_library_logs = 2;
 
-  // This schema_url applies to the "resource" field and to all logs in the
-  // "instrumentation_library_logs" except the logs which have a schema_url
-  // specified in the nested InstrumentationLibraryLogs message.
+  // This schema_url applies to the data in the "resource" field. It does not apply
+  // to the data in the "instrumentation_library_logs" field which have their own
+  // schema_url field.
   string schema_url = 3;
 }
 
@@ -49,8 +49,7 @@ message InstrumentationLibraryLogs {
   // A list of log records.
   repeated LogRecord logs = 2;
 
-  // This schema_url applies to all logs in the "logs" field regardless of the
-  // value of the schema_url field in the outer ResourceLogs message.
+  // This schema_url applies to all logs in the "logs" field.
   string schema_url = 3;
 }
 
