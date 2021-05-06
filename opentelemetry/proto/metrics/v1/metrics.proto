@@ -195,8 +195,9 @@ message InstrumentationLibraryMetrics {
 // unknown number of resets, are assumed to be lost or previously
 // recorded when the processor begins observing points.  Then:
 //
-// 1. Keep a map, using the metric name, resource, and attributes as
-//    the key, containing a struct of three parts:
+// 1. Keep a map, using the metric name, resource, instrumentation
+//    library and attributes as the key, containing a struct of
+//    three parts:
 //    - resetTimestamp: the first observation or the reset timestamp
 //    - previousTimestamp: the timestamp of the most recent observation
 //    - previousValue: a monotonic value
@@ -204,7 +205,8 @@ message InstrumentationLibraryMetrics {
 //    - in the map, set resetTimestamp to the arriving timestamp
 //    - in the map, set previousTimestamp to the arriving timestamp
 //    - in the map, set previousValue to the arriving value
-//    - in the output, set StartTimeUnixNano to the (new) resetTimestamp
+//    - in the output, set StartTimeUnixNano to the arriving timestamp
+//      (i.e., the current resetTimestamp).
 // 3. For each subsequent point that arrives in the sequence:
 //    - for monotonic sum points, if the sample value is less than
 //      previousValue, then set resetTimestamp to previousTimestamp
@@ -277,7 +279,7 @@ message Metric {
 // IntGauge represents the type of a int scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
-// 
+//
 // A Gauge does not support different aggregation temporalities. Given the
 // aggregation is unknown, points cannot be combined using the same
 // aggregation, regardless of aggregation temporalities. Therefore,
@@ -292,7 +294,7 @@ message IntGauge {
 // Gauge represents the type of a double scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
-// 
+//
 // A Gauge does not support different aggregation temporalities. Given the
 // aggregation is unknown, points cannot be combined using the same
 // aggregation, regardless of aggregation temporalities. Therefore,
@@ -323,7 +325,7 @@ message IntSum {
 // as a sum of all reported measurements over a time interval.
 message Sum {
   repeated NumberDataPoint data_points = 1;
-  
+
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
   AggregationTemporality aggregation_temporality = 2;
@@ -431,7 +433,7 @@ enum AggregationTemporality {
   //      number of requests received over the interval of time t_1 to
   //      t_0+1 with a value of 1.
   //
-  // Note: Even though, when reporting changes since last report time, using 
+  // Note: Even though, when reporting changes since last report time, using
   // CUMULATIVE is valid, it is not recommended. This may cause problems for
   // systems that do not use start_time to determine when the aggregation
   // value was reset (e.g. Prometheus).
@@ -470,7 +472,7 @@ message IntDataPoint {
 // NumberDataPoint is a single data point in a timeseries that describes the
 // time-varying value of a double metric.
 message NumberDataPoint {
-  // The set of key/value pairs that uniquely identify the timeseries from 
+  // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
 
@@ -501,7 +503,7 @@ message NumberDataPoint {
   // value fields is not present inside this oneof.
   oneof value {
     double as_double = 4;
-    sfixed64 as_int = 6; 
+    sfixed64 as_int = 6;
   }
 
   // (Optional) List of exemplars collected from
@@ -517,7 +519,7 @@ message NumberDataPoint {
 // the distribution of those values across a set of buckets.
 //
 // If the histogram contains the distribution of values, then both
-// "explicit_bounds" and "bucket counts" fields must be defined.   
+// "explicit_bounds" and "bucket counts" fields must be defined.
 // If the histogram does not contain the distribution of values, then both
 // "explicit_bounds" and "bucket_counts" must be omitted and only "count" and
 // "sum" are known.
@@ -567,7 +569,7 @@ message IntHistogramDataPoint {
   // (-infinity, explicit_bounds[i]] for i == 0
   // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
   // (explicit_bounds[i], +infinity) for i == N-1
-  // 
+  //
   // The values in the explicit_bounds array must be strictly increasing.
   //
   // Histogram buckets are inclusive of their upper boundary, except the last
@@ -586,12 +588,12 @@ message IntHistogramDataPoint {
 // distribution of those values across a set of buckets.
 //
 // If the histogram contains the distribution of values, then both
-// "explicit_bounds" and "bucket counts" fields must be defined.   
+// "explicit_bounds" and "bucket counts" fields must be defined.
 // If the histogram does not contain the distribution of values, then both
 // "explicit_bounds" and "bucket_counts" must be omitted and only "count" and
 // "sum" are known.
 message HistogramDataPoint {
-  // The set of key/value pairs that uniquely identify the timeseries from 
+  // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 9;
 
@@ -645,7 +647,7 @@ message HistogramDataPoint {
   // (-infinity, explicit_bounds[i]] for i == 0
   // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
   // (explicit_bounds[i], +infinity) for i == N-1
-  // 
+  //
   // The values in the explicit_bounds array must be strictly increasing.
   //
   // Histogram buckets are inclusive of their upper boundary, except the last
@@ -661,7 +663,7 @@ message HistogramDataPoint {
 // SummaryDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a Summary metric.
 message SummaryDataPoint {
-  // The set of key/value pairs that uniquely identify the timeseries from 
+  // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
 
