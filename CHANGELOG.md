@@ -8,9 +8,9 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 * Remove if no changes for this section before release.
 
-### Changed
+### Changed: MEtrics
 
-* Remove if no changes for this section before release.
+* :stop_sign: [DATA MODEL CHANGE] Histogram/Summary sums must be monotonic counters of events (#302)
 
 ### Added
 
