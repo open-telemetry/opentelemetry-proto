@@ -130,28 +130,6 @@ message InstrumentationLibraryMetrics {
 // to support correct rate calculation.  Although it may be omitted
 // when the start time is truly unknown, setting StartTimeUnixNano is
 // strongly encouraged.
-//
-// ## StartTimeUnixNano: Sums and Histograms
-//
-// Since these two point kinds have AggregationTemporality, the use of
-// StartTimeUnixNano is strongly recommended to ensure correct rate
-// calculation and prevent the appearnce of overlapping points.
-//
-// ## StartTimeUnixNano: Gauges
-//
-// The use of StartTimeUnixNano is optional for Gauge points.  This is
-// recommended in cases where there is a risk of mis-interpretion caused
-// by overlapping points.
-//
-// When used, StartTimeUnixNano should be set to the start time of the
-// process or the timestamp when the Gauge was first set.
-//
-// ## StartTimeUnixNano: Summaries
-//
-// Summary points are treated the same as for cumulative aggregation
-// temporality, by convention, allowing their `_sum` and `_count` fields
-// to be used for rate calculations.  StartTimeUnixNano should be set to the
-// starting timestamp in an unbroken sequence of observations.
 message Metric {
   // name of the metric, including its DNS name prefix. It must be unique.
   string name = 1;
