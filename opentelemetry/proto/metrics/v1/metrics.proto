@@ -45,7 +45,11 @@ message InstrumentationLibraryMetrics {
   repeated Metric metrics = 2;
 }
 
-// Defines a Metric which has one or more timeseries.
+// Defines a Metric which has one or more timeseries.  The following is a
+// brief summary of the Metric data model.  For more details, see:
+//
+//   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/datamodel.md
+//
 //
 // The data model and relation between entities is shown in the
 // diagram below. Here, "DataPoint" is the term used to refer to any
@@ -114,46 +118,30 @@ message InstrumentationLibraryMetrics {
 // DataPoint types.  TimeUnixNano is the moment corresponding to when
 // the data point's aggregate value was captured.
 //
-// Data points with/ the 0 value for TimeUnixNano SHOULD be rejected
+// Data points with the 0 value for TimeUnixNano SHOULD be rejected
 // by consumers.
 //
 // # StartTimeUnixNano
 //
 // StartTimeUnixNano in general allows detecting when a sequence of
-// observations is unbroken.  StartTimeUnixNano is set to the
-// beginning of an unbroken sequence of observations (all point kinds
-// except with delta aggregation temporality) or the end of an
-// unbroken sequence of observations (point kinds with delta
-// temporality).
-//
-// This field indicates to consumers the start time for points with
-// cumulative and delta AggregationTemporality, and it should be
-// included whenever possible to support correct rate calculation.
-// Although it may be omitted when the start time is truly unknown,
-// setting StartTimeUnixNano is strongly encouraged.
-//
-// There are two reasons that streams with AggregationTemporality are
-// reset: (1) a process restarts, and (2) the process "forgets" the stream
-// and then re-initializes it.  StartTimeUnixNano is critical for
-// calculating correct rates for Monotonic Sum, Histogram, and Summary
-// data points in both of these cases.
-//
-// Another use for this information which applies to all point kinds
-// is to prevent overlap when multiple writers accidentally write to a
-// single stream.  StartTimeUnixNano MAY be used for overlap detection
-// for all point kinds.
+// observations is unbroken.  This field indicates to consumers the
+// start time for points with cumulative and delta
+// AggregationTemporality, and it should be included whenever possible
+// to support correct rate calculation.  Although it may be omitted
+// when the start time is truly unknown, setting StartTimeUnixNano is
+// strongly encouraged.
 //
 // ## StartTimeUnixNano: Sums and Histograms
 //
 // Since these two point kinds have AggregationTemporality, the use of
 // StartTimeUnixNano is strongly recommended to ensure correct rate
-// calculation and prevent overlap.
+// calculation and prevent the appearnce of overlapping points.
 //
 // ## StartTimeUnixNano: Gauges
 //
 // The use of StartTimeUnixNano is optional for Gauge points.  This is
 // recommended in cases where there is a risk of mis-interpretion caused
-// by overlapping points (by a violation of the single-writer principle).
+// by overlapping points.
 //
 // When used, StartTimeUnixNano should be set to the start time of the
 // process or the timestamp when the Gauge was first set.
@@ -161,77 +149,9 @@ message InstrumentationLibraryMetrics {
 // ## StartTimeUnixNano: Summaries
 //
 // Summary points are treated the same as for cumulative aggregation
-// temporality, by convention.  StartTimeUnixNano should be set to the
+// temporality, by convention, allowing their `_sum` and `_count` fields
+// to be used for rate calculations.  StartTimeUnixNano should be set to the
 // starting timestamp in an unbroken sequence of observations.
-//
-// # Unknown StartTimeUnixNano
-//
-// This protocol adopts the Prometheus heuristic for reset detection,
-// and with it prescribes a solution for filling in StartTimeUnixNanos
-// with as much information as possible to assist consumers with
-// calculating rates and detecting overlap.  This process can be
-// applied to Sum and Histogram points with cumulative aggregation
-// temporality, Gauge, and Summary points.
-//
-// The Prometheus heuristic indicates that a reset must have occured
-// in a monotonic series whenever the value descends from one value to
-// the next, in a timestamp-ordered sequence.
-//
-// To facilitate reset and overlap detection, when single-timestamped
-// sample values are translated into OTLP, such as from the Prometheus
-// Remote-Write protocol, use the following.
-//
-// ## Filling in StartTimeUnixNano
-//
-// Note: This is meant to provide guidance in importing data into OTLP
-// that does not have start time and there is no other form of reset
-// detection.  This applies to points with cumulative aggregation
-// temporality and Gauge points but cannot be applied to points with
-// delta aggregation temporality.
-//
-// To import timestamped measurements into into OTLP using a stateful
-// processor, the input must be processed in order.  A series of
-// points that formed the beginning of the sequence, including an
-// unknown number of resets, are assumed to be lost or previously
-// recorded when the processor begins observing points.  Then:
-//
-// 1. Keep a map, using the metric name, resource, instrumentation
-//    library and attributes as the key, containing a struct of
-//    three parts:
-//    - resetTimestamp: the first observation or the reset timestamp
-//    - previousTimestamp: the timestamp of the most recent observation
-//    - previousValue: a monotonic value
-// 2. When a new point arrives and it is the first observation of that particular key:
-//    - in the map, set resetTimestamp to the arriving timestamp
-//    - in the map, set previousTimestamp to the arriving timestamp
-//    - in the map, set previousValue to the arriving value
-//    - in the output, set StartTimeUnixNano to the arriving timestamp
-//      (i.e., the current resetTimestamp).
-// 3. For each subsequent point that arrives in the sequence:
-//    - for monotonic sum points, if the sample value is less than
-//      previousValue, then set resetTimestamp to previousTimestamp
-//    - set previousValue to the arriving value
-//    - set previousTimestamp to the arriving timestamp
-//    - in the output, set StartTimeUnixNano to (current) resetTimestamp
-//
-// This technique ensures that all output points have a meaningful
-// StartTimeUnixNano.  The first point the stream written by this
-// writer has TimeUnixNano equal to StartTimeUnixNano, a point with
-// zero duration.  Consumers of this data are expected to recognize
-// these zero-width points as stream resets where the true start time
-// is unknown.
-//
-// Using StartTimeUnixNano values filled in this way, consumers are
-// able to calculate rates correctly and easily, without
-// reconstructing a sequence of ordered points to apply the Prometheus
-// heuristic.  Receivers of cumulative and delta metric data with
-// unknown start time are strongly encouraged to apply this logic as
-// while translating into OTLP, to avoid producing data points with
-// AggregationTemporality and unknown StartTimeUnixNano.
-//
-// Enties can safely be removed from the map, after they appear no
-// longer used.  This has the effect of entering a gap stream where
-// the processor reset its memory of the start time.
 message Metric {
   // name of the metric, including its DNS name prefix. It must be unique.
   string name = 1;
