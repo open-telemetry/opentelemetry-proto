@@ -599,6 +599,12 @@ message SummaryDataPoint {
 
   // sum of the values in the population. If count is zero then this field
   // must be zero.
+  //
+  // Note: Sum should only be filled out when measuring non-negative discrete
+  // events, and is assumed to be monotonic over the values of these events.
+  // Negative events *can* be recorded, but sum should not be filled out when
+  // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+  // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#summary
   double sum = 5;
 
   // Represents the value at a given quantile of a distribution.
