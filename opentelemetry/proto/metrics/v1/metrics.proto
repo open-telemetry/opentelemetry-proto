@@ -247,8 +247,8 @@ message IntHistogram {
   AggregationTemporality aggregation_temporality = 2;
 }
 
-// Histogram represents the type of a metric that is calculated by aggregating as a
-// Histogram of all reported double measurements over a time interval.
+// Histogram represents the type of a metric that is calculated by aggregating
+// as a Histogram of all reported double measurements over a time interval.
 message Histogram {
   repeated HistogramDataPoint data_points = 1;
 
@@ -526,6 +526,12 @@ message HistogramDataPoint {
   // sum of the values in the population. If count is zero then this field
   // must be zero. This value must be equal to the sum of the "sum" fields in
   // buckets if a histogram is provided.
+  //
+  // Note: Sum should only be filled out when measuring non-negative discrete
+  // events, and is assumed to be monotonic over the values of these events.
+  // Negative events *can* be recorded, but sum should not be filled out when
+  // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+  // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
   double sum = 5;
 
   // bucket_counts is an optional field contains the count values of histogram
@@ -593,6 +599,12 @@ message SummaryDataPoint {
 
   // sum of the values in the population. If count is zero then this field
   // must be zero.
+  //
+  // Note: Sum should only be filled out when measuring non-negative discrete
+  // events, and is assumed to be monotonic over the values of these events.
+  // Negative events *can* be recorded, but sum should not be filled out when
+  // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+  // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#summary
   double sum = 5;
 
   // Represents the value at a given quantile of a distribution.
@@ -609,6 +621,8 @@ message SummaryDataPoint {
     double quantile = 1;
 
     // The value at the given quantile of a distribution.
+    //
+    // Quantile values must NOT be negative.
     double value = 2;
   }
 
