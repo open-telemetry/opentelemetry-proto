@@ -37,6 +37,7 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 ### Added
 
 - Common - Add bytes (binary) as data type to AnyValue (#297)
+- Common - Add schema_url fields as described in OTEP 0152 (#298)
 
 ### Removed
 
