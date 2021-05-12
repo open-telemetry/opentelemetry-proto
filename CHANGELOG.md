@@ -33,6 +33,8 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 * :stop_sign: [DATA MODEL CHANGE] Histogram/Summary sums must be monotonic counters of events (#302)
 * :stop_sign: [DATA MODEL CHANGE] Clarify requirements and semantics for start time (#295)
+* :stop_sign: [BREAKING] Deprecate `labels` field from NumberDataPoint, HistogramDataPoint, SummaryDataPoint and add equivalent `attributes` field (#283)
+* :stop_sign: [BREAKING] Deprecate `filtered_labels` field from Exemplars and add equivalent `filtered_attributes` field (#283)
 
 ### Added
 
@@ -52,8 +54,6 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 * :stop_sign: [DEPRECATION] Deprecate IntSum, IntGauge, and IntDataPoint (#278)
 * :stop_sign: [DEPRECATION] Deprecate IntExemplar (#281)
 * :stop_sign: [DEPRECATION] Deprecate IntHistogram (#270)
-* :stop_sign: [BREAKING] Deprecate `labels` field from NumberDataPoint, HistogramDataPoint, SummaryDataPoint and add equivalent `attributes` field (#283)
-* :stop_sign: [BREAKING] Deprecate `filtered_labels` field from Exemplars and add equivalent `filtered_attributes` field (#283)
 * :stop_sign: [BREAKING] Rename DoubleGauge to Gauge (#278)
 * :stop_sign: [BREAKING] Rename DoubleSum to Sum (#278)
 * :stop_sign: [BREAKING] Rename DoubleDataPoint to NumberDataPoint (#278)
