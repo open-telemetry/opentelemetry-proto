@@ -32,6 +32,11 @@ message ResourceMetrics {
 
   // A list of metrics that originate from a resource.
   repeated InstrumentationLibraryMetrics instrumentation_library_metrics = 2;
+
+  // This schema_url applies to the data in the "resource" field. It does not apply
+  // to the data in the "instrumentation_library_metrics" field which have their own
+  // schema_url field.
+  string schema_url = 3;
 }
 
 // A collection of Metrics produced by an InstrumentationLibrary.
@@ -43,6 +48,9 @@ message InstrumentationLibraryMetrics {
 
   // A list of metrics that originate from an instrumentation library.
   repeated Metric metrics = 2;
+
+  // This schema_url applies to all metrics in the "metrics" field.
+  string schema_url = 3;
 }
 
 // Defines a Metric which has one or more timeseries.  The following is a
