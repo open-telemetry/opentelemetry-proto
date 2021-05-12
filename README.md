@@ -27,11 +27,11 @@ To generate the raw gRPC client libraries use `make gen-${LANGUAGE}`. Current su
 Component                            | Maturity |
 -------------------------------------|----------|
 **Binary Protobuf Encoding**         |          |
-collector/metrics/*                  | Beta     |
+collector/metrics/*                  | Stable   |
 collector/trace/*                    | Stable   |
 collector/logs/*                     | Alpha    |
 common/*                             | Stable   |
-metrics/*                            | Beta     |
+metrics/*                            | Stable   |
 resource/*                           | Stable   |
 trace/trace.proto                    | Stable   |
 trace/trace_config.proto             | Alpha    |
