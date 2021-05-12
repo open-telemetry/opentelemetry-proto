@@ -6,15 +6,16 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Maturity
 
-* Remove if no changes for this section before release.
+* `collector/metrics/*` is now considered `stable`. (#305)
 
 ### Changed: Metrics
 
 * :stop_sign: [DATA MODEL CHANGE] Histogram/Summary sums must be monotonic counters of events (#302)
+* :stop_sign: [DATA MODEL CHANGE] Clarify requirements and semantics for start time (#295)
 
 ### Added
 
-* Remove if no changes for this section before release.
+- Common - Add bytes (binary) as data type to AnyValue (#297)
 
 ### Removed
 
