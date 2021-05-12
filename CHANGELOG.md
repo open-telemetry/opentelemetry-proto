@@ -1,8 +1,9 @@
 # Changelog
 
+
 ## Unreleased
 
-Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.8.0...v0.9.0)
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.9.0...v0.10.0)
 
 ### Maturity
 
@@ -10,11 +11,35 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Changed: Metrics
 
-* :stop_sign: [DATA MODEL CHANGE] Histogram/Summary sums must be monotonic counters of events (#302)
+* Remove if no changes for this section before release.
 
 ### Added
 
 * Remove if no changes for this section before release.
+
+### Removed
+
+* Remove if no changes for this section before release.
+
+## 0.9.0 - 2021-04-12
+
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.8.0...v0.9.0)
+
+### Maturity
+
+* `collector/metrics/*` is now considered `stable`. (#305)
+
+### Changed: Metrics
+
+* :stop_sign: [DATA MODEL CHANGE] Histogram/Summary sums must be monotonic counters of events (#302)
+* :stop_sign: [DATA MODEL CHANGE] Clarify requirements and semantics for start time (#295)
+* :stop_sign: [BREAKING] Deprecate `labels` field from NumberDataPoint, HistogramDataPoint, SummaryDataPoint and add equivalent `attributes` field (#283)
+* :stop_sign: [BREAKING] Deprecate `filtered_labels` field from Exemplars and add equivalent `filtered_attributes` field (#283)
+
+### Added
+
+- Common - Add bytes (binary) as data type to AnyValue (#297)
+- Common - Add schema_url fields as described in OTEP 0152 (#298)
 
 ### Removed
 
@@ -29,8 +54,6 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 * :stop_sign: [DEPRECATION] Deprecate IntSum, IntGauge, and IntDataPoint (#278)
 * :stop_sign: [DEPRECATION] Deprecate IntExemplar (#281)
 * :stop_sign: [DEPRECATION] Deprecate IntHistogram (#270)
-* :stop_sign: [BREAKING] Deprecate `labels` field from NumberDataPoint, HistogramDataPoint, SummaryDataPoint and add equivalent `attributes` field (#283)
-* :stop_sign: [BREAKING] Deprecate `filtered_labels` field from Exemplars and add equivalent `filtered_attributes` field (#283)
 * :stop_sign: [BREAKING] Rename DoubleGauge to Gauge (#278)
 * :stop_sign: [BREAKING] Rename DoubleSum to Sum (#278)
 * :stop_sign: [BREAKING] Rename DoubleDataPoint to NumberDataPoint (#278)
