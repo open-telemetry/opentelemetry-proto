@@ -17,7 +17,7 @@ endef
 .PHONY: gen-all
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-objc gen-openapi gen-php gen-python gen-ruby
 
-OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.2.1
+OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.4.0
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 PROTO_INCLUDES := -I/usr/include/github.com/gogo/protobuf
 
@@ -25,6 +25,7 @@ PROTO_GEN_CPP_DIR ?= $(GENDIR)/cpp
 PROTO_GEN_CSHARP_DIR ?= $(GENDIR)/csharp
 PROTO_GEN_GO_DIR ?= $(GENDIR)/go
 PROTO_GEN_JAVA_DIR ?= $(GENDIR)/java
+PROTO_GEN_JS_DIR ?= $(GENDIR)/js
 PROTO_GEN_OBJC_DIR ?= $(GENDIR)/objc
 PROTO_GEN_OPENAPI_DIR ?= $(GENDIR)/openapi
 PROTO_GEN_PHP_DIR ?= $(GENDIR)/php
@@ -72,6 +73,16 @@ gen-java:
 	rm -rf ./$(PROTO_GEN_JAVA_DIR)
 	mkdir -p ./$(PROTO_GEN_JAVA_DIR)
 	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --java_out=./$(PROTO_GEN_JAVA_DIR) $(file)))
+
+# Generate gRPC/Protobuf implementation for JavaScript.
+.PHONY: gen-js
+gen-js:
+	rm -rf ./$(PROTO_GEN_JS_DIR)
+	mkdir -p ./$(PROTO_GEN_JS_DIR)
+	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) $(file)))
+	$(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --grpc-web_out=import_style=commonjs,mode=grpcweb:./$(PROTO_GEN_JS_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
+	$(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --grpc-web_out=import_style=commonjs,mode=grpcweb:./$(PROTO_GEN_JS_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
+	$(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --grpc-web_out=import_style=commonjs,mode=grpcweb:./$(PROTO_GEN_JS_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
 
 # Generate gRPC/Protobuf implementation for Objective-C.
 .PHONY: gen-objc
