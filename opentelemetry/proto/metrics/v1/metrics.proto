@@ -183,6 +183,8 @@ message Metric {
 // DataPointFlags is defined as a protobuf 'uint32' type, and to be used as a
 // bit-field in representing 32 distinct boolean flags.
 enum DataPointFlags {
+  FLAG_NONE = 0;
+
   // This DataPoint is valid but has no recorded value.
   FLAG_NO_RECORDED_VALUE = 1;
 
