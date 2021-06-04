@@ -537,11 +537,6 @@ message HistogramDataPoint {
   // 1970.
   fixed64 time_unix_nano = 3;
 
-  // Field "flags" is used as a bit-field as defined in enum DataPointFlags.
-  // If FLAG_NO_RECORDED_VALUE is set, the "count", "sum", "bucket_counts",
-  // "explicit_bounds" fields are undefined.
-  uint32 flags = 10;
-
   // count is the number of values in the population. Must be non-negative. This
   // value must be equal to the sum of the "count" fields in buckets if a
   // histogram is provided.
@@ -586,6 +581,11 @@ message HistogramDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 8;
+
+  // Field "flags" is used as a bit-field as defined in enum DataPointFlags.
+  // If FLAG_NO_RECORDED_VALUE is set, the "count", "sum", "bucket_counts",
+  // "explicit_bounds" fields are undefined.
+  uint32 flags = 10;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
