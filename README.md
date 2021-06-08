@@ -29,13 +29,13 @@ Component                            | Maturity |
 **Binary Protobuf Encoding**         |          |
 collector/metrics/*                  | Stable   |
 collector/trace/*                    | Stable   |
-collector/logs/*                     | Alpha    |
+collector/logs/*                     | Beta     |
 common/*                             | Stable   |
 metrics/*                            | Stable   |
 resource/*                           | Stable   |
 trace/trace.proto                    | Stable   |
 trace/trace_config.proto             | Alpha    |
-logs/*                               | Alpha    |
+logs/*                               | Beta     |
 **JSON encoding**                    |          |
 All messages                         | Alpha    |
 

@@ -7,7 +7,8 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Maturity
 
-* Remove if no changes for this section before release.
+* `collector/logs/*` is now considered `Beta`. (#311)
+* `logs/*` is now considered `Beta`. (#311)
 
 ### Changed: Metrics
 
