@@ -433,7 +433,7 @@ message HistogramDataPoint {
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
-// time-varying values of a Summary metric. It is considered legacy. See comments for Summary
+// time-varying values of a Summary metric.
 message SummaryDataPoint {
   // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
@@ -548,7 +548,7 @@ message Exemplar {
 }
 
 //
-// Add deperecated messages below this line
+// Move deprecated messages below this line
 //
 
 // IntDataPoint is deprecated. Use integer value in NumberDataPoint.
