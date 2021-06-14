@@ -188,7 +188,10 @@ enum DataPointFlags {
   // This DataPoint is valid but has no recorded value.
   FLAG_NO_RECORDED_VALUE = 1;
 
-  // Bits 2-32 are reserved for future use.
+  // All values in the population are non-negative numbers.
+  FLAG_NON_NEGATIVE_VALUES = 2;
+  
+  // Bits 3-32 are reserved for future use.
 }
 
 // IntGauge is deprecated.  Use Gauge with an integer value in NumberDataPoint.
@@ -540,7 +543,9 @@ message HistogramDataPoint {
   // count is the number of values in the population. Must be non-negative. This
   // value must be equal to the sum of the "count" fields in buckets if a
   // histogram is provided.
-  fixed64 count = 4;
+  //
+  // This field will be removed in ~3 months, on September 1, 2021.
+  fixed64 count = 4 [deprecated = true];
 
   // sum of the values in the population. If count is zero then this field
   // must be zero. This value must be equal to the sum of the "sum" fields in
@@ -551,7 +556,21 @@ message HistogramDataPoint {
   // Negative events *can* be recorded, but sum should not be filled out when
   // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
   // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
-  double sum = 5;
+  //
+  // This field will be removed in ~3 months, on September 1, 2021.
+  double sum = 5 [deprecated = true];
+
+  // count of the number of values in the population. Must be non-negative.
+  // This value must be equal to the sum of the "count" fields in buckets if a
+  // histogram is provided.
+  fixed64 population_count = 11;
+
+  // sum of the values in the population. If population_count is zero then this
+  // field must be zero.
+  //
+  // Check FLAG_NON_NEGATIVE_VALUES bit in flags for compatibility with
+  // OpenMetrics.
+  double population_sum = 12;
 
   // bucket_counts is an optional field contains the count values of histogram
   // for each bucket.
@@ -569,7 +588,7 @@ message HistogramDataPoint {
   //
   // (-infinity, explicit_bounds[i]] for i == 0
   // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-  // (explicit_bounds[i], +infinity) for i == N-1
+  // (explicit_bounds[i-1], +infinity) for i == N-1
   //
   // The values in the explicit_bounds array must be strictly increasing.
   //
@@ -583,8 +602,12 @@ message HistogramDataPoint {
   repeated Exemplar exemplars = 8;
 
   // Field "flags" is used as a bit-field as defined in enum DataPointFlags.
+  //
   // If FLAG_NO_RECORDED_VALUE is set, the "count", "sum", "bucket_counts",
   // "explicit_bounds" fields are undefined.
+  //
+  // IF FLAG_NON_NEGATIVE_VALUES is set, all values/events in the population
+  // must be non-negative.
   uint32 flags = 10;
 }
 
