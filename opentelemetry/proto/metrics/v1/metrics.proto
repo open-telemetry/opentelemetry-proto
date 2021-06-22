@@ -346,6 +346,8 @@ message NumberDataPoint {
   repeated Exemplar exemplars = 5;
 }
 
+
+
 // HistogramDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a Histogram of double values. A Histogram contains
 // summary statistics for a population of values, it may optionally contain the
@@ -644,7 +646,7 @@ message IntHistogramDataPoint {
   //
   // (-infinity, explicit_bounds[i]] for i == 0
   // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-  // (explicit_bounds[i-], +infinity) for i == N-1
+  // (explicit_bounds[i-1], +infinity) for i == N-1
   //
   // The values in the explicit_bounds array must be strictly increasing.
   //
