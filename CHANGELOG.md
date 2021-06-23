@@ -16,7 +16,7 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Added
 
-* Metrics data points add a `flags` field with one bit to represent explicitly missing data.
+* Metrics data points add a `flags` field with one bit to represent explicitly missing data. (#316)
 
 ### Removed
 
