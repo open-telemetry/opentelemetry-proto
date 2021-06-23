@@ -10,13 +10,13 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 * `collector/logs/*` is now considered `Beta`. (#311)
 * `logs/*` is now considered `Beta`. (#311)
 
-### Changed: Metrics
+### Changed
 
 * Remove if no changes for this section before release.
 
 ### Added
 
-* Remove if no changes for this section before release.
+* Metrics data points add a `flags` field with one bit to represent explicitly missing data.
 
 ### Removed
 

@@ -303,6 +303,19 @@ enum AggregationTemporality {
 }
 
 
+// DataPointFlags is defined as a protobuf 'uint32' type and is to be used as a
+// bit-field representing 32 distinct boolean flags.
+enum DataPointFlags {
+  FLAG_NONE = 0;
+
+  // This DataPoint is valid but has no recorded value.  This value
+  // SHOULD be used to reflect explicitly missing data in a series, as
+  // for an equivalent to the Prometheus "staleness marker".
+  FLAG_NO_RECORDED_VALUE = 1;
+
+  // Bits 2-32 are reserved for future use.
+}
+
 
 // NumberDataPoint is a single data point in a timeseries that describes the
 // time-varying value of a double metric.
@@ -344,6 +357,9 @@ message NumberDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 5;
+
+  // Flags that apply to this specific data point.
+  DataPointFlags flags = 8;
 }
 
 
@@ -430,6 +446,9 @@ message HistogramDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 8;
+
+  // Flags that apply to this specific data point.
+  DataPointFlags flags = 10;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
@@ -497,6 +516,9 @@ message SummaryDataPoint {
   // (Optional) list of values at different quantiles of the distribution calculated
   // from the current snapshot. The quantiles must be strictly increasing.
   repeated ValueAtQuantile quantile_values = 6;
+
+  // Flags that apply to this specific data point.
+  DataPointFlags flags = 8;
 }
 
 
