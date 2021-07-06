@@ -413,12 +413,11 @@ message HistogramDataPoint {
 
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
-  // This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-  // bucket at index i are:
+  // The boundaries for bucket at index i are:
   //
   // (-infinity, explicit_bounds[i]] for i == 0
-  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-  // (explicit_bounds[i-1], +infinity) for i == N-1
+  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+  // (explicit_bounds[i], +infinity) for i == size(explicit_bounds)
   //
   // The values in the explicit_bounds array must be strictly increasing.
   //
@@ -641,12 +640,11 @@ message IntHistogramDataPoint {
 
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
-  // This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-  // bucket at index i are:
+  // The boundaries for bucket at index i are:
   //
   // (-infinity, explicit_bounds[i]] for i == 0
-  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-  // (explicit_bounds[i-1], +infinity) for i == N-1
+  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+  // (explicit_bounds[i], +infinity) for i == size(explicit_bounds)
   //
   // The values in the explicit_bounds array must be strictly increasing.
   //
