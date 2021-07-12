@@ -417,7 +417,7 @@ message HistogramDataPoint {
   //
   // (-infinity, explicit_bounds[i]] for i == 0
   // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
-  // (explicit_bounds[i], +infinity) for i == size(explicit_bounds)
+  // (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
   //
   // The values in the explicit_bounds array must be strictly increasing.
   //
@@ -644,7 +644,7 @@ message IntHistogramDataPoint {
   //
   // (-infinity, explicit_bounds[i]] for i == 0
   // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
-  // (explicit_bounds[i], +infinity) for i == size(explicit_bounds)
+  // (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
   //
   // The values in the explicit_bounds array must be strictly increasing.
   //
