@@ -219,6 +219,18 @@ message Histogram {
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
   AggregationTemporality aggregation_temporality = 2;
+
+  enum SumType {
+    // The histogram sum is a monotonic value and will not decrease.
+    // Note: This is the default for histograms if unspecified.
+    MONOTONIC = 0;
+    // The histogram sum may increasee or decrease.
+    NON_MONOTONIC = 1;
+    // The histogram sum is not meaningful and should be ignored.
+    UNKNOWN_SUM = 2;
+  }
+  // How to interpret the sum field on histogram data points.
+  SumType sum_type = 3;
 }
 
 // Summary metric data are used to convey quantile summaries,
@@ -393,13 +405,10 @@ message HistogramDataPoint {
 
   // sum of the values in the population. If count is zero then this field
   // must be zero. This value must be equal to the sum of the "sum" fields in
-  // buckets if a histogram is provided.
+  // buckets of a histogram if provided.
   //
-  // Note: Sum should only be filled out when measuring non-negative discrete
-  // events, and is assumed to be monotonic over the values of these events.
-  // Negative events *can* be recorded, but sum should not be filled out when
-  // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-  // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+  // Additionally, this field should abide by the interpretation specified
+  // in Histogram.sum_type.  
   double sum = 5;
 
   // bucket_counts is an optional field contains the count values of histogram

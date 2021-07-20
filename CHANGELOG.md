@@ -16,7 +16,7 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Added
 
-* Remove if no changes for this section before release.
+* Added an enum to Histogram to denote the meaning of the sum field.
 
 ### Removed
 
