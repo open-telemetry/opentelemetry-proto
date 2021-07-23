@@ -180,9 +180,7 @@ message Metric {
   }
 }
 
-
-
-// Gauge represents the type of a double scalar metric that always exports the
+// Gauge represents the type of a scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
 //
@@ -195,8 +193,7 @@ message Gauge {
   repeated NumberDataPoint data_points = 1;
 }
 
-
-// Sum represents the type of a numeric double scalar metric that is calculated
+// Sum represents the type of a numeric scalar metric that is calculated
 // as a sum of all reported measurements over a time interval.
 message Sum {
   repeated NumberDataPoint data_points = 1;
@@ -209,10 +206,8 @@ message Sum {
   bool is_monotonic = 3;
 }
 
-
-
 // Histogram represents the type of a metric that is calculated by aggregating
-// as a Histogram of all reported double measurements over a time interval.
+// as a Histogram of all reported measurements over a time interval.
 message Histogram {
   repeated HistogramDataPoint data_points = 1;
 
@@ -314,10 +309,8 @@ enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
-
-
 // NumberDataPoint is a single data point in a timeseries that describes the
-// time-varying value of a double metric.
+// time-varying numerical value of a metric.
 message NumberDataPoint {
   // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
@@ -358,12 +351,10 @@ message NumberDataPoint {
   repeated Exemplar exemplars = 5;
 }
 
-
-
 // HistogramDataPoint is a single data point in a timeseries that describes the
-// time-varying values of a Histogram of double values. A Histogram contains
-// summary statistics for a population of values, it may optionally contain the
-// distribution of those values across a set of buckets.
+// time-varying values of a Histogram. A Histogram contains summary statistics
+// for a population of values, it may optionally contain the distribution of
+// those values across a set of buckets.
 //
 // If the histogram contains the distribution of values, then both
 // "explicit_bounds" and "bucket counts" fields must be defined.
