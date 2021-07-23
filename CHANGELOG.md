@@ -16,7 +16,7 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Added
 
-* Remove if no changes for this section before release.
+* ExponentialHistogram is a base-2 exponential histogram described in [OTEP 149](https://github.com/open-telemetry/oteps/pull/149).
 
 ### Removed
 
