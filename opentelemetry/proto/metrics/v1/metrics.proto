@@ -566,7 +566,7 @@ message ExponentialHistogramDataPoint {
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated Exemplar exemplars = 8;
+  repeated Exemplar exemplars = 11;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
