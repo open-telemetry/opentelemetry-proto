@@ -193,8 +193,8 @@ message Gauge {
   repeated NumberDataPoint data_points = 1;
 }
 
-// Sum represents the type of a numeric scalar metric that is calculated
-// as a sum of all reported measurements over a time interval.
+// Sum represents the type of a scalar metric that is calculated as a sum of all
+// reported measurements over a time interval.
 message Sum {
   repeated NumberDataPoint data_points = 1;
 
@@ -298,7 +298,7 @@ enum AggregationTemporality {
 }
 
 // NumberDataPoint is a single data point in a timeseries that describes the
-// time-varying numerical value of a metric.
+// time-varying scalar value of a metric.
 message NumberDataPoint {
   // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
@@ -489,8 +489,6 @@ message SummaryDataPoint {
   repeated ValueAtQuantile quantile_values = 6;
 }
 
-
-
 // A representation of an exemplar, which is a sample input measurement.
 // Exemplars also hold information about the environment when the measurement
 // was recorded, for example the span and trace ID of the active span when the
@@ -518,7 +516,7 @@ message Exemplar {
   // 1970.
   fixed64 time_unix_nano = 2;
 
-  // Numerical value of the measurement that was recorded. An exemplar is
+  // The value of the measurement that was recorded. An exemplar is
   // considered invalid when one of the recognized value fields is not present
   // inside this oneof.
   oneof value {
