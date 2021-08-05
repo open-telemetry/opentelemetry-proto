@@ -180,9 +180,7 @@ message Metric {
   }
 }
 
-
-
-// Gauge represents the type of a double scalar metric that always exports the
+// Gauge represents the type of a scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
 //
@@ -195,9 +193,8 @@ message Gauge {
   repeated NumberDataPoint data_points = 1;
 }
 
-
-// Sum represents the type of a numeric double scalar metric that is calculated
-// as a sum of all reported measurements over a time interval.
+// Sum represents the type of a scalar metric that is calculated as a sum of all
+// reported measurements over a time interval.
 message Sum {
   repeated NumberDataPoint data_points = 1;
 
@@ -209,10 +206,8 @@ message Sum {
   bool is_monotonic = 3;
 }
 
-
-
 // Histogram represents the type of a metric that is calculated by aggregating
-// as a Histogram of all reported double measurements over a time interval.
+// as a Histogram of all reported measurements over a time interval.
 message Histogram {
   repeated HistogramDataPoint data_points = 1;
 
@@ -302,7 +297,6 @@ enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
-
 // DataPointFlags is defined as a protobuf 'uint32' type and is to be used as a
 // bit-field representing 32 distinct boolean flags.
 enum DataPointFlags {
@@ -316,9 +310,8 @@ enum DataPointFlags {
   // Bits 2-32 are reserved for future use.
 }
 
-
 // NumberDataPoint is a single data point in a timeseries that describes the
-// time-varying value of a double metric.
+// time-varying scalar value of a metric.
 message NumberDataPoint {
   // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
@@ -362,12 +355,10 @@ message NumberDataPoint {
   DataPointFlags flags = 8;
 }
 
-
-
 // HistogramDataPoint is a single data point in a timeseries that describes the
-// time-varying values of a Histogram of double values. A Histogram contains
-// summary statistics for a population of values, it may optionally contain the
-// distribution of those values across a set of buckets.
+// time-varying values of a Histogram. A Histogram contains summary statistics
+// for a population of values, it may optionally contain the distribution of
+// those values across a set of buckets.
 //
 // If the histogram contains the distribution of values, then both
 // "explicit_bounds" and "bucket counts" fields must be defined.
@@ -429,12 +420,11 @@ message HistogramDataPoint {
 
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
-  // This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-  // bucket at index i are:
+  // The boundaries for bucket at index i are:
   //
   // (-infinity, explicit_bounds[i]] for i == 0
-  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-  // (explicit_bounds[i], +infinity) for i == N-1
+  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+  // (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
   //
   // The values in the explicit_bounds array must be strictly increasing.
   //
@@ -521,8 +511,6 @@ message SummaryDataPoint {
   DataPointFlags flags = 8;
 }
 
-
-
 // A representation of an exemplar, which is a sample input measurement.
 // Exemplars also hold information about the environment when the measurement
 // was recorded, for example the span and trace ID of the active span when the
@@ -550,7 +538,7 @@ message Exemplar {
   // 1970.
   fixed64 time_unix_nano = 2;
 
-  // Numerical value of the measurement that was recorded. An exemplar is
+  // The value of the measurement that was recorded. An exemplar is
   // considered invalid when one of the recognized value fields is not present
   // inside this oneof.
   oneof value {
@@ -663,12 +651,11 @@ message IntHistogramDataPoint {
 
   // explicit_bounds specifies buckets with explicitly defined bounds for values.
   //
-  // This defines size(explicit_bounds) + 1 (= N) buckets. The boundaries for
-  // bucket at index i are:
+  // The boundaries for bucket at index i are:
   //
   // (-infinity, explicit_bounds[i]] for i == 0
-  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < N-1
-  // (explicit_bounds[i], +infinity) for i == N-1
+  // (explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)
+  // (explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)
   //
   // The values in the explicit_bounds array must be strictly increasing.
   //
