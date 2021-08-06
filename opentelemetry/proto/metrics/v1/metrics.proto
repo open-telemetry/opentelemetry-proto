@@ -351,8 +351,9 @@ message NumberDataPoint {
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 5;
 
-  // Flags that apply to this specific data point.
-  DataPointFlags flags = 8;
+  // Flags that apply to this specific data point.  See DataPointFlags
+  // for the available flags and their meaning.
+  uint32 flags = 8;
 }
 
 // HistogramDataPoint is a single data point in a timeseries that describes the
@@ -437,8 +438,9 @@ message HistogramDataPoint {
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 8;
 
-  // Flags that apply to this specific data point.
-  DataPointFlags flags = 10;
+  // Flags that apply to this specific data point.  See DataPointFlags
+  // for the available flags and their meaning.
+  uint32 flags = 10;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
@@ -507,8 +509,9 @@ message SummaryDataPoint {
   // from the current snapshot. The quantiles must be strictly increasing.
   repeated ValueAtQuantile quantile_values = 6;
 
-  // Flags that apply to this specific data point.
-  DataPointFlags flags = 8;
+  // Flags that apply to this specific data point.  See DataPointFlags
+  // for the available flags and their meaning.
+  uint32 flags = 8;
 }
 
 // A representation of an exemplar, which is a sample input measurement.
