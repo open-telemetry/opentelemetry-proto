@@ -521,7 +521,7 @@ message ExponentialHistogramDataPoint {
     // fixedt64.  This field is expected to have many buckets,
     // especially zeros, so has been selected to ensure varint
     // encoding.
-    repeated uint64 bucket_counts = 6;
+    repeated uint64 bucket_counts = 2;
   } 
 
   // (Optional) List of exemplars collected from
