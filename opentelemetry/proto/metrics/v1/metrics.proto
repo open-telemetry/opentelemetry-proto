@@ -447,39 +447,11 @@ message HistogramDataPoint {
 // distribution of those values across a set of buckets.
 //
 message ExponentialHistogramDataPoint {
-  // The set of key/value pairs that uniquely identify the timeseries from
-  // where this point belongs. The list may be empty (may contain 0 elements).
-  repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
-
-  // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
-  //
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
-  // 1970.
-  fixed64 start_time_unix_nano = 2;
-
-  // TimeUnixNano is required, see the detailed comments above Metric.
-  //
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
-  // 1970.
-  fixed64 time_unix_nano = 3;
-
-  // count is the number of values in the population. Must be non-negative. This
-  // value must be equal to the sum of the "count" fields in buckets if a
-  // histogram is provided.
-  fixed64 count = 4;
-
-  // sum of the values in the population. If count is zero then this field
-  // must be zero. This value must be equal to the sum of the "sum" fields in
-  // buckets if a histogram is provided.
-  //
-  // Note: Sum should only be filled out when measuring non-negative discrete
-  // events, and is assumed to be monotonic over the values of these events.
-  // Negative events *can* be recorded, but sum should not be filled out when
-  // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-  // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
-  double sum = 5;
-
+  // T.B.D. The Attributes, Timestamps, Flags, Count, and Sum fields will
+  // be copied from HistohgramDataPoint before merging.  These fields arte
+  // identical between these two types, and both have pending changes in the
+  // opentelemetry-proto repository.
+  
   // scale describes the resolution of the histogram.  Boundaries are
   // located at powers of the base, where:
   //
@@ -509,66 +481,35 @@ message ExponentialHistogramDataPoint {
   // mass equal to (zero_count / count).
   fixed64 zero_count = 7;
 
-  // zero_tolerance may be optionally set to convey the width of the
-  // zero region.  When this is not set, implementations may assume
-  // the zero tolerance equals the smallest representable positive
-  // IEEE 754 double-precision floating point number, which is (2^−1074).
-  //
-  // Producers can be configured to round measurements to zero that fall
-  // below the zero tolerance.  Users should avoid producing measurements
-  // that have meaningless precision near zero, as exponential buckets
-  // become increasingly dense in this region.
-  //
-  // Implementations MAY consider the zero bucket to have probability
-  // density equal to (zero_count / 2*zero_tolerance), if set.
-  double zero_tolerance = 8;
-
   // positive carries the positive range of exponential bucket counts.
-  SparseBuckets positive = 9;
+  Span positive = 8;
 
   // negative carries the negative range of exponential bucket counts.
-  SparseBuckets negative = 10;
+  Span negative = 9;
 
-  // SparseBuckets are a sparse set of bucket counts, compactly encoded.
-  message SparseBuckets {
-    // Span encodes a run of contiguous histogram buckets.
-    message Span {
-      sint32 offset = 1; // Gap to previous span, or starting point for 1st span (which can be negative).
-      uint32 length = 2; // Length of consecutive buckets.
-    }
+  // Buckets are a set of bucket counts, encoded in a contiguous array
+  // of counts.
+  message Span {
+    // Offset is the index of the first count expressed in this span.
+    // 
+    // Note: This uses a varint encoding as a simple form of compression.
+    sint64 offset = 1;
 
-    // span is a repeated list of Spans that encodes a range of
-    // exponential buckets, positive or negative.  The offset of the
-    // first Span indicates the smallest index in the Histogram with
-    // non-zero count.  Subsequent contiguous buckets will be included
-    // in the same Span, and subsequent Spans encode additional
-    // buckets separated by gaps where the histogram has zero count.
+    // Count is an array of counts, where count[i] carries the count
+    // of the bucket at index (offset+i), i.e., count[i] is the count
+    // of values less than or equal to base^(offset+i) and greater
+    // than base^(offset+i-1).
     //
-    // The starting index of a Span equals its own offset plus the
-    // starting index of the previous Span plus the previous Span's
-    // length.  As a recursive formula:
-    //
-    //    starting_index(span[x+1]) =
-    //       starting_index(span[x]) +
-    //       span[x+1].offset +
-    //       span[x].length
-    //
-    // For example, the two Spans [ {offset: 10, length: 3}, {offset:
-    // 5, length: 8} ] indicate a total of 11 buckets with indices at
-    // [10, 11, 12] and [18, 19, 20, 21, 22, 23, 24, 25].
-    repeated Span span = 1;
-
-    // delta is an array of counts corresponding to the buckets
-    // described by `span`, encoded as deltas.  The indicated count 
-    // for bucket[x] is defined as a recursive formula:
-    //
-    //    bucket_count(x+1) = bucket_count(x) + delta[x+1]
-    repeated sint64 delta = 2;
+    // Note: By contrast, the explicit HistogramDataPoint uses
+    // fixedt64.  This field is expected to have many buckets,
+    // especially zeros, so has been selected to ensure varint
+    // encoding.
+    repeated uint64 bucket_counts = 6;
   } 
 
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
-  repeated Exemplar exemplars = 11;
+  repeated Exemplar exemplars = 10;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
