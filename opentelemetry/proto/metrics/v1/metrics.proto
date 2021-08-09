@@ -180,9 +180,7 @@ message Metric {
   }
 }
 
-
-
-// Gauge represents the type of a double scalar metric that always exports the
+// Gauge represents the type of a scalar metric that always exports the
 // "current value" for every data point. It should be used for an "unknown"
 // aggregation.
 //
@@ -195,9 +193,8 @@ message Gauge {
   repeated NumberDataPoint data_points = 1;
 }
 
-
-// Sum represents the type of a numeric double scalar metric that is calculated
-// as a sum of all reported measurements over a time interval.
+// Sum represents the type of a scalar metric that is calculated as a sum of all
+// reported measurements over a time interval.
 message Sum {
   repeated NumberDataPoint data_points = 1;
 
@@ -209,10 +206,8 @@ message Sum {
   bool is_monotonic = 3;
 }
 
-
-
 // Histogram represents the type of a metric that is calculated by aggregating
-// as a Histogram of all reported double measurements over a time interval.
+// as a Histogram of all reported measurements over a time interval.
 message Histogram {
   repeated HistogramDataPoint data_points = 1;
 
@@ -312,10 +307,26 @@ enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
+// DataPointFlags is defined as a protobuf 'uint32' type and is to be used as a
+// bit-field representing 32 distinct boolean flags.  Each flag defined in this
+// enum is a bit-mask.  To test the presence of a single flag in the flags of
+// a data point, for example, use an expression like:
+//
+//   (point.flags & FLAG_NO_RECORDED_VALUE) == FLAG_NO_RECORDED_VALUE
+//
+enum DataPointFlags {
+  FLAG_NONE = 0;
 
+  // This DataPoint is valid but has no recorded value.  This value
+  // SHOULD be used to reflect explicitly missing data in a series, as
+  // for an equivalent to the Prometheus "staleness marker".
+  FLAG_NO_RECORDED_VALUE = 1;
+
+  // Bits 2-31 are reserved for future use.
+}
 
 // NumberDataPoint is a single data point in a timeseries that describes the
-// time-varying value of a double metric.
+// time-varying scalar value of a metric.
 message NumberDataPoint {
   // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
@@ -354,14 +365,16 @@ message NumberDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 5;
+
+  // Flags that apply to this specific data point.  See DataPointFlags
+  // for the available flags and their meaning.
+  uint32 flags = 8;
 }
 
-
-
 // HistogramDataPoint is a single data point in a timeseries that describes the
-// time-varying values of a Histogram of double values. A Histogram contains
-// summary statistics for a population of values, it may optionally contain the
-// distribution of those values across a set of buckets.
+// time-varying values of a Histogram. A Histogram contains summary statistics
+// for a population of values, it may optionally contain the distribution of
+// those values across a set of buckets.
 //
 // If the histogram contains the distribution of values, then both
 // "explicit_bounds" and "bucket counts" fields must be defined.
@@ -439,6 +452,10 @@ message HistogramDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 8;
+
+  // Flags that apply to this specific data point.  See DataPointFlags
+  // for the available flags and their meaning.
+  uint32 flags = 10;
 }
 
 // ExponentialHistogramDataPoint is a single data point in a timeseries that describes the
@@ -577,9 +594,11 @@ message SummaryDataPoint {
   // (Optional) list of values at different quantiles of the distribution calculated
   // from the current snapshot. The quantiles must be strictly increasing.
   repeated ValueAtQuantile quantile_values = 6;
+
+  // Flags that apply to this specific data point.  See DataPointFlags
+  // for the available flags and their meaning.
+  uint32 flags = 8;
 }
-
-
 
 // A representation of an exemplar, which is a sample input measurement.
 // Exemplars also hold information about the environment when the measurement
@@ -608,7 +627,7 @@ message Exemplar {
   // 1970.
   fixed64 time_unix_nano = 2;
 
-  // Numerical value of the measurement that was recorded. An exemplar is
+  // The value of the measurement that was recorded. An exemplar is
   // considered invalid when one of the recognized value fields is not present
   // inside this oneof.
   oneof value {

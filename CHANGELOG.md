@@ -10,13 +10,14 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 * `collector/logs/*` is now considered `Beta`. (#311)
 * `logs/*` is now considered `Beta`. (#311)
 
-### Changed: Metrics
+### Changed
 
 * Remove if no changes for this section before release.
 
 ### Added
 
 * ExponentialHistogram is a base-2 exponential histogram described in [OTEP 149](https://github.com/open-telemetry/oteps/pull/149).
+* Metrics data points add a `flags` field with one bit to represent explicitly missing data. (#316)
 
 ### Removed
 
