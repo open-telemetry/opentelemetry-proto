@@ -527,6 +527,10 @@ message ExponentialHistogramDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 10;
+
+  // Flags that apply to this specific data point.  See DataPointFlags
+  // for the available flags and their meaning.
+  uint32 flags = 11;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
