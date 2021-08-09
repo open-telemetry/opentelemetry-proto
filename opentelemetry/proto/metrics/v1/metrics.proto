@@ -464,10 +464,10 @@ message HistogramDataPoint {
 // distribution of those values across a set of buckets.
 //
 message ExponentialHistogramDataPoint {
-  // T.B.D. The Attributes, Timestamps, Flags, Count, and Sum fields will
-  // be copied from HistohgramDataPoint before merging.  These fields arte
-  // identical between these two types, and both have pending changes in the
-  // opentelemetry-proto repository.
+  // T.B.D. The Attributes, Timestamps, Count, and Sum fields will be
+  // copied with their comments from HistohgramDataPoint before
+  // merging.  These fields arte identical between these two types,
+  // and have a pending change in the opentelemetry-proto repository.
   
   // scale describes the resolution of the histogram.  Boundaries are
   // located at powers of the base, where:
