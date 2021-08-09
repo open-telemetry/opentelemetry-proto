@@ -490,9 +490,11 @@ message ExponentialHistogramDataPoint {
   // greater than (base^(index-1)).
   //
   // The positive and negative ranges of the histogram are expressed
-  // separately but both use the same scale to locate their boundaries.
+  // separately.  Negative values are mapped by their absolute value
+  // into the negative range using the same scale as the positive range.
   //
-  // scale is valid in the range -4 through +8 inclusive.
+  // scale is not restricted by the protocol, as the permissible
+  // values depend on the range of the data.
   sint32 scale = 6;
 
   // zero_count is the count of values that are either exactly zero or
@@ -504,7 +506,7 @@ message ExponentialHistogramDataPoint {
   // the width of the zero region.
   //
   // Implementations MAY consider the zero bucket to have probability
-  // mass equal to (zero_count / sum).
+  // mass equal to (zero_count / count).
   fixed64 zero_count = 7;
 
   // zero_tolerance may be optionally set to convey the width of the
