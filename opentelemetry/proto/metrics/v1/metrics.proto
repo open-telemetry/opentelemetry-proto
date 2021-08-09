@@ -298,7 +298,12 @@ enum AggregationTemporality {
 }
 
 // DataPointFlags is defined as a protobuf 'uint32' type and is to be used as a
-// bit-field representing 32 distinct boolean flags.
+// bit-field representing 32 distinct boolean flags.  Each flag defined in this
+// enum is a bit-mask.  To test the presence of a single flag in the flags of
+// a data point, for example, use an expression like:
+//
+//   (point.flags & FLAG_NO_RECORDED_VALUE) == FLAG_NO_RECORDED_VALUE
+//
 enum DataPointFlags {
   FLAG_NONE = 0;
 
@@ -307,7 +312,7 @@ enum DataPointFlags {
   // for an equivalent to the Prometheus "staleness marker".
   FLAG_NO_RECORDED_VALUE = 1;
 
-  // Bits 2-32 are reserved for future use.
+  // Bits 2-31 are reserved for future use.
 }
 
 // NumberDataPoint is a single data point in a timeseries that describes the
