@@ -464,10 +464,38 @@ message HistogramDataPoint {
 // distribution of those values across a set of buckets.
 //
 message ExponentialHistogramDataPoint {
-  // T.B.D. The Attributes, Timestamps, Count, and Sum fields will be
-  // copied with their comments from HistohgramDataPoint before
-  // merging.  These fields arte identical between these two types,
-  // and have a pending change in the opentelemetry-proto repository.
+  // The set of key/value pairs that uniquely identify the timeseries from
+  // where this point belongs. The list may be empty (may contain 0 elements).
+  repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
+
+  // StartTimeUnixNano is optional but strongly encouraged, see the
+  // the detiled comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  fixed64 start_time_unix_nano = 2;
+
+  // TimeUnixNano is required, see the detailed comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  fixed64 time_unix_nano = 3;
+
+  // count is the number of values in the population. Must be non-negative. This
+  // value must be equal to the sum of the "count" fields in buckets if a
+  // histogram is provided.
+  fixed64 count = 4;
+
+  // sum of the values in the population. If count is zero then this field
+  // must be zero. This value must be equal to the sum of the "sum" fields in
+  // buckets if a histogram is provided.
+  //
+  // Note: Sum should only be filled out when measuring non-negative discrete
+  // events, and is assumed to be monotonic over the values of these events.
+  // Negative events *can* be recorded, but sum should not be filled out when
+  // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+  // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+  double sum = 5;
   
   // scale describes the resolution of the histogram.  Boundaries are
   // located at powers of the base, where:
@@ -499,14 +527,14 @@ message ExponentialHistogramDataPoint {
   fixed64 zero_count = 7;
 
   // positive carries the positive range of exponential bucket counts.
-  Span positive = 8;
+  Buckets positive = 8;
 
   // negative carries the negative range of exponential bucket counts.
-  Span negative = 9;
+  Buckets negative = 9;
 
   // Buckets are a set of bucket counts, encoded in a contiguous array
   // of counts.
-  message Span {
+  message Buckets {
     // Offset is the index of the first count expressed in this span.
     // 
     // Note: This uses a varint encoding as a simple form of compression.
