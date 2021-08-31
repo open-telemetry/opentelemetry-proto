@@ -165,6 +165,9 @@ message Span {
   //     "/http/server_latency": 300
   //     "abc.com/myattribute": true
   //     "abc.com/score": 10.239
+  //
+  // The OpenTelemetry API specification further restricts the allowed value types:
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/common.md#attributes
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 9;
 
   // dropped_attributes_count is the number of attributes that were discarded. Attributes
