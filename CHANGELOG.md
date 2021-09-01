@@ -1,7 +1,26 @@
 # Changelog
 
-
 ## Unreleased
+
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.10.0...v0.11.0)
+
+### Maturity
+
+* Remove if no changes for this section before release.
+
+### Changed
+
+* Remove if no changes for this section before release.
+
+### Added
+
+* Remove if no changes for this section before release.
+
+### Removed
+
+* Remove if no changes for this section before release.
+
+## 0.10.0 - 2021-09-01
 
 Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.9.0...v0.10.0)
 
