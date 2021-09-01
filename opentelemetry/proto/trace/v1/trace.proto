@@ -99,10 +99,11 @@ message Span {
   // the same display name at the same call point in an application.
   // This makes it easier to correlate spans in different traces.
   //
-  // This field is semantically required to be set to non-empty string.
-  // When null or empty string received - receiver may use string "name"
-  // as a replacement. There might be smarted algorithms implemented by
-  // receiver to fix the empty span name.
+  // The span name SHOULD be the most general string that identifies a (statistically)
+  // interesting class of Spans, rather than individual Span instances while still
+  // being human-readable. That is, "get_user" is a reasonable name, while
+  // "get_user/314159", where "314159" is a user ID, is not a good name due to its high
+  // cardinality. Generality SHOULD be prioritized over human-readability.
   //
   // This field is required.
   string name = 5;
