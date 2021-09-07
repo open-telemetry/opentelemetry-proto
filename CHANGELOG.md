@@ -1,7 +1,26 @@
 # Changelog
 
-
 ## Unreleased
+
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.10.0...v0.11.0)
+
+### Maturity
+
+* Remove if no changes for this section before release.
+
+### Changed
+
+* Remove if no changes for this section before release.
+
+### Added
+
+* Remove if no changes for this section before release.
+
+### Removed
+
+* Remove if no changes for this section before release.
+
+## 0.10.0 - 2021-09-07
 
 Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.9.0...v0.10.0)
 
@@ -10,17 +29,9 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 * `collector/logs/*` is now considered `Beta`. (#311)
 * `logs/*` is now considered `Beta`. (#311)
 
-### Changed
-
-* Remove if no changes for this section before release.
-
 ### Added
 
 * Metrics data points add a `flags` field with one bit to represent explicitly missing data. (#316)
-
-### Removed
-
-* Remove if no changes for this section before release.
 
 ## 0.9.0 - 2021-04-12
 
