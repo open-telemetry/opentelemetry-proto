@@ -534,7 +534,7 @@ message ExponentialHistogramDataPoint {
   // Buckets are a set of bucket counts, encoded in a contiguous array
   // of counts.
   message Buckets {
-    // Offset is the index of the first count expressed in this span.
+    // Offset is the bucket index of the first entry in the bucket_counts array.
     // 
     // Note: This uses a varint encoding as a simple form of compression.
     sint32 offset = 1;
@@ -545,9 +545,9 @@ message ExponentialHistogramDataPoint {
     // base^(offset+i+1).
     //
     // Note: By contrast, the explicit HistogramDataPoint uses
-    // fixedt64.  This field is expected to have many buckets,
-    // especially zeros, so has been selected to ensure varint
-    // encoding.
+    // fixed64.  This field is expected to have many buckets,
+    // especially zeros, so uint64 has been selected to ensure
+    // varint encoding.
     repeated uint64 bucket_counts = 2;
   } 
 
