@@ -464,10 +464,38 @@ message HistogramDataPoint {
 // distribution of those values across a set of buckets.
 //
 message ExponentialHistogramDataPoint {
-  // T.B.D. The Attributes, Timestamps, Count, and Sum fields will be
-  // copied with their comments from HistohgramDataPoint before
-  // merging.  These fields arte identical between these two types,
-  // and have a pending change in the opentelemetry-proto repository.
+  // The set of key/value pairs that uniquely identify the timeseries from
+  // where this point belongs. The list may be empty (may contain 0 elements).
+  repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
+
+  // StartTimeUnixNano is optional but strongly encouraged, see the
+  // the detiled comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  fixed64 start_time_unix_nano = 2;
+
+  // TimeUnixNano is required, see the detailed comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  fixed64 time_unix_nano = 3;
+
+  // count is the number of values in the population. Must be non-negative. This
+  // value must be equal to the sum of the "count" fields in buckets if a
+  // histogram is provided.
+  fixed64 count = 4;
+
+  // sum of the values in the population. If count is zero then this field
+  // must be zero. This value must be equal to the sum of the "sum" fields in
+  // buckets if a histogram is provided.
+  //
+  // Note: Sum should only be filled out when measuring non-negative discrete
+  // events, and is assumed to be monotonic over the values of these events.
+  // Negative events *can* be recorded, but sum should not be filled out when
+  // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+  // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+  double sum = 5;
   
   // scale describes the resolution of the histogram.  Boundaries are
   // located at powers of the base, where:
@@ -475,8 +503,8 @@ message ExponentialHistogramDataPoint {
   //   base = (2^(2^-scale))
   //
   // The histogram bucket identified by `index`, a signed integer,
-  // contains values that are less than or equal to (base^index) and
-  // greater than (base^(index-1)).
+  // contains values that are greater than or equal to (base^index) and
+  // less than (base^(index+1)).
   //
   // The positive and negative ranges of the histogram are expressed
   // separately.  Negative values are mapped by their absolute value
@@ -490,9 +518,7 @@ message ExponentialHistogramDataPoint {
   // within the region considered zero by the instrumentation at the
   // tolerated degree of precision.  This bucket stores values that
   // cannot be expressed using the standard exponential formula as
-  // well as values that have been rounded to zero.  Users have the
-  // option to set zero_tolerance to convey additional information about
-  // the width of the zero region.
+  // well as values that have been rounded to zero.
   //
   // Implementations MAY consider the zero bucket to have probability
   // mass equal to (zero_count / count).
@@ -510,12 +536,12 @@ message ExponentialHistogramDataPoint {
     // Offset is the index of the first count expressed in this span.
     // 
     // Note: This uses a varint encoding as a simple form of compression.
-    sint64 offset = 1;
+    sint32 offset = 1;
 
     // Count is an array of counts, where count[i] carries the count
-    // of the bucket at index (offset+i), i.e., count[i] is the count
-    // of values less than or equal to base^(offset+i) and greater
-    // than base^(offset+i-1).
+    // of the bucket at index (offset+i).  count[i] is the count of
+    // values greater than or equal to base^(offset+i) and less than
+    // base^(offset+i+1).
     //
     // Note: By contrast, the explicit HistogramDataPoint uses
     // fixedt64.  This field is expected to have many buckets,
@@ -524,13 +550,13 @@ message ExponentialHistogramDataPoint {
     repeated uint64 bucket_counts = 2;
   } 
 
-  // (Optional) List of exemplars collected from
-  // measurements that were used to form the data point
-  repeated Exemplar exemplars = 10;
-
   // Flags that apply to this specific data point.  See DataPointFlags
   // for the available flags and their meaning.
-  uint32 flags = 11;
+  uint32 flags = 10;
+
+  // (Optional) List of exemplars collected from
+  // measurements that were used to form the data point
+  repeated Exemplar exemplars = 11;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the

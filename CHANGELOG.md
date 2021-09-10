@@ -1,14 +1,12 @@
 # Changelog
 
-
 ## Unreleased
 
-Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.9.0...v0.10.0)
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.10.0...v0.11.0)
 
 ### Maturity
 
-* `collector/logs/*` is now considered `Beta`. (#311)
-* `logs/*` is now considered `Beta`. (#311)
+* Remove if no changes for this section before release.
 
 ### Changed
 
@@ -17,11 +15,23 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 ### Added
 
 * ExponentialHistogram is a base-2 exponential histogram described in [OTEP 149](https://github.com/open-telemetry/oteps/pull/149).
-* Metrics data points add a `flags` field with one bit to represent explicitly missing data. (#316)
 
 ### Removed
 
 * Remove if no changes for this section before release.
+
+## 0.10.0 - 2021-09-07
+
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.9.0...v0.10.0)
+
+### Maturity
+
+* `collector/logs/*` is now considered `Beta`. (#311)
+* `logs/*` is now considered `Beta`. (#311)
+
+### Added
+
+* Metrics data points add a `flags` field with one bit to represent explicitly missing data. (#316)
 
 ## 0.9.0 - 2021-04-12
 
