@@ -176,6 +176,7 @@ message Metric {
     // This field will be removed in ~3 months, on July 1, 2021.
     IntHistogram int_histogram = 8 [deprecated = true];
     Histogram histogram = 9;
+    ExponentialHistogram exponential_histogram = 12;
     Summary summary = 11;
   }
 }
@@ -525,14 +526,14 @@ message ExponentialHistogramDataPoint {
   fixed64 zero_count = 7;
 
   // positive carries the positive range of exponential bucket counts.
-  Span positive = 8;
+  Buckets positive = 8;
 
   // negative carries the negative range of exponential bucket counts.
-  Span negative = 9;
+  Buckets negative = 9;
 
   // Buckets are a set of bucket counts, encoded in a contiguous array
   // of counts.
-  message Span {
+  message Buckets {
     // Offset is the index of the first count expressed in this span.
     // 
     // Note: This uses a varint encoding as a simple form of compression.
