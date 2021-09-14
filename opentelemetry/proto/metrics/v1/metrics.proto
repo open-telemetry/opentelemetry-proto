@@ -344,7 +344,7 @@ message NumberDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
@@ -398,7 +398,7 @@ message HistogramDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
@@ -469,7 +469,7 @@ message ExponentialHistogramDataPoint {
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
@@ -576,7 +576,7 @@ message SummaryDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
@@ -687,7 +687,7 @@ message IntDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
@@ -736,7 +736,7 @@ message IntHistogramDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
