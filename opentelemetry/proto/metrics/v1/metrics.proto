@@ -416,8 +416,7 @@ message HistogramDataPoint {
   fixed64 count = 4;
 
   // sum of the values in the population. If count is zero then this field
-  // must be zero. This value must be equal to the sum of the "sum" fields in
-  // buckets if a histogram is provided.
+  // must be zero.
   //
   // Note: Sum should only be filled out when measuring non-negative discrete
   // events, and is assumed to be monotonic over the values of these events.
@@ -482,14 +481,13 @@ message ExponentialHistogramDataPoint {
   // 1970.
   fixed64 time_unix_nano = 3;
 
-  // count is the number of values in the population. Must be non-negative. This
-  // value must be equal to the sum of the "count" fields in buckets if a
-  // histogram is provided.
+  // count is the number of values in the population. Must be
+  // non-negative. This value must be equal to the sum of the "bucket_counts"
+  // values in the positive and negative Buckets plus the "zero_count" field.
   fixed64 count = 4;
 
   // sum of the values in the population. If count is zero then this field
-  // must be zero. This value must be equal to the sum of the "sum" fields in
-  // buckets if a histogram is provided.
+  // must be zero.
   //
   // Note: Sum should only be filled out when measuring non-negative discrete
   // events, and is assumed to be monotonic over the values of these events.
