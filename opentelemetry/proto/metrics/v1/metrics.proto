@@ -176,7 +176,7 @@ message Metric {
     // This field will be removed in ~3 months, on July 1, 2021.
     IntHistogram int_histogram = 8 [deprecated = true];
     Histogram histogram = 9;
-    ExponentialHistogram exponential_histogram = 12;
+    ExponentialHistogram exponential_histogram = 10;
     Summary summary = 11;
   }
 }
