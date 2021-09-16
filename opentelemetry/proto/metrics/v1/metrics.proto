@@ -457,16 +457,17 @@ message HistogramDataPoint {
   // min is the minimum value over a recent window of time.
   //
   // The interpretation is based on Metric's temporality.
-  // - delta temporality: the min value MUST be computed over over [start_time, end_time]
+  // - delta temporality: the min value MUST be computed over [start_time, end_time]
   // - cumulative temporality: the min value SHOULD be computed over [now - WIDTH, end_time]
-  //   for WIDTH in the 10 minute range.
+  //   for WIDTH up to 10 minutes.
   optional double min = 11;
 
   // max is the maximum value over a recent window of time.
   //
   // The interpretation is based on Metric's temporality.
-  // - delta temporality: the max value MUST be computed over over [start_time, end_time]
+  // - delta temporality: the max value MUST be computed over [start_time, end_time]
   // - cumulative temporality: the max value SHOULD be computed over [now - WIDTH, end_time]
+  //   for WIDTH up to 10 minutes.
   optional double max = 12;
 }
 
