@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.7.0...v0.8.0)
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.10.0...v0.11.0)
 
 ### Maturity
 
@@ -10,19 +10,69 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Changed
 
-* :stop_sign: [BREAKING?] Metrics - Rename DoubleSummary to Summary (#269)
-** TODO: Consider (#275) as it relates to stability.
-* :stop_sign: [BREAKING?] Metrics - Make explicit bounds compatible with OM/Prometheus (#262)
+* Remove if no changes for this section before release.
 
 ### Added
 
 * Remove if no changes for this section before release.
 
+### Removed
+
+* Remove if no changes for this section before release.
+
+## 0.10.0 - 2021-09-07
+
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.9.0...v0.10.0)
+
+### Maturity
+
+* `collector/logs/*` is now considered `Beta`. (#311)
+* `logs/*` is now considered `Beta`. (#311)
+
+### Added
+
+* Metrics data points add a `flags` field with one bit to represent explicitly missing data. (#316)
+
+## 0.9.0 - 2021-04-12
+
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.8.0...v0.9.0)
+
+### Maturity
+
+* `collector/metrics/*` is now considered `stable`. (#305)
+
+### Changed: Metrics
+
+* :stop_sign: [DATA MODEL CHANGE] Histogram/Summary sums must be monotonic counters of events (#302)
+* :stop_sign: [DATA MODEL CHANGE] Clarify requirements and semantics for start time (#295)
+* :stop_sign: [BREAKING] Deprecate `labels` field from NumberDataPoint, HistogramDataPoint, SummaryDataPoint and add equivalent `attributes` field (#283)
+* :stop_sign: [BREAKING] Deprecate `filtered_labels` field from Exemplars and add equivalent `filtered_attributes` field (#283)
+
+### Added
+
+- Common - Add bytes (binary) as data type to AnyValue (#297)
+- Common - Add schema_url fields as described in OTEP 0152 (#298)
 
 ### Removed
 
 * Remove if no changes for this section before release.
 
+## 0.8.0 - 2021-03-23
+
+Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.7.0...v0.8.0)
+
+### Changed: Metrics
+
+* :stop_sign: [DEPRECATION] Deprecate IntSum, IntGauge, and IntDataPoint (#278)
+* :stop_sign: [DEPRECATION] Deprecate IntExemplar (#281)
+* :stop_sign: [DEPRECATION] Deprecate IntHistogram (#270)
+* :stop_sign: [BREAKING] Rename DoubleGauge to Gauge (#278)
+* :stop_sign: [BREAKING] Rename DoubleSum to Sum (#278)
+* :stop_sign: [BREAKING] Rename DoubleDataPoint to NumberDataPoint (#278)
+* :stop_sign: [BREAKING] Rename DoubleSummary to Summary (#269)
+* :stop_sign: [BREAKING] Rename DoubleExemplar to Exemplar (#281)
+* :stop_sign: [BREAKING] Rename DoubleHistogram to Histogram (#270)
+* :stop_sign: [DATA MODEL CHANGE] Make explicit bounds compatible with OM/Prometheus (#262)
 
 ## 0.7.0 - 2021-01-28
 
@@ -30,7 +80,7 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Maturity
 
-**Protobuf Encodings**
+$$$Protobuf Encodings:**
 
 * `collector/metrics/*` is now considered `Beta`. (#223)
 * `collector/logs/*` is now considered `Alpha`. (#228)
@@ -45,7 +95,6 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 * Metrics - Add SummaryDataPoint support to Metrics proto (#227)
 
-
 ## 0.6.0 - 2020-10-28
 
 Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.5.0...v0.6.0)
@@ -58,8 +107,7 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 * Traces - Deprecated old Span status code and added a new status code according to specification (#224)
 ** Marked for removal `2021-10-22` given Stability Guarantees.
-*  Rename ProbabilitySampler to TraceIdRatioBased (#221)
-
+* Rename ProbabilitySampler to TraceIdRatioBased (#221)
 
 ## 0.5.0 - 2020-08-31
 
@@ -67,14 +115,14 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Maturity Changes
 
-**Protobuf Encodings**
+**Protobuf Encodings:**
 
 * `collector/trace/*` is now `Stable`.
 * `common/*` is now `Stable`.
 * `resource/*` is now `Stable`.
 * `trace/trace.proto` is now `Stable`. (#160)
 
-**JSON Encodings**
+**JSON Encodings:**
 
 * All messages are now `Alpha`.
 
@@ -124,7 +172,6 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 The following was announced in the release, but this was not considered Stable until `v0.5.0`
 
 > This is a Release Candidate to declare Traces part of the protocol Stable.
-
 
 ## 0.3.0 - 2020-03-23
 
