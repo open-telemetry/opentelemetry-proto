@@ -14,7 +14,7 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Added
 
-* Remove if no changes for this section before release.
+* ExponentialHistogram is a base-2 exponential histogram described in [OTEP 149](https://github.com/open-telemetry/oteps/pull/149).
 
 ### Removed
 
@@ -60,6 +60,24 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 ## 0.8.0 - 2021-03-23
 
 Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.7.0...v0.8.0)
+
+### Historical breaking change notice
+
+Release 0.8 was the last in the line of releases marked as "unstable".
+This release broke compatibility in more ways than were recognized and
+documented at the time of its release.  In particular, #278 created
+the `NumberDataPoint` type and used it in several locations in place
+of the former `DoubleDataPoint`.  The new `oneof` in `NumberDataPoint`
+re-used the former `DoubleDataPoint` tag number, which means that
+pre-0.8 `DoubleSum` and `DoubleGauge` points would parse correctly as
+a 0.8 `Sum` and `Gauge` points containing double-valued numbers.
+
+However, by virtue of a `syntax = "proto3"` declaration, the protocol
+compiler for all versions of OTLP have not included field presence,
+which means 0 values are not serialized.  **The result is that valid
+OTLP 0.7 `DoubleSum` and `DoubleGauge` points would not parse
+correctly as OTLP 0.8 data.**  Instead, they parse as
+`NumberDataPoint` with a missing value in the `oneof` field.
 
 ### Changed: Metrics
 

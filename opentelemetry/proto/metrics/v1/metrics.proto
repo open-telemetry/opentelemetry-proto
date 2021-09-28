@@ -195,6 +195,7 @@ message Metric {
     // This field will be removed in ~3 months, on July 1, 2021.
     IntHistogram int_histogram = 8 [deprecated = true];
     Histogram histogram = 9;
+    ExponentialHistogram exponential_histogram = 10;
     Summary summary = 11;
   }
 }
@@ -229,6 +230,16 @@ message Sum {
 // as a Histogram of all reported measurements over a time interval.
 message Histogram {
   repeated HistogramDataPoint data_points = 1;
+
+  // aggregation_temporality describes if the aggregator reports delta changes
+  // since last report time, or cumulative changes since a fixed start time.
+  AggregationTemporality aggregation_temporality = 2;
+}
+
+// ExponentialHistogram represents the type of a metric that is calculated by aggregating
+// as a ExponentialHistogram of all reported double measurements over a time interval.
+message ExponentialHistogram {
+  repeated ExponentialHistogramDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
   // since last report time, or cumulative changes since a fixed start time.
@@ -352,7 +363,7 @@ message NumberDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
@@ -406,7 +417,7 @@ message HistogramDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
@@ -424,8 +435,7 @@ message HistogramDataPoint {
   fixed64 count = 4;
 
   // sum of the values in the population. If count is zero then this field
-  // must be zero. This value must be equal to the sum of the "sum" fields in
-  // buckets if a histogram is provided.
+  // must be zero.
   //
   // Note: Sum should only be filled out when measuring non-negative discrete
   // events, and is assumed to be monotonic over the values of these events.
@@ -467,6 +477,106 @@ message HistogramDataPoint {
   uint32 flags = 10;
 }
 
+// ExponentialHistogramDataPoint is a single data point in a timeseries that describes the
+// time-varying values of a ExponentialHistogram of double values. A ExponentialHistogram contains
+// summary statistics for a population of values, it may optionally contain the
+// distribution of those values across a set of buckets.
+//
+message ExponentialHistogramDataPoint {
+  // The set of key/value pairs that uniquely identify the timeseries from
+  // where this point belongs. The list may be empty (may contain 0 elements).
+  repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
+
+  // StartTimeUnixNano is optional but strongly encouraged, see the
+  // the detailed comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  fixed64 start_time_unix_nano = 2;
+
+  // TimeUnixNano is required, see the detailed comments above Metric.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
+  // 1970.
+  fixed64 time_unix_nano = 3;
+
+  // count is the number of values in the population. Must be
+  // non-negative. This value must be equal to the sum of the "bucket_counts"
+  // values in the positive and negative Buckets plus the "zero_count" field.
+  fixed64 count = 4;
+
+  // sum of the values in the population. If count is zero then this field
+  // must be zero.
+  //
+  // Note: Sum should only be filled out when measuring non-negative discrete
+  // events, and is assumed to be monotonic over the values of these events.
+  // Negative events *can* be recorded, but sum should not be filled out when
+  // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+  // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+  double sum = 5;
+  
+  // scale describes the resolution of the histogram.  Boundaries are
+  // located at powers of the base, where:
+  //
+  //   base = (2^(2^-scale))
+  //
+  // The histogram bucket identified by `index`, a signed integer,
+  // contains values that are greater than or equal to (base^index) and
+  // less than (base^(index+1)).
+  //
+  // The positive and negative ranges of the histogram are expressed
+  // separately.  Negative values are mapped by their absolute value
+  // into the negative range using the same scale as the positive range.
+  //
+  // scale is not restricted by the protocol, as the permissible
+  // values depend on the range of the data.
+  sint32 scale = 6;
+
+  // zero_count is the count of values that are either exactly zero or
+  // within the region considered zero by the instrumentation at the
+  // tolerated degree of precision.  This bucket stores values that
+  // cannot be expressed using the standard exponential formula as
+  // well as values that have been rounded to zero.
+  //
+  // Implementations MAY consider the zero bucket to have probability
+  // mass equal to (zero_count / count).
+  fixed64 zero_count = 7;
+
+  // positive carries the positive range of exponential bucket counts.
+  Buckets positive = 8;
+
+  // negative carries the negative range of exponential bucket counts.
+  Buckets negative = 9;
+
+  // Buckets are a set of bucket counts, encoded in a contiguous array
+  // of counts.
+  message Buckets {
+    // Offset is the bucket index of the first entry in the bucket_counts array.
+    // 
+    // Note: This uses a varint encoding as a simple form of compression.
+    sint32 offset = 1;
+
+    // Count is an array of counts, where count[i] carries the count
+    // of the bucket at index (offset+i).  count[i] is the count of
+    // values greater than or equal to base^(offset+i) and less than
+    // base^(offset+i+1).
+    //
+    // Note: By contrast, the explicit HistogramDataPoint uses
+    // fixed64.  This field is expected to have many buckets,
+    // especially zeros, so uint64 has been selected to ensure
+    // varint encoding.
+    repeated uint64 bucket_counts = 2;
+  } 
+
+  // Flags that apply to this specific data point.  See DataPointFlags
+  // for the available flags and their meaning.
+  uint32 flags = 10;
+
+  // (Optional) List of exemplars collected from
+  // measurements that were used to form the data point
+  repeated Exemplar exemplars = 11;
+}
+
 // SummaryDataPoint is a single data point in a timeseries that describes the
 // time-varying values of a Summary metric.
 message SummaryDataPoint {
@@ -485,7 +595,7 @@ message SummaryDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1 [deprecated = true];
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
@@ -596,7 +706,7 @@ message IntDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
@@ -645,7 +755,7 @@ message IntHistogramDataPoint {
   repeated opentelemetry.proto.common.v1.StringKeyValue labels = 1;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
-  // the detiled comments above Metric.
+  // the detailed comments above Metric.
   //
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January
   // 1970.
