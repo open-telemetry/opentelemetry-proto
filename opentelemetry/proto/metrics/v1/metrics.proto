@@ -442,7 +442,7 @@ message HistogramDataPoint {
   // Negative events *can* be recorded, but sum should not be filled out when
   // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
   // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
-  double sum = 5;
+  optional double sum = 5;
 
   // bucket_counts is an optional field contains the count values of histogram
   // for each bucket.
