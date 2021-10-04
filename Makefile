@@ -77,7 +77,7 @@ gen-java:
 
 # Generate gRPC/Protobuf implementation for Kotlin.
 .PHONY: gen-kotlin
-gen-java:
+gen-kotlin:
 	rm -rf ./$(PROTO_GEN_KOTLIN_DIR)
 	mkdir -p ./$(PROTO_GEN_KOTLIN_DIR)
 	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --kotlin_out=./$(PROTO_GEN_KOTLIN_DIR) $(file)))
