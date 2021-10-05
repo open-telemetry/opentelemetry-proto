@@ -26,7 +26,9 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Added
 
-* ExponentialHistogram is a base-2 exponential histogram described in [OTEP 149](https://github.com/open-telemetry/oteps/pull/149).
+* ExponentialHistogram is a base-2 exponential histogram described in [OTEP 149](https://github.com/open-telemetry/oteps/pull/149). (#322)
+* Adds `TracesData`, `MetricsData`, and `LogsData` container types for common use
+  in transporting multiple `ResourceSpans`, `ResourceMetrics`, and `ResourceLogs`. (#332)
 
 ## 0.10.0 - 2021-09-07
 
