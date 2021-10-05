@@ -476,27 +476,10 @@ message HistogramDataPoint {
   // for the available flags and their meaning.
   uint32 flags = 10;
 
-  // Note: the definition used to for min and max fields below is
-  // based on temporality in a way meant to match the Prometheus
-  // Summary data type used with quantiles 0 and 1, respectively, when
-  // paired with cumulative temporality.  This uses a fixed width that
-  // SHOULD be up to 10 minutes or for as long as data is available.
-  // https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#summary
-  
-  // min is the minimum value over a recent window of time.
-  //
-  // The interpretation is based on Metric's temporality.
-  // - delta temporality: the min value MUST be computed over [start_time, end_time]
-  // - cumulative temporality: the min value SHOULD be computed over [now - WIDTH, end_time]
-  //   for WIDTH up to 10 minutes.
+  // min is the minimum value over (start_time, end_time].
   optional double min = 11;
 
-  // max is the maximum value over a recent window of time.
-  //
-  // The interpretation is based on Metric's temporality.
-  // - delta temporality: the max value MUST be computed over [start_time, end_time]
-  // - cumulative temporality: the max value SHOULD be computed over [now - WIDTH, end_time]
-  //   for WIDTH up to 10 minutes.
+  // max is the maximum value over (start_time, end_time].
   optional double max = 12;
 }
 
@@ -598,6 +581,12 @@ message ExponentialHistogramDataPoint {
   // (Optional) List of exemplars collected from
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 11;
+
+  // min is the minimum value over (start_time, end_time].
+  optional double min = 12;
+
+  // max is the maximum value over (start_time, end_time].
+  optional double max = 13;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
