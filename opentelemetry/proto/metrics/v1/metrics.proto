@@ -24,6 +24,25 @@ option java_package = "io.opentelemetry.proto.metrics.v1";
 option java_outer_classname = "MetricsProto";
 option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metrics/v1";
 
+// MetricsData represents the metrics data that can be stored in a persistent
+// storage, OR can be embedded by other protocols that transfer OTLP metrics
+// data but do not implement the OTLP protocol.
+//
+// The main difference between this message and collector protocol is that
+// in this message there will not be any "control" or "metadata" specific to
+// OTLP protocol.
+//
+// When new fields are added into this message, the OTLP request MUST be updated
+// as well.
+message MetricsData {
+  // An array of ResourceMetrics.
+  // For data coming from a single resource this array will typically contain
+  // one element. Intermediary nodes that receive data from multiple origins
+  // typically batch the data before forwarding further and in that case this
+  // array will contain multiple elements.
+  repeated ResourceMetrics resource_metrics = 1;
+}
+
 // A collection of InstrumentationLibraryMetrics from a Resource.
 message ResourceMetrics {
   // The resource for the metrics in this message.
