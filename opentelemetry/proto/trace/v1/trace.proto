@@ -119,9 +119,7 @@ message Span {
   // This makes it easier to correlate spans in different traces.
   //
   // This field is semantically required to be set to non-empty string.
-  // When null or empty string received - receiver may use string "name"
-  // as a replacement. There might be smarted algorithms implemented by
-  // receiver to fix the empty span name.
+  // Empty value is equivalent to an unknown span name.
   //
   // This field is required.
   string name = 5;
