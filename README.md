@@ -18,6 +18,7 @@ To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently
 * java
 * objc
 * openapi (swagger)
+* parquet
 * php
 * python
 * ruby
