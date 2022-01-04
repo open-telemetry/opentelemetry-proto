@@ -1,0 +1,22 @@
+version: v1
+plugins:
+  - name: ruby
+    out: ./gen/ruby
+  - name: cpp
+    out: ./gen/cpp
+  - name: java
+    out: ./gen/java
+  - name: go
+    out: ./gen/go
+  - name: python
+    out: ./gen/python
+  - name: php
+    out: ./gen/php
+  - name: csharp
+    out: ./gen/csharp
+  - name: js
+    out: ./gen/js
+  - name: objc
+    out: ./gen/objc
+  - name: openapi
+    out: ./gen/openapi
