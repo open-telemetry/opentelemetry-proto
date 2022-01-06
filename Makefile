@@ -15,9 +15,9 @@ endef
 
 # Generate all implementations
 .PHONY: gen-all
-gen-all: gen-cpp gen-csharp gen-go gen-java gen-objc gen-openapi gen-php gen-python gen-ruby gen-kotlin
+gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-php gen-python gen-ruby
 
-OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.7.0
+OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.8.0
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 PROTO_INCLUDES := -I/usr/include/github.com/gogo/protobuf
 
@@ -80,7 +80,7 @@ gen-java:
 gen-kotlin:
 	rm -rf ./$(PROTO_GEN_KOTLIN_DIR)
 	mkdir -p ./$(PROTO_GEN_KOTLIN_DIR)
-	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --kotlin_out=./$(PROTO_GEN_KOTLIN_DIR) $(file)))
+	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --java_out=./$(PROTO_GEN_JAVA_DIR) --kotlin_out=./$(PROTO_GEN_KOTLIN_DIR) $(file)))
 
 
 # Generate gRPC/Protobuf implementation for JavaScript.
