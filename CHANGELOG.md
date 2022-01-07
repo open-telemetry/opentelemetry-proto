@@ -10,7 +10,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Remove if no changes for this section before release.
+* Rename logs to log_records in InstrumentationLibraryLogs. (#352)
 
 ### Added
 
