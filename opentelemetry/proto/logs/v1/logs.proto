@@ -116,6 +116,23 @@ message LogRecord {
   // Value of 0 indicates unknown or missing timestamp.
   fixed64 time_unix_nano = 1;
 
+  // Time when the event was observed by the collection system.
+  // For events that originate in OpenTelemetry (e.g. using OpenTelemetry Logging SDK)
+  // this timestamp is typically set at the generation time and is equal to Timestamp.
+  // For events originating externally and collected by OpenTelemetry (e.g. using
+  // Collector) this is the time when OpenTelemetry's code observed the event measured
+  // by the clock of the OpenTelemetry code. This field SHOULD be set once the event is
+  // observed by OpenTelemetry.
+  //
+  // For converting OpenTelemetry log data to formats that support only one timestamp or
+  // when receiving OpenTelemetry log data by recipients that support only one timestamp
+  // internally the following logic is recommended:
+  //   - Use time_unix_nano if it is present, otherwise use observed_time_unix_nano.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // Value of 0 indicates unknown or missing timestamp.
+  fixed64 observed_time_unix_nano = 11;
+
   // Numerical value of the severity, normalized to values described in Log Data Model.
   // [Optional].
   SeverityNumber severity_number = 2;
