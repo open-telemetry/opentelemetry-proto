@@ -121,7 +121,7 @@ message LogRecord {
   // this timestamp is typically set at the generation time and is equal to Timestamp.
   // For events originating externally and collected by OpenTelemetry (e.g. using
   // Collector) this is the time when OpenTelemetry's code observed the event measured
-  // by the clock of the OpenTelemetry code. This field SHOULD be set once the event is
+  // by the clock of the OpenTelemetry code. This field MUST be set once the event is
   // observed by OpenTelemetry.
   //
   // For converting OpenTelemetry log data to formats that support only one timestamp or
