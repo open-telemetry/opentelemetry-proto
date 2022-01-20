@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.11.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.12.0...main).
 
 ### Maturity
 
@@ -10,7 +10,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Rename logs to log_records in InstrumentationLibraryLogs. (#352)
+* Remove if no changes for this section before release.
 
 ### Added
 
@@ -19,6 +19,19 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 ### Removed
 
 * Remove if no changes for this section before release.
+
+## 0.12.0 - 2022-01-19
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.12.0...v0.11.0).
+
+### Changed
+
+* Rename logs to log_records in InstrumentationLibraryLogs. (#352)
+
+### Removed
+
+* Remove deprecated messages and fields from traces. (#341)
+* Remove deprecated messages and fields from metrics. (#342)
 
 ## 0.11.0 - 2021-10-07
 
