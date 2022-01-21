@@ -10,11 +10,12 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Remove if no changes for this section before release.
+* `Swagger` generation updated to `openapiv2` due to the use of an updated version of protoc in `otel/build-protobuf`
+* Update the `otel/build-protobuf` version from `0.8.0` to `0.9.0`
 
 ### Added
 
-* Remove if no changes for this section before release.
+* Protobuf kotlin source generation
 
 ### Removed
 
