@@ -66,7 +66,7 @@ message InstrumentationLibraryLogs {
   opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;
 
   // A list of log records.
-  repeated LogRecord logs = 2;
+  repeated LogRecord log_records = 2;
 
   // This schema_url applies to all logs in the "logs" field.
   string schema_url = 3;
