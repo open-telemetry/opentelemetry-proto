@@ -17,7 +17,7 @@ endef
 .PHONY: gen-all
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-php gen-python gen-ruby
 
-OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.8.0
+OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.9.0
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 PROTO_INCLUDES := -I/usr/include/github.com/gogo/protobuf
 
@@ -77,10 +77,10 @@ gen-java:
 
 # Generate gRPC/Protobuf implementation for Kotlin.
 .PHONY: gen-kotlin
-gen-kotlin:
+gen-kotlin: gen-java
 	rm -rf ./$(PROTO_GEN_KOTLIN_DIR)
 	mkdir -p ./$(PROTO_GEN_KOTLIN_DIR)
-	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --java_out=./$(PROTO_GEN_JAVA_DIR) --kotlin_out=./$(PROTO_GEN_KOTLIN_DIR) $(file)))
+	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --kotlin_out=./$(PROTO_GEN_KOTLIN_DIR) $(file)))
 
 
 # Generate gRPC/Protobuf implementation for JavaScript.
@@ -103,13 +103,13 @@ gen-objc:
 	$(PROTOC) --objc_out=./$(PROTO_GEN_OBJC_DIR) --grpc-objc_out=./$(PROTO_GEN_OBJC_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 	$(PROTOC) --objc_out=./$(PROTO_GEN_OBJC_DIR) --grpc-objc_out=./$(PROTO_GEN_OBJC_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
 
-# Generate gRPC/Protobuf for swagger
+# Generate gRPC/Protobuf for openapi v2 (swagger)
 .PHONY: gen-openapi
 gen-openapi:
 	mkdir -p $(PROTO_GEN_OPENAPI_DIR)
-	$(PROTOC) --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
-	$(PROTOC) --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
-	$(PROTOC) --swagger_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/logs/v1/logs_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
+	$(PROTOC) --openapiv2_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
+	$(PROTOC) --openapiv2_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
+	$(PROTOC) --openapiv2_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/logs/v1/logs_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
 
 # Generate gRPC/Protobuf implementation for PhP.
 .PHONY: gen-php
