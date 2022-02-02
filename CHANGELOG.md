@@ -11,7 +11,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 ### Changed
 
 * `Swagger` generation updated to `openapiv2` due to the use of an updated version of protoc in `otel/build-protobuf`
-* Update the `otel/build-protobuf` version from `0.8.0` to `0.9.0`
+* Update the `otel/build-protobuf` version from `0.4.0` to `0.9.0`
 
 ### Added
 
