@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare.](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.10.0...v0.11.0)
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.12.0...main).
 
 ### Maturity
 
@@ -14,11 +14,34 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 
 ### Added
 
-* ExponentialHistogram is a base-2 exponential histogram described in [OTEP 149](https://github.com/open-telemetry/oteps/pull/149).
+* Remove if no changes for this section before release.
 
 ### Removed
 
 * Remove if no changes for this section before release.
+
+## 0.12.0 - 2022-01-19
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.12.0...v0.11.0).
+
+### Changed
+
+* Rename logs to log_records in InstrumentationLibraryLogs. (#352)
+
+### Removed
+
+* Remove deprecated messages and fields from traces. (#341)
+* Remove deprecated messages and fields from metrics. (#342)
+
+## 0.11.0 - 2021-10-07
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.10.0...v0.11.0).
+
+### Added
+
+* ExponentialHistogram is a base-2 exponential histogram described in [OTEP 149](https://github.com/open-telemetry/oteps/pull/149). (#322)
+* Adds `TracesData`, `MetricsData`, and `LogsData` container types for common use
+  in transporting multiple `ResourceSpans`, `ResourceMetrics`, and `ResourceLogs`. (#332)
 
 ## 0.10.0 - 2021-09-07
 
