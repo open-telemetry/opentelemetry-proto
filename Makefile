@@ -18,7 +18,7 @@ endef
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-objc gen-openapi gen-php gen-python gen-ruby
 
 OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.4.0
-PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
+PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD} --experimental_allow_proto3_optional
 PROTO_INCLUDES := -I/usr/include/github.com/gogo/protobuf
 
 PROTO_GEN_CPP_DIR ?= $(GENDIR)/cpp
