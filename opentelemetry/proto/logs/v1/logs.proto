@@ -127,7 +127,8 @@ message LogRecord {
   // Short event identifier that does not contain varying parts. Name describes
   // what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
   // characters. Not guaranteed to be unique in any way. [Optional].
-  string name = 4;
+  // This deprecated field is planned to be removed March 1, 2022.
+  string name = 4 [deprecated = true];
 
   // A value containing the body of the log record. Can be for example a human-readable
   // string message (including multi-line) describing the event in a free form or it can
