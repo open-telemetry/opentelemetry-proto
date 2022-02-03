@@ -135,6 +135,8 @@ message LogRecord {
   opentelemetry.proto.common.v1.AnyValue body = 5;
 
   // Additional attributes that describe the specific event occurrence. [Optional].
+  // Attribute keys MUST be unique (it is not allowed to have more than one
+  // attribute with the same key).
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 6;
   uint32 dropped_attributes_count = 7;
 
