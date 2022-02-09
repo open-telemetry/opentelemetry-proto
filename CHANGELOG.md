@@ -16,6 +16,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 ### Added
 
 * Protobuf kotlin source generation
+* Add ObservedTimestamp to LogRecord. (#351)
 
 ### Removed
 
