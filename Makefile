@@ -148,5 +148,5 @@ gen-ruby:
 	mkdir -p ./$(PROTO_GEN_RUBY_DIR)
 	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) $(PROTO_INCLUDES) --ruby_out=./$(PROTO_GEN_RUBY_DIR) $(file)))
 	$(PROTOC) $(PROTO_INCLUDES) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
-	$(PROTOC) $(PROTO_INCLUDES)--ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
+	$(PROTOC) $(PROTO_INCLUDES) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 	$(PROTOC) $(PROTO_INCLUDES) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
