@@ -17,7 +17,7 @@ endef
 .PHONY: gen-all
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-parquet gen-php gen-python gen-ruby
 
-OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.9.1
+OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.10.0
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 PROTO_INCLUDES := -I/usr/include/github.com/gogo/protobuf -I/usr/include/protoc-gen-parquet
 comma := ,
