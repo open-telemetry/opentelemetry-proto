@@ -43,27 +43,26 @@ message MetricsData {
   repeated ResourceMetrics resource_metrics = 1;
 }
 
-// A collection of InstrumentationLibraryMetrics from a Resource.
+// A collection of ScopeMetrics from a Resource.
 message ResourceMetrics {
   // The resource for the metrics in this message.
   // If this field is not set then no resource info is known.
   opentelemetry.proto.resource.v1.Resource resource = 1;
 
   // A list of metrics that originate from a resource.
-  repeated InstrumentationLibraryMetrics instrumentation_library_metrics = 2;
+  repeated ScopeMetrics scope_metrics = 2;
 
   // This schema_url applies to the data in the "resource" field. It does not apply
-  // to the data in the "instrumentation_library_metrics" field which have their own
-  // schema_url field.
+  // to the data in the "scope_metrics" field which have their own schema_url field.
   string schema_url = 3;
 }
 
-// A collection of Metrics produced by an InstrumentationLibrary.
-message InstrumentationLibraryMetrics {
-  // The instrumentation library information for the metrics in this message.
-  // Semantically when InstrumentationLibrary isn't set, it is equivalent with
-  // an empty instrumentation library name (unknown).
-  opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;
+// A collection of Metrics produced by an Scope.
+message ScopeMetrics {
+  // The instrumentation scope information for the metrics in this message.
+  // Semantically when InstrumentationScope isn't set, it is equivalent with
+  // an empty instrumentation scope name (unknown).
+  opentelemetry.proto.common.v1.InstrumentationScope scope = 1;
 
   // A list of metrics that originate from an instrumentation library.
   repeated Metric metrics = 2;
