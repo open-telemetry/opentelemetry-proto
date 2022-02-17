@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package parquet_options;
 
+option go_package = "./";
+
 import "google/protobuf/descriptor.proto";
 
 message MessageOptions {
