@@ -17,7 +17,7 @@ endef
 .PHONY: gen-all
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-php gen-python gen-ruby
 
-OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.9.0
+OTEL_DOCKER_PROTOBUF ?= build-protobuf:latest
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 PROTO_INCLUDES := -I/usr/include/github.com/gogo/protobuf
 
@@ -32,6 +32,7 @@ PROTO_GEN_OPENAPI_DIR ?= $(GENDIR)/openapi
 PROTO_GEN_PHP_DIR ?= $(GENDIR)/php
 PROTO_GEN_PYTHON_DIR ?= $(GENDIR)/python
 PROTO_GEN_RUBY_DIR ?= $(GENDIR)/ruby
+PROTO_GEN_TS_DIR ?= $(GENDIR)/ts
 
 # Docker pull image.
 .PHONY: docker-pull
@@ -88,10 +89,10 @@ gen-kotlin: gen-java
 gen-js:
 	rm -rf ./$(PROTO_GEN_JS_DIR)
 	mkdir -p ./$(PROTO_GEN_JS_DIR)
-	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) $(file)))
-	$(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --grpc-web_out=import_style=commonjs,mode=grpcweb:./$(PROTO_GEN_JS_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
-	$(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --grpc-web_out=import_style=commonjs,mode=grpcweb:./$(PROTO_GEN_JS_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
-	$(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --grpc-web_out=import_style=commonjs,mode=grpcweb:./$(PROTO_GEN_JS_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
+	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --ts_out=./$(PROTO_GEN_JS_DIR) $(file)))
+	$(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --ts_out=service=grpc-web:./$(PROTO_GEN_JS_DIR) --grpc-web_out=import_style=commonjs,mode=grpcweb:./$(PROTO_GEN_JS_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
+	$(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --ts_out=service=grpc-web:./$(PROTO_GEN_JS_DIR) --grpc-web_out=import_style=commonjs,mode=grpcweb:./$(PROTO_GEN_JS_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
+	$(PROTOC) --js_out=import_style=commonjs:./$(PROTO_GEN_JS_DIR) --ts_out=service=grpc-web:./$(PROTO_GEN_JS_DIR) --grpc-web_out=import_style=commonjs,mode=grpcweb:./$(PROTO_GEN_JS_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
 
 # Generate gRPC/Protobuf implementation for Objective-C.
 .PHONY: gen-objc
@@ -140,3 +141,13 @@ gen-ruby:
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
+
+# Generate gRPC/Protobuf implementation for TypeScript.
+.PHONY: gen-ts
+gen-ts:
+	rm -rf ./$(PROTO_GEN_TS_DIR)
+	mkdir -p ./$(PROTO_GEN_TS_DIR)
+	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --ts_out=./$(PROTO_GEN_TS_DIR) $(file)))
+	$(PROTOC) --ts_out=service=grpc-web:./$(PROTO_GEN_TS_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
+	$(PROTOC) --ts_out=service=grpc-web:./$(PROTO_GEN_TS_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
+	$(PROTOC) --ts_out=service=grpc-web:./$(PROTO_GEN_TS_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
