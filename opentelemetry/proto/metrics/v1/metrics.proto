@@ -22,7 +22,7 @@ import "opentelemetry/proto/resource/v1/resource.proto";
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.metrics.v1";
 option java_outer_classname = "MetricsProto";
-option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/metrics/v1";
+option go_package = "go.opentelemetry.io/proto/otlp/metrics/v1";
 
 // MetricsData represents the metrics data that can be stored in a persistent
 // storage, OR can be embedded by other protocols that transfer OTLP metrics
@@ -334,6 +334,8 @@ message NumberDataPoint {
 
   // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
+  // Attribute keys MUST be unique (it is not allowed to have more than one
+  // attribute with the same key).
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
@@ -380,6 +382,8 @@ message HistogramDataPoint {
 
   // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
+  // Attribute keys MUST be unique (it is not allowed to have more than one
+  // attribute with the same key).
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 9;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
@@ -457,6 +461,8 @@ message HistogramDataPoint {
 message ExponentialHistogramDataPoint {
   // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
+  // Attribute keys MUST be unique (it is not allowed to have more than one
+  // attribute with the same key).
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
@@ -562,6 +568,8 @@ message SummaryDataPoint {
 
   // The set of key/value pairs that uniquely identify the timeseries from
   // where this point belongs. The list may be empty (may contain 0 elements).
+  // Attribute keys MUST be unique (it is not allowed to have more than one
+  // attribute with the same key).
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the

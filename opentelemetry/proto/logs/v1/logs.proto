@@ -22,7 +22,7 @@ import "opentelemetry/proto/resource/v1/resource.proto";
 option java_multiple_files = true;
 option java_package = "io.opentelemetry.proto.logs.v1";
 option java_outer_classname = "LogsProto";
-option go_package = "github.com/open-telemetry/opentelemetry-proto/gen/go/logs/v1";
+option go_package = "go.opentelemetry.io/proto/otlp/logs/v1";
 
 // LogsData represents the logs data that can be stored in a persistent storage,
 // OR can be embedded by other protocols that transfer OTLP logs data but do not
@@ -116,6 +116,23 @@ message LogRecord {
   // Value of 0 indicates unknown or missing timestamp.
   fixed64 time_unix_nano = 1;
 
+  // Time when the event was observed by the collection system.
+  // For events that originate in OpenTelemetry (e.g. using OpenTelemetry Logging SDK)
+  // this timestamp is typically set at the generation time and is equal to Timestamp.
+  // For events originating externally and collected by OpenTelemetry (e.g. using
+  // Collector) this is the time when OpenTelemetry's code observed the event measured
+  // by the clock of the OpenTelemetry code. This field MUST be set once the event is
+  // observed by OpenTelemetry.
+  //
+  // For converting OpenTelemetry log data to formats that support only one timestamp or
+  // when receiving OpenTelemetry log data by recipients that support only one timestamp
+  // internally the following logic is recommended:
+  //   - Use time_unix_nano if it is present, otherwise use observed_time_unix_nano.
+  //
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // Value of 0 indicates unknown or missing timestamp.
+  fixed64 observed_time_unix_nano = 11;
+
   // Numerical value of the severity, normalized to values described in Log Data Model.
   // [Optional].
   SeverityNumber severity_number = 2;
@@ -127,7 +144,9 @@ message LogRecord {
   // Short event identifier that does not contain varying parts. Name describes
   // what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
   // characters. Not guaranteed to be unique in any way. [Optional].
-  string name = 4;
+  // This deprecated field is planned to be removed March 15, 2022. Receivers can
+  // ignore this field.
+  string name = 4 [deprecated = true];
 
   // A value containing the body of the log record. Can be for example a human-readable
   // string message (including multi-line) describing the event in a free form or it can
@@ -135,6 +154,8 @@ message LogRecord {
   opentelemetry.proto.common.v1.AnyValue body = 5;
 
   // Additional attributes that describe the specific event occurrence. [Optional].
+  // Attribute keys MUST be unique (it is not allowed to have more than one
+  // attribute with the same key).
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 6;
   uint32 dropped_attributes_count = 7;
 

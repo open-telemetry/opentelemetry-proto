@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.12.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.13.0...main).
 
 ### Maturity
 
@@ -18,8 +18,28 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Removed
 
-* Remove if no changes for this section before release.
+* Deprecate LogRecord.Name field. (#357)
 
+## 0.13.0 - 2022-02-10
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.13.0...v0.12.0).
+
+### Changed
+
+* `Swagger` generation updated to `openapiv2` due to the use of an updated version of protoc in `otel/build-protobuf`
+* Clarify attribute key uniqueness requirement (#350)
+* Fix path to Go packages (#360)
+
+### Added
+
+* Add ObservedTimestamp to LogRecord. (#351)
+* Add native kotlin support (#337)
+
+### Removed
+
+* Remove unused deprecated message StringKeyValue (#358)
+* Remove experimental metrics config service (#359)
+ 
 ## 0.12.0 - 2022-01-19
 
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.12.0...v0.11.0).
