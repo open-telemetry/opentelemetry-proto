@@ -52,6 +52,35 @@ message ResourceSpans {
   // A list of ScopeSpans that originate from a resource.
   repeated ScopeSpans scope_spans = 2;
 
+  // A list of InstrumentationLibrarySpans that originate from a resource.
+  // This field is deprecated and will be removed after grace period expires on June 15, 2022.
+  //
+  // During the grace period the following rules SHOULD be followed:
+  //
+  // For Binary Protobufs
+  // ====================
+  // Binary Protobuf senders SHOULD NOT set instrumentation_library_spans. Instead
+  // scope_spans SHOULD be set.
+  //
+  // Binary Protobuf receivers SHOULD check if instrumentation_library_spans is set
+  // and scope_spans is not set then the value in instrumentation_library_spans
+  // SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
+  // If scope_spans is set then instrumentation_library_spans SHOULD be ignored.
+  //
+  // For JSON
+  // ========
+  // JSON senders that set instrumentation_library_spans field MAY also set
+  // scope_spans to carry the same spans, essentially double-publishing the same data.
+  // Such double-publishing MAY be controlled by a user-settable option.
+  // If double-publishing is not used then the senders SHOULD set scope_spans and
+  // SHOULD NOT set instrumentation_library_spans.
+  //
+  // JSON receivers SHOULD check if instrumentation_library_spans is set and
+  // scope_spans is not set then the value in instrumentation_library_spans
+  // SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
+  // If scope_spans is set then instrumentation_library_spans field SHOULD be ignored.
+  repeated InstrumentationLibrarySpans instrumentation_library_spans = 4 [deprecated = true];
+
   // This schema_url applies to the data in the "resource" field. It does not apply
   // to the data in the "scope_spans" field which have their own schema_url field.
   string schema_url = 3;
@@ -65,6 +94,23 @@ message ScopeSpans {
   opentelemetry.proto.common.v1.InstrumentationScope scope = 1;
 
   // A list of Spans that originate from an instrumentation scope.
+  repeated Span spans = 2;
+
+  // This schema_url applies to all spans and span events in the "spans" field.
+  string schema_url = 3;
+}
+
+// A collection of Spans produced by an InstrumentationLibrary.
+// InstrumentationLibrarySpans is wire-compatible with ScopeSpans for binary
+// Protobuf format.
+// This message is deprecated and will be removed on June 15, 2022.
+message InstrumentationLibrarySpans {
+  // The instrumentation library information for the spans in this message.
+  // Semantically when InstrumentationLibrary isn't set, it is equivalent with
+  // an empty instrumentation library name (unknown).
+  opentelemetry.proto.common.v1.InstrumentationLibrary instrumentation_library = 1;
+
+  // A list of Spans that originate from an instrumentation library.
   repeated Span spans = 2;
 
   // This schema_url applies to all spans and span events in the "spans" field.
