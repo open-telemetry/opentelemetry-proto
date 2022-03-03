@@ -79,7 +79,7 @@ message ResourceMetrics {
   // scope_metrics is not set then the value in instrumentation_library_metrics
   // SHOULD be used instead by converting InstrumentationLibraryMetrics into ScopeMetrics.
   // If scope_metrics is set then instrumentation_library_metrics field SHOULD be ignored.
-  repeated InstrumentationLibraryMetrics instrumentation_library_metrics = 4 [deprecated = true];
+  repeated InstrumentationLibraryMetrics instrumentation_library_metrics = 1000 [deprecated = true];
 
   // This schema_url applies to the data in the "resource" field. It does not apply
   // to the data in the "scope_metrics" field which have their own schema_url field.
@@ -105,6 +105,8 @@ message ScopeMetrics {
 // Protobuf format.
 // This message is deprecated and will be removed on June 15, 2022.
 message InstrumentationLibraryMetrics {
+  option deprecated = true;
+
   // The instrumentation library information for the metrics in this message.
   // Semantically when InstrumentationLibrary isn't set, it is equivalent with
   // an empty instrumentation library name (unknown).

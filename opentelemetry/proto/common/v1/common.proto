@@ -71,6 +71,8 @@ message KeyValue {
 // Protobuf format.
 // This message is deprecated and will be removed on June 15, 2022.
 message InstrumentationLibrary {
+  option deprecated = true;
+
   // An empty instrumentation library name means the name is unknown.
   string name = 1;
   string version = 2;

@@ -79,7 +79,7 @@ message ResourceSpans {
   // scope_spans is not set then the value in instrumentation_library_spans
   // SHOULD be used instead by converting InstrumentationLibrarySpans into ScopeSpans.
   // If scope_spans is set then instrumentation_library_spans field SHOULD be ignored.
-  repeated InstrumentationLibrarySpans instrumentation_library_spans = 4 [deprecated = true];
+  repeated InstrumentationLibrarySpans instrumentation_library_spans = 1000 [deprecated = true];
 
   // This schema_url applies to the data in the "resource" field. It does not apply
   // to the data in the "scope_spans" field which have their own schema_url field.
@@ -105,6 +105,8 @@ message ScopeSpans {
 // Protobuf format.
 // This message is deprecated and will be removed on June 15, 2022.
 message InstrumentationLibrarySpans {
+  option deprecated = true;
+
   // The instrumentation library information for the spans in this message.
   // Semantically when InstrumentationLibrary isn't set, it is equivalent with
   // an empty instrumentation library name (unknown).

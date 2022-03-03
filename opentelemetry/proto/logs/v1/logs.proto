@@ -79,7 +79,7 @@ message ResourceLogs {
   // scope_logs is not set then the value in instrumentation_library_logs
   // SHOULD be used instead by converting InstrumentationLibraryLogs into ScopeLogs.
   // If scope_logs is set then instrumentation_library_logs field SHOULD be ignored.
-  repeated InstrumentationLibraryLogs instrumentation_library_logs = 4 [deprecated = true];
+  repeated InstrumentationLibraryLogs instrumentation_library_logs = 1000 [deprecated = true];
 
   // This schema_url applies to the data in the "resource" field. It does not apply
   // to the data in the "scope_logs" field which have their own schema_url field.
@@ -105,6 +105,8 @@ message ScopeLogs {
 // Protobuf format.
 // This message is deprecated and will be removed on June 15, 2022.
 message InstrumentationLibraryLogs {
+  option deprecated = true;
+
   // The instrumentation library information for the logs in this message.
   // Semantically when InstrumentationLibrary isn't set, it is equivalent with
   // an empty instrumentation library name (unknown).
