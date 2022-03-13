@@ -19,7 +19,6 @@ gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-
 
 OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.9.0
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
-PROTO_INCLUDES := -I/usr/include/github.com/gogo/protobuf
 
 PROTO_GEN_CPP_DIR ?= $(GENDIR)/cpp
 PROTO_GEN_CSHARP_DIR ?= $(GENDIR)/csharp
@@ -63,7 +62,7 @@ gen-csharp:
 gen-go:
 	rm -rf ./$(PROTO_GEN_GO_DIR)
 	mkdir -p ./$(PROTO_GEN_GO_DIR)
-	$(foreach file,$(PROTO_FILES),$(call exec-command,$(PROTOC) $(PROTO_INCLUDES) --gogo_out=plugins=grpc:./$(PROTO_GEN_GO_DIR) $(file)))
+	$(foreach file,$(PROTO_FILES),$(call exec-command,$(PROTOC) --go_out=plugins=grpc:./$(PROTO_GEN_GO_DIR) $(file)))
 	$(PROTOC) --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:./$(PROTO_GEN_GO_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
 	$(PROTOC) --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:./$(PROTO_GEN_GO_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 	$(PROTOC) --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/logs/v1/logs_service_http.yaml:./$(PROTO_GEN_GO_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
