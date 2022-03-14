@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.14.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.15.0...main).
 
 ### Maturity
 
@@ -20,9 +20,9 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 * Remove if no changes for this section before release.
 
-## 0.14.0 - 2022-03-14
+## 0.15.0 - 2022-03-14
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.14.0...v0.13.0).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.15.0...v0.14.0).
 
 ### Changed
 
@@ -31,6 +31,10 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 ### Added
 
 * Use optional for `sum` field to mark presence (#366)
+
+## 0.14.0 - 2022-03-08
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.14.0...v0.13.0).
 
 ### Removed
 
