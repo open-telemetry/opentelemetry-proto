@@ -19,7 +19,6 @@ gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-
 
 OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.11.0
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
-PROTO_INCLUDES := -I/usr/include/github.com/gogo/protobuf
 comma := ,
 semicolon := ";"
 
@@ -31,6 +30,7 @@ PROTO_GEN_JS_DIR ?= $(GENDIR)/js
 PROTO_GEN_KOTLIN_DIR ?= $(GENDIR)/kotlin
 PROTO_GEN_OBJC_DIR ?= $(GENDIR)/objc
 PROTO_GEN_OPENAPI_DIR ?= $(GENDIR)/openapi
+PROTO_GEN_PARQUET_DIR ?= $(GENDIR)/parquet
 PROTO_GEN_PHP_DIR ?= $(GENDIR)/php
 PROTO_GEN_PYTHON_DIR ?= $(GENDIR)/python
 PROTO_GEN_RUBY_DIR ?= $(GENDIR)/ruby
@@ -65,7 +65,7 @@ gen-csharp:
 gen-go:
 	rm -rf ./$(PROTO_GEN_GO_DIR)
 	mkdir -p ./$(PROTO_GEN_GO_DIR)
-	$(foreach file,$(PROTO_FILES),$(call exec-command,$(PROTOC) $(PROTO_INCLUDES) --gogo_out=plugins=grpc:./$(PROTO_GEN_GO_DIR) $(file)))
+	$(foreach file,$(PROTO_FILES),$(call exec-command,$(PROTOC) --gogo_out=plugins=grpc:./$(PROTO_GEN_GO_DIR) $(file)))
 	$(PROTOC) --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:./$(PROTO_GEN_GO_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
 	$(PROTOC) --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:./$(PROTO_GEN_GO_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 	$(PROTOC) --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/logs/v1/logs_service_http.yaml:./$(PROTO_GEN_GO_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
@@ -118,7 +118,7 @@ gen-openapi:
 gen-parquet:
 	rm -rf ./$(PROTO_GEN_PARQUET_DIR)
 	mkdir -p ./$(PROTO_GEN_PARQUET_DIR)
-	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) $(PROTO_INCLUDES) --parquet_out=go_file=true$(comma)output_messages=TracesData$(semicolon)LogsData$(semicolon)MetricsData$(comma)max_recursion=3:./$(PROTO_GEN_PARQUET_DIR) $(file)))
+	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --parquet_out=go_file=true$(comma)output_messages=TracesData$(semicolon)LogsData$(semicolon)MetricsData$(comma)max_recursion=3:./$(PROTO_GEN_PARQUET_DIR) $(file)))
 
 # Generate gRPC/Protobuf implementation for PhP.
 .PHONY: gen-php
