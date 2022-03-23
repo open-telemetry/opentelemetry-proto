@@ -158,6 +158,8 @@ enum LogRecordFlags {
 // A log record according to OpenTelemetry Log Data Model:
 // https://github.com/open-telemetry/oteps/blob/main/text/logs/0097-log-data-model.md
 message LogRecord {
+  reserved 4;
+
   // time_unix_nano is the time when the event occurred.
   // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
   // Value of 0 indicates unknown or missing timestamp.
@@ -187,13 +189,6 @@ message LogRecord {
   // The severity text (also known as log level). The original string representation as
   // it is known at the source. [Optional].
   string severity_text = 3;
-
-  // Short event identifier that does not contain varying parts. Name describes
-  // what happened (e.g. "ProcessStarted"). Recommended to be no longer than 50
-  // characters. Not guaranteed to be unique in any way. [Optional].
-  // This deprecated field is planned to be removed March 15, 2022. Receivers can
-  // ignore this field.
-  string name = 4 [deprecated = true];
 
   // A value containing the body of the log record. Can be for example a human-readable
   // string message (including multi-line) describing the event in a free form or it can
