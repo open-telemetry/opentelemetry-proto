@@ -18,7 +18,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Removed
 
-* Remove if no changes for this section before release.
+* Remove deprecated LogRecord.Name field.
 
 ## 0.15.0 - 2022-03-19
 
