@@ -10,7 +10,8 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Remove if no changes for this section before release.
+* Introduce optional `min` and `max` fields to the Histogram and ExponentialHistogram data points.
+  [(#279)](https://github.com/open-telemetry/opentelemetry-proto/pull/279)
 
 ### Added
 
