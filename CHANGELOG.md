@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.13.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.15.0...main).
 
 ### Maturity
 
@@ -19,11 +19,31 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Removed
 
-* Deprecate LogRecord.Name field. (#357)
+* Remove deprecated LogRecord.Name field.
+
+## 0.15.0 - 2022-03-19
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.14.0...v0.15.0).
+
+### Changed
+
+* Rename InstrumentationLibrary to InstrumentationScope (#362)
+
+### Added
+
+* Use optional for `sum` field to mark presence (#366)
+
+## 0.14.0 - 2022-03-08
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.13.0...v0.14.0).
+
+### Removed
+
+* Deprecate LogRecord.Name field (#357)
 
 ## 0.13.0 - 2022-02-10
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.13.0...v0.12.0).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.12.0...v0.13.0).
 
 ### Changed
 
@@ -43,7 +63,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
  
 ## 0.12.0 - 2022-01-19
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.12.0...v0.11.0).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.11.0...v0.12.0).
 
 ### Changed
 
