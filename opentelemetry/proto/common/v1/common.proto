@@ -22,13 +22,20 @@ option java_outer_classname = "CommonProto";
 option go_package = "go.opentelemetry.io/proto/otlp/common/v1";
 
 // inlined parquet-gen options
+// these options are used to determine how to represent data with Apache Parquet,
+// a columnar data format used for S3 buckets and other flat file storage mechanisms.
+// These options are copied from the parquet-gen tool protobuf options:
+// https://github.com/atoulme/protoc-gen-parquet/blob/master/parquet_options/parquet_options.proto
+// This is to remove the need to import the options from a remote git repository.
 import "google/protobuf/descriptor.proto";
 
+// Options for the top-level object to represent the name of the schema.
 message MessageOptions {
   // As long as table_name is not blank,
   // a schema is generated for top-level messages in each file.
   string table_name = 1;
 }
+
 
 extend google.protobuf.MessageOptions {
   MessageOptions message_opts = 1023;
@@ -42,7 +49,12 @@ enum TimestampType {
 }
 
 message FieldOptions {
+  // Admissible timestamp types for timestamp fields with Apache Parquet schema.
   TimestampType timestamp_type = 1;
+  // Whether to interpret the field as a JSON blob.
+  // Parquet files are flat files and do not support references or recursion.
+  // When a Protobuf field points to a recursive data structure, developers
+  // can mark it as a JSON blob to serialize it and avoid infinite recursion or loss of information.
   bool is_json = 2;
 }
 
