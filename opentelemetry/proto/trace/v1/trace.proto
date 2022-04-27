@@ -291,6 +291,15 @@ message Span {
     // dropped_attributes_count is the number of dropped attributes. If the value is 0,
     // then no attributes were dropped.
     uint32 dropped_attributes_count = 5;
+
+    // Flags, a bit field. 8 least significant bits are the trace flags as
+    // defined in W3C Trace Context specification. 24 most significant bits are reserved
+    // and must be set to 0. Readers must not assume that 24 most significant bits
+    // will be zero and must correctly mask the bits when reading 8-bit trace flag (use
+    // flags & TRACE_FLAGS_MASK).
+    // This value is required, as not setting it will be interpeted as 0 which is 
+    // a valid representation of all flags being present and set to 0.
+    fixed32 flags = 6;
   }
 
   // links is a collection of Links, which are references from this span to a span
@@ -304,6 +313,16 @@ message Span {
   // An optional final status for this span. Semantically when Status isn't set, it means
   // span's status code is unset, i.e. assume STATUS_CODE_UNSET (code = 0).
   Status status = 15;
+
+  // Flags, a bit field. 8 least significant bits are the trace flags as
+  // defined in W3C Trace Context specification. 24 most significant bits are reserved
+  // and must be set to 0. Readers must not assume that 24 most significant bits
+  // will be zero and must correctly mask the bits when reading 8-bit trace flag (use
+  // flags & TRACE_FLAGS_MASK).
+  // This value is required, as not setting it will be interpeted as 0 which is 
+  // a valid representation of all flags being present and set to 0.
+  fixed32 flags = 16;
+
 }
 
 // The Status type defines a logical error model that is suitable for different
