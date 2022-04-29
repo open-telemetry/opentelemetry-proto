@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.16.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.17.0...main).
 
 ### Maturity
 
@@ -10,8 +10,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Introduce optional `min` and `max` fields to the Histogram and ExponentialHistogram data points.
-  [(#279)](https://github.com/open-telemetry/opentelemetry-proto/pull/279)
+* Remove if no changes for this section before release.
 
 ### Added
 
@@ -20,6 +19,15 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 ### Removed
 
 * Remove if no changes for this section before release.
+
+## 0.17.0 - 2022-04-29
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.16.0...v0.17.0).
+
+### Changed
+
+* Introduce optional `min` and `max` fields to the Histogram and ExponentialHistogram data points.
+  [(#279)](https://github.com/open-telemetry/opentelemetry-proto/pull/279)
 
 ## 0.16.0 - 2022-03-31
 
