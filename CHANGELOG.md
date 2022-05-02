@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.15.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.16.0...main).
 
 ### Maturity
 
@@ -10,7 +10,8 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Remove if no changes for this section before release.
+* Introduce optional `min` and `max` fields to the Histogram and ExponentialHistogram data points.
+  [(#279)](https://github.com/open-telemetry/opentelemetry-proto/pull/279)
 
 ### Added
 
@@ -18,7 +19,15 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Removed
 
-* Remove deprecated LogRecord.Name field.
+* Remove if no changes for this section before release.
+
+## 0.16.0 - 2022-03-31
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.15.0...v0.16.0).
+
+### Removed
+
+* Remove deprecated LogRecord.Name field (#373).
 
 ## 0.15.0 - 2022-03-19
 
