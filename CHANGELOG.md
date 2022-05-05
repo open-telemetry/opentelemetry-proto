@@ -20,7 +20,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 * Remove if no changes for this section before release.
 
-## 0.17.0 - 2022-05-04
+## 0.17.0 - 2022-05-06
 
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.16.0...v0.17.0).
 
