@@ -42,4 +42,18 @@ message ExportLogsServiceRequest {
 }
 
 message ExportLogsServiceResponse {
+  // The details of a partially successfull export request.
+  // When the request is only partially successfull (due to e.g. invalid/bad data),
+  // the server MUST populate the details property with a developer-facing error
+  // message along with the number of accepted log records.
+  ExportLogsPartialSuccess details = 1;
+}
+
+message ExportLogsPartialSuccess {
+  // The number of accepted log records
+  int64 accepted_log_records = 1;
+
+  // A developer-facing human-readable error message in English. It should
+  // both explain the error and offer an actionable resolution to it.
+  string error_message = 2;
 }

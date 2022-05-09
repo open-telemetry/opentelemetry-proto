@@ -42,4 +42,18 @@ message ExportTraceServiceRequest {
 }
 
 message ExportTraceServiceResponse {
+  // The details of a partially successfull export request.
+  // When the request is only partially successfull (due to e.g. invalid/bad data),
+  // the server MUST populate the details property with a developer-facing error
+  // message along with the number of accepted spans.
+  ExportTracePartialSuccess details = 1;
+}
+
+message ExportTracePartialSuccess {
+  // The number of accepted spans
+  int64 accepted_spans = 1;
+
+  // A developer-facing human-readable error message in English. It should
+  // both explain the error and offer an actionable resolution to it.
+  string error_message = 2;
 }
