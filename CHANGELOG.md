@@ -10,7 +10,8 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Remove if no changes for this section before release.
+* Metrics ExponentialHistogramDataPoint makes the `sum` optional
+  (follows the same change in HistogramDataPOint in 0.15).
 
 ### Added
 
