@@ -11,7 +11,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 ### Changed
 
 * Metrics ExponentialHistogramDataPoint makes the `sum` optional
-  (follows the same change in HistogramDataPOint in 0.15).
+  (follows the same change in HistogramDataPOint in 0.15). [#392](https://github.com/open-telemetry/opentelemetry-proto/pull/392)
 
 ### Added
 
