@@ -10,8 +10,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Metrics ExponentialHistogramDataPoint makes the `sum` optional
-  (follows the same change in HistogramDataPOint in 0.15). [#392](https://github.com/open-telemetry/opentelemetry-proto/pull/392)
+* Remove if no changes for this section before release.
 
 ### Added
 
@@ -29,6 +28,8 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 * Declare logs Stable.
   [(#376)](https://github.com/open-telemetry/opentelemetry-proto/pull/376)
+* Metrics ExponentialHistogramDataPoint makes the `sum` optional
+  (follows the same change in HistogramDataPOint in 0.15). [#392](https://github.com/open-telemetry/opentelemetry-proto/pull/392)
 
 ## 0.17.0 - 2022-05-06
 
