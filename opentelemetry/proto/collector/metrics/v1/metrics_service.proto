@@ -42,11 +42,11 @@ message ExportMetricsServiceRequest {
 }
 
 message ExportMetricsServiceResponse {
-  // The details of a partially successfull export request.
-  // When the request is only partially successfull (due to e.g. invalid/bad data),
-  // the server MUST populate the details property with a developer-facing error
-  // message along with the number of accepted data points.
-  ExportMetricsPartialSuccess details = 1;
+  // The details of a partially successful export request.
+  // When the request is only partially successful (due to e.g. invalid/bad data),
+  // the server MUST populate the partial_success property with a
+  // developer-facing error message along with the number of accepted data points.
+  ExportMetricsPartialSuccess partial_success = 1;
 }
 
 message ExportMetricsPartialSuccess {
