@@ -14,7 +14,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Added
 
-* Remove if no changes for this section before release.
+* Introduce Scope Attributes. [#395](https://github.com/open-telemetry/opentelemetry-proto/pull/395)
 
 ### Removed
 
