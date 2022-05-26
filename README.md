@@ -21,6 +21,7 @@ To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently
 * php
 * python
 * ruby
+* swift
 
 ## Maturity Level
 
