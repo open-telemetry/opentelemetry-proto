@@ -151,8 +151,8 @@ enum SeverityNumber {
 
 // Masks for LogRecord.flags field.
 enum LogRecordFlags {
-  LOG_RECORD_FLAG_UNSPECIFIED = 0;
-  LOG_RECORD_FLAG_TRACE_FLAGS_MASK = 0x000000FF;
+  LOG_RECORD_FLAGS_UNSPECIFIED = 0;
+  LOG_RECORD_FLAGS_TRACE_FLAGS_MASK = 0x000000FF;
 }
 
 // A log record according to OpenTelemetry Log Data Model:

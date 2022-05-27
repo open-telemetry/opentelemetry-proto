@@ -171,36 +171,6 @@ message Span {
   // This field is required.
   string name = 5;
 
-  // SpanKind is the type of span. Can be used to specify additional relationships between spans
-  // in addition to a parent/child relationship.
-  enum SpanKind {
-    // Unspecified. Do NOT use as default.
-    // Implementations MAY assume SpanKind to be INTERNAL when receiving UNSPECIFIED.
-    SPAN_KIND_UNSPECIFIED = 0;
-
-    // Indicates that the span represents an internal operation within an application,
-    // as opposed to an operation happening at the boundaries. Default value.
-    SPAN_KIND_INTERNAL = 1;
-
-    // Indicates that the span covers server-side handling of an RPC or other
-    // remote network request.
-    SPAN_KIND_SERVER = 2;
-
-    // Indicates that the span describes a request to some remote service.
-    SPAN_KIND_CLIENT = 3;
-
-    // Indicates that the span describes a producer sending a message to a broker.
-    // Unlike CLIENT and SERVER, there is often no direct critical path latency relationship
-    // between producer and consumer spans. A PRODUCER span ends when the message was accepted
-    // by the broker while the logical processing of the message might span a much longer time.
-    SPAN_KIND_PRODUCER = 4;
-
-    // Indicates that the span describes consumer receiving a message from a broker.
-    // Like the PRODUCER kind, there is often no direct critical path latency relationship
-    // between producer and consumer spans.
-    SPAN_KIND_CONSUMER = 5;
-  }
-
   // Distinguishes between spans generated in a particular context. For example,
   // two spans with the same name may be distinguished using `CLIENT` (caller)
   // and `SERVER` (callee) to identify queueing latency associated with the span.
@@ -306,6 +276,36 @@ message Span {
   Status status = 15;
 }
 
+// SpanKind is the type of span. Can be used to specify additional relationships between spans
+// in addition to a parent/child relationship.
+enum SpanKind {
+  // Unspecified. Do NOT use as default.
+  // Implementations MAY assume SpanKind to be INTERNAL when receiving UNSPECIFIED.
+  SPAN_KIND_UNSPECIFIED = 0;
+
+  // Indicates that the span represents an internal operation within an application,
+  // as opposed to an operation happening at the boundaries. Default value.
+  SPAN_KIND_INTERNAL = 1;
+
+  // Indicates that the span covers server-side handling of an RPC or other
+  // remote network request.
+  SPAN_KIND_SERVER = 2;
+
+  // Indicates that the span describes a request to some remote service.
+  SPAN_KIND_CLIENT = 3;
+
+  // Indicates that the span describes a producer sending a message to a broker.
+  // Unlike CLIENT and SERVER, there is often no direct critical path latency relationship
+  // between producer and consumer spans. A PRODUCER span ends when the message was accepted
+  // by the broker while the logical processing of the message might span a much longer time.
+  SPAN_KIND_PRODUCER = 4;
+
+  // Indicates that the span describes consumer receiving a message from a broker.
+  // Like the PRODUCER kind, there is often no direct critical path latency relationship
+  // between producer and consumer spans.
+  SPAN_KIND_CONSUMER = 5;
+}
+
 // The Status type defines a logical error model that is suitable for different
 // programming environments, including REST APIs and RPC APIs.
 message Status {
@@ -314,18 +314,18 @@ message Status {
   // A developer-facing human readable error message.
   string message = 2;
 
-  // For the semantics of status codes see
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#set-status
-  enum StatusCode {
-    // The default status.
-    STATUS_CODE_UNSET               = 0;
-    // The Span has been validated by an Application developers or Operator to have
-    // completed successfully.
-    STATUS_CODE_OK                  = 1;
-    // The Span contains an error.
-    STATUS_CODE_ERROR               = 2;
-  };
-
   // The status code.
   StatusCode code = 3;
 }
+
+// For the semantics of status codes see
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#set-status
+enum StatusCode {
+  // The default status.
+  STATUS_CODE_UNSET               = 0;
+  // The Span has been validated by an Application developers or Operator to have
+  // completed successfully.
+  STATUS_CODE_OK                  = 1;
+  // The Span contains an error.
+  STATUS_CODE_ERROR               = 2;
+};

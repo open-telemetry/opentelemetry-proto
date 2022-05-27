@@ -56,12 +56,13 @@ message ConstantSampler {
   // - Always off
   // - Always on
   // - Always follow the parent Span's decision (off if no parent).
-  enum ConstantDecision {
-    ALWAYS_OFF = 0;
-    ALWAYS_ON = 1;
-    ALWAYS_PARENT = 2;
-  }
-  ConstantDecision decision = 1;
+  ConstantSamplerDecision decision = 1;
+}
+
+enum ConstantSamplerDecision {
+  CONSTANT_SAMPLER_DECISION_ALWAYS_OFF = 0;
+  CONSTANT_SAMPLER_DECISION_ALWAYS_ON = 1;
+  CONSTANT_SAMPLER_DECISION_ALWAYS_PARENT = 2;
 }
 
 // Sampler that tries to uniformly sample traces with a given ratio.

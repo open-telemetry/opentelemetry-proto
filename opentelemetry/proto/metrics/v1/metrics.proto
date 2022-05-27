@@ -364,12 +364,12 @@ enum AggregationTemporality {
 //   (point.flags & FLAG_NO_RECORDED_VALUE) == FLAG_NO_RECORDED_VALUE
 //
 enum DataPointFlags {
-  FLAG_NONE = 0;
+  DATA_POINTS_FLAG_NONE = 0;
 
   // This DataPoint is valid but has no recorded value.  This value
   // SHOULD be used to reflect explicitly missing data in a series, as
   // for an equivalent to the Prometheus "staleness marker".
-  FLAG_NO_RECORDED_VALUE = 1;
+  DATA_POINTS_FLAG_NO_RECORDED_VALUE = 1;
 
   // Bits 2-31 are reserved for future use.
 }
