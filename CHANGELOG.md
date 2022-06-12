@@ -10,7 +10,8 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Remove if no changes for this section before release.
+* Add `csharp_namespace` option to protos.
+  ([#399](https://github.com/open-telemetry/opentelemetry-proto/pull/399))
 
 ### Added
 
