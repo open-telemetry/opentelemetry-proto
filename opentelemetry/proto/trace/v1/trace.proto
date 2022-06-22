@@ -124,8 +124,9 @@ message InstrumentationLibrarySpans {
 // nested to form a trace tree. Spans may also be linked to other spans
 // from the same or different trace and form graphs. Often, a trace
 // contains a root span that describes the end-to-end latency, and one
-// or more subspans for its sub-operations. A trace can also contain
-// multiple root spans, or none at all. Spans do not need to be
+// or more subspans for its sub-operations. Technically a trace could also
+// contain multiple root spans, or none at all, but the semantics of
+// these cases are not defined. Spans do not need to be
 // contiguous - there may be gaps or overlaps between spans in a trace.
 //
 // The next available field id is 17.
