@@ -66,19 +66,6 @@ message KeyValue {
   AnyValue value = 2;
 }
 
-// InstrumentationLibrary is a message representing the instrumentation library information
-// such as the fully qualified name and version.
-// InstrumentationLibrary is wire-compatible with InstrumentationScope for binary
-// Protobuf format.
-// This message is deprecated and will be removed on June 15, 2022.
-message InstrumentationLibrary {
-  option deprecated = true;
-
-  // An empty instrumentation library name means the name is unknown.
-  string name = 1;
-  string version = 2;
-}
-
 // InstrumentationScope is a message representing the instrumentation scope information
 // such as the fully qualified name and version. 
 message InstrumentationScope {
