@@ -501,8 +501,8 @@ message ExponentialHistogramDataPoint {
   //   base = (2^(2^-scale))
   //
   // The histogram bucket identified by `index`, a signed integer,
-  // contains values that are greater than or equal to (base^index) and
-  // less than (base^(index+1)).
+  // contains values that are greater than (base^index) and
+  // less than or equal to (base^(index+1)).
   //
   // The positive and negative ranges of the histogram are expressed
   // separately.  Negative values are mapped by their absolute value
@@ -538,7 +538,7 @@ message ExponentialHistogramDataPoint {
 
     // Count is an array of counts, where count[i] carries the count
     // of the bucket at index (offset+i).  count[i] is the count of
-    // values greater than or equal to base^(offset+i) and less than
+    // values greater than base^(offset+i) and less or equal to than
     // base^(offset+i+1).
     //
     // Note: By contrast, the explicit HistogramDataPoint uses
