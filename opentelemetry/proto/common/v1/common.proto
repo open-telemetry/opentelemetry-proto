@@ -29,13 +29,13 @@ message AnyValue {
   // The value is one of the listed fields. It is valid for all values to be unspecified
   // in which case this AnyValue is considered to be "empty".
   oneof value {
-    string string_value = 1;
-    bool bool_value = 2;
-    int64 int_value = 3;
-    double double_value = 4;
-    ArrayValue array_value = 5;
-    KeyValueList kvlist_value = 6;
-    bytes bytes_value = 7;
+    string string_value = 1 [json_name="s"];
+    bool bool_value = 2 [json_name="b"];
+    int64 int_value = 3 [json_name="i"];
+    double double_value = 4 [json_name="d"];
+    ArrayValue array_value = 5 [json_name="a"];
+    KeyValueList kvlist_value = 6 [json_name="l"];
+    bytes bytes_value = 7 [json_name="by"];
   }
 }
 
@@ -43,7 +43,7 @@ message AnyValue {
 // since oneof in AnyValue does not allow repeated fields.
 message ArrayValue {
   // Array of values. The array may be empty (contain 0 elements).
-  repeated AnyValue values = 1;
+  repeated AnyValue values = 1 [json_name="v"];
 }
 
 // KeyValueList is a list of KeyValue messages. We need KeyValueList as a message
@@ -56,22 +56,22 @@ message KeyValueList {
   // contain 0 elements).
   // The keys MUST be unique (it is not allowed to have more than one
   // value with the same key).
-  repeated KeyValue values = 1;
+  repeated KeyValue values = 1 [json_name="v"];
 }
 
 // KeyValue is a key-value pair that is used to store Span attributes, Link
 // attributes, etc.
 message KeyValue {
-  string key = 1;
-  AnyValue value = 2;
+  string key = 1 [json_name="k"];
+  AnyValue value = 2 [json_name="v"];
 }
 
 // InstrumentationScope is a message representing the instrumentation scope information
 // such as the fully qualified name and version. 
 message InstrumentationScope {
   // An empty instrumentation scope name means the name is unknown.
-  string name = 1;
-  string version = 2;
-  repeated KeyValue attributes = 3;
-  uint32 dropped_attributes_count = 4;
+  string name = 1 [json_name="n"];
+  string version = 2 [json_name="v"];
+  repeated KeyValue attributes = 3 [json_name="a"];
+  uint32 dropped_attributes_count = 4 [json_name="da"];
 }

@@ -39,7 +39,7 @@ message ExportLogsServiceRequest {
   // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
   // data from multiple origins typically batch the data before forwarding further and
   // in that case this array will contain multiple elements.
-  repeated opentelemetry.proto.logs.v1.ResourceLogs resource_logs = 1;
+  repeated opentelemetry.proto.logs.v1.ResourceLogs resource_logs = 1 [json_name="l"];
 }
 
 message ExportLogsServiceResponse {

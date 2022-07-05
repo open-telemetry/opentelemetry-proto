@@ -39,7 +39,7 @@ message ExportTraceServiceRequest {
   // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
   // data from multiple origins typically batch the data before forwarding further and
   // in that case this array will contain multiple elements.
-  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1;
+  repeated opentelemetry.proto.trace.v1.ResourceSpans resource_spans = 1 [json_name="s"];
 }
 
 message ExportTraceServiceResponse {

@@ -18,6 +18,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
   InstrumentationLibraryMetrics messages. Delete deprecated
   instrumentation_library_logs, instrumentation_library_spans and
   instrumentation_library_metrics fields.
+* :stop_sign: [BREAKING] Use short keys for OTLP/JSON.
 
 ### Added
 
