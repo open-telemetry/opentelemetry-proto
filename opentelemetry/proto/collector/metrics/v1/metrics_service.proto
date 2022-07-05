@@ -61,5 +61,8 @@ message ExportMetricsPartialSuccess {
   // A developer-facing human-readable error message in English. It should
   // explain why the server rejected parts of the data,
   // and might offer guidance on how users can address the issues.
-  optional string error_message = 2;
+  //
+  // error_message is an optional field. An error_message with an empty value
+  // is equivalent of it not being set.
+  string error_message = 2;
 }
