@@ -44,9 +44,13 @@ message ExportMetricsServiceRequest {
 
 message ExportMetricsServiceResponse {
   // The details of a partially successful export request.
-  // When the request is only partially successful (due to e.g. invalid/bad data),
-  // the server MUST populate the partial_success property with a
-  // developer-facing error message along with the number of accepted data points.
+  // If the processing of the request is partially successful
+  // (i.e. when the server accepts only parts of the data and rejects the rest)
+  // and the number of accepted data points is known, the server MUST initialize
+  // the partial_success field and MUST set the accepted_data_points.
+
+  // When the export request is processed successfully, the server MUST leave
+  // the partial_success field unset.
   ExportMetricsPartialSuccess partial_success = 1;
 }
 
@@ -55,6 +59,7 @@ message ExportMetricsPartialSuccess {
   int64 accepted_data_points = 1;
 
   // A developer-facing human-readable error message in English. It should
-  // both explain the error and offer an actionable resolution to it.
-  string error_message = 2;
+  // explain why the server rejected parts of the data,
+  // and might offer guidance on how users can address the issues.
+  optional string error_message = 2;
 }
