@@ -56,7 +56,16 @@ message ExportMetricsServiceResponse {
 
 message ExportMetricsPartialSuccess {
   // The number of accepted data points
-  int64 accepted_data_points = 1;
+  //
+  // If the request is partially successful and the number of
+  // accepted data points is known, the server MUST set
+  // the accepted_data_points field.
+  // 
+  // The value '0' indicates that all data points were dropped by the server.
+  //
+  // Since the value '0' is meaningful, the field is marked as 'optional'
+  // so it is possible to distinguish between the not set value and the default.
+  optional int64 accepted_data_points = 1;
 
   // A developer-facing human-readable error message in English. It should
   // explain why the server rejected parts of the data,

@@ -56,7 +56,16 @@ message ExportLogsServiceResponse {
 
 message ExportLogsPartialSuccess {
   // The number of accepted log records
-  int64 accepted_log_records = 1;
+  //
+  // If the request is partially successful and the number of
+  // accepted log records is known, the server MUST set
+  // the accepted_log_records field.
+  // 
+  // The value '0' indicates that all log records were dropped by the server.
+  //
+  // Since the value '0' is meaningful, the field is marked as 'optional'
+  // so it is possible to distinguish between the not set value and the default.
+  optional int64 accepted_log_records = 1;
 
   // A developer-facing human-readable error message in English. It should
   // explain why the server rejected parts of the data,
