@@ -22,6 +22,8 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 ### Added
 
 * Introduce Scope Attributes. [#395](https://github.com/open-telemetry/opentelemetry-proto/pull/395)
+* Introduce partial success fields in `Export<signal>ServiceResponse`.
+ [#?](https://github.com/open-telemetry/opentelemetry-proto/pull/?)
 
 ### Removed
 

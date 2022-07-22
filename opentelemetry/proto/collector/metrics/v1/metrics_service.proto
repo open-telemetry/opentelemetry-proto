@@ -43,4 +43,35 @@ message ExportMetricsServiceRequest {
 }
 
 message ExportMetricsServiceResponse {
+  // The details of a partially successful export request.
+  //
+  // If the request is only partially accepted
+  // (i.e. when the server accepts only parts of the data and rejects the rest)
+  // the server MUST initialize the `partial_success` field and MUST
+  // set the `rejected_data_points` with the number of data points it rejected.
+  //
+  // The server MUST NOT set the `partial_success` field when the
+  // request was accepted in its entirety.
+  ExportMetricsPartialSuccess partial_success = 1;
+}
+
+message ExportMetricsPartialSuccess {
+  // The number of rejected data points.
+  //
+  // If the request is only partially accepted, the server MUST set
+  // the `rejected_data_points` field.
+  // 
+  // Given the server should only initialize the `partial_success` field
+  // when it rejects parts of the data, a `rejected_data_points` with
+  // value = '0' is considered an invalid result. Senders should
+  // interpret such responses from a server as if all data points were accepted.
+  int64 rejected_data_points = 1;
+
+  // A developer-facing human-readable error message in English. It should
+  // explain why the server rejected parts of the data,
+  // and might offer guidance on how users can address the issues.
+  //
+  // error_message is an optional field. An error_message with an empty value
+  // is equivalent of it not being set.
+  string error_message = 2;
 }
