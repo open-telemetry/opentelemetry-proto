@@ -58,12 +58,9 @@ message ExportTraceServiceResponse {
 message ExportTracePartialSuccess {
   // The number of rejected spans.
   //
-  // If the request is only partially accepted, the server MUST set
-  // the `rejected_spans` field.
-  // 
-  // Given the server should only initialize the `partial_success` field
+  // Given the server MUST only initialize the `partial_success` field
   // when it rejects parts of the data, a `rejected_spans` with
-  // value = '0' is considered an invalid result. Senders should
+  // value = '0' is considered an invalid result. Senders MUST
   // interpret such responses from a server as if all spans were accepted.
   int64 rejected_spans = 1;
 
