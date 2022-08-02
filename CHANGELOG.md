@@ -4,12 +4,24 @@
 
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.19.0...main).
 
-## 0.19.0 - 2022-08-02
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.18.0...v0.19.0).
-
 ### Maturity
 
 * Remove if no changes for this section before release.
+
+### Changed
+
+* Remove if no changes for this section before release.
+
+### Added
+
+* Remove if no changes for this section before release.
+
+### Removed
+
+* Remove if no changes for this section before release.
+
+## 0.19.0 - 2022-08-02
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.18.0...v0.19.0).
 
 ### Changed
 
@@ -25,10 +37,6 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 ### Added
 
 * Introduce Scope Attributes. [#395](https://github.com/open-telemetry/opentelemetry-proto/pull/395)
-
-### Removed
-
-* Remove if no changes for this section before release.
 
 ## 0.18.0 - 2022-05-17
 
