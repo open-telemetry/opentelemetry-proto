@@ -88,12 +88,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    # This is needed because checkout action does a shallow clone
-    - name: Fetch main branch for comparison
-      run: |
-        git remote set-branches origin '*'
-        git fetch --depth=1 origin main
-        git branch main origin/main
     - name: Run make breaking-change with json output to annotate PR
       # Formats JSON output into Github workflow commands
       # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
