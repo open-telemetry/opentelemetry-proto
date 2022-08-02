@@ -51,7 +51,7 @@ message ExportMetricsServiceResponse {
   // set the `rejected_<signal>` with the number of items it rejected.
   //
   // Servers MAY also make use of the `partial_success` field to convey
-  // warnings/suggestions to senders when the request was fully accepted.
+  // warnings/suggestions to senders even when the request was fully accepted.
   // In such cases, the `rejected_<signal>` MUST have a value of `0` and
   // the `error_message` MUST be non-empty.
   ExportMetricsPartialSuccess partial_success = 1;
