@@ -18,7 +18,13 @@ endef
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-php gen-python gen-ruby
 
 OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.9.0
+BUF_DOCKER ?= bufbuild/buf:1.7.0
+
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
+BUF := docker run --rm -v "${PWD}:/workspace" -w /workspace ${BUF_DOCKER}
+# When checking for protobuf breaking changes, check against the upstream repo's main branch.
+# Options are described in https://docs.buf.build/breaking/usage#git
+BUF_AGAINST ?= "https://github.com/open-telemetry/opentelemetry-proto.git"
 
 PROTO_GEN_CPP_DIR ?= $(GENDIR)/cpp
 PROTO_GEN_CSHARP_DIR ?= $(GENDIR)/csharp
@@ -36,6 +42,7 @@ PROTO_GEN_RUBY_DIR ?= $(GENDIR)/ruby
 .PHONY: docker-pull
 docker-pull:
 	docker pull $(OTEL_DOCKER_PROTOBUF)
+	docker pull $(BUF_DOCKER)
 
 # Generate gRPC/Protobuf implementation for C++.
 .PHONY: gen-cpp
@@ -139,3 +146,7 @@ gen-ruby:
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
+	
+.PHONY: breaking-change
+breaking-change:
+	$(BUF) breaking --against $(BUF_AGAINST) $(BUF_FLAGS)
