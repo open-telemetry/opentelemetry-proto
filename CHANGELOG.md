@@ -2,11 +2,27 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.18.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.19.0...main).
 
 ### Maturity
 
 * Remove if no changes for this section before release.
+
+### Changed
+
+* Remove if no changes for this section before release.
+
+### Added
+
+* Remove if no changes for this section before release.
+
+### Removed
+
+* Remove if no changes for this section before release.
+
+## 0.19.0 - 2022-08-03
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.18.0...v0.19.0).
 
 ### Changed
 
@@ -24,10 +40,6 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 * Introduce Scope Attributes. [#395](https://github.com/open-telemetry/opentelemetry-proto/pull/395)
 * Introduce partial success fields in `Export<signal>ServiceResponse`.
  [#414](https://github.com/open-telemetry/opentelemetry-proto/pull/414)
-
-### Removed
-
-* Remove if no changes for this section before release.
 
 ## 0.18.0 - 2022-05-17
 
