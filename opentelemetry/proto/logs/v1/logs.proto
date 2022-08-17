@@ -104,12 +104,6 @@ enum SeverityNumber {
   SEVERITY_NUMBER_FATAL4 = 24;
 }
 
-// Masks for LogRecord.flags field.
-enum LogRecordFlags {
-  LOG_RECORD_FLAG_UNSPECIFIED = 0;
-  LOG_RECORD_FLAG_TRACE_FLAGS_MASK = 0x000000FF;
-}
-
 // A log record according to OpenTelemetry Log Data Model:
 // https://github.com/open-telemetry/oteps/blob/main/text/logs/0097-log-data-model.md
 message LogRecord {
@@ -160,7 +154,7 @@ message LogRecord {
   // defined in W3C Trace Context specification. 24 most significant bits are reserved
   // and must be set to 0. Readers must not assume that 24 most significant bits
   // will be zero and must correctly mask the bits when reading 8-bit trace flag (use
-  // flags & TRACE_FLAGS_MASK). [Optional].
+  // flags & 0xFF). [Optional].
   fixed32 flags = 8;
 
   // A unique identifier for a trace. All logs from the same trace share

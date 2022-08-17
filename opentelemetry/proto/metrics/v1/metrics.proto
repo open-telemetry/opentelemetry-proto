@@ -311,24 +311,6 @@ enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
-// DataPointFlags is defined as a protobuf 'uint32' type and is to be used as a
-// bit-field representing 32 distinct boolean flags.  Each flag defined in this
-// enum is a bit-mask.  To test the presence of a single flag in the flags of
-// a data point, for example, use an expression like:
-//
-//   (point.flags & FLAG_NO_RECORDED_VALUE) == FLAG_NO_RECORDED_VALUE
-//
-enum DataPointFlags {
-  FLAG_NONE = 0;
-
-  // This DataPoint is valid but has no recorded value.  This value
-  // SHOULD be used to reflect explicitly missing data in a series, as
-  // for an equivalent to the Prometheus "staleness marker".
-  FLAG_NO_RECORDED_VALUE = 1;
-
-  // Bits 2-31 are reserved for future use.
-}
-
 // NumberDataPoint is a single data point in a timeseries that describes the
 // time-varying scalar value of a metric.
 message NumberDataPoint {
@@ -364,8 +346,13 @@ message NumberDataPoint {
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 5;
 
-  // Flags that apply to this specific data point.  See DataPointFlags
-  // for the available flags and their meaning.
+  // A 32-bit field that controls data point flags such as presence of the
+  // value, etc.
+  //
+  // When set, the least significant bit (right-most), denotes that the
+  // DataPoint has no recorded value. This value SHOULD be used to reflect
+  // explicitly missing data in a series, as for an equivalent to the Prometheus
+  // "staleness marker".
   uint32 flags = 8;
 }
 
@@ -444,8 +431,13 @@ message HistogramDataPoint {
   // measurements that were used to form the data point
   repeated Exemplar exemplars = 8;
 
-  // Flags that apply to this specific data point.  See DataPointFlags
-  // for the available flags and their meaning.
+  // A 32-bit field that controls data point flags such as presence of the
+  // value, etc.
+  //
+  // When set, the least significant bit (right-most), denotes that the
+  // DataPoint has no recorded value. This value SHOULD be used to reflect
+  // explicitly missing data in a series, as for an equivalent to the Prometheus
+  // "staleness marker".
   uint32 flags = 10;
 
   // min is the minimum value over (start_time, end_time].
@@ -548,8 +540,13 @@ message ExponentialHistogramDataPoint {
     repeated uint64 bucket_counts = 2;
   } 
 
-  // Flags that apply to this specific data point.  See DataPointFlags
-  // for the available flags and their meaning.
+  // A 32-bit field that controls data point flags such as presence of the
+  // value, etc.
+  //
+  // When set, the least significant bit (right-most), denotes that the
+  // DataPoint has no recorded value. This value SHOULD be used to reflect
+  // explicitly missing data in a series, as for an equivalent to the Prometheus
+  // "staleness marker".
   uint32 flags = 10;
 
   // (Optional) List of exemplars collected from
@@ -623,8 +620,13 @@ message SummaryDataPoint {
   // from the current snapshot. The quantiles must be strictly increasing.
   repeated ValueAtQuantile quantile_values = 6;
 
-  // Flags that apply to this specific data point.  See DataPointFlags
-  // for the available flags and their meaning.
+  // A 32-bit field that controls data point flags such as presence of the
+  // value, etc.
+  //
+  // When set, the least significant bit (right-most), denotes that the
+  // DataPoint has no recorded value. This value SHOULD be used to reflect
+  // explicitly missing data in a series, as for an equivalent to the Prometheus
+  // "staleness marker".
   uint32 flags = 8;
 }
 
