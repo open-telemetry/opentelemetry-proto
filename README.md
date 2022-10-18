@@ -48,23 +48,18 @@ for definition of maturity levels).
 Components marked `Stable` provide the following guarantees:
 
 - Field types, numbers and names will not change.
-- Numbers assigned to enum choices will not change.
 - Service names and service package names will not change.
-- Service operation names, parameter and return types will not change.
-
-The following changes are allowed:
-
-- Message names may change.
-- Enum names may change.
-- Enum choice names may change. This is allowed because enum choice names are not sent on
-  the wire.
-- The location of messages and enums, i.e. whether they are declared at the top
-  lexical scope or nested inside another message may change.
-- Package names may change.
-- Directory structure, location and the name of the files may change.
-
-Note that none of the above allowed changes affects the binary wire representation or the
-JSON wire representation.
+- Service method names will not change.
+- Service method parameter names will not change.
+- Service method parameter types and return types will not change.
+- Service method kind (unary vs streaming) will not change.
+- Names of messages and enums will not change.
+- Names of enum choices and numbers assigned to enum choices will not change.
+- The location of messages and enums, i.e. whether they are declared at the top lexical
+  scope or nested inside another message will not change.
+- Package names and directory structure will not change.
+- `optional` and `repeated` declarators of existing fields will not change.
+- No existing symbol will be deleted.
 
 The following additive changes are allowed:
 
