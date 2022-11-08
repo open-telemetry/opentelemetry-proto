@@ -8,6 +8,10 @@ The compiled files are published to central repositories (Maven, ...) from OpenT
 
 See [contribution guidelines](CONTRIBUTING.md) if you would like to make any changes.
 
+## OTLP/JSON
+
+See additional requirements for [OTLP/JSON wire representation here](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding).
+
 ## Generate gRPC Client Libraries
 
 To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently supported languages are:
@@ -24,17 +28,17 @@ To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently
 
 ## Maturity Level
 
-Component                            | Maturity |
--------------------------------------|----------|
-**Binary Protobuf Encoding**         |          |
-common/*                             | Stable   |
-metrics/\*<br>collector/metrics/*    | Stable   |
-resource/*                           | Stable   |
-trace/trace.proto<br>collector/trace/* | Stable   |
-trace/trace_config.proto             | Alpha    |
-logs/\*<br>collector/logs/*          | Stable   |
-**JSON encoding**                    |          |
-All messages                         | Alpha    |
+Component                            | Maturity                                                                                                                               |
+-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+**Binary Protobuf Encoding**         |                                                                                                                                        |
+common/*                             | Stable                                                                                                                                 |
+metrics/\*<br>collector/metrics/*    | Stable                                                                                                                                 |
+resource/*                           | Stable                                                                                                                                 |
+trace/trace.proto<br>collector/trace/* | Stable                                                                                                                               |
+trace/trace_config.proto             | Alpha                                                                                                                                  |
+logs/\*<br>collector/logs/*          | Stable                                                                                                                                 |
+**JSON encoding**                    |                                                                                                                                        |
+All messages                         | [Alpha](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding) |
 
 (See [maturity-matrix.yaml](https://github.com/open-telemetry/community/blob/47813530864b9fe5a5146f466a58bd2bb94edc72/maturity-matrix.yaml#L57)
 for definition of maturity levels).
@@ -43,8 +47,7 @@ for definition of maturity levels).
 
 Components marked `Stable` provide the following guarantees:
 
-- Field types will not change.
-- Field numbers will not change.
+- Field types, numbers and names will not change.
 - Numbers assigned to enum choices will not change.
 - Service names and service package names will not change.
 - Service operation names, parameter and return types will not change.
@@ -52,22 +55,19 @@ Components marked `Stable` provide the following guarantees:
 The following changes are allowed:
 
 - Message names may change.
-- Field names may change.
 - Enum names may change.
-- Enum choice names may change.
+- Enum choice names may change. This is allowed because enum choice names are not sent on
+  the wire.
 - The location of messages and enums, i.e. whether they are declared at the top
   lexical scope or nested inside another message may change.
 - Package names may change.
 - Directory structure, location and the name of the files may change.
 
-Note that none of the above allowed changes affects the binary wire representation.
+Note that none of the above allowed changes affects the binary wire representation or the
+JSON wire representation.
 
 No guarantees are provided whatsoever about the stability of the code that
 is generated from the .proto files by any particular code generator.
-
-In the future when OTLP/JSON is declared stable, several of the changes that
-are currently allowed will become disallowed since they are visible on the wire
-for JSON encoding.
 
 ## Experiments
 
