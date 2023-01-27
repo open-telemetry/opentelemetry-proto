@@ -14,7 +14,8 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Added
 
-* Remove if no changes for this section before release.
+* Introduce an optional `zero_threshold` field to `ExponentialHistogramDataPoint`.
+  [(#440)](https://github.com/open-telemetry/opentelemetry-proto/issues/440)
 
 ### Removed
 
