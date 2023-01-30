@@ -16,7 +16,8 @@ syntax = "proto3";
 
 package opentelemetry.proto.logs.v1;
 
-import "opentelemetry/proto/common/v1/common.proto";
+import "opentelemetry/proto/common/v1/value.proto";
+import "opentelemetry/proto/common/v1/scope.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
 
 option csharp_namespace = "OpenTelemetry.Proto.Logs.V1";
