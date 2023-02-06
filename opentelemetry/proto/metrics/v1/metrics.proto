@@ -561,6 +561,14 @@ message ExponentialHistogramDataPoint {
 
   // max is the maximum value over (start_time, end_time].
   optional double max = 13;
+
+  // ZeroThreshold may be optionally set to convey the width of the zero
+  // region. Where the zero region is defined as the closed interval
+  // [-ZeroThreshold, ZeroThreshold].
+  // When ZeroThreshold is unset or 0, zero count bucket stores
+  // values that cannot be expressed using the standard exponential formula as
+  // well as values that have been rounded to zero.
+  optional double zero_threshold = 14;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
