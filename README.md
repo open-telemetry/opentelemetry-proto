@@ -28,17 +28,17 @@ To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently
 
 ## Maturity Level
 
-Component                            | Maturity                                                                                                                               |
--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-**Binary Protobuf Encoding**         |                                                                                                                                        |
-common/*                             | Stable                                                                                                                                 |
-metrics/\*<br>collector/metrics/*    | Stable                                                                                                                                 |
-resource/*                           | Stable                                                                                                                                 |
-trace/trace.proto<br>collector/trace/* | Stable                                                                                                                               |
-trace/trace_config.proto             | Alpha                                                                                                                                  |
-logs/\*<br>collector/logs/*          | Stable                                                                                                                                 |
-**JSON encoding**                    |                                                                                                                                        |
-All messages                         | [Alpha](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding) |
+Component                            | Maturity                                                                                                                                |
+-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+**Binary Protobuf Encoding**         |                                                                                                                                         |
+common/*                             | Stable                                                                                                                                  |
+metrics/\*<br>collector/metrics/*    | Stable                                                                                                                                  |
+resource/*                           | Stable                                                                                                                                  |
+trace/trace.proto<br>collector/trace/* | Stable                                                                                                                                  |
+trace/trace_config.proto             | Alpha                                                                                                                                   |
+logs/\*<br>collector/logs/*          | Stable                                                                                                                                  |
+**JSON encoding**                    |                                                                                                                                         |
+All messages                         | [Stable](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding) |
 
 (See [maturity-matrix.yaml](https://github.com/open-telemetry/community/blob/47813530864b9fe5a5146f466a58bd2bb94edc72/maturity-matrix.yaml#L57)
 for definition of maturity levels).
