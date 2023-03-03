@@ -414,7 +414,7 @@ message HistogramDataPoint {
   // Negative events *can* be recorded, but sum should not be filled out when
   // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
   // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
-  optional double sum = 5;
+  double sum = 5;
 
   // bucket_counts is an optional field contains the count values of histogram
   // for each bucket.
@@ -449,10 +449,10 @@ message HistogramDataPoint {
   uint32 flags = 10;
 
   // min is the minimum value over (start_time, end_time].
-  optional double min = 11;
+  double min = 11;
 
   // max is the maximum value over (start_time, end_time].
-  optional double max = 12;
+  double max = 12;
 }
 
 // ExponentialHistogramDataPoint is a single data point in a timeseries that describes the
@@ -493,7 +493,7 @@ message ExponentialHistogramDataPoint {
   // Negative events *can* be recorded, but sum should not be filled out when
   // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
   // see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
-  optional double sum = 5;
+  double sum = 5;
   
   // scale describes the resolution of the histogram.  Boundaries are
   // located at powers of the base, where:
@@ -557,10 +557,10 @@ message ExponentialHistogramDataPoint {
   repeated Exemplar exemplars = 11;
 
   // min is the minimum value over (start_time, end_time].
-  optional double min = 12;
+  double min = 12;
 
   // max is the maximum value over (start_time, end_time].
-  optional double max = 13;
+  double max = 13;
 
   // ZeroThreshold may be optionally set to convey the width of the zero
   // region. Where the zero region is defined as the closed interval
@@ -568,7 +568,7 @@ message ExponentialHistogramDataPoint {
   // When ZeroThreshold is unset or 0, zero count bucket stores
   // values that cannot be expressed using the standard exponential formula as
   // well as values that have been rounded to zero.
-  optional double zero_threshold = 14;
+  double zero_threshold = 14;
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
