@@ -22,9 +22,10 @@ BUF_DOCKER ?= bufbuild/buf:1.7.0
 
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 BUF := docker run --rm -v "${PWD}:/workspace" -w /workspace ${BUF_DOCKER}
-# When checking for protobuf breaking changes, check against the upstream repo's main branch.
+# When checking for protobuf breaking changes, check against the latest release tag
+LAST_RELEASE_TAG := $(shell git tag --sort=committerdate | tail -1)
 # Options are described in https://docs.buf.build/breaking/usage#git
-BUF_AGAINST ?= "https://github.com/open-telemetry/opentelemetry-proto.git"
+BUF_AGAINST ?= "https://github.com/open-telemetry/opentelemetry-proto.git\#tag=$(LAST_RELEASE_TAG)"
 
 PROTO_GEN_CPP_DIR ?= $(GENDIR)/cpp
 PROTO_GEN_CSHARP_DIR ?= $(GENDIR)/csharp
