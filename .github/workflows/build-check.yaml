@@ -88,6 +88,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    # breaking-change checks against last published release which is determined
+    # using the last published tag
+    - name: Get tags
+      run: git fetch --tags origin
     - name: Run make breaking-change with json output to annotate PR
       # Formats JSON output into Github workflow commands
       # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
