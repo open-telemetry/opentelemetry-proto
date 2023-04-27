@@ -104,10 +104,21 @@ enum SeverityNumber {
   SEVERITY_NUMBER_FATAL4 = 24;
 }
 
-// Masks for LogRecord.flags field.
+// LogRecordFlags is defined as a protobuf 'uint32' type and is to be used as
+// bit-fields. Each non-zero value defined in this enum is a bit-mask.
+// To extract the bit-field, for example, use an expression like:
+//
+//   (logRecord.flags & LOG_RECORD_FLAG_TRACE_FLAGS_MASK)
+//
 enum LogRecordFlags {
-  LOG_RECORD_FLAG_UNSPECIFIED = 0;
+  // The zero value for the enum. Should not be used for comparisons.
+  // Instead use bitwise "and" with the appropriate mask as shown above.
+  LOG_RECORD_FLAG_DO_NOT_USE = 0;
+
+  // Bits 0-7 are used for trace flags.
   LOG_RECORD_FLAG_TRACE_FLAGS_MASK = 0x000000FF;
+
+  // Bits 8-31 are reserved for future use.
 }
 
 // A log record according to OpenTelemetry Log Data Model:
