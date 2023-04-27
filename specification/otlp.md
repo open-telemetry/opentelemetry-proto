@@ -1,6 +1,6 @@
 # OpenTelemetry Protocol Specification
 
-**Status**: [Stable](../document-status.md)
+**Status**: [Stable](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/document-status.md)
 
 The OpenTelemetry Protocol (OTLP) specification describes the encoding, transport,
 and delivery mechanism of telemetry data between telemetry sources, intermediate
@@ -75,9 +75,9 @@ All server components MUST support the following transport compression options:
 After establishing the underlying gRPC transport, the client starts sending
 telemetry data using unary requests using
 [Export*ServiceRequest](https://github.com/open-telemetry/opentelemetry-proto)
-messages ([ExportLogsServiceRequest](https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/collector/logs/v1/logs_service.proto) for logs,
-[ExportMetricsServiceRequest](https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/collector/metrics/v1/metrics_service.proto) for metrics,
-[ExportTraceServiceRequest](https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/collector/trace/v1/trace_service.proto) for traces).
+messages ([ExportLogsServiceRequest](../opentelemetry/proto/collector/logs/v1/logs_service.proto) for logs,
+[ExportMetricsServiceRequest](../opentelemetry/proto/collector/metrics/v1/metrics_service.proto) for metrics,
+[ExportTraceServiceRequest](../opentelemetry/proto/collector/trace/v1/trace_service.proto) for traces).
 The client continuously sends a sequence of requests to the server and expects
 to receive a response to each request:
 
@@ -150,7 +150,7 @@ If the server receives an empty request (a request that does not carry
 any telemetry data) the server SHOULD respond with success.
 
 On success, the server response MUST be a
-[Export<signal>ServiceResponse](https://github.com/open-telemetry/opentelemetry-proto/tree/main/opentelemetry/proto/collector)
+[Export<signal>ServiceResponse](../opentelemetry/proto/collector)
 message (`ExportTraceServiceResponse` for traces,
 `ExportMetricsServiceResponse` for metrics and
 `ExportLogsServiceResponse` for logs).
@@ -163,7 +163,7 @@ in case of a successful response.
 If the request is only partially accepted
 (i.e. when the server accepts only parts of the data and rejects the rest), the
 server response MUST be the same
-[Export<signal>ServiceResponse](https://github.com/open-telemetry/opentelemetry-proto/tree/main/opentelemetry/proto/collector)
+[Export<signal>ServiceResponse](../opentelemetry/proto/collector)
 message as in the [Full Success](#full-success) case.
 
 Additionally, the server MUST initialize the `partial_success` field
@@ -347,14 +347,11 @@ data while being throttled.
 
 #### OTLP/gRPC Service and Protobuf Definitions
 
-gRPC service definitions
-[are here](https://github.com/open-telemetry/opentelemetry-proto/tree/master/opentelemetry/proto/collector).
+gRPC service definitions [are here](../opentelemetry/proto/collector).
 
-Protobuf definitions for requests and responses
-[are here](https://github.com/open-telemetry/opentelemetry-proto/tree/master/opentelemetry/proto).
+Protobuf definitions for requests and responses [are here](../opentelemetry/proto).
 
-Please make sure to check the proto version and
-[maturity level](https://github.com/open-telemetry/opentelemetry-proto/#maturity-level).
+Please make sure to check the proto version and [maturity level](../README.md#maturity-level).
 Schemas for different signals may be at different maturity level - some stable,
 some in beta.
 
@@ -367,8 +364,7 @@ The default network port for OTLP/gRPC is 4317.
 OTLP/HTTP uses Protobuf payloads encoded either in
 [binary format](#binary-protobuf-encoding) or in [JSON format](#json-protobuf-encoding).
 Regardless of the encoding the Protobuf schema of the messages is the same for
-OTLP/HTTP and OTLP/gRPC as
-[defined here](https://github.com/open-telemetry/opentelemetry-proto/tree/master/opentelemetry/proto).
+OTLP/HTTP and OTLP/gRPC as [defined here](../opentelemetry/proto).
 
 OTLP/HTTP uses HTTP POST requests to send telemetry data from clients to
 servers. Implementations MAY use HTTP/1.1 or HTTP/2 transports. Implementations
@@ -475,8 +471,7 @@ If the server receives an empty request (a request that does not carry
 any telemetry data) the server SHOULD respond with success.
 
 On success, the server MUST respond with `HTTP 200 OK`. The response body MUST be
-a Protobuf-encoded
-[Export<signal>ServiceResponse](https://github.com/open-telemetry/opentelemetry-proto/tree/main/opentelemetry/proto/collector)
+a Protobuf-encoded [Export<signal>ServiceResponse](../opentelemetry/proto/collector)
 message (`ExportTraceServiceResponse` for traces,
 `ExportMetricsServiceResponse` for metrics and
 `ExportLogsServiceResponse` for logs).
@@ -489,7 +484,7 @@ in case of a successful response.
 If the request is only partially accepted
 (i.e. when the server accepts only parts of the data and rejects the rest), the
 server MUST respond with `HTTP 200 OK`. The response body MUST be the same
-[Export<signal>ServiceResponse](https://github.com/open-telemetry/opentelemetry-proto/tree/main/opentelemetry/proto/collector)
+[Export<signal>ServiceResponse](../opentelemetry/proto/collector)
 message as in the [Full Success](#full-success-1) case.
 
 Additionally, the server MUST initialize the `partial_success` field
