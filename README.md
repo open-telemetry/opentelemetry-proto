@@ -1,6 +1,11 @@
-# Language Independent Interface Types For OpenTelemetry
+# OpenTelemetry Protocol (OTLP) Specification
 
 [![Build Check](https://github.com/open-telemetry/opentelemetry-proto/workflows/Build%20Check/badge.svg?branch=main)](https://github.com/open-telemetry/opentelemetry-proto/actions?query=workflow%3A%22Build+Check%22+branch%3Amain)
+
+This repository contains the [OTLP protocol specification](specification/otlp.md)
+and the corresponding Language Independent Interface Types ([.proto files](opentelemetry/proto)).
+
+## Language Independent Interface Types
 
 The proto files can be consumed as GIT submodules or copied and built directly in the consumer project.
 
