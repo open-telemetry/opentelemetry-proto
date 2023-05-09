@@ -385,14 +385,14 @@ JSON Protobuf encoded payloads use proto3 standard defined
 [JSON Mapping](https://developers.google.com/protocol-buffers/docs/proto3#json)
 for mapping between Protobuf and JSON, with the following deviations from that mapping:
 
-- The `trace_id` and `span_id` byte arrays are represented as
+- The `traceId` and `spanId` byte arrays are represented as
   [case-insensitive hex-encoded strings](https://tools.ietf.org/html/rfc4648#section-8);
   they are not base64-encoded as is defined in the standard
   [Protobuf JSON Mapping](https://developers.google.com/protocol-buffers/docs/proto3#json).
-  Hex encoding is used for `trace_id` and `span_id` fields in all OTLP
+  Hex encoding is used for `traceId` and `spanId` fields in all OTLP
   Protobuf messages, e.g., the `Span`, `Link`, `LogRecord`, etc. messages.
-  For example, the `trace_id` field in a Span can be represented like this:
-  { "trace_id": "5B8EFFF798038103D269B633813FC60C", ... }
+  For example, the `traceId` field in a Span can be represented like this:
+  { "traceId": "5B8EFFF798038103D269B633813FC60C", ... }
 
 - Values of enum fields MUST be encoded as integer values. Unlike the standard
   [Protobuf JSON Mapping](https://developers.google.com/protocol-buffers/docs/proto3#json),
