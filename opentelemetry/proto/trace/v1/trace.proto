@@ -172,8 +172,8 @@ message Span {
   //
   //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
   //     "/http/server_latency": 300
-  //     "abc.com/myattribute": true
-  //     "abc.com/score": 10.239
+  //     "example.com/myattribute": true
+  //     "example.com/score": 10.239
   //
   // The OpenTelemetry API specification further restricts the allowed value types:
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
