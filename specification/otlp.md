@@ -422,6 +422,8 @@ numbers or strings are accepted when decoding.
 The client and the server MUST set "Content-Type: application/json" request and
 response headers when sending JSON Protobuf encoded payload.
 
+For JSON payload examples see: [OTLP JSON request examples](otlp-json-examples/README.md)
+
 #### OTLP/HTTP Request
 
 Telemetry data is sent via HTTP POST request. The body of the POST request is a

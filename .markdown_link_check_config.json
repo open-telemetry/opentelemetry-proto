@@ -1,0 +1,18 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^https://github\\.com/open-telemetry/opentelemetry-specification/(issues|pull)"
+    }
+  ],
+  "replacementPatterns": [
+    {
+        "pattern": "^/",
+        "replacement": "{{BASEURL}}/"
+    }
+  ],
+  "retryOn429": true,
+  "aliveStatusCodes": [
+    200,
+    403
+  ]
+}
