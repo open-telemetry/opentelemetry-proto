@@ -99,3 +99,15 @@ jobs:
         BUF_FLAGS="--error-format json" make -s breaking-change
         | jq -rs '.[] | "::error file=\(.path),line=\(.start_line),endLine=\(.end_line),title=Buf detected breaking change \(.type)::\(.message)"'
         ; (exit ${PIPESTATUS[0]})
+
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: check out code
+      uses: actions/checkout@v2
+
+    - name: install dependencies
+      run: npm install
+
+    - name: run markdown-link-check
+      run: make markdown-link-check

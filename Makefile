@@ -13,6 +13,9 @@ $(1)
 
 endef
 
+.PHONY: all
+all: gen-all markdown-link-check
+
 # Generate all implementations
 .PHONY: gen-all
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-php gen-python gen-ruby
@@ -151,3 +154,14 @@ gen-ruby:
 .PHONY: breaking-change
 breaking-change:
 	$(BUF) breaking --against $(BUF_AGAINST) $(BUF_FLAGS)
+
+
+ALL_DOCS := $(shell find . -type f -name '*.md' -not -path './.github/*' -not -path './node_modules/*' | sort)
+
+.PHONY: markdown-link-check
+markdown-link-check:
+	@if ! npm ls markdown-link-check; then npm install; fi
+	@for f in $(ALL_DOCS); do \
+		npx --no -- markdown-link-check --quiet --config .markdown_link_check_config.json $$f \
+			|| exit 1; \
+	done
