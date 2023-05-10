@@ -1,6 +1,6 @@
 # OTLP JSON request examples
 
-This folder contains a collection of OTLP JSON files for all signals
+This folder contains a collection of example OTLP JSON files for all signals
 that can be used as request payloads.
 
 - Trace [trace.json](trace.json)
