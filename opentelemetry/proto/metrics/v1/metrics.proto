@@ -536,9 +536,9 @@ message ExponentialHistogramDataPoint {
     // Note: This uses a varint encoding as a simple form of compression.
     sint32 offset = 1;
 
-    // Count is an array of counts, where count[i] carries the count
-    // of the bucket at index (offset+i).  count[i] is the count of
-    // values greater than base^(offset+i) and less or equal to than
+    // bucket_counts is an array of count values, where bucket_counts[i] carries
+    // the count of the bucket at index (offset+i). bucket_counts[i] is the count
+    // of values greater than base^(offset+i) and less than or equal to
     // base^(offset+i+1).
     //
     // Note: By contrast, the explicit HistogramDataPoint uses
