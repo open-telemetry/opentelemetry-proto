@@ -422,7 +422,7 @@ numbers or strings are accepted when decoding.
 The client and the server MUST set "Content-Type: application/json" request and
 response headers when sending JSON Protobuf encoded payload.
 
-For JSON payload examples see: [OTLP JSON request examples](otlp-json-examples/README.md)
+For JSON payload examples see: [OTLP JSON request examples](../examples/README.md)
 
 #### OTLP/HTTP Request
 
