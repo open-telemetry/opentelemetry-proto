@@ -1,3 +1,13 @@
+<!--- Hugo front matter used to generate the website version of this page:
+title: OTLP Specification
+linkTitle: Specification
+aliases:
+  - /docs/reference/specification/protocol/otlp
+  - /docs/specs/otel/protocol/otlp
+spelling:
+  cSpell:ignore backpressure dealocations otel otlp protobuf reconnections retryable OTEP
+--->
+
 # OpenTelemetry Protocol Specification
 
 **Status**: [Stable](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/document-status.md)
