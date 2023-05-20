@@ -316,17 +316,17 @@ enum AggregationTemporality {
 // enum is a bit-mask.  To test the presence of a single flag in the flags of
 // a data point, for example, use an expression like:
 //
-//   (point.flags & FLAG_NO_RECORDED_VALUE_MASK) == FLAG_NO_RECORDED_VALUE_MASK
+//   (point.flags & DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK) == DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK
 //
 enum DataPointFlags {
   // The zero value for the enum. Should not be used for comparisons.
   // Instead use bitwise "and" with the appropriate mask as shown above.
-  FLAG_DO_NOT_USE = 0;
+  DATA_POINT_FLAGS_DO_NOT_USE = 0;
 
   // This DataPoint is valid but has no recorded value.  This value
   // SHOULD be used to reflect explicitly missing data in a series, as
   // for an equivalent to the Prometheus "staleness marker".
-  FLAG_NO_RECORDED_VALUE_MASK = 1;
+  DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK = 1;
 
   // Bits 2-31 are reserved for future use.
 }
