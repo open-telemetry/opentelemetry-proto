@@ -39,8 +39,7 @@ Component                            | Maturity                                 
 common/*                             | Stable                                                                                                                                  |
 metrics/\*<br>collector/metrics/*    | Stable                                                                                                                                  |
 resource/*                           | Stable                                                                                                                                  |
-trace/trace.proto<br>collector/trace/* | Stable                                                                                                                                  |
-trace/trace_config.proto             | Alpha                                                                                                                                   |
+trace/\*<br>collector/trace/* | Stable                                                                                                                                  |
 logs/\*<br>collector/logs/*          | Stable                                                                                                                                  |
 **JSON encoding**                    |                                                                                                                                         |
 All messages                         | [Stable](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding) |
