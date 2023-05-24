@@ -1,5 +1,5 @@
 {
-  "resource_spans": [
+  "resourceSpans": [
     {
       "resource": {
         "attributes": [
@@ -11,7 +11,7 @@
           }
         ]
       },
-      "scope_spans": [
+      "scopeSpans": [
         {
           "scope": {
             "name": "my.library",
