@@ -1,11 +1,3 @@
-<!--- Hugo front matter used to generate the website version of this page:
-linkTitle: Requirements
-aliases:
-  - /docs/reference/specification/protocol/requirements
-  - /docs/specs/otel/protocol/requirements
-spelling: cSpell:ignore backpressure dealocations otel reconnections
---->
-
 # OpenTelemetry Protocol Requirements
 
 This document will drive OpenTelemetry Protocol design and RFC.
