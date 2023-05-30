@@ -6,20 +6,33 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Maturity
 
-* Remove if no changes for this section before release.
+* Declare OTLP/JSON Stable.
+  [#436](https://github.com/open-telemetry/opentelemetry-proto/pull/436)
+  [#435](https://github.com/open-telemetry/opentelemetry-proto/pull/435)
+* Provide stronger symbolic stability guarantees.
+  [#432](https://github.com/open-telemetry/opentelemetry-proto/pull/432)
+* Clarify how additive changes are handled.
+  [#455](https://github.com/open-telemetry/opentelemetry-proto/pull/455)
 
 ### Changed
 
-* Remove if no changes for this section before release.
+* Change the exponential histogram boundary condition.
+  [#409](https://github.com/open-telemetry/opentelemetry-proto/pull/409)
+* Clarify behavior for empty/not present/invalid trace_id and span_id fields.
+  [#442](https://github.com/open-telemetry/opentelemetry-proto/pull/442)
+* Change the collector trace endpoint to /v1/traces.
+  [#449](https://github.com/open-telemetry/opentelemetry-proto/pull/449)
 
 ### Added
 
 * Introduce an optional `zero_threshold` field to `ExponentialHistogramDataPoint`.
-  [(#440)](https://github.com/open-telemetry/opentelemetry-proto/issues/440)
+  [#441](https://github.com/open-telemetry/opentelemetry-proto/pull/441)
+  [#453](https://github.com/open-telemetry/opentelemetry-proto/pull/453)
 
 ### Removed
 
-* Remove if no changes for this section before release.
+* Delete requirement to generate new trace/span id if an invalid id is received.
+  [#444](https://github.com/open-telemetry/opentelemetry-proto/pull/444)
 
 ## 0.19.0 - 2022-08-03
 
