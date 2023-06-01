@@ -1,11 +1,3 @@
-<!--- Hugo front matter used to generate the website version of this page:
-linkTitle: Design goals
-aliases:
-  - /docs/reference/specification/protocol/design-goals
-  - /docs/specs/otel/protocol/design-goals
-spelling: cSpell:ignore backpressure otel
---->
-
 # Design Goals for OpenTelemetry Wire Protocol
 
 We want to design a telemetry data exchange protocol that has the following characteristics:
