@@ -1,11 +1,20 @@
 <!--- Hugo front matter used to generate the website version of this page:
 title: OTLP Specification
-linkTitle: Specification
+linkTitle: OTLP
 aliases:
   - /docs/reference/specification/protocol/otlp
   - /docs/specs/otel/protocol/otlp
 spelling:
-  cSpell:ignore backpressure dealocations otel otlp protobuf reconnections retryable OTEP
+  cSpell:ignore backoff backpressure dealocations errdetails nanos proto reconnections retryable
+cascade:
+  body_class: otel-docs-spec
+  github_repo: &repo https://github.com/open-telemetry/opentelemetry-proto
+  github_subdir: docs
+  path_base_for_github_subdir: content/en/docs/specs/otlp/
+  github_project_repo: *repo
+path_base_for_github_subdir:
+  from: content/en/docs/specs/otlp/_index.md
+  to: specification.md
 --->
 
 # OpenTelemetry Protocol Specification
