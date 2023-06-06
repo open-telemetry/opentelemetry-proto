@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.19.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.20.0...main).
+
+## 0.20.0 - 2023-06-06
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.19.0...v0.20.0).
 
 ### Maturity
 
