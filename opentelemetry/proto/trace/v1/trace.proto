@@ -281,6 +281,12 @@ message Span {
   // An optional final status for this span. Semantically when Status isn't set, it means
   // span's status code is unset, i.e. assume STATUS_CODE_UNSET (code = 0).
   Status status = 15;
+
+  // parent_span_is_remote identifies whether a span's parent is remote or not.
+  // This helps determine whether a span can be considered an entry-point span.
+  // A span is an entry-point span if it has no parent (parent_span_id is empty),
+  // or if parent_span_is_remote is true.
+  bool parent_span_is_remote = 16;
 }
 
 // The Status type defines a logical error model that is suitable for different
