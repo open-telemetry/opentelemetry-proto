@@ -14,16 +14,16 @@
 
 syntax = "proto3";
 
-package opentelemetry.proto.profiling.v1;
+package opentelemetry.proto.profiles.v1;
 
 import "opentelemetry/proto/common/v1/common.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
 
-option csharp_namespace = "OpenTelemetry.Proto.Profiling.V1";
+option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1";
 option java_multiple_files = true;
-option java_package = "io.opentelemetry.proto.profiling.v1";
-option java_outer_classname = "ProfilingProto";
-option go_package = "go.opentelemetry.io/proto/otlp/profiling/v1";
+option java_package = "io.opentelemetry.proto.profiles.v1";
+option java_outer_classname = "ProfilesProto";
+option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1";
 
 
 // A collection of ScopeProfiles from a Resource.
