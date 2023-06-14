@@ -25,6 +25,25 @@ option java_package = "io.opentelemetry.proto.profiles.v1";
 option java_outer_classname = "ProfilesProto";
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1";
 
+// ProfilesData represents the profiles data that can be stored in a persistent storage,
+// OR can be embedded by other protocols that transfer OTLP profiles data but do not
+// implement the OTLP protocol.
+//
+// The main difference between this message and collector protocol is that
+// in this message there will not be any "control" or "metadata" specific to
+// OTLP protocol.
+//
+// When new fields are added into this message, the OTLP request MUST be updated
+// as well.
+message ProfilesData {
+  // An array of ResourceProfiles.
+  // For data coming from a single resource this array will typically contain
+  // one element. Intermediary nodes that receive data from multiple origins
+  // typically batch the data before forwarding further and in that case this
+  // array will contain multiple elements.
+  repeated ResourceProfiles resource_profiles = 1;
+}
+
 
 // A collection of ScopeProfiles from a Resource.
 message ResourceProfiles {
@@ -95,26 +114,26 @@ message Profile {
   // attributes. If this value is 0, then no attributes were dropped.
   uint32 dropped_attributes_count = 5;
 
-  reserved 6 to 15;
+  // reserved 6 to 15;
 
-  // PPROF contains a pprof profile.
-  message PPROF {
-    // payload contains a pprof file.
-    bytes payload = 1;
-  }
+  // // PPROF contains a pprof profile.
+  // message PPROF {
+  //   // payload contains a pprof file.
+  //   bytes payload = 1;
+  // }
 
-  // JFR contains a JFR file.
-  message JFR {
-    // payload contains a JFR file.
-    bytes payload = 1;
-  }
+  // // JFR contains a JFR file.
+  // message JFR {
+  //   // payload contains a JFR file.
+  //   bytes payload = 1;
+  // }
 
-  // OPROF contains a batch of oprof events (details TBD)
-  message OPROF {}
+  // // OPROF contains a batch of oprof events (details TBD)
+  // message OPROF {}
 
-  oneof profile_kind {
-    PPROF pprof = 16;
-    JFR jfr = 17;
-    OPROF oprof = 18;
-  }
+  // oneof profile_kind {
+  //   PPROF pprof = 16;
+  //   JFR jfr = 17;
+  //   OPROF oprof = 18;
+  // }
 }

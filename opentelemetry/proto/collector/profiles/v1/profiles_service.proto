@@ -62,4 +62,18 @@ message ExportProfilesServiceResponse {
 }
 
 message ExportProfilesPartialSuccess {
+  // The number of rejected profile records.
+  //
+  // A `rejected_<signal>` field holding a `0` value indicates that the
+  // request was fully accepted.
+  int64 rejected_profile_records = 1;
+
+  // A developer-facing human-readable message in English. It should be used
+  // either to explain why the server rejected parts of the data during a partial
+  // success or to convey warnings/suggestions during a full success. The message
+  // should offer guidance on how users can address such issues.
+  //
+  // error_message is an optional field. An error_message with an empty value
+  // is equivalent to it not being set.
+  string error_message = 2;
 }
