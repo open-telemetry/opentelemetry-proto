@@ -62,11 +62,11 @@ message ExportProfilesServiceResponse {
 }
 
 message ExportProfilesPartialSuccess {
-  // The number of rejected profile records.
+  // The number of rejected profiles.
   //
   // A `rejected_<signal>` field holding a `0` value indicates that the
   // request was fully accepted.
-  int64 rejected_profile_records = 1;
+  int64 rejected_profiles = 1;
 
   // A developer-facing human-readable message in English. It should be used
   // either to explain why the server rejected parts of the data during a partial
