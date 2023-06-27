@@ -17,7 +17,6 @@ message Link {
   bytes span_id = 2;
 }
 
-// we link to attribute sets because
 message AttributeSet {
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
   uint32 dropped_attributes_count = 2;
