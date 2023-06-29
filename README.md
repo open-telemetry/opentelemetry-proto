@@ -33,6 +33,9 @@ To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently
 
 ## Maturity Level
 
+1.0.0 and newer releases from this repository may contain unstable (alpha or beta)
+components as indicated by the Maturity table below.
+
 Component                            | Maturity                                                                                                                                |
 -------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
 **Binary Protobuf Encoding**         |                                                                                                                                         |
