@@ -2,7 +2,18 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.20.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.0.0...main).
+
+## 1.0.0 - 2023-07-03
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.20.0...v1.0.0).
+
+### Maturity
+ 
+* Add note about the possibility to have unstable components after 1.0.0 
+  [#489](https://github.com/open-telemetry/opentelemetry-proto/pull/489)
+* Add maturity JSON entry per package
+  [#490](https://github.com/open-telemetry/opentelemetry-proto/pull/490)
 
 ## 0.20.0 - 2023-06-06
 
