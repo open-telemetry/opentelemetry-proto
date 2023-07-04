@@ -111,3 +111,15 @@ jobs:
 
     - name: run markdown-link-check
       run: make markdown-link-check
+
+  markdownlint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: check out code
+      uses: actions/checkout@v2
+
+    - name: install dependencies
+      run: npm install
+
+    - name: run markdownlint
+      run: make markdownlint
