@@ -26,9 +26,9 @@ message AttributeSet {
 }
 
 message Sample {
-  repeated uint64 location_indices = 1;
-  repeated uint64 link_indices = 2;
-  repeated uint64 attribute_set_indices = 3;
+  repeated uint32 location_indices = 1;
+  repeated uint32 link_indices = 2;
+  repeated uint32 attribute_set_indices = 3;
 
   // this one is repeated because there can be multiple profile kinds in one profile. Typical example is memory profiles in go that contain:
   //   * alloc_objects
