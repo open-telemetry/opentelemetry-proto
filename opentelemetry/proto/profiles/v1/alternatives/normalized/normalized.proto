@@ -96,6 +96,9 @@ message Mapping {
   }
 
   SymbolicInfo symbolic_info = 6;
+
+  // TODO(@petethepig): I wonder if we need something a little more specialized here
+  repeated uint32 attribute_set_indices = 7;
 }
 
 // borrowed from pprof proto
@@ -125,6 +128,9 @@ message Location {
   // symbols. This field must be recomputed when the symbolization state of the
   // profile changes.
   bool is_folded = 4;
+
+  // TODO(@petethepig): I wonder if we need something a little more specialized here
+  repeated uint32 attribute_set_indices = 5;
 }
 
 // borrowed from pprof proto
