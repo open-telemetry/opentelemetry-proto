@@ -17,12 +17,12 @@ message Link {
   bytes span_id = 2;
 }
 
-message StackTrace {
+message Stacktrace {
   repeated Location locations = 1;
 }
 
 message Sample {
-  repeated StackTrace stacktrace = 1;
+  Stacktrace stacktrace = 1;
   repeated Link links = 2;
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 3;
   uint32 dropped_attributes_count = 4;
@@ -131,5 +131,5 @@ message Function {
   // Source file containing the function.
   string filename = 3;
   // Line number in source file.
-  string start_line = 4;
+  uint32 start_line = 4;
 }

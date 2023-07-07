@@ -25,12 +25,12 @@ message AttributeSet {
   uint32 dropped_attributes_count = 2;
 }
 
-message StackTrace {
+message Stacktrace {
   repeated uint32 location_indices = 1;
 }
 
 message Sample {
-  StackTrace stacktrace = 1;
+  uint32 stacktrace_index = 1;
   repeated uint32 link_indices = 2;
   repeated uint32 attribute_set_indices = 3;
 
@@ -63,15 +63,16 @@ message SampleType {
 
 message Profile {
   repeated SampleType sample_types = 1;
-  repeated Sample samples = 2;
-  repeated Mapping mappings = 3;
-  repeated Location locations = 4;
-  repeated Function functions = 5;
-  repeated Link links = 6;
-  repeated AttributeSet attribute_sets = 7;
+  repeated Stacktrace stacktraces = 2;
+  repeated Sample samples = 3;
+  repeated Mapping mappings = 4;
+  repeated Location locations = 5;
+  repeated Function functions = 6;
+  repeated Link links = 7;
+  repeated AttributeSet attribute_sets = 8;
 
   // 0-th element must be an empty string ("")
-  repeated string string_table = 8;
+  repeated string string_table = 9;
 }
 
 
