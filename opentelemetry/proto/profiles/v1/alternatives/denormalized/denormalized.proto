@@ -17,8 +17,12 @@ message Link {
   bytes span_id = 2;
 }
 
-message Sample {
+message StackTrace {
   repeated Location locations = 1;
+}
+
+message Sample {
+  repeated StackTrace stacktrace = 1;
   repeated Link links = 2;
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 3;
   uint32 dropped_attributes_count = 4;
