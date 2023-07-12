@@ -29,7 +29,7 @@
             {
               "name": "my.counter",
               "unit": "1",
-              "description": "I`m a Counter",
+              "description": "I am a Counter",
               "sum": {
                 "aggregationTemporality": 1,
                 "isMonotonic": true,
@@ -53,7 +53,7 @@
             {
               "name": "my.gauge",
               "unit": "1",
-              "description": "I`m a Gauge",
+              "description": "I am a Gauge",
               "gauge": {
                 "dataPoints": [
                   {
@@ -74,7 +74,7 @@
             {
               "name": "my.histogram",
               "unit": "1",
-              "description": "I`m a Histogram",
+              "description": "I am a Histogram",
               "histogram": {
                 "aggregationTemporality": 1,
                 "dataPoints": [
