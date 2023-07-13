@@ -9,8 +9,8 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.20.0...v1.0.0).
 
 ### Maturity
- 
-* Add note about the possibility to have unstable components after 1.0.0 
+
+* Add note about the possibility to have unstable components after 1.0.0
   [#489](https://github.com/open-telemetry/opentelemetry-proto/pull/489)
 * Add maturity JSON entry per package
   [#490](https://github.com/open-telemetry/opentelemetry-proto/pull/490)
