@@ -201,6 +201,9 @@ message Metric {
 // "StartTimeUnixNano" is ignored for all data points.
 message Gauge {
   repeated NumberDataPoint data_points = 1;
+
+  // sub_type provides additional type information for gauges
+  GaugeSubType sub_type = 2;
 }
 
 // Sum represents the type of a scalar metric that is calculated as a sum of all
@@ -335,6 +338,22 @@ enum DataPointFlags {
   DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK = 1;
 
   // Bits 2-31 are reserved for future use.
+}
+
+// GaugeSubType defines valid gauge "sub-types", which are used to describe
+// "special" kinds of gauges which have additional properties. These sub-types
+// generally apply to metrics which originate from protocols which support
+// these additional types, but are represented as gauges in OTLP.
+enum GaugeSubType {
+  // GAUGE_SUBTYPE_NONE is the default GaugeSubType, which represents a gauge
+  // that does not have a sub_type.
+  GAUGE_SUBTYPE_NONE = 0;
+
+  // GAUGE_SUBTYPE_UNKNOWN is a GaugeSubType which represents a metric for
+  // which the type is not known, such as a Prometheus metric without a TYPE
+  // comment. For example, the metric may be a monotonically-increasing counter,
+  // or histogram, but type information was not included at the source.
+  GAUGE_SUBTYPE_UNKNOWN = 1;
 }
 
 // NumberDataPoint is a single data point in a timeseries that describes the
