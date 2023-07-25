@@ -202,7 +202,13 @@ message Metric {
 message Gauge {
   repeated NumberDataPoint data_points = 1;
 
-  // sub_type provides additional type information for gauges
+  // sub_type provides additional type information for gauges.
+  // 
+  // When receiving from older producers of OTLP, it is safe to assume the
+  // zero-value for sub_type, GAUGE_SUBTYPE_NONE. When sending OTLP to older
+  // consumers, it is safe for them to ignore the field. In both cases, the
+  // previous behavior without sub_type is maintained until producer and
+  // consumer are aware of the field.
   GaugeSubType sub_type = 2;
 }
 
