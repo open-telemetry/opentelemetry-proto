@@ -102,14 +102,12 @@ message Mapping {
   // it could be the contents of the .note.gnu.build-id field.
   uint32 build_id_index = 5;  // Index into string table
 
-  enum SymbolicInfo {
-    SYMBOLIC_INFO_UNSPECIFIED = 0;
-    SYMBOLIC_INFO_FULL = 1;
-    SYMBOLIC_INFO_FUNCTIONS_ONLY = 2;
-    SYMBOLIC_INFO_NO_INLINE_FRAMES = 3;
+  enum SymbolFidelity {
+    SYMBOL_FIDELITY_UNSPECIFIED = 0;
+    SYMBOL_FIDELITY_FULL = 1;
   }
 
-  SymbolicInfo symbolic_info = 6;
+  SymbolFidelity symbolic_info = 6;
 
   // TODO(@petethepig): I wonder if we need something a little more specialized here
   repeated uint32 attribute_set_indices = 7;
@@ -136,12 +134,6 @@ message Location {
   //    line[0].function_name == "memcpy"
   //    line[1].function_name == "printf"
   repeated Line line = 3;
-  // Provides an indication that multiple symbols map to this location's
-  // address, for example due to identical code folding by the linker. In that
-  // case the line information above represents one of the multiple
-  // symbols. This field must be recomputed when the symbolization state of the
-  // profile changes.
-  bool is_folded = 4;
 
   // TODO(@petethepig): I wonder if we need something a little more specialized here
   repeated uint32 attribute_set_indices = 5;

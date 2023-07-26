@@ -105,12 +105,6 @@ message Location {
   //    line[0].function_name == "memcpy"
   //    line[1].function_name == "printf"
   repeated Line line = 3;
-  // Provides an indication that multiple symbols map to this location's
-  // address, for example due to identical code folding by the linker. In that
-  // case the line information above represents one of the multiple
-  // symbols. This field must be recomputed when the symbolization state of the
-  // profile changes.
-  bool is_folded = 4;
 }
 
 // borrowed from pprof proto
