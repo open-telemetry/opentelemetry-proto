@@ -2,7 +2,18 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.20.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.0.0...main).
+
+## 1.0.0 - 2023-07-03
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.20.0...v1.0.0).
+
+### Maturity
+
+* Add note about the possibility to have unstable components after 1.0.0
+  [#489](https://github.com/open-telemetry/opentelemetry-proto/pull/489)
+* Add maturity JSON entry per package
+  [#490](https://github.com/open-telemetry/opentelemetry-proto/pull/490)
 
 ## 0.20.0 - 2023-06-06
 
@@ -47,7 +58,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 * Add `csharp_namespace` option to protos.
   ([#399](https://github.com/open-telemetry/opentelemetry-proto/pull/399))
 * Fix some out-of-date urls which link to [specification](https://github.com/open-telemetry/opentelemetry-specification). ([#402](https://github.com/open-telemetry/opentelemetry-proto/pull/402))
-* :stop_sign: [BREAKING] Delete deprecated InstrumentationLibrary, 
+* :stop_sign: [BREAKING] Delete deprecated InstrumentationLibrary,
   InstrumentationLibraryLogs, InstrumentationLibrarySpans and
   InstrumentationLibraryMetrics messages. Delete deprecated
   instrumentation_library_logs, instrumentation_library_spans and
@@ -126,7 +137,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 * Remove unused deprecated message StringKeyValue (#358)
 * Remove experimental metrics config service (#359)
- 
+
 ## 0.12.0 - 2022-01-19
 
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.11.0...v0.12.0).
@@ -277,9 +288,9 @@ Full list of differences found in [this compare.](https://github.com/open-teleme
 ### Changed
 
 * :stop_sign: [BREAKING] Metrics - protocol was refactored, and lots of breaking changes.
-** Removed MetricDescriptor and embedded into Metric and the new data types.
-** Add new data types Gauge/Sum/Histogram.
-** Make use of the "AggregationTemporality" into the data types that allow that support.
+  * Removed MetricDescriptor and embedded into Metric and the new data types.
+  * Add new data types Gauge/Sum/Histogram.
+  * Make use of the "AggregationTemporality" into the data types that allow that support.
 * Rename enum values to follow the proto3 style guide.
 
 ### Added

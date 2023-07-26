@@ -14,7 +14,7 @@ $(1)
 endef
 
 .PHONY: all
-all: gen-all markdown-link-check
+all: gen-all markdown-link-check markdownlint
 
 # Generate all implementations
 .PHONY: gen-all
@@ -163,5 +163,14 @@ markdown-link-check:
 	@if ! npm ls markdown-link-check; then npm install; fi
 	@for f in $(ALL_DOCS); do \
 		npx --no -- markdown-link-check --quiet --config .markdown_link_check_config.json $$f \
+			|| exit 1; \
+	done
+
+.PHONY: markdownlint
+markdownlint:
+	@if ! npm ls markdownlint; then npm install; fi
+	@for f in $(ALL_DOCS); do \
+		echo $$f; \
+		npx --no -p markdownlint-cli markdownlint -c .markdownlint.yaml $$f \
 			|| exit 1; \
 	done
