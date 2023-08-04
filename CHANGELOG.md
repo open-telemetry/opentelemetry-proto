@@ -4,6 +4,11 @@
 
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.0.0...main).
 
+### Added
+
+* Add a field for W3C-specified Trace Context flags to the `Span` and `Link`.
+  [#503](https://github.com/open-telemetry/opentelemetry-proto/pull/503)
+
 ## 1.0.0 - 2023-07-03
 
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v0.20.0...v1.0.0).
