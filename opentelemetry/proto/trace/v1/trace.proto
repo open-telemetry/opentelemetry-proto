@@ -76,7 +76,7 @@ message ScopeSpans {
 
 // A Span represents a single operation performed by a single component of the system.
 //
-// The next available field id is 18.
+// The next available field id is 17.
 message Span {
   // A unique identifier for a trace. All spans from the same trace share
   // the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes OR
@@ -107,7 +107,7 @@ message Span {
   // There are two flags defined in the W3C Trace Context Level 2 spec:
   // - sampled = 0x1
   // - random = 0x2
-  uint32 trace_flags = 17;
+  uint32 trace_flags = 16;
 
   // A description of the span's operation.
   //
