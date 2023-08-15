@@ -282,11 +282,24 @@ message Span {
   // span's status code is unset, i.e. assume STATUS_CODE_UNSET (code = 0).
   Status status = 15;
 
+  // ParentSpanIsRemote indicates whether the span's parent is remote (true / false) or
+  // if the field is unset.
+  enum ParentIsRemote {
+    // Unset.
+    PARENT_SPAN_IS_REMOTE_UNSET = 0;
+
+    // The parent span is not remote.
+    PARENT_SPAN_IS_REMOTE_FALSE = 1;
+
+    // The parent span is remote.
+    PARENT_SPAN_IS_REMOTE_TRUE = 2;
+  }
+
   // parent_span_is_remote identifies whether a span's parent is remote or not.
   // This helps determine whether a span can be considered an entry-point span.
   // A span is an entry-point span if it has no parent (parent_span_id is empty),
-  // or if parent_span_is_remote is true.
-  bool parent_span_is_remote = 16;
+  // or if parent_is_remote is true.
+  ParentSpanIsRemote parent_span_is_remote = 16;
 }
 
 // The Status type defines a logical error model that is suitable for different
