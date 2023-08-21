@@ -302,6 +302,11 @@ message Status {
 //   (span.flags & SPAN_FLAGS_TRACE_FLAGS_MASK)
 //
 // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+//
+// Note that Span flags were introduced in version 1.1 of the
+// OpenTelemetry protocol.  Older Span producers do not set this
+// field, consequently consumers should not rely on the absence of a
+// particular flag bit to indicate the presence of a particular feature.
 enum SpanFlags {
   // The zero value for the enum. Should not be used for comparisons.
   // Instead use bitwise "and" with the appropriate mask as shown above.
