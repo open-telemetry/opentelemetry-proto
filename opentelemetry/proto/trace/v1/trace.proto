@@ -103,11 +103,14 @@ message Span {
   // field must be empty. The ID is an 8-byte array.
   bytes parent_span_id = 4;
 
-  // Flags from the W3C traceparent, if provided.
-  // There are two flags defined in the W3C Trace Context Level 2 spec:
-  // - sampled = 0x1
-  // - random = 0x2
-  uint32 trace_flags = 16;
+  // Flags, a bit field. 8 least significant bits are the trace flags as
+  // defined in W3C Trace Context specification. 24 most significant bits are reserved
+  // and must be set to 0. Readers must not assume that 24 most significant bits
+  // will be zero and must correctly mask the bits when reading 8-bit trace flag (use
+  // flags & SPAN_FLAGS_TRACE_FLAGS_MASK). [Optional].
+  //
+  // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+  fixed32 flags = 16;
 
   // A description of the span's operation.
   //
@@ -243,11 +246,14 @@ message Span {
     // then no attributes were dropped.
     uint32 dropped_attributes_count = 5;
 
-    // Flags from the linked span's traceparent, if provided.
-    // There are two flags defined in the W3C Trace Context Level 2 spec:
-    // - sampled = 0x1
-    // - random = 0x2
-    uint32 trace_flags = 6;
+    // Flags, a bit field. 8 least significant bits are the trace flags as
+    // defined in W3C Trace Context specification. 24 most significant bits are reserved
+    // and must be set to 0. Readers must not assume that 24 most significant bits
+    // will be zero and must correctly mask the bits when reading 8-bit trace flag (use
+    // flags & SPAN_FLAGS_TRACE_FLAGS_MASK). [Optional].
+    //
+    // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+    fixed32 flags = 6;
   }
 
   // links is a collection of Links, which are references from this span to a span
@@ -285,4 +291,24 @@ message Status {
 
   // The status code.
   StatusCode code = 3;
+}
+
+// SpanFlags represents constants used to interpret the
+// Span.flags field, which is protobuf 'fixed32' type and is to
+// be used as bit-fields. Each non-zero value defined in this enum is
+// a bit-mask.  To extract the bit-field, for example, use an
+// expression like:
+//
+//   (span.flags & SPAN_FLAGS_TRACE_FLAGS_MASK)
+//
+// See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+enum SpanFlags {
+  // The zero value for the enum. Should not be used for comparisons.
+  // Instead use bitwise "and" with the appropriate mask as shown above.
+  SPAN_FLAGS_DO_NOT_USE = 0;
+
+  // Bits 0-7 are used for trace flags.
+  SPAN_FLAGS_TRACE_FLAGS_MASK = 0x000000FF;
+
+  // Bits 8-31 are reserved for future use.
 }
