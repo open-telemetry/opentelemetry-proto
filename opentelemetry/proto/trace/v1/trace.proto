@@ -286,13 +286,13 @@ message Span {
   // if the field is unset.
   enum ParentSpanIsRemote {
     // Unset. This value is expected from older clients.
-    PARENT_SPAN_IS_REMOTE_UNSET = 0;
+    PARENT_SPAN_UNKNOWN_REMOTE = 0;
 
     // The parent span is not remote.
-    PARENT_SPAN_IS_REMOTE_FALSE = 1;
+    PARENT_SPAN_NOT_REMOTE = 1;
 
     // The parent span is remote.
-    PARENT_SPAN_IS_REMOTE_TRUE = 2;
+    PARENT_SPAN_REMOTE = 2;
   }
 
   // parent_span_is_remote identifies whether a span's parent is remote or not.
