@@ -76,7 +76,7 @@ message ScopeSpans {
 
 // A Span represents a single operation performed by a single component of the system.
 //
-// The next available field id is 17.
+// The next available field id is 19.
 message Span {
   // A unique identifier for a trace. All spans from the same trace share
   // the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes OR
@@ -106,8 +106,8 @@ message Span {
   // Flags, a bit field. 8 least significant bits are the trace flags as
   // defined in W3C Trace Context specification. 24 most significant bits are reserved
   // and must be set to 0. Readers must not assume that 24 most significant bits
-  // will be zero.  When writing new spans, SDKs must set the most-significant 24-bits
-  // to zero.  To read the 8-bit trace flag (use flags & SPAN_FLAGS_TRACE_FLAGS_MASK).
+  // will be zero.  When writing new spans, the most-significant 24-bits MUST be
+  // zero.  To read the 8-bit W3C trace flag (use flags & SPAN_FLAGS_TRACE_FLAGS_MASK).
   // [Optional].
   //
   // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
@@ -250,8 +250,8 @@ message Span {
     // Flags, a bit field. 8 least significant bits are the trace flags as
     // defined in W3C Trace Context specification. 24 most significant bits are reserved
     // and must be set to 0. Readers must not assume that 24 most significant bits
-    // will be zero.  When writing new spans, SDKs must set the most-significant 24-bits
-    // to zero.  To read the 8-bit trace flag (use flags & SPAN_FLAGS_TRACE_FLAGS_MASK).
+    // will be zero.  When writing new spans, the most-significant 24-bits MUST be
+    // zero.  To read the 8-bit W3C trace flag (use flags & SPAN_FLAGS_TRACE_FLAGS_MASK).
     // [Optional].
     //
     // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
