@@ -112,9 +112,15 @@ message Span {
   // Flags, a bit field. 8 least significant bits are the trace
   // flags as defined in W3C Trace Context specification. Readers
   // MUST not assume that 24 most significant bits will be zero.
-  // When creating new spans, the most-significant 24-bits MUST be
-  // zero.  To read the 8-bit W3C trace flag (use flags &
-  // SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+  // To read the 8-bit W3C trace flag, use `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
+  //
+  // When creating span messages, if the message is logically forwarded from another source
+  // with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+  // be copied as-is. If creating from a source that does not have an equivalent flags field
+  // (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+  // be set to zero.
+  //
+  // [Optional].
   //
   // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
   fixed32 flags = 16;
