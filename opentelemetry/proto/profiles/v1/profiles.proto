@@ -1,4 +1,5 @@
 // Copyright 2023, OpenTelemetry Authors
+// Copyright 2016 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -224,6 +225,8 @@ enum SymbolFidelity {
   SYMBOL_FIDELITY_UNSPECIFIED = 0;
   SYMBOL_FIDELITY_FULL = 1;
 }
+
+// The following messages were forked from the pprof proto definition and modified to fit the OTLP profile schema:
 
 // Describes the mapping from a binary to its original source code. These are stored in a lookup table in a Profile. These are referenced by index from other messages.
 message Mapping {
