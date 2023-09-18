@@ -123,6 +123,10 @@ message Span {
   // [Optional].
   //
   // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+  //
+  // Bits 8 and 9 are reserved for representing the 3 states of whether a span's parent
+  // is remote. The states are unknown, is not remote, is remote.
+  // To read the 2-bit flag, use `flags & SPAN_FLAGS_PARENT_IS_REMOTE_MASK`.
   fixed32 flags = 16;
 
   // A description of the span's operation.
@@ -329,5 +333,8 @@ enum SpanFlags {
   // Bits 0-7 are used for trace flags.
   SPAN_FLAGS_TRACE_FLAGS_MASK = 0x000000FF;
 
-  // Bits 8-31 are reserved for future use.
+  // Bits 8 and 9 are used for for the parent is remote flag.
+  SPAN_FLAGS_PARENT_IS_REMOTE_MASK = 0x00000300;
+
+  // Bits 10-31 are reserved for future use.
 }
