@@ -109,24 +109,27 @@ message Span {
   // field must be empty. The ID is an 8-byte array.
   bytes parent_span_id = 4;
 
-  // Flags, a bit field. 8 least significant bits are the trace
-  // flags as defined in W3C Trace Context specification. Readers
-  // MUST not assume that 24 most significant bits will be zero.
+  // Flags, a bit field. Bits 0-7 (8 least significant bits) are the trace
+  // flags as defined in W3C Trace Context specification.
   // To read the 8-bit W3C trace flag, use `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
   //
   // When creating span messages, if the message is logically forwarded from another source
   // with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
   // be copied as-is. If creating from a source that does not have an equivalent flags field
-  // (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+  // (such as a runtime representation of an OpenTelemetry span), the high 22 bits MUST
   // be set to zero.
   //
   // [Optional].
   //
   // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
   //
-  // Bits 8 and 9 are reserved for representing the 3 states of whether a span's parent
+  // Bits 8 and 9 represent the 3 states of whether a span's parent
   // is remote. The states are unknown, is not remote, is remote.
   // To read the 2-bit flag, use `flags & SPAN_FLAGS_PARENT_IS_REMOTE_MASK`.
+  //
+  // [Optional].
+  //
+  // Readers MUST not assume that bits 10-31 (22 most significant bits) will be zero.
   fixed32 flags = 16;
 
   // A description of the span's operation.
@@ -263,11 +266,11 @@ message Span {
     // then no attributes were dropped.
     uint32 dropped_attributes_count = 5;
 
-    // Flags, a bit field. 8 least significant bits are the trace
+    // Flags, a bit field. Bit 0-7 (8 least significant bits) are the trace
     // flags as defined in W3C Trace Context specification. Readers
-    // MUST not assume that 24 most significant bits will be zero.
-    // When creating new spans, the most-significant 24-bits MUST be
-    // zero.  To read the 8-bit W3C trace flag (use flags &
+    // MUST not assume that bits 10-31 (22 most significant bits) will be zero.
+    // When creating new spans, bits 10-31 (most-significant 22-bits) MUST be
+    // zero. To read the 8-bit W3C trace flag (use flags &
     // SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
     //
     // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
@@ -334,7 +337,24 @@ enum SpanFlags {
   SPAN_FLAGS_TRACE_FLAGS_MASK = 0x000000FF;
 
   // Bits 8 and 9 are used for for the parent is remote flag.
+  // See SpanFlagsParentIsRemote for the valid values.
   SPAN_FLAGS_PARENT_IS_REMOTE_MASK = 0x00000300;
 
   // Bits 10-31 are reserved for future use.
+}
+
+// SpanFlagsParentIsRemote represents constants used to interpret
+// bits 8 and 9 of the Span.flags field. These two bits represent whether
+// the span's parent is remote. Bit 8 represents whether the field has been
+// set and bit 9 represents whether the parent is remote.
+// Once the bits have been read using SPAN_FLAGS_PARENT_IS_REMOTE_MASK,
+// the following constants can be used to interpret them.
+enum SpanFlagsParentIsRemote {
+  // Older clients may not set this field, so 00 represents that this value
+  // has not been set.
+  SPAN_FLAGS_PARENT_IS_REMOTE_UNKNOWN = 0;
+  // The parent is remote: 11
+  SPAN_FLAGS_PARENT_IS_REMOTE = 0x00000300;
+  // The parent is not remote: 01
+  SPAN_FLAGS_PARENT_IS_NOT_REMOTE = 0x00000100;
 }
