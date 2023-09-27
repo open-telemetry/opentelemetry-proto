@@ -274,6 +274,10 @@ message Span {
     // SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
     //
     // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+    //
+    // Bits 8 and 9 represent the 3 states of whether the link
+    // is remote. The states are unknown, is not remote, is remote.
+    // To read the 2-bit flag, use `flags & SPAN_FLAGS_LINK_IS_REMOTE_MASK`.
     fixed32 flags = 6;
   }
 
@@ -340,6 +344,10 @@ enum SpanFlags {
   // See SpanFlagsParentIsRemote for the valid values.
   SPAN_FLAGS_PARENT_IS_REMOTE_MASK = 0x00000300;
 
+  // Bits 8 and 9 are used for for the link is remote flag.
+  // See SpanFlagsLinkIsRemote for the valid values.
+  SPAN_FLAGS_LINK_IS_REMOTE_MASK = 0x00000300;
+
   // Bits 10-31 are reserved for future use.
 }
 
@@ -357,4 +365,20 @@ enum SpanFlagsParentIsRemote {
   SPAN_FLAGS_PARENT_IS_REMOTE = 0x00000300;
   // The parent is not remote: 01
   SPAN_FLAGS_PARENT_IS_NOT_REMOTE = 0x00000100;
+}
+
+// SpanFlagsLinkIsRemote represents constants used to interpret
+// bits 8 and 9 of the Link.flags field. These two bits represent whether
+// the link is remote. Bit 8 represents whether the field has been
+// set and bit 9 represents whether the link is remote.
+// Once the bits have been read using SPAN_FLAGS_LINK_IS_REMOTE_MASK,
+// the following constants can be used to interpret them.
+enum SpanFlagsLinkIsRemote {
+  // Older clients may not set this field, so 00 represents that this value
+  // has not been set.
+  SPAN_FLAGS_LINK_IS_REMOTE_UNKNOWN = 0;
+  // The linked span is remote: 11
+  SPAN_FLAGS_LINK_IS_REMOTE = 0x00000300;
+  // The linked span is not remote: 01
+  SPAN_FLAGS_LINK_IS_NOT_REMOTE = 0x00000100;
 }
