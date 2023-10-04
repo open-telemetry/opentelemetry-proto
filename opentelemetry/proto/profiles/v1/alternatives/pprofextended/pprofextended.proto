@@ -57,7 +57,7 @@ message Profile {
   // Mapping from address ranges to the image/binary/library mapped
   // into that address range.  mapping[0] will be the main binary.
   repeated Mapping mapping = 3;
-  // Locations referenced by samples.
+  // Locations referenced by samples. [deprecated, superseded by stacktrace]
   repeated Location location = 4;
   // Functions referenced by locations.
   repeated Function function = 5;
@@ -92,6 +92,8 @@ message Profile {
   // Index into the string table of the type of the preferred sample
   // value. If unset, clients should default to the last sample value.
   int64 default_sample_type = 14;
+  // The set of Stacktraces recorded in this profile.
+  repeated Stacktrace stacktrace = 15;
 }
 
 // ValueType describes the semantics and measurement units of a value.
@@ -106,7 +108,7 @@ message ValueType {
 // indicator of a higher level request being handled etc.
 message Sample {
   // The indices recorded here correspond to locations in Profile.location.
-  // The leaf is at location_index[0].
+  // The leaf is at location_index[0]. [deprecated]
   repeated uint64 location_index = 1;
   // The type and unit of each value is defined by the corresponding
   // entry in Profile.sample_type. All samples must have the same
@@ -124,6 +126,17 @@ message Sample {
   // discouraged case is having a string label and a numeric label of the same
   // name on a sample.  Again, possible to express, but should not be used.
   repeated Label label = 3;
+
+  // This is a reference to a stacktrace in Profile.stacktrace.
+  // Supersedes location_index.
+  uint64 stacktrace_index = 4;
+}
+
+// Stacktrace is a list of locations that represent a stack trace.
+message Stacktrace {
+  // The indices recorded here correspond to locations in Profile.location.
+  // The leaf is at location_index[0].
+  repeated uint64 location_index = 1;
 }
 
 message Label {
