@@ -40,6 +40,8 @@ syntax = "proto3";
 
 package opentelemetry.proto.profiles.v1.alternatives.pprofextended;
 
+import "opentelemetry/proto/common/v1/common.proto";
+
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1/alternatives/pprofextended";
 
 message Profile {
@@ -94,6 +96,9 @@ message Profile {
   int64 default_sample_type = 14;
   // The set of Stacktraces recorded in this profile.
   repeated Stacktrace stacktrace = 15;
+  // A common table for bytes referenced by various messages.
+  // bytes_table[0] must always be "".
+  repeated bytes bytes_table = 16;
 }
 
 // ValueType describes the semantics and measurement units of a value.
@@ -125,11 +130,15 @@ message Sample {
   // not have good (or any) support for multi-value labels. And an even more
   // discouraged case is having a string label and a numeric label of the same
   // name on a sample.  Again, possible to express, but should not be used.
+  // [deprecated, superseded by attributes]
   repeated Label label = 3;
 
   // This is a reference to a stacktrace in Profile.stacktrace.
   // Supersedes location_index.
   uint64 stacktrace_index = 4;
+
+  repeated opentelemetry.proto.common.v1.KeyValueInterned attributes = 11;
+  uint32 dropped_attributes_count = 12;
 }
 
 // Stacktrace is a list of locations that represent a stack trace.
