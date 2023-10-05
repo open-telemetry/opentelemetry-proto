@@ -137,8 +137,8 @@ message Sample {
   // Supersedes location_index.
   uint64 stacktrace_index = 4;
 
-  repeated opentelemetry.proto.common.v1.KeyValueInterned attributes = 11;
-  uint32 dropped_attributes_count = 12;
+  repeated opentelemetry.proto.common.v1.KeyValueInterned attributes = 5;
+  uint32 dropped_attributes_count = 6;
 }
 
 // Stacktrace is a list of locations that represent a stack trace.
