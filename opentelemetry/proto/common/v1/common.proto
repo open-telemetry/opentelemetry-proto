@@ -122,4 +122,5 @@ message KeyValueListInterned {
 message KeyValueInterned {
   int64 key = 1; // Index into the string_table.
   AnyValueInterned value = 2;
+  int64 unit = 3; // Index into the string_table.
 }
