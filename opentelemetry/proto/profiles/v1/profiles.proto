@@ -25,6 +25,7 @@ import "opentelemetry/proto/profiles/v1/alternatives/pprof/pprof.proto";
 import "opentelemetry/proto/profiles/v1/alternatives/denormalized/denormalized.proto";
 import "opentelemetry/proto/profiles/v1/alternatives/normalized/normalized.proto";
 import "opentelemetry/proto/profiles/v1/alternatives/arrays/arrays.proto";
+import "opentelemetry/proto/profiles/v1/alternatives/pprofextended/pprofextended.proto";
 
 option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1";
 option java_multiple_files = true;
@@ -131,5 +132,6 @@ message Profile {
     opentelemetry.proto.profiles.v1.alternatives.normalized.Profile normalized = 9;
     opentelemetry.proto.profiles.v1.alternatives.arrays.Profile arrays = 10;
     opentelemetry.proto.profiles.v1.alternatives.denormalized.Profile denormalized = 11;
+    opentelemetry.proto.profiles.v1.alternatives.pprofextended.Profile pprofextended = 12;
   }
 }
