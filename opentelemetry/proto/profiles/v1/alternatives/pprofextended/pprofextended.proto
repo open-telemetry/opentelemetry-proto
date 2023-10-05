@@ -139,6 +139,8 @@ message Sample {
 
   repeated opentelemetry.proto.common.v1.KeyValueInterned attributes = 5;
   uint32 dropped_attributes_count = 6;
+
+  repeated uint64 timestamps = 7;
 }
 
 // Stacktrace is a list of locations that represent a stack trace.
