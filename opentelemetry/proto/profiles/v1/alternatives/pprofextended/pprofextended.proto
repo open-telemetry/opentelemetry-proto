@@ -105,6 +105,14 @@ message Profile {
 message ValueType {
   int64 type = 1; // Index into string table.
   int64 unit = 2; // Index into string table.
+
+  enum AggregationTemporality {
+    AGGREGATION_TEMPORALITY_UNSPECIFIED = 0;
+    AGGREGATION_TEMPORALITY_DELTA = 1;
+    AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
+  }
+
+  AggregationTemporality aggregation_temporality = 3;
 }
 
 // Each Sample records values encountered in some program
