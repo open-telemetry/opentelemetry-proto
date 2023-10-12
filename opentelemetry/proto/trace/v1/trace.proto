@@ -353,7 +353,7 @@ enum SpanFlags {
 // remote.
 // Once the bits have been read using SPAN_FLAGS_PARENT_OR_LINK_IS_REMOTE_MASK,
 // the following constants can be used to interpret them.
-enum SpanFlagsParentOrLinkIsRemote {
+enum SpanFlagsContextIsRemote {
   // Older clients may not set this field, so 00 represents that this value
   // has not been set.
   SPAN_FLAGS_PARENT_OR_LINK_IS_REMOTE_UNKNOWN = 0;
