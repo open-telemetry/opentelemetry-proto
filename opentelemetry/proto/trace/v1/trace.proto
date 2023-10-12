@@ -351,7 +351,7 @@ enum SpanFlags {
 // represent whether the parent or link is remote. Bit 8 represents whether
 // the field has been set and bit 9 represents whether the parent or link is
 // remote.
-// Once the bits have been read using SPAN_FLAGS_PARENT_OR_LINK_IS_REMOTE_MASK,
+// Once the bits have been read using SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK,
 // the following constants can be used to interpret them.
 enum SpanFlagsContextIsRemote {
   // Older clients may not set this field, so 00 represents that this value
