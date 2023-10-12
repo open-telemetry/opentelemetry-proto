@@ -356,9 +356,9 @@ enum SpanFlags {
 enum SpanFlagsContextIsRemote {
   // Older clients may not set this field, so 00 represents that this value
   // has not been set.
-  SPAN_FLAGS_PARENT_OR_LINK_IS_REMOTE_UNKNOWN = 0;
+  SPAN_FLAGS_CONTEXT_IS_REMOTE_UNKNOWN = 0;
   // The parent or linked span is remote: 11
-  SPAN_FLAGS_PARENT_OR_LINK_IS_REMOTE = 0x00000300;
+  SPAN_FLAGS_CONTEXT_IS_REMOTE = 0x00000300;
   // The parent or linked span is not remote: 01
-  SPAN_FLAGS_PARENT_OR_LINK_IS_NOT_REMOTE = 0x00000100;
+  SPAN_FLAGS_CONTEXT_IS_NOT_REMOTE = 0x00000100;
 }
