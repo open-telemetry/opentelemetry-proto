@@ -94,8 +94,8 @@ message Profile {
   // Index into the string table of the type of the preferred sample
   // value. If unset, clients should default to the last sample value.
   int64 default_sample_type = 14;
-  // The set of Stacktraces recorded in this profile.
-  repeated Stacktrace stacktrace = 15;
+  // Array of locations referenced by samples.
+  repeated int64 location_indices = 15;
   // A common table for bytes referenced by various messages.
   // bytes_table[0] must always be "".
   repeated bytes bytes_table = 16;
@@ -143,12 +143,13 @@ message Sample {
 
   // This is a reference to a stacktrace in Profile.stacktrace.
   // Supersedes location_index.
-  uint64 stacktrace_index = 4;
+  uint64 locations_start_index = 4;
+  uint64 locations_end_index = 5;
 
-  repeated opentelemetry.proto.common.v1.KeyValueInterned attributes = 5;
-  uint32 dropped_attributes_count = 6;
+  repeated opentelemetry.proto.common.v1.KeyValueInterned attributes = 6;
+  uint32 dropped_attributes_count = 7;
 
-  repeated uint64 timestamps = 7;
+  repeated uint64 timestamps = 8;
 }
 
 // Stacktrace is a list of locations that represent a stack trace.
