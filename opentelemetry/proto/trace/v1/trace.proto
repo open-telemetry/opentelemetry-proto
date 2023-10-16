@@ -109,7 +109,9 @@ message Span {
   // field must be empty. The ID is an 8-byte array.
   bytes parent_span_id = 4;
 
-  // Flags, a bit field. Bits 0-7 (8 least significant bits) are the trace
+  // Flags, a bit field. 
+  //
+  // Bits 0-7 (8 least significant bits) are the trace
   // flags as defined in W3C Trace Context specification.
   // To read the 8-bit W3C trace flag, use `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
   //
