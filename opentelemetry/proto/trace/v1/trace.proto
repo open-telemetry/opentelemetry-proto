@@ -109,11 +109,11 @@ message Span {
   // field must be empty. The ID is an 8-byte array.
   bytes parent_span_id = 4;
 
-  // Flags, a bit field. 
+  // Flags, a bit field.
   //
-  // Bits 0-7 (8 least significant bits) are the trace
-  // flags as defined in W3C Trace Context specification.
-  // To read the 8-bit W3C trace flag, use `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
+  // Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+  // Context specification. To read the 8-bit W3C trace flag, use
+  // `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
   //
   // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
   //
@@ -265,9 +265,11 @@ message Span {
     // then no attributes were dropped.
     uint32 dropped_attributes_count = 5;
 
-    // Flags, a bit field. Bits 0-7 (8 least significant bits) are the trace
-    // flags as defined in W3C Trace Context specification. To read the 8-bit W3C trace
-    // flag, use `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
+    // Flags, a bit field.
+    //
+    // Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+    // Context specification. To read the 8-bit W3C trace flag, use
+    // `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
     //
     // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
     //
