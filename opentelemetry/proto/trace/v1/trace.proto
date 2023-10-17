@@ -358,8 +358,8 @@ enum SpanFlags {
 // Once the bits have been read using SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK,
 // the following constants can be used to interpret them.
 enum SpanFlagsContextIsRemote {
-  // Older clients may not set this field, so 00 represents that this value
-  // has not been set.
+  // Older client not supporting this flag, or not known whether parent or
+  // linked span is remote: 00
   SPAN_FLAGS_CONTEXT_IS_REMOTE_UNKNOWN = 0;
   // The parent or linked span is remote: 11
   SPAN_FLAGS_CONTEXT_IS_REMOTE = 0x00000300;
