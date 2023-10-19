@@ -99,6 +99,8 @@ message Profile {
   // A common table for bytes referenced by various messages.
   // bytes_table[0] must always be "".
   repeated bytes bytes_table = 16;
+
+  repeated opentelemetry.proto.common.v1.KeyValue attributes3 = 17;
 }
 
 // ValueType describes the semantics and measurement units of a value.
@@ -150,6 +152,9 @@ message Sample {
   uint32 dropped_attributes_count = 7;
 
   repeated uint64 timestamps = 8;
+
+  repeated opentelemetry.proto.common.v1.KeyValue attributes2 = 9;
+  repeated uint64 attributes3 = 10;
 }
 
 // Stacktrace is a list of locations that represent a stack trace.
