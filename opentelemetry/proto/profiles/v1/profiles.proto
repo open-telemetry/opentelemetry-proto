@@ -122,16 +122,22 @@ message Profile {
   // attributes. If this value is 0, then no attributes were dropped.
   uint32 dropped_attributes_count = 5;
 
-  // This can be original pprof or jfr encoded profile.
+  // Specifies format of the original payload. Index to the string table. [optional, required if original_payload is present]
+  uint32 original_payload_format = 6;
+  // Original payload is stored in this field. It is typically a pprof or jfr file. [optional]
   bytes original_payload = 7;
 
+  // TODO: better name for this?
+  opentelemetry.proto.profiles.v1.alternatives.pprofextended.Profile profile_body = 8;
+
+  // THIS IS TEMPORARY AND WILL BE REMOVED. ONLY USED FOR BENCHMARKS
   // this is temporary until we pick one of these formats
   // fields from one of these will be embedded in Profile message:
   oneof alternative_profile {
-    opentelemetry.proto.profiles.v1.alternatives.pprof.Profile pprof = 8;
-    opentelemetry.proto.profiles.v1.alternatives.normalized.Profile normalized = 9;
-    opentelemetry.proto.profiles.v1.alternatives.arrays.Profile arrays = 10;
-    opentelemetry.proto.profiles.v1.alternatives.denormalized.Profile denormalized = 11;
-    opentelemetry.proto.profiles.v1.alternatives.pprofextended.Profile pprofextended = 12;
+    opentelemetry.proto.profiles.v1.alternatives.pprof.Profile pprof = 101;
+    opentelemetry.proto.profiles.v1.alternatives.normalized.Profile normalized = 102;
+    opentelemetry.proto.profiles.v1.alternatives.arrays.Profile arrays = 103;
+    opentelemetry.proto.profiles.v1.alternatives.denormalized.Profile denormalized = 104;
+    opentelemetry.proto.profiles.v1.alternatives.pprofextended.Profile pprofextended = 105;
   }
 }

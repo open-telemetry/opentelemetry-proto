@@ -96,11 +96,7 @@ message Profile {
   int64 default_sample_type = 14;
   // Array of locations referenced by samples.
   repeated int64 location_indices = 15;
-  // A common table for bytes referenced by various messages.
-  // bytes_table[0] must always be "".
-  repeated bytes bytes_table = 16;
-
-  repeated opentelemetry.proto.common.v1.KeyValue attributes3 = 17;
+  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 17;
 }
 
 // ValueType describes the semantics and measurement units of a value.
@@ -155,13 +151,6 @@ message Sample {
 
   repeated opentelemetry.proto.common.v1.KeyValue attributes2 = 9;
   repeated uint64 attributes3 = 10;
-}
-
-// Stacktrace is a list of locations that represent a stack trace.
-message Stacktrace {
-  // The indices recorded here correspond to locations in Profile.location.
-  // The leaf is at location_index[0].
-  repeated uint64 location_index = 1;
 }
 
 message Label {
