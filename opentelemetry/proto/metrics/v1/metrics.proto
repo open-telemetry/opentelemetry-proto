@@ -202,14 +202,14 @@ message Metric {
 message Gauge {
   repeated NumberDataPoint data_points = 1;
 
-  // sub_type provides additional type information for gauges.
+  // type provides additional type information for gauges.
   // 
   // When receiving from older producers of OTLP, it is safe to assume the
-  // zero-value for sub_type, GAUGE_TYPE_STANDARD. When sending OTLP to older
+  // zero-value for type, GAUGE_TYPE_STANDARD. When sending OTLP to older
   // consumers, it is safe for them to ignore the field. In both cases, the
-  // previous behavior without sub_type is maintained until producer and
+  // previous behavior without type is maintained until producer and
   // consumer are aware of the field.
-  GaugeType sub_type = 2;
+  GaugeType type = 2;
 }
 
 // Sum represents the type of a scalar metric that is calculated as a sum of all
@@ -347,19 +347,20 @@ enum DataPointFlags {
 }
 
 // GaugeType defines valid gauge "sub-types", which are used to describe
-// gauges which have additional properties. These sub-types generally apply
+// gauges which have additional properties. These types generally apply
 // to metrics which originate from protocols which support these additional
 // types, but are represented as gauges in OTLP.
 enum GaugeType {
-  // GAUGE_TYPE_STANDARD is the default GaugeType, which represents a gauge
-  // that does not have a sub_type. Since the OpenTelemetry API enforces types,
-  // this subtype is used for all metrics from OpenTelemetry instrumentation.
+  // GAUGE_TYPE_STANDARD is the default GaugeType, which represents a standard
+  // gauge. Since the OpenTelemetry API enforces types, this type is used for
+  // all metrics from OpenTelemetry instrumentation.
   GAUGE_TYPE_STANDARD = 0;
 
-  // GAUGE_TYPE_UNKNOWN is a GaugeType which represents a metric for
-  // which the type is not known, such as a Prometheus metric without a TYPE
-  // comment. For example, the metric may be a monotonically-increasing counter,
-  // or histogram, but type information was not included at the source.
+  // GAUGE_TYPE_UNKNOWN is a GaugeType which represents a metric for which the
+  // real type is not known, but is treated as a Gauge, such as a Prometheus
+  // metric without a TYPE comment. For example, the metric may be a
+  // monotonically-increasing sum, or histogram, but type information was not
+  // included at the source.
   GAUGE_TYPE_UNKNOWN = 1;
 }
 
