@@ -96,6 +96,7 @@ message Profile {
   int64 default_sample_type = 14;
   // Array of locations referenced by samples.
   repeated int64 location_indices = 15;
+  // Lookup table for attributes.
   repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 16;
 }
 
@@ -196,6 +197,9 @@ message Mapping {
   // It is meant to work around deficiencies in the GNU Build ID that may compromise
   // uniqueness / correlatability. Index into string table.
   uint32 file_id_index = 11;
+
+  // References to attributes in Profile.attribute_table. [optional]
+  repeated uint64 attributes = 12;
 }
 
 // Describes function and line table debug information.
@@ -230,6 +234,9 @@ message Location {
 
   // Type of frame (e.g. kernel, native, python, hotspot, php). Index into string table.
   uint32 type_index = 6;
+
+  // References to attributes in Profile.attribute_table. [optional]
+  repeated uint64 attributes = 7;
 }
 
 message Line {

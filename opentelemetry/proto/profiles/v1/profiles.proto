@@ -33,6 +33,61 @@ option java_package = "io.opentelemetry.proto.profiles.v1";
 option java_outer_classname = "ProfilesProto";
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1";
 
+//                Relationships Diagram
+//
+// ┌──────────────────┐                LEGEND
+// │   ProfilesData   │
+// └──────────────────┘            ─────▶ embedded
+//   │
+//   │ 1-n                         ─────▷ referenced by index
+//   ▼
+// ┌──────────────────┐
+// │ ResourceProfiles │
+// └──────────────────┘
+//   │
+//   │ 1-n
+//   ▼
+// ┌──────────────────┐
+// │  ScopeProfiles   │
+// └──────────────────┘
+//   │
+//   │ 1-n
+//   ▼
+// ┌──────────────────┐
+// │ ProfileContainer │
+// └──────────────────┘
+//   │
+//   │ 1-1
+//   ▼
+// ┌──────────────────┐
+// │      Profile     │
+// └──────────────────┘
+//   │
+//   │ 1-n
+//   ▼
+// ┌──────────────────┐   1-n   ┌──────────────┐
+// │      Sample      │ ──────▷ │   KeyValue   │
+// └──────────────────┘         └──────────────┘
+//   │                    1-n       △      △
+//   │ 1-n        ┌─────────────────┘      │ 1-n
+//   ▽            │                        │
+// ┌──────────────────┐   1-1   ┌──────────────┐
+// │     Location     │ ──────▷ │   Mapping    │
+// └──────────────────┘         └──────────────┘
+//   │
+//   │ 1-n
+//   ▼
+// ┌──────────────────┐
+// │       Line       │
+// └──────────────────┘
+//   │
+//   │ 1-1
+//   ▽
+// ┌──────────────────┐
+// │     Function     │
+// └──────────────────┘
+//
+
 // ProfilesData represents the profiles data that can be stored in a persistent storage,
 // OR can be embedded by other protocols that transfer OTLP profiles data but do not
 // implement the OTLP protocol.
@@ -83,8 +138,8 @@ message ScopeProfiles {
   string schema_url = 3;
 }
 
-// A Profile represents a single profile.
-message Profile {
+// A ProfileContainer represents a single profile. It wraps pprof profile with open-telemetry specific metadata.
+message ProfileContainer {
   // A unique identifier for a profile. The ID is a 16-byte array. An ID with
   // all zeroes is considered invalid.
   //
@@ -127,8 +182,8 @@ message Profile {
   // Original payload is stored in this field. It is typically a pprof or jfr file. [optional]
   bytes original_payload = 7;
 
-  // TODO: better name for this?
-  opentelemetry.proto.profiles.v1.alternatives.pprofextended.Profile profile_body = 8;
+  // This is a reference to a pprof profile.
+  opentelemetry.proto.profiles.v1.alternatives.pprofextended.Profile profile = 8;
 
   // THIS IS TEMPORARY AND WILL BE REMOVED. ONLY USED FOR BENCHMARKS
   // this is temporary until we pick one of these formats
