@@ -200,10 +200,11 @@ message Sample {
   // [deprecated, superseded by attributes]
   repeated Label label = 3;
 
-  // This is a reference to a stacktrace in Profile.stacktrace.
-  // Supersedes location_index.
+  // locations_start_index along with locations_length refers to to a slice of locations in Profile.location. Supersedes location_index.
   uint64 locations_start_index = 4;
-  uint64 locations_end_index = 5;
+
+  // locations_length along with locations_start_index refers to a slice of locations in Profile.location. Supersedes location_index.
+  uint64 locations_length = 5;
 
   // Timestamps associated with Sample represented in ms. These timestamps are expected to fall within the Profile's time range. [optional]
   repeated uint64 timestamps = 6;
