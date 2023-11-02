@@ -138,7 +138,7 @@ message ScopeProfiles {
   string schema_url = 3;
 }
 
-// A ProfileContainer represents a single profile. It wraps pprof profile with open-telemetry specific metadata.
+// A ProfileContainer represents a single profile. It wraps pprof profile with OpenTelemetry specific metadata.
 message ProfileContainer {
   // A unique identifier for a profile. The ID is a 16-byte array. An ID with
   // all zeroes is considered invalid.
