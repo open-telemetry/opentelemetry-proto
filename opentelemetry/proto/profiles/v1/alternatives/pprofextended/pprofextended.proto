@@ -59,7 +59,7 @@ message Profile {
   // Mapping from address ranges to the image/binary/library mapped
   // into that address range.  mapping[0] will be the main binary.
   repeated Mapping mapping = 3;
-  // Locations referenced by samples. [deprecated, superseded by stacktrace]
+  // Locations referenced by samples via location_indices.
   repeated Location location = 4;
   // Functions referenced by locations.
   repeated Function function = 5;
@@ -96,7 +96,7 @@ message Profile {
   int64 default_sample_type = 14;
   // Array of locations referenced by samples.
   repeated int64 location_indices = 15;
-  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 17;
+  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 16;
 }
 
 // ValueType describes the semantics and measurement units of a value.
@@ -144,13 +144,11 @@ message Sample {
   uint64 locations_start_index = 4;
   uint64 locations_end_index = 5;
 
-  repeated opentelemetry.proto.common.v1.KeyValueInterned attributes = 6;
-  uint32 dropped_attributes_count = 7;
+  // Timestamps associated with Sample represented in ms. These timestamps are expected to fall within the Profile's time range. [optional]
+  repeated uint64 timestamps = 6;
 
-  repeated uint64 timestamps = 8;
-
-  repeated opentelemetry.proto.common.v1.KeyValue attributes2 = 9;
-  repeated uint64 attributes3 = 10;
+  // References to attributes in Profile.attribute_table. [optional]
+  repeated uint64 attributes = 7;
 }
 
 message Label {
