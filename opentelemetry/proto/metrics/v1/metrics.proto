@@ -205,7 +205,7 @@ message Gauge {
   // sub_type provides additional type information for gauges.
   // 
   // When receiving from older producers of OTLP, it is safe to assume the
-  // zero-value for sub_type, GAUGE_TYPE_NONE. When sending OTLP to older
+  // zero-value for sub_type, GAUGE_TYPE_STANDARD. When sending OTLP to older
   // consumers, it is safe for them to ignore the field. In both cases, the
   // previous behavior without sub_type is maintained until producer and
   // consumer are aware of the field.
@@ -351,10 +351,10 @@ enum DataPointFlags {
 // to metrics which originate from protocols which support these additional
 // types, but are represented as gauges in OTLP.
 enum GaugeType {
-  // GAUGE_TYPE_NONE is the default GaugeType, which represents a gauge
+  // GAUGE_TYPE_STANDARD is the default GaugeType, which represents a gauge
   // that does not have a sub_type. Since the OpenTelemetry API enforces types,
   // this subtype is used for all metrics from OpenTelemetry instrumentation.
-  GAUGE_TYPE_NONE = 0;
+  GAUGE_TYPE_STANDARD = 0;
 
   // GAUGE_TYPE_UNKNOWN is a GaugeType which represents a metric for
   // which the type is not known, such as a Prometheus metric without a TYPE
