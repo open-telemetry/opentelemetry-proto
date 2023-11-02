@@ -177,12 +177,13 @@ message ProfileContainer {
   // attributes. If this value is 0, then no attributes were dropped.
   uint32 dropped_attributes_count = 5;
 
-  // Specifies format of the original payload. Index to the string table. [optional, required if original_payload is present]
-  uint32 original_payload_format = 6;
-  // Original payload is stored in this field. It is typically a pprof or jfr file. [optional]
+  // Specifies format of the original payload. Common values are defined in semantic conventions. [required if original_payload is present]
+  string original_payload_format = 6;
+  // Original payload is stored in this field. It is typically a pprof or jfr file.
+  // The field is optional, however if it is present `profile` MUST be present as well.
   bytes original_payload = 7;
 
-  // This is a reference to a pprof profile.
+  // This is a reference to a pprof profile. Required, even when original_payload is present.
   opentelemetry.proto.profiles.v1.alternatives.pprofextended.Profile profile = 8;
 
   // THIS IS TEMPORARY AND WILL BE REMOVED. ONLY USED FOR BENCHMARKS
