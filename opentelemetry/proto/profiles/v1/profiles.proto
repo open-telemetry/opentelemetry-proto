@@ -179,8 +179,12 @@ message ProfileContainer {
 
   // Specifies format of the original payload. Common values are defined in semantic conventions. [required if original_payload is present]
   string original_payload_format = 6;
-  // Original payload is stored in this field. It is typically a pprof or jfr file.
-  // The field is optional, however if it is present `profile` MUST be present as well.
+
+  // Original payload can be stored in this field. This can be useful for users who want to get the original payload.
+  // Formats such as JFR are highly extensible and can contain more information than what is defined in this spec.
+  // Inclusion of original payload should be configurable by the user. Default behavior should be to not include the original payload.
+  // If the original payload is in pprof format, it SHOULD not be included in this field.
+  // The field is optional, however if it is present `profile` MUST be present and contain the same profiling information.
   bytes original_payload = 7;
 
   // This is a reference to a pprof profile. Required, even when original_payload is present.
