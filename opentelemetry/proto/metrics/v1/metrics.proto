@@ -168,7 +168,7 @@ message ScopeMetrics {
 message Metric {
   reserved 4, 6, 8;
 
-  // name of the metric, including its DNS name prefix. It must be unique.
+  // name of the metric.
   string name = 1;
 
   // description of the metric, which can be used in documentation.
