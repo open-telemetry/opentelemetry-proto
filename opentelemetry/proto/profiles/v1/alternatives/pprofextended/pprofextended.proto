@@ -211,6 +211,9 @@ message Sample {
 
   // References to attributes in Profile.attribute_table. [optional]
   repeated uint64 attributes = 7;
+
+  // A 128bit id that uniquely identifies this stacktrace, globally. Index into string table. [optional]
+  uint32 stacktrace_id_index = 2;
 }
 
 message Label {
