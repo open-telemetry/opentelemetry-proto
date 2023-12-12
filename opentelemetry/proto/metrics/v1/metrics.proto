@@ -196,7 +196,7 @@ message Metric {
   // for lossless roundtrip translation to / from another data model.
   // Attribute keys MUST be unique (it is not allowed to have more than one
   // attribute with the same key).
-  repeated opentelemetry.proto.common.v1.KeyValue metadata_attributes = 12;
+  repeated opentelemetry.proto.common.v1.KeyValue metadata = 12;
 }
 
 // Gauge represents the type of a scalar metric that always exports the
