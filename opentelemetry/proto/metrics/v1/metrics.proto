@@ -98,12 +98,14 @@ message ScopeMetrics {
 //   fields.
 //
 //     Metric
-//  +------------+
-//  |name        |
-//  |description |
-//  |unit        |     +------------------------------------+
-//  |data        |---> |Gauge, Sum, Histogram, Summary, ... |
-//  +------------+     +------------------------------------+
+//  +--------------------+
+//  |name                |
+//  |resource attributes |
+//  |scope               |
+//  |description         |
+//  |unit                |     +------------------------------------+
+//  |data                |---> |Gauge, Sum, Histogram, Summary, ... |
+//  +--------------------+     +------------------------------------+
 //
 //    Data [One of Gauge, Sum, Histogram, Summary, ...]
 //  +-----------+
@@ -112,6 +114,8 @@ message ScopeMetrics {
 //  +-----------+  |
 //                 |      +---------------------------+
 //                 |      |DataPoint 1                |
+//                 |      |                           |
+//                 |      |attribute                  |
 //                 v      |+------+------+   +------+ |
 //              +-----+   ||label |label |...|label | |
 //              |  1  |-->||value1|value2|...|valueN| |
@@ -125,6 +129,8 @@ message ScopeMetrics {
 //              |  .  |                   .
 //              |  .  |   +---------------------------+
 //              |  .  |   |DataPoint M                |
+//              |  .  |   |                           |
+//              |  .  |   |attribute                  |
 //              +-----+   |+------+------+   +------+ |
 //              |  M  |-->||label |label |...|label | |
 //              +-----+   ||value1|value2|...|valueN| |
