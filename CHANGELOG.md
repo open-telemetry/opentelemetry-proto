@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.1.0...main).
 
 ## 1.1.0 - 2024-01-10
