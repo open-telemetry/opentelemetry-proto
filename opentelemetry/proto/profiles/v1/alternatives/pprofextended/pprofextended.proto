@@ -248,6 +248,13 @@ message Label {
   int64 num_unit = 4;  // Index into string table
 }
 
+enum BuildIdKind {
+  // BUILD_ID_LINKER indicates that the build id is linker-provided (usually GNU build ID)
+  BUILD_ID_LINKER = 0;
+  // BUILD_ID_BINARY_HASH indicates that the build id is a hash of the binary.
+  BUILD_ID_BINARY_HASH = 1;
+}
+
 message Mapping {
   // Unique nonzero id for the mapping. [deprecated]
   uint64 id = 1;
@@ -272,10 +279,8 @@ message Mapping {
   bool has_line_numbers = 9;
   bool has_inline_frames = 10;
 
-  // A string that uniquely identifies a particular binary with high probability.
-  // It is meant to work around deficiencies in the GNU Build ID that may compromise
-  // uniqueness / correlatability. Index into string table.
-  uint32 file_id_index = 11;
+  // Specifies the kind of build id. See BuildIdKind enum for more detaiks [optional]
+  BuildIdKind build_id_kind = 11;
 
   // References to attributes in Profile.attribute_table. [optional]
   repeated uint64 attributes = 12;
