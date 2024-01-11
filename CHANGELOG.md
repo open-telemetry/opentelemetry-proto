@@ -10,7 +10,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Added
 
-* Add a field for W3C-specified Trace Context flags to the `Span` and `Link`.
+* Add `flags` field to `Span` and `Span/Link` for W3C-specified Trace Context flags .
   [#503](https://github.com/open-telemetry/opentelemetry-proto/pull/503)
 
 ### Changed
