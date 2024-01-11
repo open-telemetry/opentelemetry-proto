@@ -119,7 +119,8 @@ message Span {
   //
   // Bits 8 and 9 represent the 3 states of whether a span's parent
   // is remote. The states are (unknown, is not remote, is remote).
-  // To read the 2-bit flag, use `flags & SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK`.
+  // To read whether the value is known, use `flags & SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK`.
+  // To read whether the span is remote, use `flags & SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK`.
   //
   // When creating span messages, if the message is logically forwarded from another source
   // with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
@@ -275,7 +276,8 @@ message Span {
     //
     // Bits 8 and 9 represent the 3 states of whether the link is remote. The states
     // are unknown, is not remote, is remote.
-    // To read the 2-bit flag, use `flags & SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK`.
+    // To read whether the value is known, use `flags & SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK`.
+    // To read whether the link is remote, use `flags & SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK`.
     //
     // Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
     // When creating new spans, bits 10-31 (most-significant 22-bits) MUST be zero.
