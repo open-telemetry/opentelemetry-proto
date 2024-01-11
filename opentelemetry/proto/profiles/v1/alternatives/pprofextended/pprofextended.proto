@@ -44,6 +44,7 @@ import "opentelemetry/proto/common/v1/common.proto";
 
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1/alternatives/pprofextended";
 
+// Represents a complete profile, including sample types, samples, mappings to binaries, locations, functions, string table, and additional metadata.
 message Profile {
   // A description of the samples associated with each Sample.value.
   // For a cpu profile this might be:
@@ -103,6 +104,7 @@ message Profile {
 }
 
 // A pointer from a profile Sample to a trace Span.
+// Connects a profile sample to a trace span, identified by unique trace and span IDs.
 message Link {
   // A unique identifier of a trace that this linked span is part of. The ID is a
   // 16-byte array.
@@ -112,6 +114,8 @@ message Link {
   bytes span_id = 2;
 }
 
+// Specifies the method of aggregating metric values, either DELTA (change since last report)
+// or CUMULATIVE (total since a fixed start time).
 enum AggregationTemporality {
   /* UNSPECIFIED is the default AggregationTemporality, it MUST not be used. */
   AGGREGATION_TEMPORALITY_UNSPECIFIED = 0;
@@ -178,7 +182,7 @@ enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_CUMULATIVE = 2;
 }
 
-// ValueType describes the semantics and measurement units of a value.
+// ValueType describes the type and units of a value, with an optional aggregation temporality.
 message ValueType {
   int64 type = 1; // Index into string table.
   int64 unit = 2; // Index into string table.
@@ -231,6 +235,8 @@ message Sample {
   uint32 stacktrace_id_index = 9;
 }
 
+// Provides additional context for a sample,
+// such as thread ID or allocation size, with optional units. [deprecated]
 message Label {
   int64 key = 1;   // Index into string table
 
@@ -248,6 +254,7 @@ message Label {
   int64 num_unit = 4;  // Index into string table
 }
 
+// Indicates the type of build ID, either from the linker or a binary hash.
 enum BuildIdKind {
   // BUILD_ID_LINKER indicates that the build id is linker-provided (usually GNU build ID)
   BUILD_ID_LINKER = 0;
@@ -255,6 +262,8 @@ enum BuildIdKind {
   BUILD_ID_BINARY_HASH = 1;
 }
 
+// Describes the mapping of a binary in memory, including its address range,
+// file offset, and metadata like build ID
 message Mapping {
   // Unique nonzero id for the mapping. [deprecated]
   uint64 id = 1;
@@ -323,6 +332,7 @@ message Location {
   repeated uint64 attributes = 7;
 }
 
+// Details a specific line in a source code, linked to a function.
 message Line {
   // The index of the corresponding profile.Function for this line.
   uint64 function_index = 1;
@@ -330,6 +340,8 @@ message Line {
   int64 line = 2;
 }
 
+// Describes a function, including its human-readable name, system name,
+// source file, and starting line number in the source.
 message Function {
   // Unique nonzero id for the function. [deprecated]
   uint64 id = 1;
