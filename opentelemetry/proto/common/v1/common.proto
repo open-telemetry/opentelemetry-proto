@@ -80,6 +80,8 @@ message InstrumentationScope {
   uint32 dropped_attributes_count = 4;
 }
 
+// THE FOLLOWING "Interned" MESSAGES ARE TEMPORARY AND WILL BE REMOVED. ONLY USED FOR BENCHMARKS
+
 // AnyValueInterned is used to represent any type of attribute value. AnyValueInterned may contain a
 // primitive value such as a string or integer or it may contain an arbitrary nested
 // object containing arrays, key-value lists and primitives.
