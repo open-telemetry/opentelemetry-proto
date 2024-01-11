@@ -229,11 +229,14 @@ message Sample {
   // References to attributes in Profile.attribute_table. [optional]
   repeated uint64 attributes = 7;
 
+  // References to attribute units in Profile.string_table. Each number in this array MUST have a matching attribute reference in attributes array. [optional]
+  repeated uint64 attribute_units = 8;
+
   // References to links in Profile.link_table. [optional]
-  repeated uint64 links = 8;
+  repeated uint64 links = 9;
 
   // A 128bit id that uniquely identifies this stacktrace, globally. Index into string table. [optional]
-  uint32 stacktrace_id_index = 9;
+  uint32 stacktrace_id_index = 10;
 }
 
 // Provides additional context for a sample,
