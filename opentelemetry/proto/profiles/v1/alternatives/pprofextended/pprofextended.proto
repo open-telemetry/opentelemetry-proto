@@ -44,7 +44,8 @@ import "opentelemetry/proto/common/v1/common.proto";
 
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1/alternatives/pprofextended";
 
-// Represents a complete profile, including sample types, samples, mappings to binaries, locations, functions, string table, and additional metadata.
+// Represents a complete profile, including sample types, samples,
+// mappings to binaries, locations, functions, string table, and additional metadata.
 message Profile {
   // A description of the samples associated with each Sample.value.
   // For a cpu profile this might be:
