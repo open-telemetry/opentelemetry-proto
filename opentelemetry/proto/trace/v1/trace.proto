@@ -344,9 +344,10 @@ enum SpanFlags {
   SPAN_FLAGS_TRACE_FLAGS_MASK = 0x000000FF;
 
   // Bits 8 and 9 are used to indicate that the parent span or link span is remote.
-  // Bit 8 indicates whether the value is known. Bit 9 indicates whether the span
-  // or link is remote.
-  SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK = 0x00000300;
+  // Bit 8 (`HAS_IS_REMOTE`) indicates whether the value is known.
+  // Bit 9 (`IS_REMOTE`) indicates whether the span or link is remote.
+  SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x00000100;
+  SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK = 0x00000200;
 
   // Bits 10-31 are reserved for future use.
 }
