@@ -4,6 +4,13 @@
 
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.1.0...main).
 
+### Added
+
+* Add metric.metadata for supporting additional metadata on metrics
+  [#514](https://github.com/open-telemetry/opentelemetry-proto/pull/514)
+
+### Changed
+
 ## 1.1.0 - 2024-01-10
 
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.0.0...v1.1.0).
