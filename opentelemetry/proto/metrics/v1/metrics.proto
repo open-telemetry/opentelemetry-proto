@@ -116,14 +116,6 @@ message ScopeMetrics {
 // │          └── Summary
 // └── ...
 //
-//     Metric
-//  +------------+
-//  |name        |
-//  |description |
-//  |unit        |     +------------------------------------+
-//  |data        |---> |Gauge, Sum, Histogram, Summary, ... |
-//  +------------+     +------------------------------------+
-//
 //    Data [One of Gauge, Sum, Histogram, Summary, ...]
 //  +-----------+
 //  |...        |  // Metadata about the Data.
