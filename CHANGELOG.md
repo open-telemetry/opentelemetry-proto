@@ -2,12 +2,24 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.0.0...main).
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.1.0...main).
+
+## 1.1.0 - 2024-01-10
+
+Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.0.0...v1.1.0).
 
 ### Added
 
-* Add a field for W3C-specified Trace Context flags to the `Span` and `Link`.
+* Add `flags` field to `Span` and `Span/Link` for W3C-specified Trace Context flags .
   [#503](https://github.com/open-telemetry/opentelemetry-proto/pull/503)
+
+### Changed
+
+* Update and fix OTLP JSON examples. [#516](https://github.com/open-telemetry/opentelemetry-proto/pull/516),
+  [#510](https://github.com/open-telemetry/opentelemetry-proto/pull/510),
+  [#499](https://github.com/open-telemetry/opentelemetry-proto/pull/499)
+* Remove irrelevant comments from metric name field. [#512](https://github.com/open-telemetry/opentelemetry-proto/pull/512)
+* Add comment to explain schema_url fields. [#504](https://github.com/open-telemetry/opentelemetry-proto/pull/504)
 
 ## 1.0.0 - 2023-07-03
 
