@@ -230,8 +230,8 @@ message Sample {
   // References to attribute units in Profile.string_table. Each number in this array MUST have a matching attribute reference in attributes array. [optional]
   repeated uint64 attribute_units = 11;
 
-  // References to links in Profile.link_table. [optional]
-  repeated uint64 links = 12;
+  // Reference to link in Profile.link_table. [optional]
+  uint64 link = 12;
 
   // Timestamps associated with Sample represented in ms. These timestamps are expected
   // to fall within the Profile's time range. [optional]
