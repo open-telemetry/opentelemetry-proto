@@ -258,11 +258,14 @@ message Label {
   int64 num_unit = 4;  // Index into string table
 }
 
-// Indicates the type of build ID, either from the linker or a binary hash.
+// Indicates the semantics of the build_id field.
 enum BuildIdKind {
-  // BUILD_ID_LINKER indicates that the build id is linker-provided (usually GNU build ID)
+  // Linker-generated build ID, stored in the ELF binary notes.
   BUILD_ID_LINKER = 0;
-  // BUILD_ID_BINARY_HASH indicates that the build id is a hash of the binary.
+  // Build ID based on the content hash of the binary. Currently no particular
+  // hashing approach is standardized, so a given producer needs to define it
+  // themselves and thus unlike BUILD_ID_LINKER this kind of hash is producer-specific.
+  // We may choose to provide a standardized stable hash recommendation later.
   BUILD_ID_BINARY_HASH = 1;
 }
 
