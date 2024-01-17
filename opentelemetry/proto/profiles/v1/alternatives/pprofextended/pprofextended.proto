@@ -42,6 +42,7 @@ package opentelemetry.proto.profiles.v1.alternatives.pprofextended;
 
 import "opentelemetry/proto/common/v1/common.proto";
 
+option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1.Alternatives.PprofExtended";
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1/alternatives/pprofextended";
 
 // Represents a mapping between Attribute Keys and Units.
