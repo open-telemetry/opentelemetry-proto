@@ -63,10 +63,16 @@ message Profile {
   repeated Mapping mapping = 3;
   // Locations referenced by samples via location_indices.
   repeated Location location = 4;
+  // Array of locations referenced by samples.
+  repeated int64 location_indices = 15;
   // Functions referenced by locations.
   repeated Function function = 5;
   // A common table for strings referenced by various messages.
   // string_table[0] must always be "".
+  // Lookup table for attributes.
+  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 16;
+  // Lookup table for links.
+  repeated Link link_table = 17;
   repeated string string_table = 6;
   // frames with Function.function_name fully matching the following
   // regexp will be dropped from the samples, along with their successors.
@@ -96,12 +102,6 @@ message Profile {
   // Index into the string table of the type of the preferred sample
   // value. If unset, clients should default to the last sample value.
   int64 default_sample_type = 14;
-  // Array of locations referenced by samples.
-  repeated int64 location_indices = 15;
-  // Lookup table for attributes.
-  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 16;
-  // Lookup table for links.
-  repeated Link link_table = 17;
 }
 
 // A pointer from a profile Sample to a trace Span.
@@ -197,8 +197,16 @@ message ValueType {
 // indicator of a higher level request being handled etc.
 message Sample {
   // The indices recorded here correspond to locations in Profile.location.
-  // The leaf is at location_index[0]. [deprecated]
+  // The leaf is at location_index[0]. [deprecated, superseded by locations_start_index / locations_length]
   repeated uint64 location_index = 1;
+  // locations_start_index along with locations_length refers to to a slice of locations in Profile.location.
+  // Supersedes location_index.
+  uint64 locations_start_index = 7;
+  // locations_length along with locations_start_index refers to a slice of locations in Profile.location.
+  // Supersedes location_index.
+  uint64 locations_length = 8;
+  // A 128bit id that uniquely identifies this stacktrace, globally. Index into string table. [optional]
+  uint32 stacktrace_id_index = 9;
   // The type and unit of each value is defined by the corresponding
   // entry in Profile.sample_type. All samples must have the same
   // number of values, the same as the length of Profile.sample_type.
@@ -216,27 +224,18 @@ message Sample {
   // name on a sample.  Again, possible to express, but should not be used.
   // [deprecated, superseded by attributes]
   repeated Label label = 3;
-
-  // locations_start_index along with locations_length refers to to a slice of locations in Profile.location. Supersedes location_index.
-  uint64 locations_start_index = 4;
-
-  // locations_length along with locations_start_index refers to a slice of locations in Profile.location. Supersedes location_index.
-  uint64 locations_length = 5;
-
-  // Timestamps associated with Sample represented in ms. These timestamps are expected to fall within the Profile's time range. [optional]
-  repeated uint64 timestamps = 6;
-
   // References to attributes in Profile.attribute_table. [optional]
-  repeated uint64 attributes = 7;
+  repeated uint64 attributes = 10;
 
   // References to attribute units in Profile.string_table. Each number in this array MUST have a matching attribute reference in attributes array. [optional]
-  repeated uint64 attribute_units = 8;
+  repeated uint64 attribute_units = 11;
 
   // References to links in Profile.link_table. [optional]
-  repeated uint64 links = 9;
+  repeated uint64 links = 12;
 
-  // A 128bit id that uniquely identifies this stacktrace, globally. Index into string table. [optional]
-  uint32 stacktrace_id_index = 10;
+  // Timestamps associated with Sample represented in ms. These timestamps are expected
+  // to fall within the Profile's time range. [optional]
+  repeated uint64 timestamps = 13;
 }
 
 // Provides additional context for a sample,
@@ -290,13 +289,13 @@ message Mapping {
   int64 build_id = 6;  // Index into string table
   // Specifies the kind of build id. See BuildIdKind enum for more details [optional]
   BuildIdKind build_id_kind = 11;
+  // References to attributes in Profile.attribute_table. [optional]
+  repeated uint64 attributes = 12;
   // The following fields indicate the resolution of symbolic info.
   bool has_functions = 7;
   bool has_filenames = 8;
   bool has_line_numbers = 9;
   bool has_inline_frames = 10;
-  // References to attributes in Profile.attribute_table. [optional]
-  repeated uint64 attributes = 12;
 }
 
 // Describes function and line table debug information.
