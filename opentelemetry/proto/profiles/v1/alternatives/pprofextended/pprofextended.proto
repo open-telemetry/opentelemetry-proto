@@ -68,14 +68,14 @@ message Profile {
   repeated int64 location_indices = 15;
   // Functions referenced by locations.
   repeated Function function = 5;
-  // A common table for strings referenced by various messages.
-  // string_table[0] must always be "".
   // Lookup table for attributes.
   repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 16;
   // Represents a mapping between Attribute Keys and Units.
   repeated AttributeUnit attribute_units = 17;
   // Lookup table for links.
   repeated Link link_table = 18;
+  // A common table for strings referenced by various messages.
+  // string_table[0] must always be "".
   repeated string string_table = 6;
   // frames with Function.function_name fully matching the following
   // regexp will be dropped from the samples, along with their successors.
