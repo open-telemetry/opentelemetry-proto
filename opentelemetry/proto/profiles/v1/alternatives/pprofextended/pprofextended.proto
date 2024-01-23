@@ -349,6 +349,8 @@ message Line {
   uint64 function_index = 1;
   // Line number in source code.
   int64 line = 2;
+  // Column number in source code.
+  int64 column = 3;
 }
 
 // Describes a function, including its human-readable name, system name,
