@@ -5,7 +5,7 @@ aliases:
   - /docs/reference/specification/protocol/otlp
   - /docs/specs/otel/protocol/otlp
 spelling:
-  cSpell:ignore backoff backpressure dealocations errdetails nanos proto reconnections retryable
+  cSpell:ignore backoff backpressure errdetails nanos proto reconnections retryable
 cascade:
   body_class: otel-docs-spec
   github_repo: &repo https://github.com/open-telemetry/opentelemetry-proto
