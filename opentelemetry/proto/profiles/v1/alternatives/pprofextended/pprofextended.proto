@@ -45,14 +45,6 @@ import "opentelemetry/proto/common/v1/common.proto";
 option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1.Alternatives.PprofExtended";
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1/alternatives/pprofextended";
 
-// Represents a mapping between Attribute Keys and Units.
-message AttributeUnit {
-  // Index into string table.
-  int64 attribute_key = 1;
-  // Index into string table.
-  int64 unit = 2;
-}
-
 // Represents a complete profile, including sample types, samples,
 // mappings to binaries, locations, functions, string table, and additional metadata.
 message Profile {
@@ -113,6 +105,14 @@ message Profile {
   // Index into the string table of the type of the preferred sample
   // value. If unset, clients should default to the last sample value.
   int64 default_sample_type = 14;
+}
+
+// Represents a mapping between Attribute Keys and Units.
+message AttributeUnit {
+  // Index into string table.
+  int64 attribute_key = 1;
+  // Index into string table.
+  int64 unit = 2;
 }
 
 // A pointer from a profile Sample to a trace Span.
