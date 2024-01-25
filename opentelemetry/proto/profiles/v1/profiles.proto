@@ -88,7 +88,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1";
 // └──────────────────┘
 //
 
-// ProfilesData represents the profiles data that can be stored in a persistent storage,
+// ProfilesData represents the profiles data that can be stored in persistent storage,
 // OR can be embedded by other protocols that transfer OTLP profiles data but do not
 // implement the OTLP protocol.
 //
