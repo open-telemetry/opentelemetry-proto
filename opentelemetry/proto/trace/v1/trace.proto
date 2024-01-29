@@ -113,7 +113,7 @@ message Span {
   //
   // Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
   // Context specification. To read the 8-bit W3C trace flag, use
-  // `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
+  // `flags & SpanFlags.SPAN_FLAGS_TRACE_FLAGS_MASK`.
   //
   // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
   //
@@ -270,7 +270,7 @@ message Span {
     //
     // Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
     // Context specification. To read the 8-bit W3C trace flag, use
-    // `flags & SPAN_FLAGS_TRACE_FLAGS_MASK`.
+    // `flags & SpanFlags.SPAN_FLAGS_TRACE_FLAGS_MASK`.
     //
     // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
     //
@@ -329,7 +329,7 @@ message Status {
 // a bit-mask.  To extract the bit-field, for example, use an
 // expression like:
 //
-//   (span.flags & SPAN_FLAGS_TRACE_FLAGS_MASK)
+//   (span.flags & SpanFlags.SPAN_FLAGS_TRACE_FLAGS_MASK)
 //
 // See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
 //
