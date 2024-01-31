@@ -191,7 +191,7 @@ message Metric {
 
   // Additional metadata attributes that describe the metric. [Optional].
   // Attributes are non-identifying.
-  // Consumers SHOULD not need to be aware of these attributes.
+  // Consumers SHOULD NOT need to be aware of these attributes.
   // These attributes MAY be used to encode information allowing
   // for lossless roundtrip translation to / from another data model.
   // Attribute keys MUST be unique (it is not allowed to have more than one
