@@ -31,10 +31,10 @@
 //   to a mapping.
 // - There is a N->1 relationship from sample.location_id entries to
 //   locations. For every sample.location_id entry there must be a
-//   unique Location with that id.
+//   unique Location with that index.
 // - There is an optional N->1 relationship from locations to
 //   mappings. For every nonzero Location.mapping_id there must be a
-//   unique Mapping with that id.
+//   unique Mapping with that index.
 
 syntax = "proto3";
 
