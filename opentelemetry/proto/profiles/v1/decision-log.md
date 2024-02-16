@@ -114,3 +114,55 @@ if they are > 32 bits then the payload is going to be too huge anyway
 
 ### Details
 [Github Conversation](https://github.com/open-telemetry/opentelemetry-proto/pull/488/files#r1246155907)
+
+
+
+
+
+# Decision #6
+Arrays of integers should be used instead of arrays of structs
+
+### Date
+Aug 23 2023
+
+### Context
+
+Samples are a collection of references to other messages plus a value. The standard way of representing those is to put each `Sample` into a separate message, and link from `Sample` to other messages. Parsing / generating such payloads creates many individual objects that runtime has to track.
+
+An "arrays of integers" representation puts values of the same kind into separate arrays. This reduces the size of the resulting protobuf payload and the number of objects that need to be allocated to parse / generate such payload.
+
+Here's pseudocode that illustrates the approach. Note that this example is simplified for the sake of clarity:
+
+```
+// normalized
+"samples": [
+  {
+    "stacktrace_id": 1,
+    "value": 100
+  }, {
+    "stacktrace_id": 2,
+    "value": 200
+  }
+],
+
+// arrays
+"stacktrace_ids": [1, 2],
+"values": [100, 200]
+```
+
+Benchmarking shows that this approach is more efficient in terms of CPU utilization, memory consumption and size of the resulting protobuf payload.
+
+### Alternatives Considered
+
+`normalized` represenation where we don't use arrays of integers, but arrays of structures instead
+
+
+### Reasoning
+
+* `arrays` representation is the most efficient in terms of CPU utilization, memory consumption and size of the resulting protobuf payload. It is however cognitively more complex to implement and understand.
+* as presented in [Design Goals](#design-goals) section, the performance characteristics of the format are very important for the profiling signal
+* the format is not intended to be used directly by the end users, but rather by the developers of profiling systems that are used to and are expected to be able to handle the complexity. It is not more complex than other existing formats
+
+### Details
+
+* [Benchmarking Results](https://docs.google.com/spreadsheets/d/1Q-6MlegV8xLYdz5WD5iPxQU2tsfodX1-CDV1WeGzyQ0/edit?usp=sharing)
