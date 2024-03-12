@@ -54,6 +54,12 @@ message ArrayValue {
 message KeyValueList {
   // A collection of key/value pairs of key-value pairs. The list may be empty (may
   // contain 0 elements).
+  // The keys SHOULD be unique. Key/value collection whose keys are all unique
+  // is interoperable in the sense that all software receiving that collection will
+  // agree on the key-value mappings. When the key within a collection are not
+  // unique, the behavior of software that receives such an object is
+  // unpredictable. Some receivers report all of the key/value pairs,
+  // including duplicates. Other receivers report the last key/value pair only.
   repeated KeyValue values = 1;
 }
 
@@ -72,6 +78,12 @@ message InstrumentationScope {
   string version = 2;
 
   // Additional attributes that describe the scope. [Optional].
+  // Attribute keys SHOULD be unique. Attributes whose keys are all unique
+  // is interoperable in the sense that all software receiving that collection will
+  // agree on the key-value mappings. When the key within attributes are not
+  // unique, the behavior of software that receives such an object is
+  // unpredictable. Some receivers report all of the key/value pairs,
+  // including duplicates. Other receivers report the last key/value pair only.
   repeated KeyValue attributes = 3;
   uint32 dropped_attributes_count = 4;
 }
