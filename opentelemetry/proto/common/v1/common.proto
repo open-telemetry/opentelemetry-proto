@@ -58,8 +58,9 @@ message KeyValueList {
   // is interoperable in the sense that all software receiving that collection will
   // agree on the key-value mappings. When the key within a collection are not
   // unique, the behavior of software that receives such an object is
-  // unpredictable. Some receivers report all of the key/value pairs,
-  // including duplicates. Other receivers report the last key/value pair only.
+  // unpredictable. Many receivers report the last key/value pair only.
+  // Some receivers report all of the key/value pairs, including duplicates. 
+  // Other receivers report an error or fail to parse the object.
   repeated KeyValue values = 1;
 }
 
@@ -82,8 +83,9 @@ message InstrumentationScope {
   // is interoperable in the sense that all software receiving that collection will
   // agree on the key-value mappings. When the key within attributes are not
   // unique, the behavior of software that receives such an object is
-  // unpredictable. Some receivers report all of the key/value pairs,
-  // including duplicates. Other receivers report the last key/value pair only.
+  // unpredictable. Many receivers report the last key/value pair only.
+  // Some receivers report all of the key/value pairs, including duplicates. 
+  // Other receivers report an error or fail to parse the object.
   repeated KeyValue attributes = 3;
   uint32 dropped_attributes_count = 4;
 }
