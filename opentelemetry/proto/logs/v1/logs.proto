@@ -170,8 +170,13 @@ message LogRecord {
   opentelemetry.proto.common.v1.AnyValue body = 5;
 
   // Additional attributes that describe the specific event occurrence. [Optional].
-  // Attribute keys MUST be unique (it is not allowed to have more than one
-  // attribute with the same key).
+  // Attribute keys SHOULD be unique. Attributes whose keys are all unique
+  // is interoperable in the sense that all software receiving that collection will
+  // agree on the key-value mappings. When the key within attributes are not
+  // unique, the behavior of software that receives such an object is
+  // unpredictable. Many receivers report the last key/value pair only.
+  // Some receivers report all of the key/value pairs, including duplicates. 
+  // Other receivers report an error or fail to parse the object.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 6;
   uint32 dropped_attributes_count = 7;
 
