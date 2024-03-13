@@ -11,7 +11,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Changed
 
-* Update comments to allow attributes with duplicate keys.
+* Document that behavior of software receiving KeyValues with duplicated keys is unpredictable.
   [#533](https://github.com/open-telemetry/opentelemetry-proto/pull/533)
 
 ## 1.1.0 - 2024-01-10
