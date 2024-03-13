@@ -54,8 +54,13 @@ message ArrayValue {
 message KeyValueList {
   // A collection of key/value pairs of key-value pairs. The list may be empty (may
   // contain 0 elements).
-  // The keys MUST be unique (it is not allowed to have more than one
-  // value with the same key).
+  // The keys SHOULD be unique. Key/value collection whose keys are all unique
+  // is interoperable in the sense that all software receiving that collection will
+  // agree on the key-value mappings. When the key within a collection are not
+  // unique, the behavior of software that receives such an object is
+  // unpredictable. Many receivers report the last key/value pair only.
+  // Some receivers report all of the key/value pairs, including duplicates. 
+  // Other receivers report an error or fail to parse the object.
   repeated KeyValue values = 1;
 }
 
