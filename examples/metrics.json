@@ -36,8 +36,8 @@
                 "dataPoints": [
                   {
                     "asDouble": 5,
-                    "startTimeUnixNano": 1544712660300000000,
-                    "timeUnixNano": 1544712660300000000,
+                    "startTimeUnixNano": "1544712660300000000",
+                    "timeUnixNano": "1544712660300000000",
                     "attributes": [
                       {
                         "key": "my.counter.attr",
@@ -58,7 +58,7 @@
                 "dataPoints": [
                   {
                     "asDouble": 10,
-                    "timeUnixNano": 1544712660300000000,
+                    "timeUnixNano": "1544712660300000000",
                     "attributes": [
                       {
                         "key": "my.gauge.attr",
@@ -79,8 +79,8 @@
                 "aggregationTemporality": 1,
                 "dataPoints": [
                   {
-                    "startTimeUnixNano": 1544712660300000000,
-                    "timeUnixNano": 1544712660300000000,
+                    "startTimeUnixNano": "1544712660300000000",
+                    "timeUnixNano": "1544712660300000000",
                     "count": 2,
                     "sum": 2,
                     "bucketCounts": [1,1],

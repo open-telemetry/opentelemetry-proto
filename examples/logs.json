@@ -27,8 +27,9 @@
           },
           "logRecords": [
             {
-              "timeUnixNano": 1544712660300000000,
-              "observedTimeUnixNano": 1544712660300000000,
+              "timeUnixNano": "1544712660300000000",
+              "observedTimeUnixNano": "1544712660300000000",
+              "severityNumber": 10,
               "severityText": "Information",
               "traceId": "5B8EFFF798038103D269B633813FC60C",
               "spanId": "EEE19B7EC3C1B174",
@@ -51,7 +52,7 @@
                 {
                   "key": "int.attribute",
                   "value": {
-                    "intValue": 10
+                    "intValue": "10"
                   }
                 },
                 {
