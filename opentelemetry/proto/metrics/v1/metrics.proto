@@ -97,13 +97,24 @@ message ScopeMetrics {
 // - DataPoint contains timestamps, attributes, and one of the possible value type
 //   fields.
 //
-//     Metric
-//  +------------+
-//  |name        |
-//  |description |
-//  |unit        |     +------------------------------------+
-//  |data        |---> |Gauge, Sum, Histogram, Summary, ... |
-//  +------------+     +------------------------------------+
+// MetricsData
+// ├── ResourceMetrics
+// │ ├── Resource
+// │ ├── SchemaURL
+// │ └── ScopeMetrics
+// │    ├── Scope
+// │    ├── SchemaURL
+// │    └── Metric
+// │       ├── Name
+// │       ├── Description
+// │       ├── Unit
+// │       └── data
+// │          ├── Gauge
+// │          ├── Sum
+// │          ├── Histogram
+// │          ├── ExponentialHistogram
+// │          └── Summary
+// └── ...
 //
 //    Data [One of Gauge, Sum, Histogram, Summary, ...]
 //  +-----------+
