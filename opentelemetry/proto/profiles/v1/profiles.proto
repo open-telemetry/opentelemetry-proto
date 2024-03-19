@@ -1,5 +1,4 @@
 // Copyright 2023, OpenTelemetry Authors
-// Copyright 2016 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -189,16 +188,5 @@ message ProfileContainer {
   bytes original_payload = 7;
 
   // This is a reference to a pprof profile. Required, even when original_payload is present.
-  opentelemetry.proto.profiles.v1.alternatives.pprofextended.Profile profile = 8;
-
-  // THIS IS TEMPORARY AND WILL BE REMOVED. ONLY USED FOR BENCHMARKS
-  // this is temporary until we pick one of these formats
-  // fields from one of these will be embedded in Profile message:
-  oneof alternative_profile {
-    opentelemetry.proto.profiles.v1.alternatives.pprof.Profile pprof = 101;
-    opentelemetry.proto.profiles.v1.alternatives.normalized.Profile normalized = 102;
-    opentelemetry.proto.profiles.v1.alternatives.arrays.Profile arrays = 103;
-    opentelemetry.proto.profiles.v1.alternatives.denormalized.Profile denormalized = 104;
-    opentelemetry.proto.profiles.v1.alternatives.pprofextended.Profile pprofextended = 105;
-  }
+  opentelemetry.proto.profiles.v1.pprofextended.Profile profile = 8;
 }
