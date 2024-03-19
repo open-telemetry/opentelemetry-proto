@@ -7,7 +7,7 @@ and the corresponding Language Independent Interface Types ([.proto files](opent
 
 ## Language Independent Interface Types
 
-The `.proto` files can be consumed as GIT submodules or copied and built directly into the consumer project.
+The proto files can be consumed as GIT submodules or copied and built directly in the consumer project.
 
 The compiled files are published to central repositories (Maven, ...) from OpenTelemetry client libraries.
 
@@ -15,11 +15,11 @@ See [contribution guidelines](CONTRIBUTING.md) if you would like to make any cha
 
 ## OTLP/JSON
 
-For additional requirements regarding the OTLP/JSON wire representation, refer to [OTLP/JSON wire representation here](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding).
+See additional requirements for [OTLP/JSON wire representation here](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#json-protobuf-encoding).
 
 ## Generate gRPC Client Libraries
 
-To generate the raw gRPC client libraries, use the command `make gen-${LANGUAGE}`. The currently supported languages are:
+To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently supported languages are:
 
 * cpp
 * csharp
@@ -33,8 +33,8 @@ To generate the raw gRPC client libraries, use the command `make gen-${LANGUAGE}
 
 ## Maturity Level
 
-Releases 1.0.0 and newer releases from this repository may contain unstable (alpha or beta)
-components as indicated by the Maturity table below:
+1.0.0 and newer releases from this repository may contain unstable (alpha or beta)
+components as indicated by the Maturity table below.
 
 | Component | Binary Protobuf Maturity | JSON Maturity |
 | --------- |--------------- | ------------- |
@@ -57,7 +57,7 @@ Components marked `Stable` provide the following guarantees:
 - Service method names will not change. [from 1.0.0]
 - Service method parameter names will not change. [from 1.0.0]
 - Service method parameter types and return types will not change. [from 1.0.0]
-- Service method kind (unary vs. streaming) will not change.
+- Service method kind (unary vs streaming) will not change.
 - Names of messages and enums will not change. [from 1.0.0]
 - Numbers assigned to enum choices will not change.
 - Names of enum choices will not change. [from 1.0.0]
@@ -67,7 +67,7 @@ Components marked `Stable` provide the following guarantees:
 - `optional` and `repeated` declarators of existing fields will not change. [from 1.0.0]
 - No existing symbol will be deleted.  [from 1.0.0]
 
-Note: The guarantees marked as [from 1.0.0] will go into effect when this repository is tagged
+Note: guarantees marked [from 1.0.0] will go into effect when this repository is tagged
 with version number 1.0.0.
 
 The following additive changes are allowed:
@@ -88,7 +88,7 @@ is generated from the .proto files by any particular code generator.
 
 ## Experiments
 
-In some cases, we are trying to experiment with different features. In this case,
+In some cases we are trying to experiment with different features. In this case,
 we recommend using an "experimental" sub-directory instead of adding them to any
 protocol version. These protocols should not be used, except for
 development/testing purposes.
