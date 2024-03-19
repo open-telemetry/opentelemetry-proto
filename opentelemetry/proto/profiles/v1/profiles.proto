@@ -18,14 +18,7 @@ package opentelemetry.proto.profiles.v1;
 
 import "opentelemetry/proto/common/v1/common.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
-
-// TODO(@petethepig): idea here is that we will eventually get rid of these
-//   and have just version in this (profiles.proto) file
-import "opentelemetry/proto/profiles/v1/alternatives/pprof/pprof.proto";
-import "opentelemetry/proto/profiles/v1/alternatives/denormalized/denormalized.proto";
-import "opentelemetry/proto/profiles/v1/alternatives/normalized/normalized.proto";
-import "opentelemetry/proto/profiles/v1/alternatives/arrays/arrays.proto";
-import "opentelemetry/proto/profiles/v1/alternatives/pprofextended/pprofextended.proto";
+import "opentelemetry/proto/profiles/v1/pprofextended.proto";
 
 option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1";
 option java_multiple_files = true;
@@ -188,5 +181,5 @@ message ProfileContainer {
   bytes original_payload = 7;
 
   // This is a reference to a pprof profile. Required, even when original_payload is present.
-  opentelemetry.proto.profiles.v1.pprofextended.Profile profile = 8;
+  opentelemetry.proto.profiles.v1.Profile profile = 8;
 }

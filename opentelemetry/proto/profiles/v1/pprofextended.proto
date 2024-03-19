@@ -54,12 +54,12 @@
 
 syntax = "proto3";
 
-package opentelemetry.proto.profiles.v1.pprofextended;
+package opentelemetry.proto.profiles.v1;
 
 import "opentelemetry/proto/common/v1/common.proto";
 
-option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1.Alternatives.PprofExtended";
-option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1/alternatives/pprofextended";
+option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1.PprofExtended";
+option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1/pprofextended";
 
 // Represents a complete profile, including sample types, samples,
 // mappings to binaries, locations, functions, string table, and additional metadata.
