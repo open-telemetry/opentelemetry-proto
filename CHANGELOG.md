@@ -8,6 +8,7 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 * Add metric.metadata for supporting additional metadata on metrics
   [#514](https://github.com/open-telemetry/opentelemetry-proto/pull/514)
+* Add example of an Event [#538](https://github.com/open-telemetry/opentelemetry-proto/pull/538)
 
 ### Changed
 
