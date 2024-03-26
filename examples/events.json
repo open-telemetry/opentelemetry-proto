@@ -29,6 +29,7 @@
               {
                 "timeUnixNano": "1544712660300000000",
                 "observedTimeUnixNano": "1544712660300000000",
+                "severityNumber": 9,
                 "attributes": [
                     {
                       "key": "event.name",
