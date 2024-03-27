@@ -498,9 +498,15 @@ in case of a successful response.
 
 ##### Partial Success
 
-If the request is only partially accepted
-(i.e. when the server accepts only parts of the data and rejects the rest), the
-server MUST respond with `HTTP 200 OK`. The response body MUST be the same
+The partial success is when the request is only partially accepted (i.e. when the
+server accepts only parts of the data and fails the rest). In such a case:
+
+* If all of the samples were rejected (not-retryable failures), the server MUST
+respond with `HTTP 200 OK`. 
+* If any of the failed sample write attempts are retry-able, the server MUST
+respond with related retry-able status code mentioned below.
+
+In all cases the response body MUST be the same
 [Export\<signal>ServiceResponse](../opentelemetry/proto/collector)
 message as in the [Full Success](#full-success-1) case.
 
@@ -553,7 +559,7 @@ The requests that receive a response status code listed in following table SHOUL
 be retried.
 All other `4xx` or `5xx` response status codes MUST NOT be retried.
 
-|HTTP response status code|
+|Retryable HTTP response status code|
 |---------|
 |429 Too Many Requests|
 |502 Bad Gateway|
