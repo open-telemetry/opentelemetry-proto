@@ -501,9 +501,9 @@ in case of a successful response.
 The partial success is when the request is only partially accepted (i.e. when the
 server accepts only parts of the data and fails the rest). In such a case:
 
-* If all of the samples were rejected (not-retryable failures), the server MUST
+- If all of the samples are rejected (not-retryable failures), the server MUST
 respond with `HTTP 200 OK`. 
-* If any of the failed sample write attempts are retry-able, the server MUST
+- If any of the failed sample write attempts are retry-able, the server MUST
 respond with related retry-able status code mentioned below.
 
 In all cases the response body MUST be the same
