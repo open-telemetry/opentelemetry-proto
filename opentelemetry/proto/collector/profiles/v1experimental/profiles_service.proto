@@ -1,4 +1,4 @@
-// Copyright 2019, OpenTelemetry Authors
+// Copyright 2023, OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package opentelemetry.proto.collector.profiles.v1;
 
-import "opentelemetry/proto/profiles/v1/profiles.proto";
+import "opentelemetry/proto/profiles/v1experimental/profiles.proto";
 
 option csharp_namespace = "OpenTelemetry.Proto.Collector.Profiles.V1";
 option java_multiple_files = true;
@@ -39,7 +39,7 @@ message ExportProfilesServiceRequest {
   // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
   // data from multiple origins typically batch the data before forwarding further and
   // in that case this array will contain multiple elements.
-  repeated opentelemetry.proto.profiles.v1.ResourceProfiles resource_profiles = 1;
+  repeated opentelemetry.proto.profiles.v1experimental.ResourceProfiles resource_profiles = 1;
 }
 
 message ExportProfilesServiceResponse {

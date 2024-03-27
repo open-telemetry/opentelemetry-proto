@@ -5,5 +5,5 @@ config_version: 3
 http:
  rules:
  - selector: opentelemetry.proto.collector.profiles.v1.ProfilesService.Export
-   post: /v1/profiles
+   post: /v1experimental/profiles
    body: "*"
