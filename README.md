@@ -74,7 +74,7 @@ The following additive changes are allowed:
 - Adding new fields to existing messages.
 - Adding new messages or enums.
 - Adding new choices to existing enums.
-- Adding new choices to existing oneof fields.
+- Adding new choices to existing one of fields.
 - Adding new services.
 - Adding new methods to existing services.
 
