@@ -6,6 +6,14 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 ### Added
 
+### Changed
+
+## 1.2.0 - 2024-03-29
+
+### Added
+
+* Indicate if a `Span`'s parent or link is remote using 2 bit flag.
+  [#484](https://github.com/open-telemetry/opentelemetry-proto/pull/484)
 * Add metric.metadata for supporting additional metadata on metrics
   [#514](https://github.com/open-telemetry/opentelemetry-proto/pull/514)
 
@@ -19,8 +27,6 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 * Add `flags` field to `Span` and `Span/Link` for W3C-specified Trace Context flags.
   [#503](https://github.com/open-telemetry/opentelemetry-proto/pull/503)
-* Indicate if a `Span`'s parent or link is remote using 2 bit flag.
-  [#484](https://github.com/open-telemetry/opentelemetry-proto/pull/484)
 
 ### Changed
 
