@@ -5,6 +5,14 @@ GOPATH_GENDIR := $(GOPATH_DIR)/$(GENDIR)
 # Find all .proto files.
 PROTO_FILES := $(wildcard opentelemetry/proto/*/*/*.proto opentelemetry/proto/*/*/*/*.proto)
 
+# Make docker work when running on SELinux Enforcing Systems.
+# https://docs.docker.com/storage/bind-mounts/#configure-the-selinux-label
+ifeq ($(shell getenforce),Enforcing)
+	USE_MOUNT_OPTION := :z
+else
+	USE_MOUNT_OPTION :=
+endif
+
 # Function to execute a command. Note the empty line before endef to make sure each command
 # gets executed separately instead of concatenated with previous one.
 # Accepts command to execute as first parameter.
@@ -23,8 +31,8 @@ gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-
 OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.9.0
 BUF_DOCKER ?= bufbuild/buf:1.7.0
 
-PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
-BUF := docker run --rm -v "${PWD}:/workspace" -w /workspace ${BUF_DOCKER}
+PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD}$(USE_MOUNT_OPTION) -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
+BUF := docker run --rm -v "${PWD}:/workspace${USE_MOUNT_OPTION}" -w /workspace ${BUF_DOCKER}
 # When checking for protobuf breaking changes, check against the latest release tag
 LAST_RELEASE_TAG := $(shell git tag --sort=committerdate | tail -1)
 # Options are described in https://docs.buf.build/breaking/usage#git
@@ -150,7 +158,7 @@ gen-ruby:
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
-	
+
 .PHONY: breaking-change
 breaking-change:
 	$(BUF) breaking --against $(BUF_AGAINST) $(BUF_FLAGS)
