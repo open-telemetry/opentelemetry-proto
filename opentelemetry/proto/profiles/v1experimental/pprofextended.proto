@@ -257,7 +257,7 @@ message Sample {
   // Reference to link in Profile.link_table. [optional]
   uint64 link = 12;
 
-  // Timestamps associated with Sample represented in ms. These timestamps are expected
+  // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
   // to fall within the Profile's time range. [optional]
   repeated uint64 timestamps = 13;
 }
