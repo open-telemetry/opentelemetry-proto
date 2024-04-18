@@ -117,7 +117,7 @@ message ResourceProfiles {
   string schema_url = 3;
 }
 
-// A collection of Profiles produced by an InstrumentationScope.
+// A collection of ProfileContainers produced by an InstrumentationScope.
 message ScopeProfiles {
   // The instrumentation scope information for the profiles in this message.
   // Semantically when InstrumentationScope isn't set, it is equivalent with
