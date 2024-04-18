@@ -112,6 +112,9 @@ message ResourceProfiles {
   // A list of ScopeProfiles that originate from a resource.
   repeated ScopeProfiles scope_profiles = 2;
 
+  // The Schema URL, if known. This is the identifier of the Schema that the resource data
+  // is recorded in. To learn more about Schema URL see
+  // https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
   // This schema_url applies to the data in the "resource" field. It does not apply
   // to the data in the "scope_profiles" field which have their own schema_url field.
   string schema_url = 3;
@@ -127,7 +130,10 @@ message ScopeProfiles {
   // A list of ProfileContainers that originate from an instrumentation scope.
   repeated ProfileContainer profiles = 2;
 
-  // This schema_url applies to all profiles and profile events in the "profiles" field.
+  // The Schema URL, if known. This is the identifier of the Schema that the metric data
+  // is recorded in. To learn more about Schema URL see
+  // https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
+  // This schema_url applies to all profiles in the "profiles" field.
   string schema_url = 3;
 }
 
