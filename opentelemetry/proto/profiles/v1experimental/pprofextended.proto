@@ -259,7 +259,7 @@ message Sample {
 
   // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
   // to fall within the Profile's time range. [optional]
-  repeated uint64 unix_nano_times = 13;
+  repeated uint64 timestamps_unix_nano = 13;
 }
 
 // Provides additional context for a sample,
