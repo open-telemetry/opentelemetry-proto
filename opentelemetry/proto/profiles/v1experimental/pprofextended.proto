@@ -82,6 +82,18 @@ message Profile {
   repeated Location location = 4;
   // Array of locations referenced by samples.
   repeated int64 location_indices = 15;
+  // Whether addresses within locations have been normalized to be
+  // execution-context agnostic. This is important, because a symbolizer needs
+  // this information to correctly process an address or not prior to
+  // symbolization. Normalization means subtracting the base from the address.
+  // The base is calculated depending on the executable type:
+  //
+  // * ET_EXEC (Executable files): For executable files (ET_EXEC), typically no adjustment is necessary as they are loaded at fixed addresses, usually starting at address 0. Therefore, the base is often 0, meaning the virtual address directly corresponds to the symbol table address.
+  // * ET_DYN (Dynamic libraries): For dynamic libraries or Position Independent Executables (PIEs), which are marked as ET_DYN, the base address is the virtual address where the mapping of the library or executable starts. This base needs to be calculated to map a runtime virtual address to a symbol address. This is achieved by considering the start of the virtual address range and the offset within the executable file. The calculation adjusts runtime addresses to file offsets, accounting for any discrepancies caused by the location and offset of the executable segment as detailed in the program header.
+  // * ET_REL (Relocatable files): For relocatable files (ET_REL), the base is typically the starting virtual address of where the file is loaded because these types of files are not bound to a specific address and require relocation processing.
+  //
+  // An example of calculating the base address can be found in pprof: https://github.com/google/pprof/blob/e4905b036c4ea7eb8e42342ed91e4a6dd5fcadfb/internal/elfexec/elfexec.go#L212-L283
+  bool normalized_addresses = 19;
   // Functions referenced by locations.
   repeated Function function = 5;
   // Lookup table for attributes.
