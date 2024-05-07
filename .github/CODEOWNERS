@@ -23,3 +23,6 @@ opentelemetry/proto/metrics/  @open-telemetry/specs-approvers @open-telemetry/sp
 
 # Logs owners (global + logs)
 opentelemetry/proto/logs/     @open-telemetry/specs-approvers @open-telemetry/specs-logs-approvers
+
+# Profiles owners (global + profiles)
+opentelemetry/proto/profiles  @open-telemetry/specs-approvers @open-telemetry/profiling-maintainers
