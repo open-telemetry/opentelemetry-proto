@@ -59,6 +59,8 @@ package opentelemetry.proto.profiles.v1experimental;
 import "opentelemetry/proto/common/v1/common.proto";
 
 option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1Experimental";
+option java_multiple_files = true;
+option java_package = "io.opentelemetry.proto.profiles.v1experimental";
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1experimental";
 
 // Represents a complete profile, including sample types, samples,
