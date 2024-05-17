@@ -36,17 +36,19 @@ To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently
 1.0.0 and newer releases from this repository may contain unstable (alpha or beta)
 components as indicated by the Maturity table below.
 
-| Component | Binary Protobuf Maturity | JSON Maturity |
-| --------- |--------------- | ------------- |
-| common/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| resource/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| metrics/\*<br>collector/metrics/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| trace/\*<br>collector/trace/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| logs/\*<br>collector/logs/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| profiles/\*<br>collector/profiles/* | Experimental | [Experimental](docs/specification.md#json-protobuf-encoding) |
+| Component | Binary Protobuf Maturity | JSON Maturity                                                    |
+| --------- |--------------------------|------------------------------------------------------------------|
+| common/* | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)           |
+| resource/* | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)           |
+| metrics/\*<br>collector/metrics/* | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)           |
+| trace/\*<br>collector/trace/* | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)           |
+| logs/\*<br>collector/logs/* | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)           |
+| profiles/\*<br>collector/profiles/* | Experimental **          | [Experimental](docs/specification.md#json-protobuf-encoding) ** |
 
-(See [maturity-matrix.yaml](https://github.com/open-telemetry/community/blob/47813530864b9fe5a5146f466a58bd2bb94edc72/maturity-matrix.yaml#L57)
-for definition of maturity levels).
+** Additional requirements for profiles are [listed here](CONTRIBUTING.md#profiles-compatibility-requirements).
+
+See [maturity-matrix.yaml](https://github.com/open-telemetry/community/blob/47813530864b9fe5a5146f466a58bd2bb94edc72/maturity-matrix.yaml#L57)
+for definition of maturity levels.
 
 ## Stability Definition
 
