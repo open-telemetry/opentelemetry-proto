@@ -235,7 +235,7 @@ message Sample {
   // Supersedes location_index.
   uint64 locations_length = 8;
   // A 128bit id that uniquely identifies this stacktrace, globally. Index into string table. [optional]
-  uint32 stacktrace_id_index = 9;
+  int64 stacktrace_id_index = 9;
   // The type and unit of each value is defined by the corresponding
   // entry in Profile.sample_type. All samples must have the same
   // number of values, the same as the length of Profile.sample_type.
@@ -355,7 +355,7 @@ message Location {
   bool is_folded = 5;
 
   // Type of frame (e.g. kernel, native, python, hotspot, php). Index into string table.
-  uint32 type_index = 6;
+  int64 type_index = 6;
 
   // References to attributes in Profile.attribute_table. [optional]
   repeated uint64 attributes = 7;
