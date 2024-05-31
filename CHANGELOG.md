@@ -4,7 +4,7 @@
 
 Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.3.2...main).
 
-## 1.3.2 - 2024-05-28
+## 1.3.2 - 2024-05-31
 
 ### Changed
 
