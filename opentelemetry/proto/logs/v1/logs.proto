@@ -208,4 +208,9 @@ message LogRecord {
   //   - the field is not present,
   //   - the field contains an invalid value.
   bytes span_id = 10;
+
+  // trace_state conveys information about request position in multiple distributed tracing graphs.
+  // It is a trace_state in w3c-trace-context format: https://www.w3.org/TR/trace-context/#tracestate-header.
+  // See also https://github.com/w3c/distributed-tracing for more details about this field.
+  string trace_state = 12;
 }
