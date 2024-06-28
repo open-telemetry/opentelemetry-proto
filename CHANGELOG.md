@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Full list of differences found in [this compare](https://github.com/open-telemetry/opentelemetry-proto/compare/v1.3.2...main).
+The full list of changes can be found in the compare view for the respective release at <https://github.com/open-telemetry/opentelemetry-proto/releases>.
 
 ## 1.3.2 - 2024-06-28
 
