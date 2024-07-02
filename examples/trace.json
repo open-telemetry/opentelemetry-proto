@@ -31,8 +31,8 @@
               "spanId": "EEE19B7EC3C1B174",
               "parentSpanId": "EEE19B7EC3C1B173",
               "name": "I'm a server span",
-              "startTimeUnixNano": 1544712660000000000,
-              "endTimeUnixNano": 1544712661000000000,
+              "startTimeUnixNano": "1544712660000000000",
+              "endTimeUnixNano": "1544712661000000000",
               "kind": 2,
               "attributes": [
                 {
