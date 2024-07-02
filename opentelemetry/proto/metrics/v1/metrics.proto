@@ -114,6 +114,14 @@ message ScopeMetrics {
 // - DataPoint contains timestamps, attributes, and one of the possible value type
 //   fields.
 //
+//    Metric
+//  +------------+
+//  |name        |
+//  |description |
+//  |unit        |     +------------------------------------+
+//  |data        |---> |Gauge, Sum, Histogram, Summary, ... |
+//  +------------+     +------------------------------------+
+//
 //    Data [One of Gauge, Sum, Histogram, Summary, ...]
 //  +-----------+
 //  |...        |  // Metadata about the Data.
