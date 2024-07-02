@@ -29,6 +29,24 @@ option go_package = "go.opentelemetry.io/proto/otlp/metrics/v1";
 // storage, OR can be embedded by other protocols that transfer OTLP metrics
 // data but do not implement the OTLP protocol.
 //
+// MetricsData
+// └─── ResourceMetrics
+//   ├── Resource
+//   ├── SchemaURL
+//   └── ScopeMetrics
+//      ├── Scope
+//      ├── SchemaURL
+//      └── Metric
+//         ├── Name
+//         ├── Description
+//         ├── Unit
+//         └── data
+//            ├── Gauge
+//            ├── Sum
+//            ├── Histogram
+//            ├── ExponentialHistogram
+//            └── Summary
+//
 // The main difference between this message and collector protocol is that
 // in this message there will not be any "control" or "metadata" specific to
 // OTLP protocol.
@@ -85,7 +103,6 @@ message ScopeMetrics {
 //
 //   https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/data-model.md
 //
-//
 // The data model and relation between entities is shown in the
 // diagram below. Here, "DataPoint" is the term used to refer to any
 // one of the specific data point value types, and "points" is the term used
@@ -97,7 +114,7 @@ message ScopeMetrics {
 // - DataPoint contains timestamps, attributes, and one of the possible value type
 //   fields.
 //
-//     Metric
+//    Metric
 //  +------------+
 //  |name        |
 //  |description |
