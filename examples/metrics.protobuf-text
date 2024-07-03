@@ -1,0 +1,112 @@
+# proto-file: opentelemetry/proto/collector/metrics/v1/trace_service.proto
+# proto-message: ExportMetricsServiceRequest
+# this message can be compiled to a binary message file with:
+#    cat examples/metrics.protobuf-text | protoc --encode=opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest opentelemetry/proto/collector/metrics/v1/metrics_service.proto > examples/metrics.protobuf-bin
+# and then delivered via cURL with:
+#    curl -X POST --data-binary @metrics.protobuf-bin -H "Content-Type: application/x-protobuf" localhost:4318/opentelemetry.proto.collector.metrics.v1.MetricsService/Export
+
+resource_metrics: [
+  {
+    resource: {
+      attributes: [
+        {
+          key: "service.name",
+          value: {
+            string_value: "my.service"
+          }
+        }
+      ]
+    },
+    scope_metrics: [
+      {
+        scope: {
+          name: "my.library",
+          version: "1.0.0",
+          attributes: [
+            {
+              key: "my.scope.attribute",
+              value: {
+                string_value: "some scope attribute"
+              }
+            }
+          ]
+        },
+        metrics: [
+          {
+            name: "my.counter",
+            unit: "1",
+            description: "I am a Counter",
+            sum: {
+              aggregation_temporality: 1,
+              is_monotonic: true,
+              data_points: [
+                {
+                  as_double: 5,
+                  start_time_unix_nano: 1544712660300000000,
+                  time_unix_nano: 1544712660300000000,
+                  attributes: [
+                    {
+                      key: "my.counter.attr",
+                      value: {
+                        string_value: "some value"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            name: "my.gauge",
+            unit: "1",
+            description: "I am a Gauge",
+            gauge: {
+              data_points: [
+                {
+                  as_double: 10,
+                  time_unix_nano: 1544712660300000000,
+                  attributes: [
+                    {
+                      key: "my.gauge.attr",
+                      value: {
+                        string_value: "some value"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            name: "my.histogram",
+            unit: "1",
+            description: "I am a Histogram",
+            histogram: {
+              aggregation_temporality: 1,
+              data_points: [
+                {
+                  start_time_unix_nano: 1544712660300000000,
+                  time_unix_nano: 1544712660300000000,
+                  count: 2,
+                  sum: 2,
+                  bucket_counts: [1,1],
+                  explicit_bounds: [1],
+                  min: 0,
+                  max: 2,
+                  attributes: [
+                    {
+                      key: "my.histogram.attr",
+                      value: {
+                        string_value: "some value"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
