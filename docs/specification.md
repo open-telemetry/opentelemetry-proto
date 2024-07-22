@@ -72,7 +72,7 @@ OTLP defines the encoding of telemetry data and the protocol used to exchange
 data between the client and the server.
 
 This specification defines how OTLP is implemented over
-[gRPC](https://grpc.io/) and HTTP 1.1 transports and specifies
+[gRPC](https://grpc.io/) and HTTP transports and specifies
 [Protocol Buffers schema](https://developers.google.com/protocol-buffers/docs/overview)
 that is used for the payloads.
 
