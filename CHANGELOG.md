@@ -31,6 +31,7 @@ The full list of changes can be found in the compare view for the respective rel
   [#484](https://github.com/open-telemetry/opentelemetry-proto/pull/484)
 * Add metric.metadata for supporting additional metadata on metrics
   [#514](https://github.com/open-telemetry/opentelemetry-proto/pull/514)
+* Add example of an Event [#538](https://github.com/open-telemetry/opentelemetry-proto/pull/538)
 
 ### Changed
 
