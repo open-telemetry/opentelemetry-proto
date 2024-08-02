@@ -79,6 +79,8 @@ message Profile {
   repeated Sample sample = 2;
   // Mapping from address ranges to the image/binary/library mapped
   // into that address range.  mapping[0] will be the main binary.
+  // If multiple binaries contribute to the Profile and no main
+  // binary can be identified, mapping[0] has no special meaning.
   repeated Mapping mapping = 3;
   // Locations referenced by samples via location_indices.
   repeated Location location = 4;
