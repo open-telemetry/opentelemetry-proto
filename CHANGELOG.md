@@ -43,6 +43,8 @@ Full list of differences found in [this compare](https://github.com/open-telemet
 
 * Add `flags` field to `Span` and `Span/Link` for W3C-specified Trace Context flags.
   [#503](https://github.com/open-telemetry/opentelemetry-proto/pull/503)
+* Add a field for W3C-specified Trace Context TraceState to the `LogRecord`.
+  [#522](https://github.com/open-telemetry/opentelemetry-proto/pull/522)
 
 ### Changed
 
