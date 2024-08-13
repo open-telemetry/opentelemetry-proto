@@ -6,6 +6,7 @@ that can be used as request payloads.
 - Trace [trace.json](trace.json)
 - Metrics [metrics.json](metrics.json)
 - Logs [logs.json](logs.json)
+  - Events [events.json](events.json)
 
 ## Trying it out
 
