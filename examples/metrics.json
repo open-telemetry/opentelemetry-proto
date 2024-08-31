@@ -98,6 +98,39 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "my.exponential.histogram",
+              "unit": "1",
+              "description": "I am an Exponential Histogram",
+              "exponentialHistogram": {
+                "aggregationTemporality": 1,
+                "dataPoints": [
+                  {
+                    "startTimeUnixNano": "1544712660300000000",
+                    "timeUnixNano": "1544712660300000000",
+                    "count": 3,
+                    "sum": 10,
+                    "scale": 0,
+                    "zeroCount": 1,
+                    "positive": {
+                      "offset": 1,
+                      "bucketCounts": [0,2]
+                    },
+                    "min": 0,
+                    "max": 5,
+                    "zeroThreshold": 0,
+                    "attributes": [
+                      {
+                        "key": "my.exponential.histogram.attr",
+                        "value": {
+                          "stringValue": "some value"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
             }
           ]
         }
