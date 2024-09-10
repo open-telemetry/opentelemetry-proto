@@ -96,7 +96,7 @@ telemetry data using unary requests using
 messages ([ExportLogsServiceRequest](../opentelemetry/proto/collector/logs/v1/logs_service.proto) for logs,
 [ExportMetricsServiceRequest](../opentelemetry/proto/collector/metrics/v1/metrics_service.proto) for metrics,
 [ExportTraceServiceRequest](../opentelemetry/proto/collector/trace/v1/trace_service.proto) for traces),
-[ExportProfilesServiceRequest](../opentelemetry/proto/collector/trace/v1experimental/profiles_service.proto) for profiles).
+[ExportProfilesServiceRequest](../opentelemetry/proto/collector/profiles/v1experimental/profiles_service.proto) for profiles).
 The client continuously sends a sequence of requests to the server and expects
 to receive a response to each request:
 
