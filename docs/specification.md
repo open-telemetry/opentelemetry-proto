@@ -15,7 +15,10 @@ cascade:
 
 # OpenTelemetry Protocol Specification
 
-**Status**: [Stable](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/document-status.md)
+**Status**:
+
+* [Stable](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/document-status.md) for the trace, metric and log signals.
+* [Development](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/document-status.md) for the profiles signal.
 
 The OpenTelemetry Protocol (OTLP) specification describes the encoding, transport,
 and delivery mechanism of telemetry data between telemetry sources, intermediate
