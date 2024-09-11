@@ -14,17 +14,17 @@
 
 syntax = "proto3";
 
-package opentelemetry.proto.profiles.v1experimental;
+package opentelemetry.proto.profiles.v1development;
 
 import "opentelemetry/proto/common/v1/common.proto";
 import "opentelemetry/proto/resource/v1/resource.proto";
-import "opentelemetry/proto/profiles/v1experimental/pprofextended.proto";
+import "opentelemetry/proto/profiles/v1development/pprofextended.proto";
 
-option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1Experimental";
+option csharp_namespace = "OpenTelemetry.Proto.Profiles.V1Development";
 option java_multiple_files = true;
-option java_package = "io.opentelemetry.proto.profiles.v1experimental";
+option java_package = "io.opentelemetry.proto.profiles.v1development";
 option java_outer_classname = "ProfilesProto";
-option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1experimental";
+option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 
 //                Relationships Diagram
 //
@@ -187,5 +187,5 @@ message ProfileContainer {
   bytes original_payload = 7;
 
   // This is a reference to a pprof profile. Required, even when original_payload is present.
-  opentelemetry.proto.profiles.v1experimental.Profile profile = 8;
+  opentelemetry.proto.profiles.v1development.Profile profile = 8;
 }
