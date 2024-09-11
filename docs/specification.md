@@ -462,7 +462,7 @@ The default URL path for requests that carry log data is `/v1/logs` and the
 request body is a Protobuf-encoded `ExportLogsServiceRequest` message.
 
 The default URL path for requests that carry profiling data is
-`/v1experimental/profiles` and the request body is a Protobuf-encoded
+`/v1development/profiles` and the request body is a Protobuf-encoded
 `ExportProfilesServiceRequest` message.
 
 The client MAY gzip the content and in that case MUST include
