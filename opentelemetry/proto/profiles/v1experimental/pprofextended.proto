@@ -130,7 +130,6 @@ message Profile {
   // that did not bother to supply a link.
   int64 doc_url = 19;  // Index into string table.
 
-  reserved 20 to max; // NEXT ID
 }
 
 // Represents a mapping between Attribute Keys and Units.
