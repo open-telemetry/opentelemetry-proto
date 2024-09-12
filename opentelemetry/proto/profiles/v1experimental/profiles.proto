@@ -176,7 +176,7 @@ message ScopeProfiles {
 message Profile {
 
   // first section: pprof fields.
-  // Note that whilst these retain the name and field id from pprof as far as practicable
+  // Note that whilst these retain the name and field id from pprof in most cases
   // for ease of understanding data migration, it is not intended that pprof:Profile and
   // OpenTelemetry:Profile encoding be wire compatible.
 
@@ -192,12 +192,12 @@ message Profile {
   // The set of samples recorded in this profile.
   repeated Sample sample = 2;
   // Mapping from address ranges to the image/binary/library mapped
-  // into that address range.  mapping[0] will be the main binary.
-  repeated Mapping mapping = 3;
+  // into that address range.  mapping_table[0] will be the main binary.
+  repeated Mapping mapping_table = 3;
   // Locations referenced by samples via location_indices.
-  repeated Location location = 4;
+  repeated Location location_table = 4;
   // Functions referenced by locations.
-  repeated Function function = 5;
+  repeated Function function_table = 5;
   // A common table for strings referenced by various messages.
   // string_table[0] must always be "".
   repeated string string_table = 6;
@@ -237,7 +237,7 @@ message Profile {
   reserved 16,17,18,19;
 
 
-  // second section: OTEL fields.
+  // second section: OpenTelemetry fields.
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
   // all zeroes is considered invalid.
@@ -427,7 +427,7 @@ message Sample {
   repeated int32 attribute_indices = 10;
 
   // Reference to link in Profile.link_table. [optional]
-  int32 link = 12;
+  int32 link_index = 12;
 
   // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
   // to fall within the Profile's time range. [optional]
@@ -499,7 +499,7 @@ message Location {
   // Unique nonzero id for the location.  A profile could use
   // instruction addresses or any integer sequence as ids. [deprecated]
   uint64 id = 1;
-  // The index of the corresponding profile.Mapping for this location.
+  // The index of the corresponding Mapping item in profile.mapping_table for this location.
   // It can be unset if the mapping is unknown or not applicable for
   // this profile type.
   int32 mapping_index = 2;
@@ -528,12 +528,12 @@ message Location {
   int32 type_strindex = 6;
 
   // References to attributes in Profile.attribute_table. [optional]
-  repeated int32 attributes_indices = 7;
+  repeated int32 attribute_indices = 7;
 }
 
 // Details a specific line in a source code, linked to a function.
 message Line {
-  // The index of the corresponding profile.Function for this line.
+  // The index of the corresponding Function item in profile.function_table for this line.
   int32 function_index = 1;
   // Line number in source code.
   int64 line = 2;
