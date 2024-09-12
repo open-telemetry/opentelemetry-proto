@@ -129,7 +129,7 @@ message ResourceProfiles {
   string schema_url = 3;
 }
 
-// A collection of ProfileContainers produced by an InstrumentationScope.
+// A collection of Profiles produced by an InstrumentationScope.
 message ScopeProfiles {
   // The instrumentation scope information for the profiles in this message.
   // Semantically when InstrumentationScope isn't set, it is equivalent with
@@ -424,7 +424,7 @@ message Sample {
   // [deprecated, superseded by attributes]
   repeated Label label = 3;
   // References to attributes in Profile.attribute_table. [optional]
-  repeated int32 attributes = 10;
+  repeated int32 attribute_indices = 10;
 
   // Reference to link in Profile.link_table. [optional]
   int32 link = 12;
@@ -486,7 +486,7 @@ message Mapping {
   // Specifies the kind of build id. See BuildIdKind enum for more details [optional]
   BuildIdKind build_id_kind = 11;
   // References to attributes in Profile.attribute_table. [optional]
-  repeated uint64 attributes = 12;
+  repeated int32 attribute_indices = 12;
   // The following fields indicate the resolution of symbolic info.
   bool has_functions = 7;
   bool has_filenames = 8;
@@ -528,7 +528,7 @@ message Location {
   int32 type_strindex = 6;
 
   // References to attributes in Profile.attribute_table. [optional]
-  repeated uint64 attributes = 7;
+  repeated int32 attributes_indices = 7;
 }
 
 // Details a specific line in a source code, linked to a function.
