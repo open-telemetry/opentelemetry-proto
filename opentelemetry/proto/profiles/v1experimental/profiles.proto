@@ -258,7 +258,7 @@ message Profile {
   fixed64 end_time_unix_nano = 22;
 
   // Array of locations referenced by samples.
-  repeated int64 location_indices = 23;
+  repeated int32 location_indices = 23;
 
   // Lookup table for attributes.
   repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 24;
