@@ -15,7 +15,10 @@ cascade:
 
 # OpenTelemetry Protocol Specification
 
-**Status**: [Stable](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/document-status.md)
+**Status**:
+
+* [Stable](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/document-status.md) for the trace, metric and log signals.
+* [Development](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/document-status.md) for the profiles signal.
 
 The OpenTelemetry Protocol (OTLP) specification describes the encoding, transport,
 and delivery mechanism of telemetry data between telemetry sources, intermediate
@@ -92,7 +95,8 @@ telemetry data using unary requests using
 [Export*ServiceRequest](https://github.com/open-telemetry/opentelemetry-proto)
 messages ([ExportLogsServiceRequest](../opentelemetry/proto/collector/logs/v1/logs_service.proto) for logs,
 [ExportMetricsServiceRequest](../opentelemetry/proto/collector/metrics/v1/metrics_service.proto) for metrics,
-[ExportTraceServiceRequest](../opentelemetry/proto/collector/trace/v1/trace_service.proto) for traces).
+[ExportTraceServiceRequest](../opentelemetry/proto/collector/trace/v1/trace_service.proto) for traces,
+[ExportProfilesServiceRequest](../opentelemetry/proto/collector/profiles/v1experimental/profiles_service.proto) for profiles).
 The client continuously sends a sequence of requests to the server and expects
 to receive a response to each request:
 
@@ -165,10 +169,10 @@ If the server receives an empty request (a request that does not carry
 any telemetry data) the server SHOULD respond with success.
 
 On success, the server response MUST be a
-[Export\<signal>ServiceResponse](../opentelemetry/proto/collector)
-message (`ExportTraceServiceResponse` for traces,
-`ExportMetricsServiceResponse` for metrics and
-`ExportLogsServiceResponse` for logs).
+[Export\<signal>ServiceResponse](../opentelemetry/proto/collector) message
+(`ExportTraceServiceResponse` for traces, `ExportMetricsServiceResponse` for
+metrics, `ExportLogsServiceResponse` for logs and
+`ExportProfilesServiceResponse` for profiles).
 
 The server MUST leave the `partial_success` field unset
 in case of a successful response.
@@ -182,11 +186,12 @@ server response MUST be the same
 message as in the [Full Success](#full-success) case.
 
 Additionally, the server MUST initialize the `partial_success` field
-(`ExportTracePartialSuccess` message for traces,
-`ExportMetricsPartialSuccess` message for metrics and
-`ExportLogsPartialSuccess` message for logs), and it MUST set the respective
-`rejected_spans`, `rejected_data_points` or `rejected_log_records` field with
-the number of spans/data points/log records it rejected.
+(`ExportTracePartialSuccess` message for traces, `ExportMetricsPartialSuccess`
+message for metrics, `ExportLogsPartialSuccess` message for logs and
+`ExportProfilesPartialSuccess` for profiles), and it MUST set the respective
+`rejected_spans`, `rejected_data_points`, `rejected_log_records` or
+`rejected_profiles` field with the number of spans/data points/log
+records/profiles it rejected.
 
 The server SHOULD populate the `error_message` field with a human-readable
 error message in English. The message should explain why the
@@ -456,6 +461,10 @@ the request body is a Protobuf-encoded `ExportMetricsServiceRequest` message.
 The default URL path for requests that carry log data is `/v1/logs` and the
 request body is a Protobuf-encoded `ExportLogsServiceRequest` message.
 
+The default URL path for requests that carry profiling data is
+`/v1development/profiles` and the request body is a Protobuf-encoded
+`ExportProfilesServiceRequest` message.
+
 The client MAY gzip the content and in that case MUST include
 "Content-Encoding: gzip" request header. The client MAY include
 "Accept-Encoding: gzip" request header if it can receive gzip-encoded responses.
@@ -487,11 +496,12 @@ server.
 If the server receives an empty request (a request that does not carry
 any telemetry data) the server SHOULD respond with success.
 
-On success, the server MUST respond with `HTTP 200 OK`. The response body MUST be
-a Protobuf-encoded [Export\<signal>ServiceResponse](../opentelemetry/proto/collector)
-message (`ExportTraceServiceResponse` for traces,
-`ExportMetricsServiceResponse` for metrics and
-`ExportLogsServiceResponse` for logs).
+On success, the server MUST respond with `HTTP 200 OK`. The response body MUST
+be a Protobuf-encoded
+[Export\<signal>ServiceResponse](../opentelemetry/proto/collector) message
+(`ExportTraceServiceResponse` for traces, `ExportMetricsServiceResponse` for
+metrics, `ExportLogsServiceResponse` for logs and
+`ExportProfilesServiceResponse` for profiles).
 
 The server MUST leave the `partial_success` field unset
 in case of a successful response.
@@ -505,10 +515,10 @@ server MUST respond with `HTTP 200 OK`. The response body MUST be the same
 message as in the [Full Success](#full-success-1) case.
 
 Additionally, the server MUST initialize the `partial_success` field
-(`ExportTracePartialSuccess` message for traces,
-`ExportMetricsPartialSuccess` message for metrics and
-`ExportLogsPartialSuccess` message for logs), and it MUST set the respective
-`rejected_spans`, `rejected_data_points` or `rejected_log_records` field with
+(`ExportTracePartialSuccess` message for traces, `ExportMetricsPartialSuccess`
+message for metrics, `ExportLogsPartialSuccess` message for logs and
+`ExportProfilesPartialSuccess` for profiles), and it MUST set the respective
+`rejected_spans`, `rejected_data_points`, `rejected_log_records` or `rejected_profiles` field with
 the number of spans/data points/log records it rejected.
 
 The server SHOULD populate the `error_message` field with a human-readable
