@@ -241,16 +241,6 @@ message Sample {
   // result has a list of values that is the element-wise sum of the
   // lists of the originals.
   repeated int64 value = 2;
-  // label includes additional context for this sample. It can include
-  // things like a thread id, allocation size, etc.
-  //
-  // NOTE: While possible, having multiple values for the same label key is
-  // strongly discouraged and should never be used. Most tools (e.g. pprof) do
-  // not have good (or any) support for multi-value labels. And an even more
-  // discouraged case is having a string label and a numeric label of the same
-  // name on a sample.  Again, possible to express, but should not be used.
-  // [deprecated, superseded by attributes]
-  repeated Label label = 3;
   // References to attributes in Profile.attribute_table. [optional]
   repeated uint64 attributes = 10;
 
@@ -334,9 +324,6 @@ message Location {
   // symbols. This field must be recomputed when the symbolization state of the
   // profile changes.
   bool is_folded = 5;
-
-  // Type of frame (e.g. kernel, native, python, hotspot, php). Index into string table.
-  int64 type_index = 6;
 
   // References to attributes in Profile.attribute_table. [optional]
   repeated uint64 attributes = 7;
