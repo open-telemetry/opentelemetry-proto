@@ -211,8 +211,10 @@ message Profile {
   // The following pprof fields are informational, do not affect
   // interpretation of results.
 
-  // Time of collection (UTC) represented as nanoseconds past the epoch.
-  int64 time_nanos = 9;
+  // start_time_unix_nano is the start time of the profile.
+  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
+  // This field is semantically required.
+  fixed64 start_time_unix_nano = 9;
   // Duration of the profile, if a duration makes sense.
   int64 duration_nanos = 10;
   // The kind of events between sampled occurrences.
@@ -245,27 +247,15 @@ message Profile {
   // This field is required.
   bytes profile_id = 20;
 
-  // start_time_unix_nano is the start time of the profile.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  //
-  // This field is semantically required and it is expected that end_time >= start_time.
-  fixed64 start_time_unix_nano = 21;
-
-  // end_time_unix_nano is the end time of the profile.
-  // Value is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.
-  //
-  // This field is semantically required and it is expected that end_time >= start_time.
-  fixed64 end_time_unix_nano = 22;
-
   // Array of locations referenced by samples.
-  repeated int32 location_indices = 23;
+  repeated int32 location_indices = 21;
 
   // Lookup table for attributes.
-  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 24;
+  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 22;
   // Represents a mapping between Attribute Keys and Units.
-  repeated AttributeUnit attribute_units = 25;
+  repeated AttributeUnit attribute_units = 23;
   // Lookup table for links.
-  repeated Link link_table = 26;
+  repeated Link link_table = 24;
 
   // attributes is a collection of key/value pairs. Note, global attributes
   // like server name can be set using the resource API. Examples of attributes:
@@ -279,22 +269,23 @@ message Profile {
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
   // Attribute keys MUST be unique (it is not allowed to have more than one
   // attribute with the same key).
-  repeated opentelemetry.proto.common.v1.KeyValue attributes = 27;
+  repeated opentelemetry.proto.common.v1.KeyValue attributes = 25;
 
   // dropped_attributes_count is the number of attributes that were discarded. Attributes
   // can be discarded because their keys are too long or because there are too many
   // attributes. If this value is 0, then no attributes were dropped.
-  uint32 dropped_attributes_count = 28;
+  uint32 dropped_attributes_count = 26;
 
   // Specifies format of the original payload. Common values are defined in semantic conventions. [required if original_payload is present]
-  string original_payload_format = 29;
+  string original_payload_format = 27;
 
   // Original payload can be stored in this field. This can be useful for users who want to get the original payload.
   // Formats such as JFR are highly extensible and can contain more information than what is defined in this spec.
   // Inclusion of original payload should be configurable by the user. Default behavior should be to not include the original payload.
   // If the original payload is in pprof format, it SHOULD not be included in this field.
-  // The field is optional, however if it is present `profile` MUST be present and contain the same profiling information.
-  bytes original_payload = 30;
+  // The field is optional, however if it is present then equivalent converted data should be populated in other fields
+  // of this message as far as is practicable.
+  bytes original_payload = 28;
 }
 
 // Represents a mapping between Attribute Keys and Units.
