@@ -268,6 +268,9 @@ message ExponentialHistogram {
 // data type. These data points cannot always be merged in a meaningful way.
 // While they can be useful in some applications, histogram data points are
 // recommended for new applications.
+// Summary metrics do not have an aggregation temporality field. This is
+// because the count and sum fields of a SummaryDataPoint are assumed to be
+// cumulative values.
 message Summary {
   repeated SummaryDataPoint data_points = 1;
 }
@@ -606,7 +609,8 @@ message ExponentialHistogramDataPoint {
 }
 
 // SummaryDataPoint is a single data point in a timeseries that describes the
-// time-varying values of a Summary metric.
+// time-varying values of a Summary metric. The count and sum fields represent
+// cumulative values.
 message SummaryDataPoint {
   reserved 1;
 
