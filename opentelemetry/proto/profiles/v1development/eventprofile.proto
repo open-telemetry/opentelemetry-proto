@@ -1,0 +1,230 @@
+// Copyright 2024, OpenTelemetry Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package opentelemetry.proto.profiles.v1development;
+
+import "opentelemetry/proto/common/v1/common.proto";
+
+// Profile holds a collection of events that represent a profile.
+message Profile {
+  // Data
+  repeated Event events = 1;
+
+  // Dictionary Tables
+  repeated EventType event_types = 3; // first element is the default event type
+  repeated Stack stacks = 4; // first element should be an empty stack (no frames)
+  repeated Location locations = 5;
+  repeated Function functions = 6;
+  repeated Mapping mappings = 7;
+  repeated KeyValue attributes = 8;
+  repeated Link links = 10;
+  repeated string strings = 11; // first element SHOULD be ""
+  repeated Clock clocks = 12;
+  reserved 13 to 15; // keep some 1-byte encodable field numbers for future use
+
+  // Meta Data
+  fixed64 time_unix_nano = 16; // The end time of the profile in nanoseconds since the Unix epoch.
+  int64 duration_nanos = 17; // The duration of the profile in nanoseconds.
+  repeated uint32 comment_string_index = 18;
+  // TODO: missing period
+}
+
+// Event holds a single event in a profile. It comes in two flavors:
+//
+// 1. Aggregate Event: The count is greater than 0.
+// - time and duration are optional. Their default value is
+//   represented by by Profile.time_unix_nano and Profile.duration_nanos.
+//
+// 1. Individual Event: The count value is 0 (omitted on the wire).
+// - The time field must be used and the EventType must have a Clock associated
+//   with it.
+//
+// TODO: The above is probably a bit too simplistic. There are 32 combinations
+// for the fields time, duration, value, count and sum when considering that
+// they can be unset (0) or holding a value (>1). We need to be clear which
+// combinations have use cases and which should be considered invalid.
+message Event {
+  // The index of EventType associated with this event. The most frequent event
+  // type should use index 0 so it can be omitted on the wire.
+  uint32 event_type_index = 1;
+
+  // The index of the Stack associated with this event.
+  uint32 stack_index = 2;
+
+  // The index of the Link associated with this event if available.
+  optional uint32 link_index = 3;
+
+  // The indices of the attributes associated with this event.
+  repeated uint32 attribute_indices = 4;
+
+  // time represents the timestamp of the event. For events without a duration,
+  // this is the end time of the event. Time values for the same Clock must be
+  // delta encoded. This means that the time value of the first Event on the
+  // wire is the number of clock cycles since the start of the associated Clock.
+  // For subsequent Event messages for the same Clock, the time value is the
+  // number of clock cycles since the previous message on the wire.
+  int64 time = 5;
+
+  // The duration of the event. This is typically used for Off-CPU wait events.
+  // CPU samples are point in time events that have a value representing their
+  // magnitude, but a duration of 0. the time period during which the CPU
+  // time acrued is explicitly known. The unit of the duration is defined by the
+  // Clock associated with the EventType. When no Clock is associated with the
+  // the EventType, this should be 0 (omitted).
+  uint64 duration = 6;
+
+  // The value of the event in the unit specified in the EventType. If there is
+  // a Clock for the EventType, the value defaults to EventType.default_value
+  // when it is 0 (omitted). If there is no Clock for the EventType, the value
+  // defaults to Event.count * EventType.default_value. The latter case allows
+  // for the efficient aggregation of CPU samples with equal magnitudes.
+  uint64 value = 7;
+
+  // The number of events that were aggregated into this event. A count value of
+  // 0 should be used for individual events to reduce message size, but 1 is
+  // also allowed and considered to be equivalent. A count larger than 1
+  // indicates that this event is an aggregate of multiple events.
+  uint64 count = 8;
+
+  // The the sum the values of the aggregated events. If an event has a count
+  // and a EventType.default_value, the sum field should be 0, and clients
+  // should derive it by multiplying the count with the default value.
+  uint64 sum = 9;
+
+  // TODO: Add more statistics for aggregated events (e.g. min, max,
+  // stddev, etc) or even histogram sketches?
+}
+
+// Clock describes the clock format used by the EventType. Clocks are expected
+// to be monotonic and include the time when a system is suspended.
+message Clock {
+  // The number of clock cycles per second (Hz). To represent a wall clock with
+  // nanosecond resolution, this would be 1_000_000_000. For a TSC clock, the
+  // value will depend on the TSC frequency of the CPU. The value of this field
+  // impacts the interpretation of Event.time and Event.duration.
+  uint64 frequency = 1;
+  // The start time of the clock in nanoseconds since the Unix epoch.
+  // Implementations SHOULD avoid chosing a start time that falls within a leap
+  // second as the corresponding unix timestamps are ambiguous relative to UTC.
+  fixed64 time_unix_nano = 2;
+  // The indices of the attributes associated with this clock.
+  repeated uint32 attribute_indices = 3;
+}
+
+message EventType {
+  // The name of the event type. Semantic conventions define the names of common
+  // profiling events as well as how they map to existing profiling formats such
+  // as JFR and Go Execution Traces.
+  uint32 name_string_index = 1;
+  // The unit of the Event.value and Event.sum field. Follows the format
+  // described by http://unitsofmeasure.org/ucum.html and MUST be specified
+  // using the UCUM case sensitive (“c/s”) variant. The units "By" for bytes and
+  // "s" for seconds as well as the prefixes "n" (nano), "u" (micro), "m"
+  // (milli), "k" (kilo), "M" (mega) and "G" (giga) SHOULD be supported by all
+  // implementations.
+  uint32 unit_string_index = 2;
+  // The index of the Clock associated with this event type. The absence of this
+  // field indiciates that events associated with this event type are expected
+  // to be aggregates containing a Event.count for the number of events that
+  // were aggregated into this event and an Event.value representing the sum of
+  // the values of the aggregated events.
+  optional uint32 clock_index = 3;
+  // The default value for the Event.value field. This is used when the value
+  // field is the same for all events of this type. For example CPU samples may
+  // typically represent the same value of 10ms.
+  uint64 default_value = 4;
+  // A list of attributes that further describe the event type. These attributes
+  // are described using semantic conventions.
+  repeated uint32 attribute_incidices = 7;
+}
+
+message Stack {
+  // A Stack is a list of Location indices. The first element is the leaf frame.
+  // An empty stack indiciates that an Event did not contain a stack trace.
+  repeated uint32 location_index = 1;
+}
+
+message Location {
+  uint32 mapping_index = 1;
+  uint64 address = 2;
+  repeated Line line = 3;
+  bool is_folded = 4;
+  int32 type_string_index = 5;
+  repeated uint32 attribute_index = 6;
+}
+
+message Link {
+  bytes trace_id = 1;
+  bytes span_id = 2;
+}
+
+message Mapping {
+  uint64 memory_start = 1;
+  uint64 memory_limit = 2;
+  uint64 file_offset = 3;
+  uint32 filename_string_index = 4;
+  uint32 build_id_string_index = 5;
+  BuildIdKind build_id_kind = 6;
+  repeated uint64 attributes = 7;
+  bool has_functions = 8;
+  bool has_filenames = 9;
+  bool has_line_numbers = 10;
+  bool has_inline_frames = 11;
+}
+
+message Line {
+  uint32 function_index = 1;
+  int64 line = 2;
+  int64 column = 3;
+}
+
+message Function {
+  uint64 id = 1;
+  uint32 name_string_uindex = 2;
+  uint32 system_name_string_index = 3;
+  uint32 filename_string_index = 4;
+  int64 start_line = 5;
+}
+
+// KeyValue is semantically equivalent to opentelemetry.proto.common.v1.KeyValue
+// but is defined here in order to allow referencing the Profiles.strings table
+// to reduce the size of the serialized data, especially repetitive key strings.
+message KeyValue {
+  uint32 key_string_index = 1;
+  AnyValue value = 2;
+}
+
+// AnyValue is semantically equivalent to opentelemetry.proto.common.v1.ArrayValue,
+// see KeyValue message for more details.
+message AnyValue {
+  oneof value {
+    uint32 string_index = 1;
+    bool bool_value = 2;
+    int64 int_value = 3;
+    double double_value = 4;
+    ArrayValue array_value = 5;
+    KeyValueList kvlist_value = 6;
+    bytes bytes_value = 7;
+  }
+}
+
+// ArrayValue is semantically equivalent to opentelemetry.proto.common.v1.ArrayValue,
+// see KeyValue message for more details.
+message ArrayValue {
+  repeated AnyValue values = 1;
+}
+
+// TODO: Can we use something like https://github.com/bufbuild/protovalidate?
