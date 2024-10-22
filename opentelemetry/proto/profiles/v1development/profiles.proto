@@ -483,7 +483,7 @@ message Location {
 
 // Details a specific line in a source code, linked to a function.
 message Line {
-  // The index of the corresponding profile.Function for this line.
+  // Reference to function in Profile.function_table.
   int32 function_index = 1;
   // Line number in source code.
   int64 line = 2;
