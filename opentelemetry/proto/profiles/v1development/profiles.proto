@@ -452,7 +452,7 @@ message Location {
   // Unique nonzero id for the location.  A profile could use
   // instruction addresses or any integer sequence as ids. [deprecated]
   uint64 id = 1;
-  // The index of the corresponding profile.Mapping for this location.
+  // Reference to mapping in Profile.mapping_table.
   // It can be unset if the mapping is unknown or not applicable for
   // this profile type.
   int32 mapping_index = 2;
