@@ -377,7 +377,7 @@ message ValueType {
 // augmented with auxiliary information like the thread-id, some
 // indicator of a higher level request being handled etc.
 message Sample {
-  // The indices recorded here correspond to locations in Profile.location.
+  // References to locations in Profile.location_table.
   // The leaf is at location_index[0]. [deprecated, superseded by locations_start_index / locations_length]
   repeated int32 location_index = 1;
   // locations_start_index along with locations_length refers to to a slice of locations in Profile.location.
