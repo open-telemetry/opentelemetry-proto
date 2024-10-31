@@ -423,6 +423,54 @@ message Label {
   int64 num_unit = 4;  // Index into string table
 }
 
+// Specifies the availability of the function and file names, line numbers and
+// inline frames for a mapping.
+enum SymbolizationLevel {
+  // Unknown or unassigned. Clients can try to determine the actual level
+  // heuristically from the presence of function and file names, line numbers
+  // and inline frames.
+  SYMBOLIZATION_LEVEL_UNSPECIFIED = 0;
+  // No symbolization was attempted for the mapping and it's known to be a
+  // native mapping with no pre-populated symbol information. Function and file
+  // names, line numbers and inline frames are absent for all locations for the
+  // mapping.
+  //
+  // This level is common for a native (e.g. C++) mapping in a profile emitted
+  // by a production profiling collector since no symbolization is typically
+  // attempted on the host as debug information is usually not shipped to
+  // production machines.
+  //
+  // The level is rarely used with managed language mappings like Java since
+  // symbolization for those languages is typically done on the host.
+  SYMBOLIZATION_LEVEL_NONE = 1;
+  // Limited symbol information is available: function names are assigned but
+  // may be imprecise; file names, line numbers and inline frames are missing.
+  //
+  // This level is encountered when the symbolization is performed for a C++
+  // binary that has symbol table (.symtab) present, but no DWARF. Such a symbol
+  // table records top-level symbol names, but it won't have the more granular
+  // function and line breakdown.
+  //
+  // The level is rarely used with managed languages like Java since their
+  // symbolization information is typically more complete.
+  SYMBOLIZATION_LEVEL_SYMBOLS = 2;
+  // Limited debug information is available: function / file names and line
+  // numbers are assigned but the inline frames are not available.
+  //
+  // This is a somewhat exotic case specific to C++ binaries with split DWARF
+  // information. When symbolization is done against such a binary and the *.dwp
+  // file is not available, the DWARF is available only partially which results
+  // in this more complete but still partial symbolization level.
+  //
+  // This level is never practically useful for managed languages.
+  SYMBOLIZATION_LEVEL_LINES_NOINLINE = 3;
+  // Full, most-desired level of symbolization. All of function and file names,
+  // line numbers and inline frames are available. This level indicates that
+  // full debug information was available for the binary. It is also what
+  // managed languages like Java provide.
+  SYMBOLIZATION_LEVEL_LINES_INLINE = 4;
+}
+
 // Describes the mapping of a binary in memory, including its address range,
 // file offset, and metadata like build ID
 message Mapping {
@@ -440,11 +488,13 @@ message Mapping {
   int64 filename = 5;  // Index into string table
   // References to attributes in Profile.attribute_table. [optional]
   repeated uint64 attributes = 12;
-  // The following fields indicate the resolution of symbolic info.
-  bool has_functions = 7;
-  bool has_filenames = 8;
-  bool has_line_numbers = 9;
-  bool has_inline_frames = 10;
+  bool has_functions = 7;  // Deprecated, to be removed.
+  bool has_filenames = 8;  // Deprecated, to be removed.
+  bool has_line_numbers = 9;  // Deprecated, to be removed.
+  bool has_inline_frames = 10;  // Deprecated, to be removed.
+  // The level of availability of the function and file names, line numbers and
+  // inline frames for the mapping. [optional]
+  SymbolizationLevel symbolization_level = 13;
 }
 
 // Describes function and line table debug information.
