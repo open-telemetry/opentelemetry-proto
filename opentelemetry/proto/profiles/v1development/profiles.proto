@@ -383,7 +383,7 @@ message Sample {
   // locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
   // Supersedes location_index.
   int32 locations_start_index = 7;
-  // locations_length along with locations_start_index refers to a slice of locations in Profile.location.
+  // locations_length along with locations_start_index refers to a slice of locations in Profile.location_indices.
   // Supersedes location_index.
   int32 locations_length = 8;
   // The type and unit of each value is defined by the corresponding
