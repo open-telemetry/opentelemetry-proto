@@ -380,7 +380,7 @@ message Sample {
   // References to locations in Profile.location_table.
   // The leaf is at location_index[0]. [deprecated, superseded by locations_start_index / locations_length]
   repeated int32 location_index = 1;
-  // locations_start_index along with locations_length refers to to a slice of locations in Profile.location.
+  // locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
   // Supersedes location_index.
   int32 locations_start_index = 7;
   // locations_length along with locations_start_index refers to a slice of locations in Profile.location.
