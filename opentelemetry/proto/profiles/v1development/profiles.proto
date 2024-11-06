@@ -198,53 +198,47 @@ message Profile {
   // Locations referenced by samples via location_indices.
   repeated Location location_table = 4;
   // Array of locations referenced by samples.
-  repeated int32 location_indices = 15;
+  repeated int32 location_indices = 5;
   // Functions referenced by locations.
-  repeated Function function_table = 5;
+  repeated Function function_table = 6;
   // Lookup table for attributes.
-  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 16;
+  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 7;
   // Represents a mapping between Attribute Keys and Units.
-  repeated AttributeUnit attribute_units = 17;
+  repeated AttributeUnit attribute_units = 8;
   // Lookup table for links.
-  repeated Link link_table = 18;
+  repeated Link link_table = 9;
   // A common table for strings referenced by various messages.
   // string_table[0] must always be "".
-  repeated string string_table = 6;
-  // frames with Function.function_name fully matching the following
-  // regexp will be dropped from the samples, along with their successors.
-  int32 drop_frames_strindex = 7;   // Index into string table.
-  // frames with Function.function_name fully matching the following
-  // regexp will be kept, even if it matches drop_frames.
-  int32 keep_frames_strindex = 8;  // Index into string table.
+  repeated string string_table = 10;
 
   // The following fields 9-14 are informational, do not affect
   // interpretation of results.
 
   // Time of collection (UTC) represented as nanoseconds past the epoch.
-  int64 time_nanos = 9;
+  int64 time_nanos = 11;
   // Duration of the profile, if a duration makes sense.
-  int64 duration_nanos = 10;
+  int64 duration_nanos = 12;
   // The kind of events between sampled occurrences.
   // e.g [ "cpu","cycles" ] or [ "heap","bytes" ]
-  ValueType period_type = 11;
+  ValueType period_type = 13;
   // The number of events between sampled occurrences.
-  int64 period = 12;
+  int64 period = 14;
   // Free-form text associated with the profile. The text is displayed as is
   // to the user by the tools that read profiles (e.g. by pprof). This field
   // should not be used to store any machine-readable information, it is only
   // for human-friendly content. The profile must stay functional if this field
   // is cleaned.
-  repeated int32 comment_strindices = 13; // Indices into string table.
+  repeated int32 comment_strindices = 15; // Indices into string table.
   // Index into the string table of the type of the preferred sample
   // value. If unset, clients should default to the last sample value.
-  int32 default_sample_type_strindex = 14;
+  int32 default_sample_type_strindex = 16;
 
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
   // all zeroes is considered invalid.
   //
   // This field is required.
-  bytes profile_id = 19;
+  bytes profile_id = 17;
 
   // attributes is a collection of key/value pairs. Note, global attributes
   // like server name can be set using the resource API. Examples of attributes:
@@ -258,15 +252,15 @@ message Profile {
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
   // Attribute keys MUST be unique (it is not allowed to have more than one
   // attribute with the same key).
-  repeated opentelemetry.proto.common.v1.KeyValue attributes = 20;
+  repeated opentelemetry.proto.common.v1.KeyValue attributes = 18;
 
   // dropped_attributes_count is the number of attributes that were discarded. Attributes
   // can be discarded because their keys are too long or because there are too many
   // attributes. If this value is 0, then no attributes were dropped.
-  uint32 dropped_attributes_count = 21;
+  uint32 dropped_attributes_count = 19;
 
   // Specifies format of the original payload. Common values are defined in semantic conventions. [required if original_payload is present]
-  string original_payload_format = 22;
+  string original_payload_format = 20;
 
   // Original payload can be stored in this field. This can be useful for users who want to get the original payload.
   // Formats such as JFR are highly extensible and can contain more information than what is defined in this spec.
@@ -274,7 +268,7 @@ message Profile {
   // If the original payload is in pprof format, it SHOULD not be included in this field.
   // The field is optional, however if it is present then equivalent converted data should be populated in other fields
   // of this message as far as is practicable.
-  bytes original_payload = 23;
+  bytes original_payload = 21;
 }
 
 // Represents a mapping between Attribute Keys and Units.
@@ -377,31 +371,27 @@ message ValueType {
 // augmented with auxiliary information like the thread-id, some
 // indicator of a higher level request being handled etc.
 message Sample {
-  // References to locations in Profile.location_table.
-  // The leaf is at location_index[0]. [deprecated, superseded by locations_start_index / locations_length]
-  repeated int32 location_index = 1;
   // locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
-  // Supersedes location_index.
-  int32 locations_start_index = 7;
+  int32 locations_start_index = 1;
   // locations_length along with locations_start_index refers to a slice of locations in Profile.location_indices.
   // Supersedes location_index.
-  int32 locations_length = 8;
+  int32 locations_length = 2;
   // The type and unit of each value is defined by the corresponding
   // entry in Profile.sample_type. All samples must have the same
   // number of values, the same as the length of Profile.sample_type.
   // When aggregating multiple samples into a single sample, the
   // result has a list of values that is the element-wise sum of the
   // lists of the originals.
-  repeated int64 value = 2;
+  repeated int64 value = 3;
   // References to attributes in Profile.attribute_table. [optional]
-  repeated int32 attribute_indices = 10;
+  repeated int32 attribute_indices = 4;
 
   // Reference to link in Profile.link_table. [optional]
-  int32 link_index = 12;
+  optional int32 link_index = 5;
 
   // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
   // to fall within the Profile's time range. [optional]
-  repeated uint64 timestamps_unix_nano = 13;
+  repeated uint64 timestamps_unix_nano = 6;
 }
 
 // Provides additional context for a sample,
@@ -426,42 +416,37 @@ message Label {
 // Describes the mapping of a binary in memory, including its address range,
 // file offset, and metadata like build ID
 message Mapping {
-  // Unique nonzero id for the mapping. [deprecated]
-  uint64 id = 1;
   // Address at which the binary (or DLL) is loaded into memory.
-  uint64 memory_start = 2;
+  uint64 memory_start = 1;
   // The limit of the address range occupied by this mapping.
-  uint64 memory_limit = 3;
+  uint64 memory_limit = 2;
   // Offset in the binary that corresponds to the first mapped address.
-  uint64 file_offset = 4;
+  uint64 file_offset = 3;
   // The object this entry is loaded from.  This can be a filename on
   // disk for the main binary and shared libraries, or virtual
   // abstractions like "[vdso]".
-  int32 filename_strindex = 5;  // Index into string table
+  int32 filename_strindex = 4;  // Index into string table
   // References to attributes in Profile.attribute_table. [optional]
-  repeated int32 attribute_indices = 12;
+  repeated int32 attribute_indices = 5;
   // The following fields indicate the resolution of symbolic info.
-  bool has_functions = 7;
-  bool has_filenames = 8;
-  bool has_line_numbers = 9;
-  bool has_inline_frames = 10;
+  bool has_functions = 6;
+  bool has_filenames = 7;
+  bool has_line_numbers = 8;
+  bool has_inline_frames = 9;
 }
 
 // Describes function and line table debug information.
 message Location {
-  // Unique nonzero id for the location.  A profile could use
-  // instruction addresses or any integer sequence as ids. [deprecated]
-  uint64 id = 1;
   // Reference to mapping in Profile.mapping_table.
   // It can be unset if the mapping is unknown or not applicable for
   // this profile type.
-  int32 mapping_index = 2;
+  optional int32 mapping_index = 1;
   // The instruction address for this location, if available.  It
   // should be within [Mapping.memory_start...Mapping.memory_limit]
   // for the corresponding mapping. A non-leaf address may be in the
   // middle of a call instruction. It is up to display tools to find
   // the beginning of the instruction if necessary.
-  uint64 address = 3;
+  uint64 address = 2;
   // Multiple line indicates this location has inlined functions,
   // where the last entry represents the caller into which the
   // preceding entries were inlined.
@@ -469,16 +454,16 @@ message Location {
   // E.g., if memcpy() is inlined into printf:
   //    line[0].function_name == "memcpy"
   //    line[1].function_name == "printf"
-  repeated Line line = 4;
+  repeated Line line = 3;
   // Provides an indication that multiple symbols map to this location's
   // address, for example due to identical code folding by the linker. In that
   // case the line information above represents one of the multiple
   // symbols. This field must be recomputed when the symbolization state of the
   // profile changes.
-  bool is_folded = 5;
+  bool is_folded = 4;
 
   // References to attributes in Profile.attribute_table. [optional]
-  repeated int32 attribute_indices = 7;
+  repeated int32 attribute_indices = 5;
 }
 
 // Details a specific line in a source code, linked to a function.
@@ -494,15 +479,13 @@ message Line {
 // Describes a function, including its human-readable name, system name,
 // source file, and starting line number in the source.
 message Function {
-  // Unique nonzero id for the function. [deprecated]
-  uint64 id = 1;
   // Name of the function, in human-readable form if available.
-  int32 name_strindex = 2; // Index into string table
+  int32 name_strindex = 1; // Index into string table
   // Name of the function, as identified by the system.
   // For instance, it can be a C++ mangled name.
-  int32 system_name_strindex = 3; // Index into string table
+  int32 system_name_strindex = 2; // Index into string table
   // Source file containing the function.
-  int32 filename_strindex = 4; // Index into string table
+  int32 filename_strindex = 3; // Index into string table
   // Line number in source file.
-  int64 start_line = 5;
+  int64 start_line = 4;
 }
