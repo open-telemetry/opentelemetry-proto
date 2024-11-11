@@ -27,7 +27,7 @@ Last but not least, first-class support for timestamps allows greater compatibil
 
 ## Design
 
-This proposal comes with a prelimary sketch for the new format to illustrate the feasibility of supporting timestamped as well as aggregated profiling data within the same format. However, the final design will be subject to further discussion and refinement and the changes can be merged via smaller PRs if needed.
+This proposal comes with a prelimary sketch for the new format to illustrate the feasibility of supporting event based as well as aggregated profiling data within the same format. However, the final design will be subject to further discussion and refinement and the changes can be merged via smaller PRs if needed.
 
 The goals for the design are to be a strict superset of pprof and a useful subset of JFR, Go Execution Traces and Linux perf. Efficiency is also a goal, but it is secondary to the goal of providing a flexible and extensible format that can be implemented by a wide range of profilers and analysis tools.
 
