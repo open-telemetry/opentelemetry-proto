@@ -90,7 +90,7 @@ before and after the change interoperate.
 Sometimes we need to experiment with new components, for example to add a
 completely new signal to OpenTelemetry. In this case, to define new experimental
 components we recommend placing new proto files in a "development" sub-directory.
-Such ioslated experimental components are excluded from
+Such isolated experimental components are excluded from
 above [stability requirements](#stability-definition).
 
 We recommend using
@@ -107,7 +107,7 @@ Experiments which succeed, require a review to be marked `Stable`. Once marked
 ### Experimental Additions to Stable Components
 
 New experimental fields or messages may be added in `Development` state to `Stable`
-components. The experimental fields and messages withing `Stable components` are subject
+components. The experimental fields and messages within `Stable components` are subject
 to the full [stability requirements](#stability-definition), and in addition, they must be
 clearly labeled as `Development` (or as any other non-`Stable` level) in the .proto file
 source code.
