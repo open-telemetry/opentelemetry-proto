@@ -208,4 +208,11 @@ message LogRecord {
   //   - the field is not present,
   //   - the field contains an invalid value.
   bytes span_id = 10;
+
+  // A globally unique identifier of event category/type among all events. All
+  // events with the same event_name MUST conform to the same schema for both their
+  // attributes and their body.
+  //
+  // Status: [Development]
+  string event_name = 11;
 }
