@@ -6,7 +6,7 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Added
 
-- logs: Add top-level `event_name` field to log records instead of `event.name` attribute. [#TODO](https://github.com/open-telemetry/opentelemetry-proto/pull/TODO)
+- logs: Add top-level `event_name` field to log records instead of `event.name` attribute. [#600](https://github.com/open-telemetry/opentelemetry-proto/pull/600)
 
 ## 1.3.2 - 2024-06-28
 
