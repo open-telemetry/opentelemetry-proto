@@ -214,5 +214,5 @@ message LogRecord {
   // attributes and their body.
   //
   // Status: [Development]
-  string event_name = 11;
+  string event_name = 12;
 }
