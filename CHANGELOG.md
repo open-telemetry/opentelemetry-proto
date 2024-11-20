@@ -4,7 +4,7 @@
 
 The full list of changes can be found in the compare view for the respective release at <https://github.com/open-telemetry/opentelemetry-proto/releases>.
 
-## 1.3.3. - 2024-11-19
+## 1.4.0 - 2024-11-20
 
 ### Added
 
