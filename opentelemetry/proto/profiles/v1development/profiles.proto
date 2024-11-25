@@ -394,25 +394,6 @@ message Sample {
   repeated uint64 timestamps_unix_nano = 6;
 }
 
-// Provides additional context for a sample,
-// such as thread ID or allocation size, with optional units. [deprecated]
-message Label {
-  int32 key_strindex = 1;   // Index into string table
-
-  // At most one of the following must be present
-  int32 str_strindex = 2;   // Index into string table
-  int64 num = 3;
-
-  // Should only be present when num is present.
-  // Specifies the units of num.
-  // Use arbitrary string (for example, "requests") as a custom count unit.
-  // If no unit is specified, consumer may apply heuristic to deduce the unit.
-  // Consumers may also  interpret units like "bytes" and "kilobytes" as memory
-  // units and units like "seconds" and "nanoseconds" as time units,
-  // and apply appropriate unit conversions to these.
-  int32 num_unit_strindex = 4;  // Index into string table
-}
-
 // Describes the mapping of a binary in memory, including its address range,
 // file offset, and metadata like build ID
 message Mapping {
