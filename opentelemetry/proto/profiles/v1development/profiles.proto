@@ -229,10 +229,6 @@ message Profile {
   // for human-friendly content. The profile must stay functional if this field
   // is cleaned.
   repeated int32 comment_strindices = 15; // Indices into string table.
-  // Index into the string table of the type of the preferred sample
-  // value. If unset, clients should default to the last sample value.
-  int32 default_sample_type_strindex = 16;
-
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
   // all zeroes is considered invalid.
@@ -269,6 +265,9 @@ message Profile {
   // The field is optional, however if it is present then equivalent converted data should be populated in other fields
   // of this message as far as is practicable.
   bytes original_payload = 21;
+
+  // Index into the sample_type array for the type of the default sample value.
+  int32 default_sample_type_index = 23;
 }
 
 // Represents a mapping between Attribute Keys and Units.
