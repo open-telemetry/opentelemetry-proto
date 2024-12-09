@@ -202,10 +202,6 @@ message Profile {
   // Functions referenced by locations.
   repeated Function function_table = 6;
   // Lookup table for attributes.
-  // The OpenTelemetry API specification further restricts the allowed value types:
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
-  // Attribute keys MUST be unique (it is not allowed to have more than one
-  // attribute with the same key).
   repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 7;
   // Represents a mapping between Attribute Keys and Units.
   repeated AttributeUnit attribute_units = 8;
@@ -269,6 +265,10 @@ message Profile {
   //     "abc.com/myattribute": true
   //     "abc.com/score": 10.239
   //
+  // The OpenTelemetry API specification further restricts the allowed value types:
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
+  // Attribute keys MUST be unique (it is not allowed to have more than one
+  // attribute with the same key).
   repeated int32 attribute_indices = 22;
 }
 
