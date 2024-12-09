@@ -144,6 +144,9 @@ message ScopeProfiles {
   // https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
   // This schema_url applies to all profiles in the "profiles" field.
   string schema_url = 3;
+
+  // Lookup table for attributes.
+  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 4;
 }
 
 // Profile is a common stacktrace profile format.
@@ -201,8 +204,6 @@ message Profile {
   repeated int32 location_indices = 5;
   // Functions referenced by locations.
   repeated Function function_table = 6;
-  // Lookup table for attributes.
-  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 7;
   // Represents a mapping between Attribute Keys and Units.
   repeated AttributeUnit attribute_units = 8;
   // Lookup table for links.
@@ -383,7 +384,7 @@ message Sample {
   // result has a list of values that is the element-wise sum of the
   // lists of the originals.
   repeated int64 value = 3;
-  // References to attributes in Profile.attribute_table. [optional]
+  // References to attributes in ScopeProfiles.attribute_table. [optional]
   repeated int32 attribute_indices = 4;
 
   // Reference to link in Profile.link_table. [optional]
@@ -407,7 +408,7 @@ message Mapping {
   // disk for the main binary and shared libraries, or virtual
   // abstractions like "[vdso]".
   int32 filename_strindex = 4;  // Index into string table
-  // References to attributes in Profile.attribute_table. [optional]
+  // References to attributes in ScopeProfiles.attribute_table. [optional]
   repeated int32 attribute_indices = 5;
   // The following fields indicate the resolution of symbolic info.
   bool has_functions = 6;
@@ -443,7 +444,7 @@ message Location {
   // profile changes.
   bool is_folded = 4;
 
-  // References to attributes in Profile.attribute_table. [optional]
+  // References to attributes in ScopeProfiles.attribute_table. [optional]
   repeated int32 attribute_indices = 5;
 }
 
