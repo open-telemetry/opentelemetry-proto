@@ -180,16 +180,6 @@ message ScopeProfiles {
 // for ease of understanding data migration, it is not intended that pprof:Profile and
 // OpenTelemetry:Profile encoding be wire compatible.
 message Profile {
-
-  // A description of the samples associated with each Sample.value.
-  // For a cpu profile this might be:
-  //   [["cpu","nanoseconds"]] or [["wall","seconds"]] or [["syscall","count"]]
-  // For a heap profile, this might be:
-  //   [["allocations","count"], ["space","bytes"]],
-  // If one of the values represents the number of events represented
-  // by the sample, by convention it should be at index 0 and use
-  // sample_type.unit == "count".
-  repeated ValueType sample_type = 1;
   // The set of samples recorded in this profile.
   repeated Sample sample = 2;
   // Mapping from address ranges to the image/binary/library mapped
@@ -231,10 +221,6 @@ message Profile {
   // for human-friendly content. The profile must stay functional if this field
   // is cleaned.
   repeated int32 comment_strindices = 15; // Indices into string table.
-  // Index into the string table of the type of the preferred sample
-  // value. If unset, clients should default to the last sample value.
-  int32 default_sample_type_strindex = 16;
-
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
   // all zeroes is considered invalid.
@@ -271,6 +257,13 @@ message Profile {
   // The field is optional, however if it is present then equivalent converted data should be populated in other fields
   // of this message as far as is practicable.
   bytes original_payload = 21;
+
+  // A description of the samples associated with each Sample.value.
+  // For a cpu profile this might be:
+  //   ["cpu","nanoseconds"] or ["wall","seconds"] or ["syscall","count"]
+  // For a heap profile, this might be:
+  //   ["allocations","count"] or ["space","bytes"]
+  ValueType sample_type = 24;
 }
 
 // Represents a mapping between Attribute Keys and Units.
