@@ -2,6 +2,9 @@
 
 _Instruction for Maintainers only._
 
+- Run [opentelemetry.io workflow](https://github.com/open-telemetry/opentelemetry.io/actions/workflows/build-dev.yml)
+  against `opentelemetry-proto` submodule as a smoke-test for docs. Fix broken links, if any.
+
 - Prepare the release by updating [CHANGELOG.md](CHANGELOG.md), see for example
 [this PR](https://github.com/open-telemetry/opentelemetry-proto/pull/537).
 Merge the PR. From this point on no new PRs can be merged until the release is complete.
