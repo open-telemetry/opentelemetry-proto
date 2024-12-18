@@ -1,0 +1,10 @@
+include-fragments = true
+
+exclude  = [
+    # excluding links to pull requests and issues is done for performance
+    "^https://github.com/open-telemetry/opentelemetry-proto/pull/\\d+$",
+    "^https://github.com/open-telemetry/opentelemetry-proto/issue/\\d+$"
+]
+
+# better to be safe and avoid failures
+max-retries = 6
