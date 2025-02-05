@@ -28,6 +28,7 @@ We follow a structured workflow to ensure smooth collaboration:
 - Follow [Conventional Commits](https://www.conventionalcommits.org/) where possible.
 
 ### Pull Request Guidelines
+
 - Fork the repository and create a new branch.
 - Follow the coding guidelines before submitting your PR.
 - Ensure tests pass locally before pushing.
