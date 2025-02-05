@@ -25,10 +25,6 @@ Additional Notes:
 
 We follow a structured workflow to ensure smooth collaboration:
 
-### Branch Naming Convention
-- **Feature branches**: `feature/<short-description>`
-- **Bugfix branches**: `fix/<short-description>`
-- **Documentation updates**: `docs/<short-description>`
 
 ### Commit Message Format
 - Use descriptive commit messages (e.g., `fix(proto): resolve issue with trace spec`)
@@ -169,16 +165,3 @@ Currently supported languages:
 - ruby
 
 Thank you for contributing! 🚀
-
-
-
-# Contributing
-
-Read OpenTelemetry project [contributing
-guide](https://github.com/open-telemetry/community/blob/main/guides/contributor/README.md)
-for general information about the project.
-
-## Making changes to the .proto files
-
-After making any changes to .proto files make sure to generate all
-implementation by running `make gen-all`.
