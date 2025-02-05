@@ -85,7 +85,6 @@ make compatibility-test
 
 - Follow OpenTelemetry’s [Contribution Guidelines](https://opentelemetry.io/docs/contributing/style-guide/).
 - Ensure that `.proto` files adhere to OpenTelemetry's stability guarantees.
-- Ensure new changes maintain compatibility with existing OpenTelemetry client libraries.
 - Include clear and concise documentation updates if needed.
 
 Check for issues labeled [`good first issue`](https://github.com/open-telemetry/opentelemetry-proto/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to start contributing.
