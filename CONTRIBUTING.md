@@ -84,7 +84,7 @@ make compatibility-test
 ## Contributing Rules
 
 - Follow OpenTelemetry’s [Contribution Guidelines](https://github.com/open-telemetry/community/blob/main/CONTRIBUTING.md).
-- Ensure that .proto files adhere to OpenTelemetry’s stability guarantees.
+- Ensure that `.proto` files adhere to OpenTelemetry's stability guarantees.
 - Ensure new changes maintain compatibility with existing OpenTelemetry client libraries.
 - Include clear and concise documentation updates if needed.
 
