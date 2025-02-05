@@ -23,6 +23,7 @@ Additional Notes:
 
 We follow a structured workflow to ensure smooth collaboration:
 ### Commit Message Format
+
 - Use descriptive commit messages (e.g., `fix(proto): resolve issue with trace spec`)
 - Follow [Conventional Commits](https://www.conventionalcommits.org/) where possible.
 
