@@ -19,9 +19,11 @@ Before getting started, ensure you have the following installed:
 Additional Notes:
 - Ensure your environment supports the required dependencies for building and testing .proto files.
 - Windows users may need [Git Bash](https://gitforwindows.org/) for better compatibility.
+
 ## Workflow
 
 We follow a structured workflow to ensure smooth collaboration:
+
 ### Commit Message Format
 
 - Use descriptive commit messages (e.g., `fix(proto): resolve issue with trace spec`)
