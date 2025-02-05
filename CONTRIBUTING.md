@@ -4,7 +4,7 @@
 
 Welcome to the OpenTelemetry Protocol (OTLP) Specification repository! 🎉
 
-Thank you for your interest in contributing to this project. This repository contains the OTLP protocol specification and the corresponding Language Independent Interface Types (.proto files). Your contributions help improve the interoperability of OpenTelemetry client libraries across various languages.
+Thank you for your interest in contributing to this project. This repository contains the OTLP specification and the corresponding Language Independent Interface Types (`.proto` files). Your contributions help improve the interoperability of OpenTelemetry clients across various programming languages.
 
 If you have any questions, feel free to ask in the community channels. We’re happy to help! 😊
 
