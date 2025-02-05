@@ -83,7 +83,7 @@ make compatibility-test
 
 ## Contributing Rules
 
-- Follow OpenTelemetry’s [Contribution Guidelines](https://github.com/open-telemetry/community/blob/main/CONTRIBUTING.md).
+- Follow OpenTelemetry’s [Contribution Guidelines](https://opentelemetry.io/docs/contributing/style-guide/).
 - Ensure that `.proto` files adhere to OpenTelemetry's stability guarantees.
 - Ensure new changes maintain compatibility with existing OpenTelemetry client libraries.
 - Include clear and concise documentation updates if needed.
@@ -97,7 +97,6 @@ Check for issues labeled [`good first issue`](https://github.com/open-telemetry/
 Need help? Join our community:
 
 - **Slack**: [OpenTelemetry Slack](https://opentelemetry.io/community/)
-- **GitHub Discussions**: [OpenTelemetry Discussions](https://github.com/open-telemetry/opentelemetry-proto/discussions)
 - **Issues**: If you encounter a bug, [open an issue](https://github.com/open-telemetry/opentelemetry-proto/issues)
 
 ---
