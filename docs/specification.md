@@ -665,10 +665,6 @@ payloads that contain zero spans, zero metric points or zero log records),
 receivers MAY ignore empty envelopes, and implementations that receive and send
 (forward) OTLP payloads MAY drop empty envelopes.
 
-There are certain use cases for communicating the existece of a Resource
-without any contained telemetry data, such as service discovery or mapping, but
-going forward those use cases are best addressed by using Entities instead.
-
 ## Known Limitations
 
 ### Request Acknowledgements
