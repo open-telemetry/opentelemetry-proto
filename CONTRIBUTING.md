@@ -14,11 +14,9 @@ Before getting started, ensure you have the following installed:
 
 * **Docker** – [Install Docker](https://docs.docker.com/engine/install/)
 * **Make** (for running development tasks)
-* **Protobuf Compiler (protoc)** – [Install protoc](https://grpc.io/docs/protoc-installation/)
 
 Additional Notes:
 
-* Ensure your environment supports the required dependencies for building and testing .proto files.
 * Windows users may need [Git Bash](https://gitforwindows.org/) for better compatibility.
 
 ## Workflow
@@ -33,8 +31,7 @@ We follow a structured workflow to ensure smooth collaboration:
 ### Pull Request Guidelines
 
 - Fork the repository and create a new branch.
-- Follow the coding guidelines before submitting your PR.
-- Ensure tests pass locally before pushing.
+- Ensure `make all` pass locally before pushing.
 - Link relevant issues in the PR description.
 
 ---
@@ -52,19 +49,6 @@ cd opentelemetry-proto
 make gen-all
 ```
 
-To validate your changes:
-
-```bash
-make check
-```
-
-To update dependencies:
-
-```bash
-make update
-```
-
-
 ## Testing
 
 To test your changes, run:
@@ -79,16 +63,10 @@ To verify the protobuf definitions:
 make proto-lint
 ```
 
-To check compatibility with different OpenTelemetry client libraries:
-
-```bash
-make compatibility-test
-```
-
 
 ## Contributing Rules
 
-- Follow OpenTelemetry’s [Contribution Guidelines](https://opentelemetry.io/docs/contributing/style-guide/).
+- Follow OpenTelemetry’s [Contribution Guidelines](https://github.com/open-telemetry/community/blob/main/guides/contributor/README.md).
 - Ensure that `.proto` files adhere to OpenTelemetry's stability guarantees.
 - Include clear and concise documentation updates if needed.
 
@@ -103,11 +81,9 @@ Need help? Join our community:
 - **Issues**: If you encounter a bug, [open an issue](https://github.com/open-telemetry/opentelemetry-proto/issues)
 
 
-## Troubleshooting Guide
+## Troubleshooting
 
-### Common Issues & Fixes
-
-#### 1. Protobuf Compiler Issues
+#### Protobuf Compiler Issues
 
 **Error:** `protoc: command not found`
 
@@ -117,7 +93,7 @@ sudo apt install protobuf-compiler  # Linux
 brew install protobuf  # macOS
 ```
 
-#### 2. Build Failures
+#### Build Failures
 
 **Error:** `Failed to generate gRPC client libraries`
 
@@ -126,7 +102,7 @@ brew install protobuf  # macOS
 make clean && make gen-all
 ```
 
-#### 3. Linting Errors
+#### Linting Errors
 
 **Error:** `proto-lint: some files do not conform to style guidelines`
 
@@ -134,8 +110,6 @@ make clean && make gen-all
 ```bash
 make proto-lint-fix
 ```
-
----
 
 ## Additional Information
 
@@ -146,7 +120,6 @@ This repository follows OpenTelemetry’s stability guarantees:
 * Stable components will not introduce breaking changes
 * Development components may be removed or changed without prior notice.
 
-Refer to the [Versioning and Stability](https://github.com/open-telemetry/opentelemetry-proto/blob/main/README.md#versioning-and-stability) documentation for more details.
 
 ### Generating gRPC Client Libraries
 
