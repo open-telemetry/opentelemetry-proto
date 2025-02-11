@@ -12,13 +12,14 @@ If you have any questions, feel free to ask in the community channels. We're hap
 
 Before getting started, ensure you have the following installed:
 
-- **Docker** – [Install Docker](https://docs.docker.com/engine/install/)
-- **Make** (for running development tasks)
-- **Protobuf Compiler (protoc)** – [Install protoc](https://grpc.io/docs/protoc-installation/)
+* **Docker** – [Install Docker](https://docs.docker.com/engine/install/)
+* **Make** (for running development tasks)
+* **Protobuf Compiler (protoc)** – [Install protoc](https://grpc.io/docs/protoc-installation/)
 
 Additional Notes:
-- Ensure your environment supports the required dependencies for building and testing .proto files.
-- Windows users may need [Git Bash](https://gitforwindows.org/) for better compatibility.
+
+* Ensure your environment supports the required dependencies for building and testing .proto files.
+* Windows users may need [Git Bash](https://gitforwindows.org/) for better compatibility.
 
 ## Workflow
 
@@ -26,8 +27,8 @@ We follow a structured workflow to ensure smooth collaboration:
 
 ### Commit Message Format
 
-- Use descriptive commit messages (e.g., `fix(proto): resolve issue with trace spec`)
-- Follow [Conventional Commits](https://www.conventionalcommits.org/) where possible.
+* Use descriptive commit messages (e.g., `fix(proto): resolve issue with trace spec`)
+* Follow [Conventional Commits](https://www.conventionalcommits.org/) where possible.
 
 ### Pull Request Guidelines
 
@@ -52,16 +53,17 @@ make gen-all
 ```
 
 To validate your changes:
+
 ```bash
 make check
 ```
 
 To update dependencies:
+
 ```bash
 make update
 ```
 
----
 
 ## Testing
 
@@ -72,16 +74,17 @@ make test
 ```
 
 To verify the protobuf definitions:
+
 ```bash
 make proto-lint
 ```
 
 To check compatibility with different OpenTelemetry client libraries:
+
 ```bash
 make compatibility-test
 ```
 
----
 
 ## Contributing Rules
 
@@ -91,7 +94,6 @@ make compatibility-test
 
 Check for issues labeled [`good first issue`](https://github.com/open-telemetry/opentelemetry-proto/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to start contributing.
 
----
 
 ## Further Help
 
@@ -100,13 +102,13 @@ Need help? Join our community:
 - **Slack**: [OpenTelemetry Slack](https://opentelemetry.io/community/)
 - **Issues**: If you encounter a bug, [open an issue](https://github.com/open-telemetry/opentelemetry-proto/issues)
 
----
 
 ## Troubleshooting Guide
 
 ### Common Issues & Fixes
 
 #### 1. Protobuf Compiler Issues
+
 **Error:** `protoc: command not found`
 
 **Fix:** Install the protobuf compiler:
@@ -116,6 +118,7 @@ brew install protobuf  # macOS
 ```
 
 #### 2. Build Failures
+
 **Error:** `Failed to generate gRPC client libraries`
 
 **Fix:** Ensure Docker is running and retry:
@@ -124,6 +127,7 @@ make clean && make gen-all
 ```
 
 #### 3. Linting Errors
+
 **Error:** `proto-lint: some files do not conform to style guidelines`
 
 **Fix:** Run:
@@ -138,8 +142,9 @@ make proto-lint-fix
 ### Stability Guidelines
 
 This repository follows OpenTelemetry’s stability guarantees:
-- Stable components will not introduce breaking changes.
-- Development components may be removed or changed without prior notice.
+
+* Stable components will not introduce breaking changes
+* Development components may be removed or changed without prior notice.
 
 Refer to the [Versioning and Stability](https://github.com/open-telemetry/opentelemetry-proto/blob/main/README.md#versioning-and-stability) documentation for more details.
 
@@ -152,14 +157,15 @@ make gen-<language>
 ```
 
 Currently supported languages:
-- cpp
-- csharp
-- go
-- java
-- objc
-- openapi (swagger)
-- php
-- python
-- ruby
+
+* cpp
+* csharp
+* go
+* java
+* objc
+* openapi (swagger)
+* php
+* python
+* ruby
 
 Thank you for contributing! 🚀
