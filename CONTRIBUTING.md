@@ -63,7 +63,6 @@ To verify the protobuf definitions:
 make proto-lint
 ```
 
-
 ## Contributing Rules
 
 - Follow OpenTelemetry’s [Contribution Guidelines](https://github.com/open-telemetry/community/blob/main/guides/contributor/README.md).
@@ -72,14 +71,12 @@ make proto-lint
 
 Check for issues labeled [`good first issue`](https://github.com/open-telemetry/opentelemetry-proto/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to start contributing.
 
-
 ## Further Help
 
 Need help? Join our community:
 
 - **Slack**: [OpenTelemetry Slack](https://opentelemetry.io/community/)
 - **Issues**: If you encounter a bug, [open an issue](https://github.com/open-telemetry/opentelemetry-proto/issues)
-
 
 ## Troubleshooting
 
@@ -88,6 +85,7 @@ Need help? Join our community:
 **Error:** `protoc: command not found`
 
 **Fix:** Install the protobuf compiler:
+
 ```bash
 sudo apt install protobuf-compiler  # Linux
 brew install protobuf  # macOS
@@ -98,6 +96,7 @@ brew install protobuf  # macOS
 **Error:** `Failed to generate gRPC client libraries`
 
 **Fix:** Ensure Docker is running and retry:
+
 ```bash
 make clean && make gen-all
 ```
@@ -107,6 +106,7 @@ make clean && make gen-all
 **Error:** `proto-lint: some files do not conform to style guidelines`
 
 **Fix:** Run:
+
 ```bash
 make proto-lint-fix
 ```
@@ -119,7 +119,6 @@ This repository follows OpenTelemetry’s stability guarantees:
 
 * Stable components will not introduce breaking changes
 * Development components may be removed or changed without prior notice.
-
 
 ### Generating gRPC Client Libraries
 
