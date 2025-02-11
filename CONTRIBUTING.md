@@ -4,7 +4,7 @@
 
 Welcome to the OpenTelemetry Protocol (OTLP) Specification repository! 🎉
 
-Thank you for your interest in contributing to this project. This repository contains the OTLP specification and the corresponding Language Independent Interface Types (`.proto` files). Your contributions help improve the interoperability of OpenTelemetry clients across various programming languages.
+Your contributions help improve the interoperability of OpenTelemetry clients across various programming languages.
 
 If you have any questions, feel free to ask in the community channels. We're happy to help! 😊
 
@@ -83,7 +83,7 @@ Need help? Join our community:
 
 ## Troubleshooting
 
-#### Protobuf Compiler Issues
+### Protobuf Compiler Issues
 
 **Error:** `protoc: command not found`
 
@@ -93,7 +93,7 @@ sudo apt install protobuf-compiler  # Linux
 brew install protobuf  # macOS
 ```
 
-#### Build Failures
+### Build Failures
 
 **Error:** `Failed to generate gRPC client libraries`
 
@@ -102,7 +102,7 @@ brew install protobuf  # macOS
 make clean && make gen-all
 ```
 
-#### Linting Errors
+### Linting Errors
 
 **Error:** `proto-lint: some files do not conform to style guidelines`
 
