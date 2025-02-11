@@ -266,7 +266,7 @@ message ExponentialHistogram {
 
 // Summary metric data are used to convey quantile summaries,
 // a Prometheus (see: https://prometheus.io/docs/concepts/metric_types/#summary)
-// and OpenMetrics (see: https://github.com/OpenObservability/OpenMetrics/blob/4dbf6075567ab43296eed941037c12951faafb92/protos/prometheus.proto#L45)
+// and OpenMetrics (see: https://github.com/prometheus/OpenMetrics/blob/4dbf6075567ab43296eed941037c12951faafb92/protos/prometheus.proto#L45)
 // data type. These data points cannot always be merged in a meaningful way.
 // While they can be useful in some applications, histogram data points are
 // recommended for new applications.
@@ -533,7 +533,7 @@ message ExponentialHistogramDataPoint {
   // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
   // see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#histogram
   optional double sum = 5;
-  
+
   // scale describes the resolution of the histogram.  Boundaries are
   // located at powers of the base, where:
   //
@@ -571,7 +571,7 @@ message ExponentialHistogramDataPoint {
   // of counts.
   message Buckets {
     // Offset is the bucket index of the first entry in the bucket_counts array.
-    // 
+    //
     // Note: This uses a varint encoding as a simple form of compression.
     sint32 offset = 1;
 
@@ -585,7 +585,7 @@ message ExponentialHistogramDataPoint {
     // especially zeros, so uint64 has been selected to ensure
     // varint encoding.
     repeated uint64 bucket_counts = 2;
-  } 
+  }
 
   // Flags that apply to this specific data point.  See DataPointFlags
   // for the available flags and their meaning.
