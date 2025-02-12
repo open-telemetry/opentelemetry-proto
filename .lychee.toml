@@ -2,7 +2,9 @@ include_fragments = true
 
 exclude = [
     # excluding links to pull requests and issues is done for performance
-    "^https://github.com/open-telemetry/opentelemetry-proto/(pull|issue)/\\d+$"
+    "^https://github.com/open-telemetry/opentelemetry-proto/(pull|issue)/\\d+$",
+    # Exclude links to specific <a href> tags.
+    "retryable-response-codes$"
 ]
 
 # better to be safe and avoid failures
