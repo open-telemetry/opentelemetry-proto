@@ -163,24 +163,24 @@ message ScopeProfiles {
 // - On-disk, the serialized proto must be gzip-compressed.
 //
 // - The profile is represented as a set of samples, where each sample
-//   references a sequence of locations, and where each location belongs
+//   references a stack trace which is a list of locations, each belonging
 //   to a mapping.
-// - There is a N->1 relationship from sample.location_id entries to
-//   locations. For every sample.location_id entry there must be a
+// - There is a N->1 relationship from Stack.location_indices entries to
+//   locations. For every Stack.location_indices entry there must be a
 //   unique Location with that index.
 // - There is an optional N->1 relationship from locations to
 //   mappings. For every nonzero Location.mapping_id there must be a
 //   unique Mapping with that index.
 
-// Represents a complete profile, including sample types, samples,
-// mappings to binaries, locations, functions, string table, and additional metadata.
-// It modifies and annotates pprof Profile with OpenTelemetry specific fields.
+// Represents a complete profile, including sample types, samples, mappings to
+// binaries, stacks, locations, functions, string table, and additional
+// metadata.  It modifies and annotates pprof Profile with OpenTelemetry
+// specific fields.
 //
 // Note that whilst fields in this message retain the name and field id from pprof in most cases
 // for ease of understanding data migration, it is not intended that pprof:Profile and
 // OpenTelemetry:Profile encoding be wire compatible.
 message Profile {
-
   // A description of the samples associated with each Sample.value.
   // For a cpu profile this might be:
   //   [["cpu","nanoseconds"]] or [["wall","seconds"]] or [["syscall","count"]]
@@ -197,10 +197,10 @@ message Profile {
   // If multiple binaries contribute to the Profile and no main
   // binary can be identified, mapping[0] has no special meaning.
   repeated Mapping mapping_table = 3;
-  // Locations referenced by samples via location_indices.
+  // Locations referenced by stacks via location_indices.
   repeated Location location_table = 4;
-  // Array of locations referenced by samples.
-  repeated int32 location_indices = 5;
+  // Stacks referenced by samples via stack_index.
+  repeated Stack stack_table = 5;
   // Functions referenced by locations.
   repeated Function function_table = 6;
   // Lookup table for attributes.
@@ -373,11 +373,8 @@ message ValueType {
 // augmented with auxiliary information like the thread-id, some
 // indicator of a higher level request being handled etc.
 message Sample {
-  // locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
-  int32 locations_start_index = 1;
-  // locations_length along with locations_start_index refers to a slice of locations in Profile.location_indices.
-  // Supersedes location_index.
-  int32 locations_length = 2;
+  // Reference to stack in Profile.stack_table.
+  int32 stack_index = 1;
   // The type and unit of each value is defined by the corresponding
   // entry in Profile.sample_type. All samples must have the same
   // number of values, the same as the length of Profile.sample_type.
@@ -394,6 +391,12 @@ message Sample {
   // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
   // to fall within the Profile's time range. [optional]
   repeated uint64 timestamps_unix_nano = 6;
+}
+
+// A Stack represents a stack trace as a list of locations. The first location
+// is the leaf frame.
+message Stack {
+  repeated int32 location_indices = 1;
 }
 
 // Describes the mapping of a binary in memory, including its address range,
