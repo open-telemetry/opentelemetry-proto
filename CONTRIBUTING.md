@@ -25,4 +25,4 @@ implementation by running `make gen-all`.
 
 If you have any questions or need assistance while contributing, feel free to reach out to the [`otel-specification`](https://cloud-native.slack.com/archives/C01N7PP1THC) Slack channel. 
 
-View meeting notes of previous SIG calls too [here](https://docs.google.com/document/d/1pdvPeKjA8v8w_fGKAN68JjWBmVJtPCpqdi9IZrd6eEo/edit?tab=t.0#heading=h.w5ybybd67v4h) to stay up to date.
+View meeting notes of previous SIG calls too [here](https://github.com/open-telemetry/opentelemetry-specification) to stay up to date.
