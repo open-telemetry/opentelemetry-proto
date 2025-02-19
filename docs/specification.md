@@ -559,6 +559,9 @@ below about what this field can contain in each specific failure case.
 The server SHOULD use HTTP response status codes to indicate
 retryable and not-retryable errors for a particular erroneous situation. The
 client SHOULD honour HTTP response status codes as retryable or not-retryable.
+
+##### Retryable Response Codes
+
 The requests that receive a response status code listed in following table SHOULD
 be retried.
 All other `4xx` or `5xx` response status codes MUST NOT be retried.
@@ -591,9 +594,10 @@ overloaded, the server SHOULD respond with `HTTP 429 Too Many Requests` or
 recommended time interval in seconds to wait before retrying.
 
 The client SHOULD honour the waiting interval specified in the "Retry-After"
-header if it is present. If the client receives an `HTTP 429` or an `HTTP 503`
-response and the "Retry-After" header is not present in the response, then the
-client SHOULD implement an exponential backoff strategy between retries.
+header if it is present. If the client receives a retryable error code (see
+[table above](#retryable-response-codes)) and the "Retry-After" header is
+not present in the response, then the client SHOULD implement an exponential backoff
+strategy between retries.
 
 ##### All Other Responses
 
