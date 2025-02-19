@@ -231,9 +231,8 @@ message Profile {
   // for human-friendly content. The profile must stay functional if this field
   // is cleaned.
   repeated int32 comment_strindices = 15; // Indices into string table.
-  // Index into the string table of the type of the preferred sample
-  // value. If unset, clients should default to the last sample value.
-  int32 default_sample_type_strindex = 16;
+  // Index into the sample_type array to the default sample type.
+  int32 default_sample_type_index = 16;
 
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
