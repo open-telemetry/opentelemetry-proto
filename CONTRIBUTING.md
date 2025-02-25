@@ -27,3 +27,5 @@ If you have any questions or need assistance while contributing,
 feel free to reach out to the [`#otel-specification`](https://cloud-native.slack.com/archives/C01N7PP1THC) Slack channel. 
 
 View meeting notes of previous SIG calls in this [google doc](https://docs.google.com/spreadsheets/d/1SYKfjYhZdm2Wh2Cl6KVQalKg_m4NhTPZqq-8SzEVO6s/edit?gid=0#gid=0) as stated [here](https://github.com/open-telemetry/community/?tab=readme-ov-file#governing-bodies) to stay up to date.
+
+Also see the [specification](https://github.com/open-telemetry/opentelemetry-specification?tab=readme-ov-file#questions) repo for more info. Thank you.
