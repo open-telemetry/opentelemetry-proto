@@ -23,6 +23,7 @@ implementation by running `make gen-all`.
 
 ## Further Help
 
-If you have any questions or need assistance while contributing, feel free to reach out to the [`otel-specification`](https://cloud-native.slack.com/archives/C01N7PP1THC) Slack channel. 
+If you have any questions or need assistance while contributing,
+feel free to reach out to the [`otel-specification`](https://cloud-native.slack.com/archives/C01N7PP1THC) Slack channel. 
 
 View meeting notes of previous SIG calls too [here](https://github.com/open-telemetry/opentelemetry-specification) to stay up to date.
