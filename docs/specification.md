@@ -655,6 +655,20 @@ This ensures that all destination servers receive the data regardless of their
 speed of reception (within the available limits imposed by the size of the
 client-side queue).
 
+### Empty Telemetry Envelopes
+
+Under certain circumstances, it is possible to have a telemetry envelope with
+no contents. Some examples would be a ResourceMetrics with no ScopeMetrics
+inside it, a ResourceMetrics with no Metrics inside it, or the equivalents for
+Logs or Spans. One way this might happen would be for filtering rules to remove
+all the contained data points, though there are others.
+
+In practice, such empty envelopes are often discarded by existing
+implementations. Given that, senders SHOULD NOT create empty envelopes (OTLP
+payloads that contain zero spans, zero metric points or zero log records),
+receivers MAY ignore empty envelopes, and implementations that receive and send
+(forward) OTLP payloads MAY drop empty envelopes.
+
 ## Known Limitations
 
 ### Request Acknowledgements
