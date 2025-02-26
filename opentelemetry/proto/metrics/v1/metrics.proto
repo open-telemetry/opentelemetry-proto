@@ -194,7 +194,7 @@ message Metric {
   string description = 2;
 
   // unit in which the metric value is reported. Follows the format
-  // described by http://unitsofmeasure.org/ucum.html.
+  // described by https://unitsofmeasure.org/ucum.html.
   string unit = 3;
 
   // Data determines the aggregation type (if any) of the metric, what is the
