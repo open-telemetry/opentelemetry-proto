@@ -134,7 +134,9 @@ message ResourceProfiles {
   // the resource field represents the entire host.
   // The sub-resources represent higher-granularity resources running on that host, for example,
   // containers, pods or processes. These resources are later referred to by their index in the
-  // sub-resources list.
+  // sub-resources list. Sub-resources must not replicate or override any attributes defined at 
+  // the resource level. Instead, sub-resources must only include attributes specific to that 
+  // sub-resource. 
   repeated opentelemetry.proto.resource.v1.Resource sub_resources = 4;
 }
 
