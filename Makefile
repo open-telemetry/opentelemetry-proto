@@ -86,7 +86,7 @@ gen-go:
 gen-java:
 	rm -rf ./$(PROTO_GEN_JAVA_DIR)
 	mkdir -p ./$(PROTO_GEN_JAVA_DIR)
-	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --java_out=./$(PROTO_GEN_JAVA_DIR) $(file)))
+	$(foreach file,$(PROTO_FILES),$(call exec-command, $(PROTOC) --java_out=./$(PROTO_GEN_JAVA_DIR) --grpc-java_out=./$(PROTO_GEN_JAVA_DIR) $(file)))
 
 # Generate gRPC/Protobuf implementation for Kotlin.
 .PHONY: gen-kotlin
