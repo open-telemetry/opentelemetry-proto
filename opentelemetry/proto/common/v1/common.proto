@@ -90,7 +90,7 @@ message EntityRef {
   // https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
   //
   // This schema_url applies to the data in this message and to the Resource attributes
-  // referenced by id_attr_keys and descr_attr_keys.
+  // referenced by id_keys and description_keys.
   // TODO: discuss if we are happy with this somewhat complicated definition of what
   // the schema_url applies to.
   //
