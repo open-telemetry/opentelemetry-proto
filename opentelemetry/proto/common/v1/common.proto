@@ -81,7 +81,7 @@ message InstrumentationScope {
 }
 
 // A reference to an Entity.
-// Entity represents an object of interest associated with produced telemetry: e.g spans, metrics or logs.
+// Entity represents an object of interest associated with produced telemetry: e.g spans, metrics, profiles, or logs.
 //
 // Status: [Development]
 message EntityRef {
