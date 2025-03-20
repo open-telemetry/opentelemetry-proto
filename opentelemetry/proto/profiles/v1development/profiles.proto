@@ -453,10 +453,10 @@ message Location {
 message Line {
   // Reference to function in Profile.function_table.
   int32 function_index = 1;
-  // Line number in source code.
-  optional int64 line = 2;
-  // Column number in source code.
-  optional int64 column = 3;
+  // Line number in source code. 0 means unset.
+  int64 line = 2;
+  // Column number in source code. 0 means unset.
+  int64 column = 3;
 }
 
 // Describes a function, including its human-readable name, system name,
@@ -469,6 +469,6 @@ message Function {
   int32 system_name_strindex = 2;
   // Source file containing the function. Empty string if not available.
   int32 filename_strindex = 3;
-  // Line number in source file.
-  optional int64 start_line = 4;
+  // Line number in source file. 0 means unset.
+  int64 start_line = 4;
 }
