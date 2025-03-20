@@ -16,4 +16,5 @@
 *   @open-telemetry/spec-sponsors
 
 # Profiles owners (global + profiles)
-opentelemetry/proto/profiles  @open-telemetry/spec-sponsors @open-telemetry/profiling-maintainers
+opentelemetry/proto/profiles  @open-telemetry/spec-sponsors @open-telemetry/profiling-maintainers @open-telemetry/profiling-approvers
+opentelemetry/proto/collector/profiles  @open-telemetry/spec-sponsors @open-telemetry/profiling-maintainers @open-telemetry/profiling-approvers
