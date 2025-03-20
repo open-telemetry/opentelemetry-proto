@@ -453,27 +453,23 @@ message Location {
 // Details a specific line in a source code, linked to a function.
 message Line {
   // Reference to function in Profile.function_table.
-  optional int32 function_index = 1;
+  int32 function_index = 1;
   // Line number in source code.
-  int64 line = 2;
+  optional int64 line = 2;
   // Column number in source code.
-  int64 column = 3;
+  optional int64 column = 3;
 }
 
 // Describes a function, including its human-readable name, system name,
 // source file, and starting line number in the source.
 message Function {
-  // Index into Profile.string_table to the name of the function, in
-  // human-readable form.
-  // Use index 0 if value is not available.
+  // Function name. Empty string if not available.
   int32 name_strindex = 1;
-  // Index into Profile.string_table to the name of the function, as identified
-  // by the system. For instance, it can be a C++ mangled name.
-  // Use index 0 if value is not available.
+  // Function name, as identified by the system. For instance,
+  // it can be a C++ mangled name. Empty string if not available.
   int32 system_name_strindex = 2;
-  // Index into Profile.string_table to the source file containing the function.
-  // Use index 0 if value is not available.
+  // Source file containing the function. Empty string if not available.
   int32 filename_strindex = 3;
   // Line number in source file.
-  int64 start_line = 4;
+  optional int64 start_line = 4;
 }
