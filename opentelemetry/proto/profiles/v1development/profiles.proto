@@ -453,22 +453,22 @@ message Location {
 message Line {
   // Reference to function in Profile.function_table.
   int32 function_index = 1;
-  // Line number in source code.
+  // Line number in source code. 0 means unset.
   int64 line = 2;
-  // Column number in source code.
+  // Column number in source code. 0 means unset.
   int64 column = 3;
 }
 
 // Describes a function, including its human-readable name, system name,
 // source file, and starting line number in the source.
 message Function {
-  // Name of the function, in human-readable form if available.
-  int32 name_strindex = 1; // Index into string table
-  // Name of the function, as identified by the system.
-  // For instance, it can be a C++ mangled name.
-  int32 system_name_strindex = 2; // Index into string table
-  // Source file containing the function.
-  int32 filename_strindex = 3; // Index into string table
-  // Line number in source file.
+  // Function name. Empty string if not available.
+  int32 name_strindex = 1;
+  // Function name, as identified by the system. For instance,
+  // it can be a C++ mangled name. Empty string if not available.
+  int32 system_name_strindex = 2;
+  // Source file containing the function. Empty string if not available.
+  int32 filename_strindex = 3;
+  // Line number in source file. 0 means unset.
   int64 start_line = 4;
 }
