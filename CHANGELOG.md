@@ -8,6 +8,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Changed
 
+- logs: Stabilize `event_name` field in `LogRecord` message. [#643](https://github.com/open-telemetry/opentelemetry-proto/pull/643)
+
 ### Removed
 
 ## 1.5.0 - 2024-12-12
