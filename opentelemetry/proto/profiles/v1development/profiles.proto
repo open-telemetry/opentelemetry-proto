@@ -102,11 +102,35 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 // as well.
 message ProfilesData {
   // An array of ResourceProfiles.
-  // For data coming from a single resource this array will typically contain
-  // one element. Intermediary nodes that receive data from multiple origins
-  // typically batch the data before forwarding further and in that case this
-  // array will contain multiple elements.
+  // A ResourceProfile will be created for each virtual environment. Any
+  // ScopeProfiles that are not assigned to a virtual environment should be
+  // collected within an additional ResourceProfile. Furthermore, a
+  // ResourceProfile will be created for each value assigned to the RESOURCE
+  // environment variable.
   repeated ResourceProfiles resource_profiles = 1;
+
+  // Mapping from address ranges to the image/binary/library mapped
+  // into that address range.
+  repeated Mapping mapping_table = 2;
+
+  // Locations referenced by samples via Profile.location_indices.
+  repeated Location location_table = 3;
+
+  // Functions referenced by locations.
+  repeated Function function_table = 4;
+
+  // Lookup table for links.
+  repeated Link link_table = 5;
+
+  // A common table for strings referenced by various messages.
+  // string_table[0] must always be "".
+  repeated string string_table = 6;
+
+  // Lookup table for attributes.
+  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 7;
+
+  // Represents a mapping between Attribute Keys and Units.
+  repeated AttributeUnit attribute_units = 8;
 }
 
 
@@ -180,7 +204,6 @@ message ScopeProfiles {
 // for ease of understanding data migration, it is not intended that pprof:Profile and
 // OpenTelemetry:Profile encoding be wire compatible.
 message Profile {
-
   // A description of the samples associated with each Sample.value.
   // For a cpu profile this might be:
   //   [["cpu","nanoseconds"]] or [["wall","seconds"]] or [["syscall","count"]]
@@ -192,26 +215,9 @@ message Profile {
   repeated ValueType sample_type = 1;
   // The set of samples recorded in this profile.
   repeated Sample sample = 2;
-  // Mapping from address ranges to the image/binary/library mapped
-  // into that address range.  mapping[0] will be the main binary.
-  // If multiple binaries contribute to the Profile and no main
-  // binary can be identified, mapping[0] has no special meaning.
-  repeated Mapping mapping_table = 3;
-  // Locations referenced by samples via location_indices.
-  repeated Location location_table = 4;
+
   // Array of locations referenced by samples.
-  repeated int32 location_indices = 5;
-  // Functions referenced by locations.
-  repeated Function function_table = 6;
-  // Lookup table for attributes.
-  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 7;
-  // Represents a mapping between Attribute Keys and Units.
-  repeated AttributeUnit attribute_units = 8;
-  // Lookup table for links.
-  repeated Link link_table = 9;
-  // A common table for strings referenced by various messages.
-  // string_table[0] must always be "".
-  repeated string string_table = 10;
+  repeated int32 location_indices = 3;
 
   // The following fields 9-14 are informational, do not affect
   // interpretation of results.
@@ -233,7 +239,6 @@ message Profile {
   repeated int32 comment_strindices = 15; // Indices into string table.
   // Index into the sample_type array to the default sample type.
   int32 default_sample_type_index = 16;
-
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
   // all zeroes is considered invalid.
@@ -385,10 +390,10 @@ message Sample {
   // result has a list of values that is the element-wise sum of the
   // lists of the originals.
   repeated int64 value = 3;
-  // References to attributes in Profile.attribute_table. [optional]
+  // References to attributes in ProfilesData.attribute_table. [optional]
   repeated int32 attribute_indices = 4;
 
-  // Reference to link in Profile.link_table. [optional]
+  // Reference to link in ProfilesData.link_table. [optional]
   optional int32 link_index = 5;
 
   // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
@@ -409,7 +414,7 @@ message Mapping {
   // disk for the main binary and shared libraries, or virtual
   // abstractions like "[vdso]".
   int32 filename_strindex = 4;  // Index into string table
-  // References to attributes in Profile.attribute_table. [optional]
+  // References to attributes in ProfilesData.attribute_table. [optional]
   repeated int32 attribute_indices = 5;
   // The following fields indicate the resolution of symbolic info.
   bool has_functions = 6;
@@ -420,7 +425,7 @@ message Mapping {
 
 // Describes function and line table debug information.
 message Location {
-  // Reference to mapping in Profile.mapping_table.
+  // Reference to mapping in ProfilesData.mapping_table.
   // It can be unset if the mapping is unknown or not applicable for
   // this profile type.
   optional int32 mapping_index = 1;
@@ -445,13 +450,13 @@ message Location {
   // profile changes.
   bool is_folded = 4;
 
-  // References to attributes in Profile.attribute_table. [optional]
+  // References to attributes in ProfilesData.attribute_table. [optional]
   repeated int32 attribute_indices = 5;
 }
 
 // Details a specific line in a source code, linked to a function.
 message Line {
-  // Reference to function in Profile.function_table.
+  // Reference to function in ProfilesData.function_table.
   int32 function_index = 1;
   // Line number in source code. 0 means unset.
   int64 line = 2;
