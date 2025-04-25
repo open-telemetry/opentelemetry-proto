@@ -207,13 +207,10 @@ message ScopeProfiles {
 message Profile {
   // A description of the samples associated with each Sample.value.
   // For a cpu profile this might be:
-  //   [["cpu","nanoseconds"]] or [["wall","seconds"]] or [["syscall","count"]]
+  //   ["cpu","nanoseconds"] or ["wall","seconds"] or ["syscall","count"]
   // For a heap profile, this might be:
-  //   [["allocations","count"], ["space","bytes"]],
-  // If one of the values represents the number of events represented
-  // by the sample, by convention it should be at index 0 and use
-  // sample_type.unit == "count".
-  repeated ValueType sample_type = 1;
+  //   ["allocations","count"] or ["space","bytes"],
+  ValueType sample_type = 1;
   // The set of samples recorded in this profile.
   repeated Sample sample = 2;
 
@@ -238,22 +235,20 @@ message Profile {
   // for human-friendly content. The profile must stay functional if this field
   // is cleaned.
   repeated int32 comment_strindices = 8; // Indices into ProfilesData.string_table.
-  // Index into the sample_type array to the default sample type.
-  int32 default_sample_type_index = 9;
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
   // all zeroes is considered invalid.
   //
   // This field is required.
-  bytes profile_id = 10;
+  bytes profile_id = 9;
 
   // dropped_attributes_count is the number of attributes that were discarded. Attributes
   // can be discarded because their keys are too long or because there are too many
   // attributes. If this value is 0, then no attributes were dropped.
-  uint32 dropped_attributes_count = 11;
+  uint32 dropped_attributes_count = 10;
 
   // Specifies format of the original payload. Common values are defined in semantic conventions. [required if original_payload is present]
-  string original_payload_format = 12;
+  string original_payload_format = 11;
 
   // Original payload can be stored in this field. This can be useful for users who want to get the original payload.
   // Formats such as JFR are highly extensible and can contain more information than what is defined in this spec.
@@ -261,7 +256,7 @@ message Profile {
   // If the original payload is in pprof format, it SHOULD not be included in this field.
   // The field is optional, however if it is present then equivalent converted data should be populated in other fields
   // of this message as far as is practicable.
-  bytes original_payload = 13;
+  bytes original_payload = 12;
 
   // References to attributes in attribute_table. [optional]
   // It is a collection of key/value pairs. Note, global attributes
@@ -276,7 +271,7 @@ message Profile {
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
   // Attribute keys MUST be unique (it is not allowed to have more than one
   // attribute with the same key).
-  repeated int32 attribute_indices = 14;
+  repeated int32 attribute_indices = 13;
 }
 
 // Represents a mapping between Attribute Keys and Units.
@@ -384,21 +379,16 @@ message Sample {
   // locations_length along with locations_start_index refers to a slice of locations in Profile.location_indices.
   // Supersedes location_index.
   int32 locations_length = 2;
-  // The type and unit of each value is defined by the corresponding
-  // entry in Profile.sample_type. All samples must have the same
-  // number of values, the same as the length of Profile.sample_type.
-  // When aggregating multiple samples into a single sample, the
-  // result has a list of values that is the element-wise sum of the
-  // lists of the originals.
-  repeated int64 value = 3;
+  // The type and unit of each value is defined by Profile.sample_type.
+  repeated int64 values = 3;
   // References to attributes in ProfilesData.attribute_table. [optional]
   repeated int32 attribute_indices = 4;
 
   // Reference to link in ProfilesData.link_table. [optional]
   optional int32 link_index = 5;
 
-  // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
-  // to fall within the Profile's time range. [optional]
+  // Timestamps associated with Sample represented in nanoseconds. These
+  // timestamps are expected to fall within the Profile's time range. [optional]
   repeated uint64 timestamps_unix_nano = 6;
 }
 
