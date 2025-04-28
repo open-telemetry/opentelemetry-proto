@@ -13,7 +13,7 @@ The full list of changes can be found in the compare view for the respective rel
 ### Changed
 
 - logs: Stabilize `event_name` field in `LogRecord` message. [#643](https://github.com/open-telemetry/opentelemetry-proto/pull/643)
-- profiles: Move the lookup tables to ProfilesData. [#644](https://github.com/open-telemetry/opentelemetry-proto/pull/64)
+- profiles: Move the lookup tables to ProfilesData. [#644](https://github.com/open-telemetry/opentelemetry-proto/pull/644)
 - profiles: Move default sample_type from the string table to sample_type. [#620](https://github.com/open-telemetry/opentelemetry-proto/pull/620)
 
 ## 1.5.0 - 2024-12-12
