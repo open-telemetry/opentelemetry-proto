@@ -31,12 +31,13 @@ service ProfilesService {
 }
 
 message ExportProfilesServiceRequest {
-  // An array of ResourceProfiles.
-  // For data coming from a single resource this array will typically contain one
-  // element. Intermediary nodes (such as OpenTelemetry Collector) that receive
-  // data from multiple origins typically batch the data before forwarding further and
-  // in that case this array will contain multiple elements.
-  repeated opentelemetry.proto.profiles.v1development.ResourceProfiles resource_profiles = 1;
+  // The ProfilesData.
+  // For data coming from a single resource this object will typically contain
+  // one element resource profiles. Intermediary nodes (such as OpenTelemetry
+  // Collector) that receive data from multiple origins typically batch the
+  // data before forwarding further and in that case there will be multiple
+  // resources.
+  opentelemetry.proto.profiles.v1development.ProfilesData profiles_data = 1;
 }
 
 message ExportProfilesServiceResponse {
