@@ -205,11 +205,11 @@ message ScopeProfiles {
 // for ease of understanding data migration, it is not intended that pprof:Profile and
 // OpenTelemetry:Profile encoding be wire compatible.
 message Profile {
-  // A description of the samples associated with each Sample.value.
+  // The type and unit of all Sample.values in this profile.
   // For a cpu profile this might be:
-  //   ["cpu","nanoseconds"] or ["wall","seconds"] or ["syscall","count"]
+  //   ["cpu","count"] or ["off_cpu","nanoseconds"]
   // For a heap profile, this might be:
-  //   ["allocations","count"] or ["space","bytes"],
+  //   ["allocated_objects","count"] or ["allocated_space","bytes"],
   ValueType sample_type = 1;
   // The set of samples recorded in this profile.
   repeated Sample sample = 2;
