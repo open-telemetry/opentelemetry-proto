@@ -137,8 +137,8 @@ message ProfilesData {
   // Resource.attributes and semantic conventions.
   repeated ResourceProfiles resource_profiles = 1;
 
-  // An array of ProfilesReferenceTables
-  repeated ProfilesReferenceTables lookup_tables = 2;
+  // One instance of ProfilesReferenceTables
+  ProfilesReferenceTables lookup_tables = 2;
 }
 
 
