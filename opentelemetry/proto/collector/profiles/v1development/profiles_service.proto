@@ -37,6 +37,9 @@ message ExportProfilesServiceRequest {
   // data from multiple origins typically batch the data before forwarding further and
   // in that case this array will contain multiple elements.
   repeated opentelemetry.proto.profiles.v1development.ResourceProfiles resource_profiles = 1;
+
+  // The lookup tables containing all data shared by profiles across the message being sent.
+  repeated opentelemetry.proto.profiles.v1development.ProfilesReferenceTables lookup_tables = 2;
 }
 
 message ExportProfilesServiceResponse {

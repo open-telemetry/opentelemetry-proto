@@ -43,15 +43,15 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 
 //                Relationships Diagram
 //
-// ┌──────────────────┐                LEGEND
-// │   ProfilesData   │
-// └──────────────────┘            ─────▶ embedded
-//   │
-//   │ 1-n                         ─────▷ referenced by index
-//   ▼
-// ┌──────────────────┐
-// │ ResourceProfiles │
-// └──────────────────┘
+// ┌──────────────────┐                      LEGEND
+// │   ProfilesData   │ ─────┐
+// └──────────────────┘      │           ─────▶ embedded
+//   │                       │
+//   │ 1-n                   │ 1-n       ─────▷ referenced by index
+//   ▼                       ▼
+// ┌──────────────────┐   ┌─────────────────────────┐
+// │ ResourceProfiles │   │ ProfilesReferenceTables │
+// └──────────────────┘   └─────────────────────────┘
 //   │
 //   │ 1-n
 //   ▼
@@ -90,26 +90,9 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 // └──────────────────┘
 //
 
-// ProfilesData represents the profiles data that can be stored in persistent storage,
-// OR can be embedded by other protocols that transfer OTLP profiles data but do not
-// implement the OTLP protocol.
-//
-// The main difference between this message and collector protocol is that
-// in this message there will not be any "control" or "metadata" specific to
-// OTLP protocol.
-//
-// When new fields are added into this message, the OTLP request MUST be updated
-// as well.
-message ProfilesData {
-  // An array of ResourceProfiles.
-  // For data coming from an SDK profiler, this array will typically contain one
-  // element. Host-level profilers will usually create one ResourceProfile per
-  // container, as well as one additional ResourceProfile grouping all samples
-  // from non-containerized processes.
-  // Other resource groupings are possible as well and clarified via
-  // Resource.attributes and semantic conventions.
-  repeated ResourceProfiles resource_profiles = 1;
-
+// ProfilesReferenceTables represents the profiles data shared across the
+// entire message being sent.
+message ProfilesReferenceTables {
   // Mappings from address ranges to the image/binary/library mapped
   // into that address range referenced by locations via Location.mapping_index.
   repeated Mapping mapping_table = 2;
@@ -132,6 +115,30 @@ message ProfilesData {
 
   // Represents a mapping between Attribute Keys and Units.
   repeated AttributeUnit attribute_units = 8;
+}
+
+// ProfilesData represents the profiles data that can be stored in persistent storage,
+// OR can be embedded by other protocols that transfer OTLP profiles data but do not
+// implement the OTLP protocol.
+//
+// The main difference between this message and collector protocol is that
+// in this message there will not be any "control" or "metadata" specific to
+// OTLP protocol.
+//
+// When new fields are added into this message, the OTLP request MUST be updated
+// as well.
+message ProfilesData {
+  // An array of ResourceProfiles.
+  // For data coming from an SDK profiler, this array will typically contain one
+  // element. Host-level profilers will usually create one ResourceProfile per
+  // container, as well as one additional ResourceProfile grouping all samples
+  // from non-containerized processes.
+  // Other resource groupings are possible as well and clarified via
+  // Resource.attributes and semantic conventions.
+  repeated ResourceProfiles resource_profiles = 1;
+
+  // An array of ProfilesReferenceTables
+  repeated ProfilesReferenceTables lookup_tables = 2;
 }
 
 
