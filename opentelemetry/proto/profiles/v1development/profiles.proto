@@ -138,25 +138,23 @@ message ProfilesData {
   // corresponding to the given stack tree node. The two arrays must have the
   // same length. The parent array uses -1 for the root nodes.
   //
-  // For example, these stacks:
+  // For example, the following location and stack tree data:
   //
-  //   main -> foo -> bar
-  //   main -> foo -> bar -> baz1
-  //   main -> foo -> bar -> baz2
-  //   main -> foo -> baz2
-  //
-  // would be expressed with a location_table like:
   // location_table = ["", "main", "foo", "bar", "baz1", "baz2"]
+  // (stack index)        =   0  1  2  3  4  5
+  // stack_parent_array   = [-1, 0, 1, 2, 2, 1]
+  // stack_location_index = [ 1, 2, 3, 4, 5, 5]
   //
-  // And the stack tree arrays would be:
-  // (stack index)        =   0  1  2  3  4  5  6
-  // stack_parent_array   = [-1, 0, 1, 2, 3, 3, 2]
-  // stack_location_index = [ 0, 1, 2, 3, 4, 5, 5]
+  // are encoding these stacks (the number is the stack index):
+  //
+  //   main|0 -> foo|1 -> bar|2
+  //   main|0 -> foo|1 -> bar|2 -> baz1|3
+  //   main|0 -> foo|1 -> bar|2 -> baz2|4
+  //   main|0 -> foo|1 -> baz2|5
   //
   repeated int32 stack_parent_array = 9;
   repeated int32 stack_location_index = 10;
 }
-
 
 // A collection of ScopeProfiles from a Resource.
 message ResourceProfiles {
