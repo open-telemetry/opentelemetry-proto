@@ -224,7 +224,7 @@ message Profile {
   // The set of samples recorded in this profile.
   repeated Sample sample = 2;
 
-  // References to locations in ProfilesData.location_table.
+  // References to locations in ProfilesReferenceTables.location_table.
   repeated int32 location_indices = 3;
 
   // The following fields 4-14 are informational, do not affect
@@ -244,7 +244,7 @@ message Profile {
   // should not be used to store any machine-readable information, it is only
   // for human-friendly content. The profile must stay functional if this field
   // is cleaned.
-  repeated int32 comment_strindices = 8; // Indices into ProfilesData.string_table.
+  repeated int32 comment_strindices = 8; // Indices into ProfilesReferenceTables.string_table.
   // Index into the sample_type array to the default sample type.
   int32 default_sample_type_index = 9;
 
@@ -375,8 +375,8 @@ enum AggregationTemporality {
 
 // ValueType describes the type and units of a value, with an optional aggregation temporality.
 message ValueType {
-  int32 type_strindex = 1; // Index into ProfilesData.string_table.
-  int32 unit_strindex = 2; // Index into ProfilesData.string_table.
+  int32 type_strindex = 1; // Index into ProfilesReferenceTables.string_table.
+  int32 unit_strindex = 2; // Index into ProfilesReferenceTables.string_table.
 
   AggregationTemporality aggregation_temporality = 3;
 }
@@ -398,10 +398,10 @@ message Sample {
   // result has a list of values that is the element-wise sum of the
   // lists of the originals.
   repeated int64 value = 3;
-  // References to attributes in ProfilesData.attribute_table. [optional]
+  // References to attributes in ProfilesReferenceTables.attribute_table. [optional]
   repeated int32 attribute_indices = 4;
 
-  // Reference to link in ProfilesData.link_table. [optional]
+  // Reference to link in ProfilesReferenceTables.link_table. [optional]
   optional int32 link_index = 5;
 
   // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
@@ -421,8 +421,8 @@ message Mapping {
   // The object this entry is loaded from.  This can be a filename on
   // disk for the main binary and shared libraries, or virtual
   // abstractions like "[vdso]".
-  int32 filename_strindex = 4;  // Index into ProfilesData.string_table.
-  // References to attributes in ProfilesData.attribute_table. [optional]
+  int32 filename_strindex = 4;  // Index into ProfilesReferenceTables.string_table.
+  // References to attributes in ProfilesReferenceTables.attribute_table. [optional]
   repeated int32 attribute_indices = 5;
   // The following fields indicate the resolution of symbolic info.
   bool has_functions = 6;
@@ -433,7 +433,7 @@ message Mapping {
 
 // Describes function and line table debug information.
 message Location {
-  // Reference to mapping in ProfilesData.mapping_table.
+  // Reference to mapping in ProfilesReferenceTables.mapping_table.
   // It can be unset if the mapping is unknown or not applicable for
   // this profile type.
   optional int32 mapping_index = 1;
@@ -458,13 +458,13 @@ message Location {
   // profile changes.
   bool is_folded = 4;
 
-  // References to attributes in ProfilesData.attribute_table. [optional]
+  // References to attributes in ProfilesReferenceTables.attribute_table. [optional]
   repeated int32 attribute_indices = 5;
 }
 
 // Details a specific line in a source code, linked to a function.
 message Line {
-  // Reference to function in ProfilesData.function_table.
+  // Reference to function in ProfilesReferenceTables.function_table.
   int32 function_index = 1;
   // Line number in source code. 0 means unset.
   int64 line = 2;
