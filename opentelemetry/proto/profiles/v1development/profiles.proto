@@ -47,7 +47,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 // │   ProfilesData   │ ─────┐
 // └──────────────────┘      │           ─────▶ embedded
 //   │                       │
-//   │ 1-n                   │ 1-n       ─────▷ referenced by index
+//   │ 1-n                   │           ─────▷ referenced by index
 //   ▼                       ▼
 // ┌──────────────────┐   ┌─────────────────────────┐
 // │ ResourceProfiles │   │ ProfilesReferenceTables │
