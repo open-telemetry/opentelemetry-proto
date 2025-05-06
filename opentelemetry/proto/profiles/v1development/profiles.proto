@@ -132,6 +132,29 @@ message ProfilesData {
 
   // Represents a mapping between Attribute Keys and Units.
   repeated AttributeUnit attribute_units = 8;
+
+  // Stack tree encoded as two parallel arrays: one for the parent array,
+  // another for the ProfilesData.location_table index of the location
+  // corresponding to the given stack tree node. The two arrays must have the
+  // same length. The parent array uses -1 for the root nodes.
+  //
+  // For example, these stacks:
+  //
+  //   main -> foo -> bar
+  //   main -> foo -> bar -> baz1
+  //   main -> foo -> bar -> baz2
+  //   main -> foo -> baz2
+  //
+  // would be expressed with a location_table like:
+  // location_table = ["", "main", "foo", "bar", "baz1", "baz2"]
+  //
+  // And the stack tree arrays would be:
+  // (stack index)        =   0  1  2  3  4  5  6
+  // stack_parent_array   = [-1, 0, 1, 2, 3, 3, 2]
+  // stack_location_index = [ 0, 1, 2, 3, 4, 5, 5]
+  //
+  repeated int32 stack_parent_array = 9;
+  repeated int32 stack_location_index = 10;
 }
 
 
@@ -216,9 +239,6 @@ message Profile {
   repeated ValueType sample_type = 1;
   // The set of samples recorded in this profile.
   repeated Sample sample = 2;
-
-  // References to locations in ProfilesData.location_table.
-  repeated int32 location_indices = 3;
 
   // The following fields 4-14 are informational, do not affect
   // interpretation of results.
@@ -379,11 +399,9 @@ message ValueType {
 // augmented with auxiliary information like the thread-id, some
 // indicator of a higher level request being handled etc.
 message Sample {
-  // locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
-  int32 locations_start_index = 1;
-  // locations_length along with locations_start_index refers to a slice of locations in Profile.location_indices.
-  // Supersedes location_index.
-  int32 locations_length = 2;
+  // Index into ProfilesData.{stack_parent_array, stack_location_index} stack
+  // table, representing the stack tree node of the sample.
+  int32 stack_index = 1;
   // The type and unit of each value is defined by the corresponding
   // entry in Profile.sample_type. All samples must have the same
   // number of values, the same as the length of Profile.sample_type.
