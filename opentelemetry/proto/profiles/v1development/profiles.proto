@@ -138,7 +138,7 @@ message ProfilesData {
   repeated ResourceProfiles resource_profiles = 1;
 
   // One instance of ProfilesReferenceTables
-  ProfilesReferenceTables lookup_tables = 2;
+  ProfilesReferenceTables reference_tables = 2;
 }
 
 

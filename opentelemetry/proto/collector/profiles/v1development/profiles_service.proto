@@ -38,8 +38,8 @@ message ExportProfilesServiceRequest {
   // in that case this array will contain multiple elements.
   repeated opentelemetry.proto.profiles.v1development.ResourceProfiles resource_profiles = 1;
 
-  // The lookup table containing all data shared by profiles across the message being sent.
-  opentelemetry.proto.profiles.v1development.ProfilesReferenceTables lookup_tables = 2;
+  // The reference table containing all data shared by profiles across the message being sent.
+  opentelemetry.proto.profiles.v1development.ProfilesReferenceTables reference_tables = 2;
 }
 
 message ExportProfilesServiceResponse {
