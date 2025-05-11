@@ -206,8 +206,8 @@ message ScopeProfiles {
 // OpenTelemetry:Profile encoding be wire compatible.
 message Profile {
   // The type and unit of all Sample.values in this profile.
-  // For a cpu profile this might be:
-  //   ["cpu","count"] or ["off_cpu","nanoseconds"]
+  // For a cpu or off-cpu profile this might be:
+  //   ["cpu","nanoseconds"] or ["off_cpu","nanoseconds"]
   // For a heap profile, this might be:
   //   ["allocated_objects","count"] or ["allocated_space","bytes"],
   ValueType sample_type = 1;
