@@ -39,7 +39,7 @@ message ExportProfilesServiceRequest {
   repeated opentelemetry.proto.profiles.v1development.ResourceProfiles resource_profiles = 1;
 
   // The reference table containing all data shared by profiles across the message being sent.
-  opentelemetry.proto.profiles.v1development.ProfilesReferenceTables reference_tables = 2;
+  opentelemetry.proto.profiles.v1development.ProfilesDictionary dictionary = 2;
 }
 
 message ExportProfilesServiceResponse {
