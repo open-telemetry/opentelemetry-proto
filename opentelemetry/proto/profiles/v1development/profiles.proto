@@ -374,10 +374,14 @@ message ValueType {
   AggregationTemporality aggregation_temporality = 3;
 }
 
-// Each Sample records values encountered in some program
-// context. The program context is typically a stack trace, perhaps
-// augmented with auxiliary information like the thread-id, some
-// indicator of a higher level request being handled etc.
+// Each Sample records values encountered in some program context. The program
+// context is typically a stack trace, perhaps augmented with auxiliary
+// information like the thread-id, some indicator of a higher level request
+// being handled etc.
+//
+// A Sample MUST have have at least one values or timestamps_unix_nano entry. If
+// both fields are populated, they MUST contain the same number of elements, and
+// the elements at the same index MUST refer to the same event.
 message Sample {
   // locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
   int32 locations_start_index = 1;
@@ -393,7 +397,7 @@ message Sample {
   optional int32 link_index = 5;
 
   // Timestamps associated with Sample represented in nanoseconds. These
-  // timestamps are expected to fall within the Profile's time range. [optional]
+  // timestamps should fall within the Profile's time range.
   repeated uint64 timestamps_unix_nano = 6;
 }
 
