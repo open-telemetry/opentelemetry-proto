@@ -313,8 +313,8 @@ using
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40)
 or [through the gRPC metadata key `grpc-retry-pushback-ms`](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#pushback).
 
-Some clients may only respect one of these pushback mechanisms, so it's recommended for the server to implement both or check the client's
-implementation before deciding which one to use.
+Some clients may only respect one of these pushback mechanisms, so it's recommended for the server to implement both if it's
+critical that it be respected.
 
 Here is a snippet of sample Go code to illustrate using `RetryInfo`:
 
@@ -371,7 +371,7 @@ outline in the documentation for [`grpc-retry-pushback-ms`](https://github.com/g
 or outlined in documentation for
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40),
 depending on which one is present. If both are present they should be the same, and either can be used. It is acceptable for
-client's to only look for one of these values, server's should set both or check client implementation to be certain that it will
+client's to only look for one of these values, server's should set both to be certain that it will
 be respected.
 
 The value of `retry_delay`/`grpc-retry-pushback-ms` is determined by the server and is implementation
