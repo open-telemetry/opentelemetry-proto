@@ -247,9 +247,11 @@ message Profile {
   int32 default_sample_type_index = 9;
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
-  // all zeroes is considered invalid.
-  //
-  // This field is required.
+  // all zeroes is considered invalid. It may be used for deduplication and signal
+  // correlation purposes. It is acceptable to treat two profiles with different values
+  // in this field as not equal, even if they represented the same object at an earlier
+  // time.
+  // This field is optional; an ID may be assigned to an ID-less profile in a later step.
   bytes profile_id = 10;
 
   // dropped_attributes_count is the number of attributes that were discarded. Attributes
