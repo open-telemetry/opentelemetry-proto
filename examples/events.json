@@ -27,14 +27,16 @@
           },
           "logRecords": [
             {
+              "eventName": "browser.page_view",
               "timeUnixNano": "1544712660300000000",
               "observedTimeUnixNano": "1544712660300000000",
               "severityNumber": 9,
+              "severityText": "test severity text",
               "attributes": [
                 {
-                  "key": "event.name",
+                  "key": "event.attribute",
                   "value": {
-                    "stringValue": "browser.page_view"
+                    "stringValue": "some event attribute"
                   }
                 }
               ],
