@@ -311,7 +311,7 @@ and MAY supply additional
 [details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
 using
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40)
-or [through the gRPC metadata key `grpc-retry-pushback-ms`](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#pushback).
+or via Trailer [with the gRPC metadata key `grpc-retry-pushback-ms`](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#pushback).
 
 Some clients may only respect one of these pushback mechanisms, so it's recommended for the server to implement both if it's
 critical that it be respected.
