@@ -227,16 +227,18 @@ retryable and not-retryable:
 The server MUST indicate retryable errors using code
 [Unavailable](https://godoc.org/google.golang.org/grpc/codes) and MAY supply
 additional
-[details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails).
-Here is a sample Go code to illustrate:
+[details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
+using
+[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40)
+containing 0 value of RetryDelay. Here is a sample Go code to illustrate:
 
 ```go
   // Do this on server side.
-  st, err := status.New(codes.Unavailable, "Server is unavailable")
+  st, err := status.New(codes.Unavailable, "Server is unavailable").
+    WithDetails(&errdetails.RetryInfo{RetryDelay: &duration.Duration{Seconds: 0}})
   if err != nil {
     log.Fatal(err)
   }
-
   return st.Err()
 ```
 
