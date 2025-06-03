@@ -343,17 +343,10 @@ Here is a snippet of sample Go code to illustrate using `RetryInfo`:
 ```
 Here is a snippet of sample Python code to illustrate using `grpc-retry-pushback-ms`:
 
-```python
-  # Do this on the server side.
-  context.set_trailing_metadata(
-        (
-            (
-                "grpc-retry-pushback-ms",
-                "5000", # 5 seconds
-            ),
-        )
-    )
-  context.abort(StatusCode.UNAVAILABLE, "")
+```go
+# Do this on the server side.
+trailer := metadata.Pairs("grpc-retry-pushback-ms", "5000")
+grpc.SetTrailer(ctx, trailer)
 
   ...
 
