@@ -178,6 +178,13 @@ message ScopeProfiles {
   // https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
   // This schema_url applies to all profiles in the "profiles" field.
   string schema_url = 3;
+
+  // The preferred type and unit of Samples in at least one Profile.
+  // For a cpu or off-cpu profile this might be:
+  //   ["cpu","nanoseconds"] or ["off_cpu","nanoseconds"]
+  // For a heap profile, this might be:
+  //   ["allocated_objects","count"] or ["allocated_space","bytes"],
+  ValueType default_sample_type = 4;
 }
 
 // Profile is a common stacktrace profile format.
