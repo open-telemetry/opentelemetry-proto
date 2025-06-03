@@ -95,7 +95,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 message ProfilesDictionary {
   // Mappings from address ranges to the image/binary/library mapped
   // into that address range referenced by locations via Location.mapping_index.
-  // mapping_table[0] must always be set to an invalid default mapping,
+  // mapping_table[0] must always be set to a zero value default mapping,
   // so that _index fields can use 0 to indicate null/unset.
   repeated Mapping mapping_table = 1;
 
@@ -106,7 +106,7 @@ message ProfilesDictionary {
   repeated Function function_table = 3;
 
   // Links referenced by samples via Sample.link_index.
-  // link_table[0] must always be set to an invalid default link,
+  // link_table[0] must always be set to a zero value default link,
   // so that _index fields can use 0 to indicate null/unset.
   repeated Link link_table = 4;
 
