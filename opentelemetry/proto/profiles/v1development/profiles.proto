@@ -180,10 +180,7 @@ message ScopeProfiles {
   string schema_url = 3;
 
   // The preferred type and unit of Samples in at least one Profile.
-  // For a cpu or off-cpu profile this might be:
-  //   ["cpu","nanoseconds"] or ["off_cpu","nanoseconds"]
-  // For a heap profile, this might be:
-  //   ["allocated_objects","count"] or ["allocated_space","bytes"],
+  // See Profile.sample_type for possible values.
   ValueType default_sample_type = 4;
 }
 
