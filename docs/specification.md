@@ -302,7 +302,7 @@ If the server is unable to keep up with the pace of data it receives from the
 client then it SHOULD signal that fact to the client. The client MUST then
 throttle itself to avoid overwhelming the server.
 
-To signal backpressure when using gRPC transport, the server MUST return an
+To signal backpressure when using gRPC transport, the server SHOULD return an
 error with code [Unavailable](https://godoc.org/google.golang.org/grpc/codes)
 and MAY supply additional
 [details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
