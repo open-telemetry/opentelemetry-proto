@@ -224,8 +224,14 @@ retryable and not-retryable:
   and cannot be deserialized or processed by the server. The client
   SHOULD maintain a counter of such dropped data.
 
-For retryable errors the server is recommended to use code
-[Unavailable](https://godoc.org/google.golang.org/grpc/codes).
+The server SHOULD indicate retryable errors using code
+	[Unavailable](https://godoc.org/google.golang.org/grpc/codes) and MAY supply
+	additional
+	[details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
+	using
+	[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
+  
+	Here is a sample Go code to illustrate:
 
 ```go
   // Do this on server side.
