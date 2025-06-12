@@ -196,8 +196,6 @@ message ScopeProfiles {
 //   that is most useful to humans.  There should be enough
 //   information present to determine the original sampled values.
 //
-// - On-disk, the serialized proto must be gzip-compressed.
-//
 // - The profile is represented as a set of samples, where each sample
 //   references a sequence of locations, and where each location belongs
 //   to a mapping.
