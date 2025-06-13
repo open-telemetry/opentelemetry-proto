@@ -183,6 +183,8 @@ markdownlint:
 	@if ! npm ls markdownlint; then npm install; fi
 	@for f in $(ALL_DOCS); do \
 		echo $$f; \
-		npx --no -p markdownlint-cli markdownlint -c .markdownlint.yaml $$f \
-			|| exit 1; \
+		docker run --rm \
+			--mount 'type=bind,source=$(PWD),target=/workdir' \
+			davidanson/markdownlint-cli2:v0.18.1 \
+			--config .markdownlint.yaml $$f || exit 1; \
 	done
