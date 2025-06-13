@@ -1,4 +1,4 @@
-include_fragments = false
+include_fragments = true
 
 exclude = [
     # excluding links to pull requests and issues is done for performance
