@@ -172,7 +172,7 @@ ALL_DOCS := $(shell find . -type f -name '*.md' -not -path './.github/*' -not -p
 markdown-link-check:
 	docker run --rm \
 		--mount 'type=bind,source=$(PWD),target=/home/repo' \
-		lycheeverse/lychee \
+		lycheeverse/lychee:sha-3a09227-alpine \
 		--config home/repo/.lychee.toml \
 		--root-dir /home/repo \
 		-v \
