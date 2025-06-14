@@ -172,7 +172,7 @@ ALL_DOCS := $(shell find . -type f -name '*.md' -not -path './.github/*' -not -p
 markdown-link-check:
 	docker run --rm \
 		--mount 'type=bind,source=$(PWD),target=/home/repo' \
-		lycheeverse/lychee \
+		lycheeverse/lychee:sha-3a09227-alpine \
 		--config home/repo/.lychee.toml \
 		--root-dir /home/repo \
 		-v \
@@ -180,9 +180,10 @@ markdown-link-check:
 
 .PHONY: markdownlint
 markdownlint:
-	@if ! npm ls markdownlint; then npm install; fi
 	@for f in $(ALL_DOCS); do \
 		echo $$f; \
-		npx --no -p markdownlint-cli markdownlint -c .markdownlint.yaml $$f \
-			|| exit 1; \
+		docker run --rm \
+			--mount 'type=bind,source=$(PWD),target=/workdir' \
+			davidanson/markdownlint-cli2:v0.18.1 \
+			--config .markdownlint.yaml $$f || exit 1; \
 	done

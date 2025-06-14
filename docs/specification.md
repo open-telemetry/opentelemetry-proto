@@ -1,3 +1,4 @@
+<!-- markdownlint-disable-next-line first-line-heading -->
 <!--- Hugo front matter used to generate the website version of this page:
 title: OTLP Specification
 linkTitle: OTLP
