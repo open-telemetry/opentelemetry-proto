@@ -180,7 +180,6 @@ markdown-link-check:
 
 .PHONY: markdownlint
 markdownlint:
-	@if ! npm ls markdownlint; then npm install; fi
 	@for f in $(ALL_DOCS); do \
 		echo $$f; \
 		docker run --rm \
