@@ -20,6 +20,8 @@ all: gen-all markdown-link-check markdownlint
 .PHONY: gen-all
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-php gen-python gen-ruby
 
+DEPENDENCIES_DOCKERFILE=./dependencies.Dockerfile
+
 OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.9.0
 BUF_DOCKER ?= bufbuild/buf:1.7.0
 
@@ -168,21 +170,24 @@ breaking-change:
 
 ALL_DOCS := $(shell find . -type f -name '*.md' -not -path './.github/*' -not -path './node_modules/*' | sort)
 
+LYCHEEIMAGE := $(shell awk '$$4=="lychee" {print $$2}' $(DEPENDENCIES_DOCKERFILE))
 .PHONY: markdown-link-check
 markdown-link-check:
 	docker run --rm \
 		--mount 'type=bind,source=$(PWD),target=/home/repo' \
-		lycheeverse/lychee \
+		$(LYCHEEIMAGE) \
 		--config home/repo/.lychee.toml \
 		--root-dir /home/repo \
 		-v \
 		home/repo
 
+MARKDOWNLINTIMAGE := $(shell awk '$$4=="markdownlint" {print $$2}' $(DEPENDENCIES_DOCKERFILE))
 .PHONY: markdownlint
 markdownlint:
-	@if ! npm ls markdownlint; then npm install; fi
 	@for f in $(ALL_DOCS); do \
 		echo $$f; \
-		npx --no -p markdownlint-cli markdownlint -c .markdownlint.yaml $$f \
-			|| exit 1; \
+		docker run --rm \
+			--mount 'type=bind,source=$(PWD),target=/workdir' \
+			$(MARKDOWNLINTIMAGE) \
+			--config .markdownlint.yaml $$f || exit 1; \
 	done
