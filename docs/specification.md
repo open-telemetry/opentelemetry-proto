@@ -234,7 +234,7 @@ Here is a sample Go code to illustrate:
 
 ```go
   // Do this on server side.
-  st, err := status.New(codes.Unavailable, "Server is unavailable")
+  st, err := status.New(codes.Unavailable, "Server is unavailable").
     WithDetails(&errdetails.RetryInfo{RetryDelay: &duration.Duration{Seconds: 5}})
   if err != nil {
     log.Fatal(err)
