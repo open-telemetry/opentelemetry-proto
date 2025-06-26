@@ -95,6 +95,8 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 message ProfilesDictionary {
   // Mappings from address ranges to the image/binary/library mapped
   // into that address range referenced by locations via Location.mapping_index.
+  // mapping_table[0] must always be set to a zero value default mapping,
+  // so that _index fields can use 0 to indicate null/unset.
   repeated Mapping mapping_table = 1;
 
   // Locations referenced by samples via Profile.location_indices.
@@ -104,6 +106,8 @@ message ProfilesDictionary {
   repeated Function function_table = 3;
 
   // Links referenced by samples via Sample.link_index.
+  // link_table[0] must always be set to a zero value default link,
+  // so that _index fields can use 0 to indicate null/unset.
   repeated Link link_table = 4;
 
   // A common table for strings referenced by various messages.
@@ -398,7 +402,8 @@ message Sample {
   repeated int32 attribute_indices = 4;
 
   // Reference to link in ProfilesDictionary.link_table. [optional]
-  optional int32 link_index = 5;
+  // It can be unset / set to 0 if no link exists, as link_table[0] is always a 'null' default value.
+  int32 link_index = 5;
 
   // Timestamps associated with Sample represented in nanoseconds. These
   // timestamps should fall within the Profile's time range.
@@ -430,9 +435,9 @@ message Mapping {
 // Describes function and line table debug information.
 message Location {
   // Reference to mapping in ProfilesDictionary.mapping_table.
-  // It can be unset if the mapping is unknown or not applicable for
-  // this profile type.
-  optional int32 mapping_index = 1;
+  // It can be unset / set to 0 if the mapping is unknown or not applicable for
+  // this profile type, as mapping_table[0] is always a 'null' default mapping.
+  int32 mapping_index = 1;
   // The instruction address for this location, if available.  It
   // should be within [Mapping.memory_start...Mapping.memory_limit]
   // for the corresponding mapping. A non-leaf address may be in the

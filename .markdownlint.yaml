@@ -12,3 +12,5 @@ ol-prefix:
   style: ordered
 no-inline-html: false
 fenced-code-language: false
+MD024: false
+MD059: false
