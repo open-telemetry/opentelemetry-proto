@@ -225,18 +225,18 @@ retryable and not-retryable:
   and cannot be deserialized or processed by the server. The client
   SHOULD maintain a counter of such dropped data.
 
-The server MUST indicate retryable errors using code
+The server SHOULD indicate retryable errors using code
 [Unavailable](https://godoc.org/google.golang.org/grpc/codes) and MAY supply
 additional
 [details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
 using
-[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40)
-containing 0 value of RetryDelay. Here is a sample Go code to illustrate:
+[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
+Here is a sample Go code to illustrate:
 
 ```go
   // Do this on server side.
   st, err := status.New(codes.Unavailable, "Server is unavailable").
-    WithDetails(&errdetails.RetryInfo{RetryDelay: &duration.Duration{Seconds: 0}})
+    WithDetails(&errdetails.RetryInfo{RetryDelay: &duration.Duration{Seconds: 5}})
   if err != nil {
     log.Fatal(err)
   }
@@ -309,7 +309,7 @@ If the server is unable to keep up with the pace of data it receives from the
 client then it SHOULD signal that fact to the client. The client MUST then
 throttle itself to avoid overwhelming the server.
 
-To signal backpressure when using gRPC transport, the server MUST return an
+To signal backpressure when using gRPC transport, the server SHOULD return an
 error with code [Unavailable](https://godoc.org/google.golang.org/grpc/codes)
 and MAY supply additional
 [details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
