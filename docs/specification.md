@@ -240,7 +240,6 @@ containing 0 value of RetryDelay. Here is a sample Go code to illustrate:
   if err != nil {
     log.Fatal(err)
   }
-
   return st.Err()
 ```
 
@@ -314,8 +313,13 @@ error with code [Unavailable](https://godoc.org/google.golang.org/grpc/codes)
 and MAY supply additional
 [details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
 using
-[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
-Here is a snippet of sample Go code to illustrate:
+[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40)
+or via Trailer [with the gRPC metadata key `grpc-retry-pushback-ms`](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#pushback).
+
+Some clients may only respect one of these pushback mechanisms, so it's recommended for the server to implement both if it's
+critical that it be respected.
+
+Here is a snippet of sample Go code to illustrate using `RetryInfo`:
 
 ```go
   // Do this on the server side.
@@ -340,29 +344,34 @@ Here is a snippet of sample Go code to illustrate:
     }
   }
 ```
+Here is a snippet of sample Python code to illustrate using `grpc-retry-pushback-ms`:
+
+```go
+# Do this on the server side.
+trailer := metadata.Pairs("grpc-retry-pushback-ms", "5000")
+grpc.SetTrailer(ctx, trailer)
+
+  ...
+
+  # On the client side use gRPC retry config: https://grpc.io/docs/guides/retry/, which will automatically parse this header
+  # and handle all backoff and retry logic.
+  # Or manually parse the header:
+  
+  pushback = dict(error.trailing_metadata()).get("grpc-retry-pushback-ms")
+  if pushback is not None:
+    wait_period = int(pushback)
+```
 
 When the client receives this signal, it SHOULD follow the recommendations
-outlined in documentation for
-[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40):
+outline in the documentation for [`grpc-retry-pushback-ms`](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#pushback)
+or outlined in documentation for
+[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40),
+depending on which one is present. If both are present they should be the same, and either can be used. It is acceptable for
+client's to only look for one of these values, server's should set both to be certain that it will
+be respected.
 
-```
-// Describes when the clients can retry a failed request. Clients could ignore
-// the recommendation here or retry when this information is missing from the error
-// responses.
-//
-// It's always recommended that clients should use exponential backoff when
-// retrying.
-//
-// Clients should wait until `retry_delay` amount of time has passed since
-// receiving the error response before retrying.  If retrying requests also
-// fail, clients should use an exponential backoff scheme to increase gradually
-// the delay between retries based on `retry_delay` until either a maximum
-// number of retries has been reached, or a maximum retry delay cap has been
-// reached.
-```
-
-The value of `retry_delay` is determined by the server and is implementation
-dependant. The server SHOULD choose a `retry_delay` value that is big enough to
+The value of `retry_delay`/`grpc-retry-pushback-ms` is determined by the server and is implementation
+dependant. The server SHOULD choose a `retry_delay`/`grpc-retry-pushback-ms` value that is big enough to
 give the server time to recover yet is not too big to cause the client to drop
 data while being throttled.
 
