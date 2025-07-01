@@ -392,6 +392,20 @@ message ValueType {
 // A Sample MUST have have at least one values or timestamps_unix_nano entry. If
 // both fields are populated, they MUST contain the same number of elements, and
 // the elements at the same index MUST refer to the same event.
+//
+// Examples of different ways of representing a sample with the total value of 10:
+//
+// Report of a stacktrace at 10 timestamps (consumers must assume the value is 1 for each point):
+//    values: []
+//    timestamps_unix_nano: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+//
+// Report of a stacktrace with an aggregated value without timestamps:
+//   values: [10]
+//    timestamps_unix_nano: []
+//
+// Report of a stacktrace at 4 timestamps where each point records a specific value:
+//    values: [2, 2, 3, 3]
+//    timestamps_unix_nano: [1, 2, 3, 4]
 message Sample {
   // locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
   int32 locations_start_index = 1;
