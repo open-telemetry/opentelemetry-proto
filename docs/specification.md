@@ -350,25 +350,14 @@ Here is a snippet of sample Python code to illustrate using `grpc-retry-pushback
 # Do this on the server side.
 trailer := metadata.Pairs("grpc-retry-pushback-ms", "5000")
 grpc.SetTrailer(ctx, trailer)
-
-  ...
-
-  # On the client side use gRPC retry config: https://grpc.io/docs/guides/retry/, which will automatically parse this header
-  # and handle all backoff and retry logic.
-  # Or manually parse the header:
-  
-  pushback = dict(error.trailing_metadata()).get("grpc-retry-pushback-ms")
-  if pushback is not None:
-    wait_period = int(pushback)
 ```
 
-When the client receives this signal, it SHOULD follow the recommendations
-outline in the documentation for [`grpc-retry-pushback-ms`](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#pushback)
-or outlined in documentation for
-[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40),
-depending on which one is present. If both are present they should be the same, and either can be used. It is acceptable for
-client's to only look for one of these values, server's should set both to be certain that it will
-be respected.
+On the client side using gRPC retry config (https://grpc.io/docs/guides/retry/) 
+will cause gRPC to automatically parse this header and handle all backoff and retry logic.
+
+When the client receives this signal, if it isn't using gRPC retry config, it SHOULD 
+follow the recommendations or outlined in documentation for
+[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
 
 The value of `retry_delay`/`grpc-retry-pushback-ms` is determined by the server and is implementation
 dependant. The server SHOULD choose a `retry_delay`/`grpc-retry-pushback-ms` value that is big enough to
