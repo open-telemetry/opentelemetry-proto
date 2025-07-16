@@ -316,8 +316,9 @@ using
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40)
 or via Trailer [with the gRPC metadata key `grpc-retry-pushback-ms`](https://github.com/grpc/proposal/blob/master/A6-client-retries.md#pushback).
 
-Some clients may only respect one of these pushback mechanisms, so it's recommended for the server to implement both if it's
-critical that it be respected.
+The client SHOULD honor at least one of these backpressure mechanisms.
+
+In order to have the backpressure respected, the server SHOULD implement both mechanisms.
 
 Here is a snippet of sample Go code to illustrate using `RetryInfo`:
 
@@ -344,20 +345,20 @@ Here is a snippet of sample Go code to illustrate using `RetryInfo`:
     }
   }
 ```
-Here is a snippet of sample Python code to illustrate using `grpc-retry-pushback-ms`:
+Here is a snippet of sample Go code to illustrate using `grpc-retry-pushback-ms`:
 
 ```go
-# Do this on the server side.
+// Do this on the server side.
 trailer := metadata.Pairs("grpc-retry-pushback-ms", "5000")
 grpc.SetTrailer(ctx, trailer)
 ```
 
 On the client side using gRPC retry config (https://grpc.io/docs/guides/retry/) 
-will cause gRPC to automatically parse this header and handle all backoff and retry logic.
+will cause the gRPC client to automatically parse the `grpc-retry-pushback-ms` 
+trailer metadata and handle all backoff and retry logic.
 
-When the client receives this signal, if it isn't using gRPC retry config, it SHOULD 
-follow the recommendations or outlined in documentation for
-[RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
+The description of how the client should respect `RetryInfo` is provided
+in its [documentation](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L34-L39).
 
 The value of `retry_delay`/`grpc-retry-pushback-ms` is determined by the server and is implementation
 dependant. The server SHOULD choose a `retry_delay`/`grpc-retry-pushback-ms` value that is big enough to
