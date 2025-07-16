@@ -353,8 +353,8 @@ trailer := metadata.Pairs("grpc-retry-pushback-ms", "5000")
 grpc.SetTrailer(ctx, trailer)
 ```
 
-On the client side using gRPC retry config (https://grpc.io/docs/guides/retry/) 
-will cause the gRPC client to automatically parse the `grpc-retry-pushback-ms` 
+On the client side using gRPC retry config - https://grpc.io/docs/guides/retry/ - 
+will cause the gRPC client to automatically parse the `grpc-retry-pushback-ms`
 trailer metadata and handle all backoff and retry logic.
 
 The description of how the client should respect `RetryInfo` is provided
