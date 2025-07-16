@@ -345,6 +345,7 @@ Here is a snippet of sample Go code to illustrate using `RetryInfo`:
     }
   }
 ```
+
 Here is a snippet of sample Go code to illustrate using `grpc-retry-pushback-ms`:
 
 ```go
