@@ -6,6 +6,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Added
 
+- all: Add notes about the attribute values restrictions. [#683](https://github.com/open-telemetry/opentelemetry-proto/pull/683)
+
 ### Changed
 
 ### Removed
