@@ -32,7 +32,7 @@ message Resource {
   //
   // The attribute values SHOULD NOT contain empty values.
   // The attribute values SHOULD NOT contain bytes values.
-  // The attributes values SHOULD NOT contain array values different than array of string values, bool values, int values,
+  // The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
   // double values.
   // The attribute values SHOULD NOT contain kvlist values.
   // The behavior of software that receives attributes containing such values can be unpredictable.
