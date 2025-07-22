@@ -386,7 +386,7 @@ message NumberDataPoint {
   // The behavior of software that receives attributes containing such values can be unpredictable.
   // These restritions can change in a minor release.
   // The restritions take origin from the OpenTelemetry specification:
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute.
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
@@ -444,7 +444,7 @@ message HistogramDataPoint {
   // The behavior of software that receives attributes containing such values can be unpredictable.
   // These restritions can change in a minor release.
   // The restritions take origin from the OpenTelemetry specification:
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute.
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 9;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
@@ -538,7 +538,7 @@ message ExponentialHistogramDataPoint {
   // The behavior of software that receives attributes containing such values can be unpredictable.
   // These restritions can change in a minor release.
   // The restritions take origin from the OpenTelemetry specification:
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute.
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the
@@ -664,7 +664,7 @@ message SummaryDataPoint {
   // The behavior of software that receives attributes containing such values can be unpredictable.
   // These restritions can change in a minor release.
   // The restritions take origin from the OpenTelemetry specification:
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute.
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
 
   // StartTimeUnixNano is optional but strongly encouraged, see the

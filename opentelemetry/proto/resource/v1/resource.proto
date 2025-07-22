@@ -38,7 +38,7 @@ message Resource {
   // The behavior of software that receives attributes containing such values can be unpredictable.
   // These restritions can change in a minor release.
   // The restritions take origin from the OpenTelemetry specification:
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute.
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
 
   // dropped_attributes_count is the number of dropped attributes. If the value is 0, then
