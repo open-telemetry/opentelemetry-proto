@@ -115,10 +115,7 @@ message ProfilesDictionary {
   repeated string string_table = 5;
 
   // A common table for attributes referenced by various messages.
-  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 6;
-
-  // Represents a mapping between Attribute Keys and Units.
-  repeated AttributeUnit attribute_units = 7;
+  repeated KeyValueAndUnit attribute_table = 6;
 }
 
 // ProfilesData represents the profiles data that can be stored in persistent storage,
@@ -501,4 +498,13 @@ message Function {
   int32 filename_strindex = 3;
   // Line number in source file. 0 means unset.
   int64 start_line = 4;
+}
+
+// A custom 'dictionary native' style of encoding attributes which is more specialized
+// for our use than opentelemetry.proto.common.v1.KeyValue
+// Specifically, uses the string table for keys and allows optional unit information.
+message KeyValueAndUnit {
+  int32 key_strindex  = 1;
+  opentelemetry.proto.common.v1.AnyValue value = 2;
+  int32 unit_strindex = 3; // non-zero where the unit cannot be derived from the name by semconv.
 }
