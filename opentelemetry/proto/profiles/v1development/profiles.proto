@@ -59,7 +59,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 // │  ScopeProfiles   │
 // └──────────────────┘
 //   │
-//   │ 1-1
+//   │ 1-n
 //   ▼
 // ┌──────────────────┐
 // │      Profile     │
