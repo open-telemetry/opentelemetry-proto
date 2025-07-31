@@ -4,6 +4,10 @@
 
 The full list of changes can be found in the compare view for the respective release at <https://github.com/open-telemetry/opentelemetry-proto/releases>.
 
+### Added
+
+- all: add notes about the attribute values restrictions. [#683](https://github.com/open-telemetry/opentelemetry-proto/pull/683)
+
 ## 1.7.0 - 2025-05-19
 
 ### Added
