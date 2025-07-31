@@ -384,8 +384,8 @@ message NumberDataPoint {
   // double values.
   // The attribute values SHOULD NOT contain kvlist values.
   // The behavior of software that receives attributes containing such values can be unpredictable.
-  // These restritions can change in a minor release.
-  // The restritions take origin from the OpenTelemetry specification:
+  // These restrictions can change in a minor release.
+  // The restrictions take origin from the OpenTelemetry specification:
   // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
 
@@ -442,8 +442,8 @@ message HistogramDataPoint {
   // double values.
   // The attribute values SHOULD NOT contain kvlist values.
   // The behavior of software that receives attributes containing such values can be unpredictable.
-  // These restritions can change in a minor release.
-  // The restritions take origin from the OpenTelemetry specification:
+  // These restrictions can change in a minor release.
+  // The restrictions take origin from the OpenTelemetry specification:
   // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 9;
 
@@ -536,8 +536,8 @@ message ExponentialHistogramDataPoint {
   // double values.
   // The attribute values SHOULD NOT contain kvlist values.
   // The behavior of software that receives attributes containing such values can be unpredictable.
-  // These restritions can change in a minor release.
-  // The restritions take origin from the OpenTelemetry specification:
+  // These restrictions can change in a minor release.
+  // The restrictions take origin from the OpenTelemetry specification:
   // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
 
@@ -662,8 +662,8 @@ message SummaryDataPoint {
   // double values.
   // The attribute values SHOULD NOT contain kvlist values.
   // The behavior of software that receives attributes containing such values can be unpredictable.
-  // These restritions can change in a minor release.
-  // The restritions take origin from the OpenTelemetry specification:
+  // These restrictions can change in a minor release.
+  // The restrictions take origin from the OpenTelemetry specification:
   // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 7;
 
