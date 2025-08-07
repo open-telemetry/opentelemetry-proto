@@ -232,9 +232,9 @@ message Profile {
   // interpretation of results.
 
   // Time of collection (UTC) represented as nanoseconds past the epoch.
-  uint64 time_nanos = 4;
+  fixed64 time_unix_nano = 4;
   // Duration of the profile, if a duration makes sense.
-  uint64 duration_nanos = 5;
+  uint64 duration_nano = 5;
   // The kind of events between sampled occurrences.
   // e.g [ "cpu","cycles" ] or [ "heap","bytes" ]
   ValueType period_type = 6;
@@ -421,7 +421,7 @@ message Sample {
 
   // Timestamps associated with Sample represented in nanoseconds. These
   // timestamps should fall within the Profile's time range.
-  repeated uint64 timestamps_unix_nano = 6;
+  repeated fixed64 timestamps_unix_nano = 6;
 }
 
 // Describes the mapping of a binary in memory, including its address range,
