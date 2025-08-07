@@ -232,9 +232,9 @@ message Profile {
   // interpretation of results.
 
   // Time of collection (UTC) represented as nanoseconds past the epoch.
-  int64 time_nanos = 4;
+  uint64 time_nanos = 4;
   // Duration of the profile, if a duration makes sense.
-  int64 duration_nanos = 5;
+  uint64 duration_nanos = 5;
   // The kind of events between sampled occurrences.
   // e.g [ "cpu","cycles" ] or [ "heap","bytes" ]
   ValueType period_type = 6;
