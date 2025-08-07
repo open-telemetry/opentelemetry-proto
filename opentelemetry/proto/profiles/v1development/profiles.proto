@@ -439,11 +439,6 @@ message Mapping {
   int32 filename_strindex = 4;  // Index into ProfilesDictionary.string_table.
   // References to attributes in ProfilesDictionary.attribute_table. [optional]
   repeated int32 attribute_indices = 5;
-  // The following fields indicate the resolution of symbolic info.
-  bool has_functions = 6;
-  bool has_filenames = 7;
-  bool has_line_numbers = 8;
-  bool has_inline_frames = 9;
 }
 
 // Describes function and line table debug information.
