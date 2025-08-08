@@ -139,6 +139,8 @@ message ProfilesData {
   // from non-containerized processes.
   // Other resource groupings are possible as well and clarified via
   // Resource.attributes and semantic conventions.
+  // Tools that visualize profiles should prefer displaying
+  // resources_profiles[0].scope_profiles[0].profiles[0] by default.
   repeated ResourceProfiles resource_profiles = 1;
 
   // One instance of ProfilesDictionary
@@ -182,10 +184,6 @@ message ScopeProfiles {
   // https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
   // This schema_url applies to all profiles in the "profiles" field.
   string schema_url = 3;
-
-  // The preferred type and unit of Samples in at least one Profile.
-  // See Profile.sample_type for possible values.
-  ValueType default_sample_type = 4;
 }
 
 // Profile is a common stacktrace profile format.
@@ -441,11 +439,6 @@ message Mapping {
   int32 filename_strindex = 4;  // Index into ProfilesDictionary.string_table.
   // References to attributes in ProfilesDictionary.attribute_table. [optional]
   repeated int32 attribute_indices = 5;
-  // The following fields indicate the resolution of symbolic info.
-  bool has_functions = 6;
-  bool has_filenames = 7;
-  bool has_line_numbers = 8;
-  bool has_inline_frames = 9;
 }
 
 // Describes function and line table debug information.
