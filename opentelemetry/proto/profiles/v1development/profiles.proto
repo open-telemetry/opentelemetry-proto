@@ -115,6 +115,26 @@ message ProfilesDictionary {
   repeated string string_table = 5;
 
   // A common table for attributes referenced by various messages.
+  // It is a collection of key/value pairs. Note, global attributes
+  // like server name can be set using the resource API. Examples of attributes:
+  //
+  //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+  //     "/http/server_latency": 300
+  //     "abc.com/myattribute": true
+  //     "abc.com/score": 10.239
+  //
+  // Attribute keys MUST be unique (it is not allowed to have more than one
+  // attribute with the same key).
+  //
+  // The attribute values SHOULD NOT contain empty values.
+  // The attribute values SHOULD NOT contain bytes values.
+  // The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+  // double values.
+  // The attribute values SHOULD NOT contain kvlist values.
+  // The behavior of software that receives attributes containing such values can be unpredictable.
+  // These restrictions can change in a minor release.
+  // The restrictions take origin from the OpenTelemetry specification:
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 6;
 
   // Represents a mapping between Attribute Keys and Units.
@@ -272,18 +292,6 @@ message Profile {
   bytes original_payload = 12;
 
   // References to attributes in attribute_table. [optional]
-  // It is a collection of key/value pairs. Note, global attributes
-  // like server name can be set using the resource API. Examples of attributes:
-  //
-  //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
-  //     "/http/server_latency": 300
-  //     "abc.com/myattribute": true
-  //     "abc.com/score": 10.239
-  //
-  // The OpenTelemetry API specification further restricts the allowed value types:
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
-  // Attribute keys MUST be unique (it is not allowed to have more than one
-  // attribute with the same key).
   repeated int32 attribute_indices = 13;
 }
 
