@@ -93,10 +93,14 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 // ProfilesDictionary represents the profiles data shared across the
 // entire message being sent.
 message ProfilesDictionary {
+
+  // Note all fields in this message MUST have a zero value encoded as the first element.
+  // This allows for _index fields pointing into the dictionary to use a 0 pointer value
+  // to indicate 'null' / 'not set'. Unless otherwise defined, a 'zero value' message value
+  // is one with all default field values, so as to minimize wire encoded size.
+
   // Mappings from address ranges to the image/binary/library mapped
   // into that address range referenced by locations via Location.mapping_index.
-  // mapping_table[0] must always be set to a zero value default mapping,
-  // so that _index fields can use 0 to indicate null/unset.
   repeated Mapping mapping_table = 1;
 
   // Locations referenced by samples via Profile.location_indices.
@@ -106,8 +110,6 @@ message ProfilesDictionary {
   repeated Function function_table = 3;
 
   // Links referenced by samples via Sample.link_index.
-  // link_table[0] must always be set to a zero value default link,
-  // so that _index fields can use 0 to indicate null/unset.
   repeated Link link_table = 4;
 
   // A common table for strings referenced by various messages.
