@@ -92,7 +92,8 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 
 // ProfilesDictionary represents the profiles data shared across the
 // entire message being sent.
-// Note all fields in this message MUST have a zero value encoded as the first element.
+//
+// Note that all fields in this message MUST have a zero value encoded as the first element.
 // This allows for _index fields pointing into the dictionary to use a 0 pointer value
 // to indicate 'null' / 'not set'. Unless otherwise defined, a 'zero value' message value
 // is one with all default field values, so as to minimize wire encoded size.
