@@ -130,12 +130,28 @@ is generated from the .proto files by any particular code generator.
 
 ## Maintainers
 
+### All Signals
+
 - [OpenTelemetry Technical Committee](https://github.com/open-telemetry/community/blob/main/community-members.md#technical-committee)
+
+### Profiling
+
+- [Christos Kalkanis](https://github.com/christos68k)
+- [Dmitry Filimonov](https://github.com/petethepig)
+- [Felix Geisendörfer](https://github.com/felixge)
+- [Jonathan Halliday](https://github.com/jhalliday)
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
 
 ## Approvers
 
+### All Signals
+
 - [OpenTelemetry Specification Sponsors](https://github.com/open-telemetry/community/blob/main/community-members.md#specifications-and-proto)
+
+### Profiling
+
+- [Alexey Alexandrov](https://github.com/aalexand)
+- [Florian Lehner](https://github.com/florianl)
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
