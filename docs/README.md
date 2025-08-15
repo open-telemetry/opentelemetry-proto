@@ -1,4 +1,4 @@
-# OTLP Docs
+# OpenTelemetry Protocol (OTLP) Docs
 
 The below table defines how the OTLP docs get mounted to the Open Telemetry website.
 
