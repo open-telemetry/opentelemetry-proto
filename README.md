@@ -152,6 +152,10 @@ For more information about the maintainer role, see the [community repository](h
 ### Profiling
 
 - [Alexey Alexandrov](https://github.com/aalexand)
+- [Christos Kalkanis](https://github.com/christos68k)
+- [Dmitry Filimonov](https://github.com/petethepig)
+- [Felix Geisendörfer](https://github.com/felixge)
 - [Florian Lehner](https://github.com/florianl)
+- [Jonathan Halliday](https://github.com/jhalliday)
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
