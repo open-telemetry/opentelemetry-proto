@@ -130,11 +130,7 @@ is generated from the .proto files by any particular code generator.
 
 ## Maintainers
 
-### All Signals
-
 - [OpenTelemetry Technical Committee](https://github.com/open-telemetry/community/blob/main/community-members.md#technical-committee)
-
-### Profiling
 
 - [Christos Kalkanis](https://github.com/christos68k)
 - [Dmitry Filimonov](https://github.com/petethepig)
