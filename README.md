@@ -132,11 +132,6 @@ is generated from the .proto files by any particular code generator.
 
 - [OpenTelemetry Technical Committee](https://github.com/open-telemetry/community/blob/main/community-members.md#technical-committee)
 
-- [Christos Kalkanis](https://github.com/christos68k)
-- [Dmitry Filimonov](https://github.com/petethepig)
-- [Felix Geisendörfer](https://github.com/felixge)
-- [Jonathan Halliday](https://github.com/jhalliday)
-
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
 
 ## Approvers
