@@ -67,9 +67,9 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 //   │                                n-1
 //   │ 1-n         ┌───────────────────────────────────────┐
 //   ▼             │                                       ▽
-// ┌──────────────────┐   1-n   ┌──────────────┐      ┌──────────┐
-// │      Sample      │ ──────▷ │   KeyValue   │      │   Link   │
-// └──────────────────┘         └──────────────┘      └──────────┘
+// ┌──────────────────┐   1-n   ┌─────────────────┐   ┌──────────┐
+// │      Sample      │ ──────▷ │ KeyValueAndUnit │   │   Link   │
+// └──────────────────┘         └─────────────────┘   └──────────┘
 //   │                    1-n       △      △
 //   │ 1-n        ┌─────────────────┘      │ 1-n
 //   ▽            │                        │
@@ -124,9 +124,6 @@ message ProfilesDictionary {
   //     "abc.com/myattribute": true
   //     "abc.com/score": 10.239
   //
-  // Attribute keys MUST be unique (it is not allowed to have more than one
-  // attribute with the same key).
-  //
   // The attribute values SHOULD NOT contain empty values.
   // The attribute values SHOULD NOT contain bytes values.
   // The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
@@ -136,10 +133,7 @@ message ProfilesDictionary {
   // These restrictions can change in a minor release.
   // The restrictions take origin from the OpenTelemetry specification:
   // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
-  repeated opentelemetry.proto.common.v1.KeyValue attribute_table = 6;
-
-  // Represents a mapping between Attribute Keys and Units.
-  repeated AttributeUnit attribute_units = 7;
+  repeated KeyValueAndUnit attribute_table = 6;
 }
 
 // ProfilesData represents the profiles data that can be stored in persistent storage,
@@ -294,14 +288,6 @@ message Profile {
 
   // References to attributes in attribute_table. [optional]
   repeated int32 attribute_indices = 13;
-}
-
-// Represents a mapping between Attribute Keys and Units.
-message AttributeUnit {
-  // Index into string table.
-  int32 attribute_key_strindex = 1;
-  // Index into string table.
-  int32 unit_strindex = 2;
 }
 
 // A pointer from a profile Sample to a trace Span.
@@ -496,4 +482,13 @@ message Function {
   int32 filename_strindex = 3;
   // Line number in source file. 0 means unset.
   int64 start_line = 4;
+}
+
+// A custom 'dictionary native' style of encoding attributes which is more convenient
+// for profiles than opentelemetry.proto.common.v1.KeyValue
+// Specifically, uses the string table for keys and allows optional unit information.
+message KeyValueAndUnit {
+  int32 key_strindex  = 1;
+  opentelemetry.proto.common.v1.AnyValue value = 2;
+  int32 unit_strindex = 3; // zero indicates implicit (by semconv) or non-defined unit.
 }
