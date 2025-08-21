@@ -59,7 +59,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 // │  ScopeProfiles   │
 // └──────────────────┘
 //   │
-//   │ 1-1
+//   │ 1-n
 //   ▼
 // ┌──────────────────┐
 // │      Profile     │
@@ -92,11 +92,14 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 
 // ProfilesDictionary represents the profiles data shared across the
 // entire message being sent.
+//
+// Note that all fields in this message MUST have a zero value encoded as the first element.
+// This allows for _index fields pointing into the dictionary to use a 0 pointer value
+// to indicate 'null' / 'not set'. Unless otherwise defined, a 'zero value' message value
+// is one with all default field values, so as to minimize wire encoded size.
 message ProfilesDictionary {
   // Mappings from address ranges to the image/binary/library mapped
   // into that address range referenced by locations via Location.mapping_index.
-  // mapping_table[0] must always be set to a zero value default mapping,
-  // so that _index fields can use 0 to indicate null/unset.
   repeated Mapping mapping_table = 1;
 
   // Locations referenced by samples via Profile.location_indices.
@@ -106,8 +109,6 @@ message ProfilesDictionary {
   repeated Function function_table = 3;
 
   // Links referenced by samples via Sample.link_index.
-  // link_table[0] must always be set to a zero value default link,
-  // so that _index fields can use 0 to indicate null/unset.
   repeated Link link_table = 4;
 
   // A common table for strings referenced by various messages.
@@ -115,6 +116,23 @@ message ProfilesDictionary {
   repeated string string_table = 5;
 
   // A common table for attributes referenced by various messages.
+  // It is a collection of key/value pairs. Note, global attributes
+  // like server name can be set using the resource API. Examples of attributes:
+  //
+  //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+  //     "/http/server_latency": 300
+  //     "abc.com/myattribute": true
+  //     "abc.com/score": 10.239
+  //
+  // The attribute values SHOULD NOT contain empty values.
+  // The attribute values SHOULD NOT contain bytes values.
+  // The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+  // double values.
+  // The attribute values SHOULD NOT contain kvlist values.
+  // The behavior of software that receives attributes containing such values can be unpredictable.
+  // These restrictions can change in a minor release.
+  // The restrictions take origin from the OpenTelemetry specification:
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated KeyValueAndUnit attribute_table = 6;
 }
 
@@ -136,6 +154,8 @@ message ProfilesData {
   // from non-containerized processes.
   // Other resource groupings are possible as well and clarified via
   // Resource.attributes and semantic conventions.
+  // Tools that visualize profiles should prefer displaying
+  // resources_profiles[0].scope_profiles[0].profiles[0] by default.
   repeated ResourceProfiles resource_profiles = 1;
 
   // One instance of ProfilesDictionary
@@ -179,10 +199,6 @@ message ScopeProfiles {
   // https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
   // This schema_url applies to all profiles in the "profiles" field.
   string schema_url = 3;
-
-  // The preferred type and unit of Samples in at least one Profile.
-  // See Profile.sample_type for possible values.
-  ValueType default_sample_type = 4;
 }
 
 // Profile is a common stacktrace profile format.
@@ -231,9 +247,9 @@ message Profile {
   // interpretation of results.
 
   // Time of collection (UTC) represented as nanoseconds past the epoch.
-  int64 time_nanos = 4;
+  fixed64 time_unix_nano = 4;
   // Duration of the profile, if a duration makes sense.
-  int64 duration_nanos = 5;
+  uint64 duration_nano = 5;
   // The kind of events between sampled occurrences.
   // e.g [ "cpu","cycles" ] or [ "heap","bytes" ]
   ValueType period_type = 6;
@@ -271,18 +287,6 @@ message Profile {
   bytes original_payload = 12;
 
   // References to attributes in attribute_table. [optional]
-  // It is a collection of key/value pairs. Note, global attributes
-  // like server name can be set using the resource API. Examples of attributes:
-  //
-  //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
-  //     "/http/server_latency": 300
-  //     "abc.com/myattribute": true
-  //     "abc.com/score": 10.239
-  //
-  // The OpenTelemetry API specification further restricts the allowed value types:
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/common/README.md#attribute
-  // Attribute keys MUST be unique (it is not allowed to have more than one
-  // attribute with the same key).
   repeated int32 attribute_indices = 13;
 }
 
@@ -412,7 +416,7 @@ message Sample {
 
   // Timestamps associated with Sample represented in nanoseconds. These
   // timestamps should fall within the Profile's time range.
-  repeated uint64 timestamps_unix_nano = 6;
+  repeated fixed64 timestamps_unix_nano = 6;
 }
 
 // Describes the mapping of a binary in memory, including its address range,
@@ -430,11 +434,6 @@ message Mapping {
   int32 filename_strindex = 4;  // Index into ProfilesDictionary.string_table.
   // References to attributes in ProfilesDictionary.attribute_table. [optional]
   repeated int32 attribute_indices = 5;
-  // The following fields indicate the resolution of symbolic info.
-  bool has_functions = 6;
-  bool has_filenames = 7;
-  bool has_line_numbers = 8;
-  bool has_inline_frames = 9;
 }
 
 // Describes function and line table debug information.
@@ -457,15 +456,8 @@ message Location {
   //    line[0].function_name == "memcpy"
   //    line[1].function_name == "printf"
   repeated Line line = 3;
-  // Provides an indication that multiple symbols map to this location's
-  // address, for example due to identical code folding by the linker. In that
-  // case the line information above represents one of the multiple
-  // symbols. This field must be recomputed when the symbolization state of the
-  // profile changes.
-  bool is_folded = 4;
-
   // References to attributes in ProfilesDictionary.attribute_table. [optional]
-  repeated int32 attribute_indices = 5;
+  repeated int32 attribute_indices = 4;
 }
 
 // Details a specific line in a source code, linked to a function.
