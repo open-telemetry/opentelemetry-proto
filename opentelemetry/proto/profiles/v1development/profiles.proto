@@ -440,10 +440,10 @@ message Mapping {
   repeated int32 attribute_indices = 5;
 }
 
-// A Stack represents a stack trace as a list of locations. The first location
-// is the leaf frame.
+// A Stack represents a stack trace as a list of locations.
 message Stack {
   // References to locations in ProfilesDictionary.location_table.
+  // The first location is the leaf frame.
   repeated int32 location_indices = 1;
 }
 
