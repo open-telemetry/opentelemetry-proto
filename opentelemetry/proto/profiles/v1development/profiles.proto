@@ -420,7 +420,7 @@ message Sample {
 
   // Timestamps associated with Sample represented in nanoseconds. These
   // timestamps should fall within the Profile's time range.
-  repeated fixed64 timestamps_unix_nano = 4;
+  repeated fixed64 timestamps_unix_nano = 5;
 }
 
 // Describes the mapping of a binary in memory, including its address range,
