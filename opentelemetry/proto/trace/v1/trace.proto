@@ -261,7 +261,7 @@ message Span {
 
     // attributes is a collection of attribute key/value pairs on the link.
     //
-    // Attribute keys SHOULD be unique (it is not allowed to have more than one
+    // Attribute keys MUST be unique (it is not allowed to have more than one
     // attribute with the same key).
     // The behavior of software that receives duplicated keys can be unpredictable.
     repeated opentelemetry.proto.common.v1.KeyValue attributes = 4;
