@@ -71,7 +71,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 // │      Sample      │ ──────▷ │ KeyValueAndUnit │   │   Link   │
 // └──────────────────┘         └─────────────────┘   └──────────┘
 //   │                              △      △
-//   │ 1-1                          │      │ 1-n
+//   │ n-1                          │      │ 1-n
 //   ▽                              │      │
 // ┌──────────────────┐             │      │
 // │      Stack       │             │      │
