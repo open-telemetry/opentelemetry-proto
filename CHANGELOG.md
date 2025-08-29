@@ -10,7 +10,9 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Changed
 
-- all: drop attribute values restrictions. [#707](https://github.com/open-telemetry/opentelemetry-proto/pull/707)
+- all: drop attribute values restrictions.
+  ⚠️ **IMPORTANT**: OTLP consumers are expected to accept attribute values that were previously considered invalid.
+  [#707](https://github.com/open-telemetry/opentelemetry-proto/pull/707)
 
 ## 1.7.0 - 2025-05-19
 
