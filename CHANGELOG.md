@@ -24,7 +24,7 @@ The full list of changes can be found in the compare view for the respective rel
 ### Fixed
 
 - examples: fix OTLP JSON Event example body. [#666](https://github.com/open-telemetry/opentelemetry-proto/pull/666)
-- docs: minor specification fixes around `UNAVAILABLE` nd `RetryInfo`. [#669](https://github.com/open-telemetry/opentelemetry-proto/pull/669)
+- docs: minor specification fixes around `UNAVAILABLE` and `RetryInfo`. [#669](https://github.com/open-telemetry/opentelemetry-proto/pull/669)
 
 ### Removed
 
