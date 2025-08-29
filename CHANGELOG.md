@@ -12,9 +12,10 @@ The full list of changes can be found in the compare view for the respective rel
 - profiles: avoid `optional` keyword usage. [#659](https://github.com/open-telemetry/opentelemetry-proto/pull/659)
 - profiles: make `profile_id` optional. [#665](https://github.com/open-telemetry/opentelemetry-proto/pull/665)
 - profiles: use single `Profile.sample_type` and clarify use of timestamps. [#649](https://github.com/open-telemetry/opentelemetry-proto/pull/649)
-- all: add notes about the attribute values restrictions.
+- all: add notes about the attribute values restrictions. [#683](https://github.com/open-telemetry/opentelemetry-proto/pull/683)
+  
   ⚠️ **IMPORTANT**: These restrictions can be dropped in a future minor release.
-  [#683](https://github.com/open-telemetry/opentelemetry-proto/pull/683)
+  
 - profiles: clarify usage of the zero value as the first element of tables in `ProfilesDictionary`. [#688](https://github.com/open-telemetry/opentelemetry-proto/pull/688), [#698](https://github.com/open-telemetry/opentelemetry-proto/pull/698)
 - profiles: unsigned `time_nanos` and `duration_nanos` in `Profile`. [#692](https://github.com/open-telemetry/opentelemetry-proto/pull/692)
 - profiles: improve attribute encoding in `ProfilesDictionary`. [#672](https://github.com/open-telemetry/opentelemetry-proto/pull/672)
