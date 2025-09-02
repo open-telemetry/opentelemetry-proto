@@ -4,6 +4,16 @@
 
 The full list of changes can be found in the compare view for the respective release at <https://github.com/open-telemetry/opentelemetry-proto/releases>.
 
+### Changed
+
+- all: drop attribute values restrictions. [#707](https://github.com/open-telemetry/opentelemetry-proto/pull/707)<br>
+  ⚠️ **IMPORTANT**: OTLP consumers are expected to accept attribute values that were previously considered invalid.
+  All attributes can now contain:
+  - empty values,
+  - bytes values,
+  - array values different than array of string values, bool values, int values, double values,
+  - kvlist values.
+
 ## 1.8.0 - 2025-09-02
 
 ### Changed
@@ -29,16 +39,6 @@ The full list of changes can be found in the compare view for the respective rel
 - profiles: remove `default_sample_type`. [#679](https://github.com/open-telemetry/opentelemetry-proto/pull/679)
 - profiles: remove `has_*` debug info fields, they are moving to attributes. [#595](https://github.com/open-telemetry/opentelemetry-proto/pull/595)
 - profiles: remove `Location.is_folded`. [#690](https://github.com/open-telemetry/opentelemetry-proto/pull/690)
-
-### Changed
-
-- all: drop attribute values restrictions. [#707](https://github.com/open-telemetry/opentelemetry-proto/pull/707)<br>
-  ⚠️ **IMPORTANT**: OTLP consumers are expected to accept attribute values that were previously considered invalid.
-  All attributes can now contain:
-  - empty values,
-  - bytes values,
-  - array values different than array of string values, bool values, int values, double values,
-  - kvlist values.
 
 ## 1.7.0 - 2025-05-19
 
