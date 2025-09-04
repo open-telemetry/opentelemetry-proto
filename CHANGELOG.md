@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- profiles: rename line -> lines and sample -> samples since they are repeated fields. [#712](https://github.com/open-telemetry/opentelemetry-proto/pull/712)
+
 The full list of changes can be found in the compare view for the respective release at <https://github.com/open-telemetry/opentelemetry-proto/releases>.
 
 ## 1.8.0 - 2025-09-02
