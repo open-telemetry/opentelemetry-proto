@@ -106,19 +106,28 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 message ProfilesDictionary {
   // Mappings from address ranges to the image/binary/library mapped
   // into that address range referenced by locations via Location.mapping_index.
+  //
+  // mapping_table[0] must always be zero value (Mapping{}) and present.
   repeated Mapping mapping_table = 1;
 
   // Locations referenced by samples via Stack.location_indices.
+  //
+  // location_table[0] must always be zero value (Location{}) and present.
   repeated Location location_table = 2;
 
   // Functions referenced by locations via Line.function_index.
+  //
+  // function_table[0] must always be zero value (Function{}) and present.
   repeated Function function_table = 3;
 
   // Links referenced by samples via Sample.link_index.
+  //
+  // link_table[0] must always be zero value (Link{}) and present.
   repeated Link link_table = 4;
 
   // A common table for strings referenced by various messages.
-  // string_table[0] must always be "".
+  //
+  // string_table[0] must always be "" and present.
   repeated string string_table = 5;
 
   // A common table for attributes referenced by various messages.
@@ -139,9 +148,13 @@ message ProfilesDictionary {
   // These restrictions can change in a minor release.
   // The restrictions take origin from the OpenTelemetry specification:
   // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
+  //
+  // attribute_table[0] must always be zero value (KeyValueAndUnit{}) and present.
   repeated KeyValueAndUnit attribute_table = 6;
 
   // Stacks referenced by samples via Sample.stack_index.
+  //
+  // stack_table[0] must always be zero value (Stack{}) and present.
   repeated Stack stack_table = 7;
 }
 
