@@ -393,6 +393,10 @@ message ValueType {
 // both fields are populated, they MUST contain the same number of elements, and
 // the elements at the same index MUST refer to the same event.
 //
+// For the purposes of efficiently representing aggregated data observations, a Sample is regarded
+// as having a shared identity and an associated collection of per-observation data points.
+// Samples having the same identity may be combined by inserting timestamps and values to the data arrays.
+//
 // Examples of different ways of representing a sample with the total value of 10:
 //
 // Report of a stacktrace at 10 timestamps (consumers must assume the value is 1 for each point):
@@ -400,6 +404,9 @@ message ValueType {
 //    timestamps_unix_nano: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 //
 // Report of a stacktrace with an aggregated value without timestamps:
+// Note that in such case, it is not possible to determine how many aggregated observations summed to form the value.
+// If lossless encoding is preferred to space efficiency, it is recommended to instead encode the value as an attribute,
+// i.e. add more unique Sample messages. This may be required only where timestamps are not present.
 //   values: [10]
 //    timestamps_unix_nano: []
 //
@@ -407,17 +414,21 @@ message ValueType {
 //    values: [2, 2, 3, 3]
 //    timestamps_unix_nano: [1, 2, 3, 4]
 message Sample {
+
+  // A Sample's identity (i.e. 'primary key') is the tuple of {stack_index, sorted(attribute_indices), link_index}
+
   // Reference to stack in ProfilesDictionary.stack_table.
   int32 stack_index = 1;
-  // The type and unit of each value is defined by Profile.sample_type.
-  repeated int64 values = 2;
   // References to attributes in ProfilesDictionary.attribute_table. [optional]
-  repeated int32 attribute_indices = 3;
-
+  repeated int32 attribute_indices = 2;
   // Reference to link in ProfilesDictionary.link_table. [optional]
   // It can be unset / set to 0 if no link exists, as link_table[0] is always a 'null' default value.
-  int32 link_index = 4;
+  int32 link_index = 3;
 
+  // The following fields may contain per-observation data and do not form part of the Sample's key.
+
+  // The type and unit of each value is defined by Profile.sample_type.
+  repeated int64 values = 4;
   // Timestamps associated with Sample represented in nanoseconds. These
   // timestamps should fall within the Profile's time range.
   repeated fixed64 timestamps_unix_nano = 5;
