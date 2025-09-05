@@ -14,6 +14,10 @@ The full list of changes can be found in the compare view for the respective rel
   - array values different than array of string values, bool values, int values, double values,
   - kvlist values.
 
+### Removed
+
+- profiles: remove aggregation temporality enum and field. [#710](https://github.com/open-telemetry/opentelemetry-proto/pull/710)
+
 ## 1.8.0 - 2025-09-02
 
 ### Changed
