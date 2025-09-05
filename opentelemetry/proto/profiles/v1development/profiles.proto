@@ -248,7 +248,7 @@ message Profile {
   //   ["allocated_objects","count"] or ["allocated_space","bytes"],
   ValueType sample_type = 1;
   // The set of samples recorded in this profile.
-  repeated Sample sample = 2;
+  repeated Sample samples = 2;
 
   // The following fields 3-12 are informational, do not affect
   // interpretation of results.
@@ -394,9 +394,9 @@ message Location {
   // preceding entries were inlined.
   //
   // E.g., if memcpy() is inlined into printf:
-  //    line[0].function_name == "memcpy"
-  //    line[1].function_name == "printf"
-  repeated Line line = 3;
+  //    lines[0].function_name == "memcpy"
+  //    lines[1].function_name == "printf"
+  repeated Line lines = 3;
   // References to attributes in ProfilesDictionary.attribute_table. [optional]
   repeated int32 attribute_indices = 4;
 }
