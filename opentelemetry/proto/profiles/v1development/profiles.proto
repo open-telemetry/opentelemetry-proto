@@ -395,7 +395,7 @@ message ValueType {
 //
 // For the purposes of efficiently representing aggregated data observations, a Sample is regarded
 // as having a shared identity and an associated collection of per-observation data points.
-// Samples having the same identity may be combined by inserting timestamps and values to the data arrays.
+// Samples having the same identity SHOULD be combined by inserting timestamps and values to the data arrays.
 //
 // Examples of different ways of representing a sample with the total value of 10:
 //
