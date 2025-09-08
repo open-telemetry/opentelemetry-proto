@@ -425,7 +425,7 @@ message Sample {
   // It can be unset / set to 0 if no link exists, as link_table[0] is always a 'null' default value.
   int32 link_index = 3;
 
-  // The following fields may contain per-observation data and do not form part of the Sample's key.
+  // The following fields may contain per-observation data and do not form part of the Sample's identity.
 
   // The type and unit of each value is defined by Profile.sample_type.
   repeated int64 values = 4;
