@@ -137,11 +137,11 @@ message ProfilesDictionary {
   // tables like Resource.attributes. The referencing attribute_indices fields,
   // though, do maintain the key uniqueness requirement.
   //
-  // It's recommended to use attributes for variables with bounded set of
-  // values, such as categorical variables
-  // (https://en.wikipedia.org/wiki/Categorical_variable). Using an attribute
-  // of a floating point type (e.g., CPU time) in a sample can quickly make
-  // every attribute value unique, defeating the purpose of the dictionary and
+  // It's recommended to use attributes for variables with bounded cardinality,
+  // such as categorical variables
+  // (https://en.wikipedia.org/wiki/Categorical_variable). Using an attribute of
+  // a floating point type (e.g., CPU time) in a sample can quickly make every
+  // attribute value unique, defeating the purpose of the dictionary and
   // impractically increasing the profile size.
   //
   // Examples of attributes:
