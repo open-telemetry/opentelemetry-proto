@@ -106,32 +106,55 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 message ProfilesDictionary {
   // Mappings from address ranges to the image/binary/library mapped
   // into that address range referenced by locations via Location.mapping_index.
+  //
+  // mapping_table[0] must always be zero value (Mapping{}) and present.
   repeated Mapping mapping_table = 1;
 
   // Locations referenced by samples via Stack.location_indices.
+  //
+  // location_table[0] must always be zero value (Location{}) and present.
   repeated Location location_table = 2;
 
   // Functions referenced by locations via Line.function_index.
+  //
+  // function_table[0] must always be zero value (Function{}) and present.
   repeated Function function_table = 3;
 
   // Links referenced by samples via Sample.link_index.
+  //
+  // link_table[0] must always be zero value (Link{}) and present.
   repeated Link link_table = 4;
 
   // A common table for strings referenced by various messages.
-  // string_table[0] must always be "".
+  //
+  // string_table[0] must always be "" and present.
   repeated string string_table = 5;
 
-  // A common table for attributes referenced by various messages.
-  // It is a collection of key/value pairs. Note, global attributes
-  // like server name can be set using the resource API. Examples of attributes:
+  // A common table for attributes referenced by the Profile, Sample, Mapping
+  // and Location messages below through attribute_indices field. Each entry is
+  // a key/value pair with an optional unit. Since this is a dictionary table,
+  // multiple entries with the same key may be present, unlike direct attribute
+  // tables like Resource.attributes. The referencing attribute_indices fields,
+  // though, do maintain the key uniqueness requirement.
   //
+  // It's recommended to use attributes for variables with bounded cardinality,
+  // such as categorical variables
+  // (https://en.wikipedia.org/wiki/Categorical_variable). Using an attribute of
+  // a floating point type (e.g., CPU time) in a sample can quickly make every
+  // attribute value unique, defeating the purpose of the dictionary and
+  // impractically increasing the profile size.
+  //
+  // Examples of attributes:
   //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
-  //     "/http/server_latency": 300
   //     "abc.com/myattribute": true
-  //     "abc.com/score": 10.239
+  //     "allocation_size": 128 bytes
+  //
+  // attribute_table[0] must always be zero value (KeyValueAndUnit{}) and present.
   repeated KeyValueAndUnit attribute_table = 6;
 
   // Stacks referenced by samples via Sample.stack_index.
+  //
+  // stack_table[0] must always be zero value (Stack{}) and present.
   repeated Stack stack_table = 7;
 }
 
