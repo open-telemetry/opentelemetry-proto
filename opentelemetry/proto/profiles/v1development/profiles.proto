@@ -290,7 +290,7 @@ message Profile {
   // This field is optional; an ID may be assigned to an ID-less profile in a later step.
   bytes profile_id = 8;
 
-  // dropped_attributes_count is the number of attributes that were discarded. Attributes
+  // The number of attributes that were discarded. Attributes
   // can be discarded because their keys are too long or because there are too many
   // attributes. If this value is 0, then no attributes were dropped.
   uint32 dropped_attributes_count = 9;
@@ -323,8 +323,11 @@ message Link {
 
 // ValueType describes the type and units of a value.
 message ValueType {
-  int32 type_strindex = 1; // Index into ProfilesDictionary.string_table.
-  int32 unit_strindex = 2; // Index into ProfilesDictionary.string_table.
+  // Index into ProfilesDictionary.string_table.
+  int32 type_strindex = 1;
+
+  // Index into ProfilesDictionary.string_table.
+  int32 unit_strindex = 2;
 }
 
 // Each Sample records values encountered in some program context. The program
@@ -427,7 +430,7 @@ message Line {
 // Describes a function, including its human-readable name, system name,
 // source file, and starting line number in the source.
 message Function {
-  // Function name. Empty string if not available.
+  // The function name. Empty string if not available.
   int32 name_strindex = 1;
   // Function name, as identified by the system. For instance,
   // it can be a C++ mangled name. Empty string if not available.
@@ -442,7 +445,11 @@ message Function {
 // for profiles than opentelemetry.proto.common.v1.KeyValue
 // Specifically, uses the string table for keys and allows optional unit information.
 message KeyValueAndUnit {
+  // The index into the string table for the attribute's key.
   int32 key_strindex  = 1;
+  // The value of the attribute.
   opentelemetry.proto.common.v1.AnyValue value = 2;
-  int32 unit_strindex = 3; // zero indicates implicit (by semconv) or non-defined unit.
+  // The index into the string table for the attribute's unit.
+  // zero indicates implicit (by semconv) or non-defined unit.
+  int32 unit_strindex = 3;
 }

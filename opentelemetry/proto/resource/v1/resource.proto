@@ -41,7 +41,7 @@ message Resource {
   // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
 
-  // dropped_attributes_count is the number of dropped attributes. If the value is 0, then
+  // The number of dropped attributes. If the value is 0, then
   // no attributes were dropped.
   uint32 dropped_attributes_count = 2;
 
