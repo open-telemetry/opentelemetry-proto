@@ -228,14 +228,16 @@ message Metric {
 // AggregationTemporality is not included. Consequently, this also means
 // "StartTimeUnixNano" is ignored for all data points.
 message Gauge {
-  // The time series point values for this gauge.
+  // The time series data points.
+  // Note: Multiple time series may be included (same timestamp, different attributes).
   repeated NumberDataPoint data_points = 1;
 }
 
 // Sum represents the type of a scalar metric that is calculated as a sum of all
 // reported measurements over a time interval.
 message Sum {
-  // The time series point values for this sum.
+  // The time series data points.
+  // Note: Multiple time series may be included (same timestamp, different attributes).
   repeated NumberDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
@@ -249,7 +251,8 @@ message Sum {
 // Histogram represents the type of a metric that is calculated by aggregating
 // as a Histogram of all reported measurements over a time interval.
 message Histogram {
-  // The time series point values for this histogram.
+  // The time series data points.
+  // Note: Multiple time series may be included (same timestamp, different attributes).
   repeated HistogramDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
@@ -260,7 +263,8 @@ message Histogram {
 // ExponentialHistogram represents the type of a metric that is calculated by aggregating
 // as a ExponentialHistogram of all reported double measurements over a time interval.
 message ExponentialHistogram {
-  // The time series point values for this histogram.
+  // The time series data points.
+  // Note: Multiple time series may be included (same timestamp, different attributes).
   repeated ExponentialHistogramDataPoint data_points = 1;
 
   // aggregation_temporality describes if the aggregator reports delta changes
@@ -278,7 +282,8 @@ message ExponentialHistogram {
 // because the count and sum fields of a SummaryDataPoint are assumed to be
 // cumulative values.
 message Summary {
-  // The time series point values for this summary.
+  // The time series data points.
+  // Note: Multiple time series may be included (same timestamp, different attributes).
   repeated SummaryDataPoint data_points = 1;
 }
 
