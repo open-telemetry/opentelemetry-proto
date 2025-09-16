@@ -58,7 +58,7 @@ message MetricsData {
   // For data coming from a single resource this array will typically contain
   // one element. Intermediary nodes that receive data from multiple origins
   // typically batch the data before forwarding further and in that case this
-// array will contain multiple elements.
+  // array will contain multiple elements.
   repeated ResourceMetrics resource_metrics = 1;
 }
 
