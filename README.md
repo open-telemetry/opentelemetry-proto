@@ -2,7 +2,7 @@
 
 [![Build Check](https://github.com/open-telemetry/opentelemetry-proto/workflows/Build%20Check/badge.svg?branch=main)](https://github.com/open-telemetry/opentelemetry-proto/actions?query=workflow%3A%22Build+Check%22+branch%3Amain)
 
-This repository contains the [OTLP protocol specification](docs/specification.md)
+This repository contains the [OTLP protocol specification](docs/specs/specification.md)
 and the corresponding Language Independent Interface Types ([.proto files](opentelemetry/proto)).
 
 ## Language Independent Interface Types
@@ -38,12 +38,12 @@ components as indicated by the Maturity table below.
 
 | Component | Binary Protobuf Maturity | JSON Maturity |
 | --------- |--------------- | ------------- |
-| common/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| resource/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| metrics/\*<br>collector/metrics/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| trace/\*<br>collector/trace/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| logs/\*<br>collector/logs/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
-| profiles/\*<br>collector/profiles/* | Development | [Development](docs/specification.md#json-protobuf-encoding) |
+| common/* | Stable | [Stable](docs/specs/specification.md#json-protobuf-encoding) |
+| resource/* | Stable | [Stable](docs/specs/specification.md#json-protobuf-encoding) |
+| metrics/\*<br>collector/metrics/* | Stable | [Stable](docs/specs/specification.md#json-protobuf-encoding) |
+| trace/\*<br>collector/trace/* | Stable | [Stable](docs/specs/specification.md#json-protobuf-encoding) |
+| logs/\*<br>collector/logs/* | Stable | [Stable](docs/specs/specification.md#json-protobuf-encoding) |
+| profiles/\*<br>collector/profiles/* | Development | [Development](docs/specs/specification.md#json-protobuf-encoding) |
 
 (See [Versioning and Stability](https://github.com/open-telemetry/opentelemetry-specification/blob/a08d1f92f62acd4aafe4dfaa04ae7bf28600d49e/specification/versioning-and-stability.md)
 for definition of maturity levels).
