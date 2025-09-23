@@ -170,7 +170,7 @@ message ProfilesDictionary {
   // Lines referenced by samples via Location.line_indices.
   //
   // line_table[0] must always be zero value (Line{}) and present.
-  repeated Stack line_table = 8;
+  repeated Line line_table = 8;
 }
 
 // ProfilesData represents the profiles data that can be stored in persistent storage,
