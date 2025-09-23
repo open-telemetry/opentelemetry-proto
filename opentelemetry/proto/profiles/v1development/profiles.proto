@@ -166,6 +166,11 @@ message ProfilesDictionary {
   //
   // stack_table[0] must always be zero value (Stack{}) and present.
   repeated Stack stack_table = 7;
+
+  // Lines referenced by samples via Location.line_indices.
+  //
+  // line_table[0] must always be zero value (Line{}) and present.
+  repeated Stack line_table = 8;
 }
 
 // ProfilesData represents the profiles data that can be stored in persistent storage,
@@ -422,7 +427,9 @@ message Location {
   // E.g., if memcpy() is inlined into printf:
   //    lines[0].function_name == "memcpy"
   //    lines[1].function_name == "printf"
-  repeated Line lines = 3;
+  //
+  // References to line in ProfilesDictionary.line_table.
+  repeated int32 line_indices = 3;
   // References to attributes in ProfilesDictionary.attribute_table. [optional]
   repeated int32 attribute_indices = 4;
 }
