@@ -404,9 +404,6 @@ message ValueType {
 //    timestamps_unix_nano: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 //
 // Report of a stacktrace with an aggregated value without timestamps:
-// Note that in such case, it is not possible to determine how many aggregated observations summed to form the value.
-// If lossless encoding is preferred to space efficiency, it is recommended to instead encode the value as an attribute,
-// i.e. add more unique Sample messages. This may be required only where timestamps are not present.
 //   values: [10]
 //    timestamps_unix_nano: []
 //
