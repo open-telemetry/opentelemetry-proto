@@ -1,8 +1,17 @@
 # Changelog
 
+The full list of changes can be found in the compare view for the respective release at <https://github.com/open-telemetry/opentelemetry-proto/releases>.
+
 ## Unreleased
 
-The full list of changes can be found in the compare view for the respective release at <https://github.com/open-telemetry/opentelemetry-proto/releases>.
+### Changed
+
+- profiles: add a note about cardinality implications for attribute values. [#713](https://github.com/open-telemetry/opentelemetry-proto/pull/713)
+- profiles: rename line -> lines and sample -> samples since they are repeated fields. [#712](https://github.com/open-telemetry/opentelemetry-proto/pull/712)
+
+### Removed
+
+- profiles: remove aggregation temporality enum and field. [#710](https://github.com/open-telemetry/opentelemetry-proto/pull/710)
 
 ## 1.8.0 - 2025-09-02
 
