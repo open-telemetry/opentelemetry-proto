@@ -308,8 +308,8 @@ message Profile {
   // The original payload format. See also original_payload. Optional, but the
   // format and the bytes must be set or unset together.
   //
-  // The allowed values for the format string are defined by the semantic
-  // conventions schema. Some examples are "jfr", "pprof", "linux_perf".
+  // The allowed values for the format string are defined by the OpenTelemetry
+  // specification. Some examples are "jfr", "pprof", "linux_perf".
   //
   // The original payload may be optionally provided when the conversion to the
   // OLTP format was done from a different format with some loss of the fidelity
