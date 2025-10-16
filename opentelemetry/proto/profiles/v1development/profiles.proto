@@ -368,7 +368,7 @@ message ValueType {
 //    timestamps_unix_nano: [1, 2, 3, 4]
 message Sample {
 
-  // A Sample's identity (i.e. 'primary key') is the tuple of {stack_index, sorted(attribute_indices), link_index}
+  // A Sample's identity (i.e. 'primary key') is the tuple of {stack_index, set_of(attribute_indices), link_index}
 
   // Reference to stack in ProfilesDictionary.stack_table.
   int32 stack_index = 1;
