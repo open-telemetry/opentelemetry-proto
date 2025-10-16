@@ -1,3 +1,7 @@
+<!--- Hugo front matter used to generate the website version of this page:
+linkTitle: Requirements
+--->
+
 # OpenTelemetry Protocol Requirements
 
 This document will drive OpenTelemetry Protocol design and RFC.
