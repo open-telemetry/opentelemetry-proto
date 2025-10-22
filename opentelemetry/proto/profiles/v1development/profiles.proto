@@ -285,12 +285,6 @@ message Profile {
   ValueType period_type = 5;
   // The number of events between sampled occurrences.
   int64 period = 6;
-  // Free-form text associated with the profile. The text is displayed as is
-  // to the user by the tools that read profiles (e.g. by pprof). This field
-  // should not be used to store any machine-readable information, it is only
-  // for human-friendly content. The profile must stay functional if this field
-  // is cleaned.
-  repeated int32 comment_strindices = 7; // Indices into ProfilesDictionary.string_table.
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
   // all zeroes is considered invalid. It may be used for deduplication and signal
@@ -298,15 +292,15 @@ message Profile {
   // in this field as not equal, even if they represented the same object at an earlier
   // time.
   // This field is optional; an ID may be assigned to an ID-less profile in a later step.
-  bytes profile_id = 8;
+  bytes profile_id = 7;
 
   // The number of attributes that were discarded. Attributes
   // can be discarded because their keys are too long or because there are too many
   // attributes. If this value is 0, then no attributes were dropped.
-  uint32 dropped_attributes_count = 9;
+  uint32 dropped_attributes_count = 8;
 
   // Specifies format of the original payload. Common values are defined in semantic conventions. [required if original_payload is present]
-  string original_payload_format = 10;
+  string original_payload_format = 9;
 
   // Original payload can be stored in this field. This can be useful for users who want to get the original payload.
   // Formats such as JFR are highly extensible and can contain more information than what is defined in this spec.
@@ -314,10 +308,10 @@ message Profile {
   // If the original payload is in pprof format, it SHOULD not be included in this field.
   // The field is optional, however if it is present then equivalent converted data should be populated in other fields
   // of this message as far as is practicable.
-  bytes original_payload = 11;
+  bytes original_payload = 10;
 
   // References to attributes in attribute_table. [optional]
-  repeated int32 attribute_indices = 12;
+  repeated int32 attribute_indices = 11;
 }
 
 // A pointer from a profile Sample to a trace Span.
