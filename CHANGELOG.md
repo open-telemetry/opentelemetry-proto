@@ -6,6 +6,7 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Changed
 
+- profiles: drop field profile.comment_strindices. [#729](https://github.com/open-telemetry/opentelemetry-proto/pull/729)
 - profiles: clarify the original payload field comments. [#722](https://github.com/open-telemetry/opentelemetry-proto/pull/722)
 - profiles: add a note about cardinality implications for attribute values. [#713](https://github.com/open-telemetry/opentelemetry-proto/pull/713)
 - profiles: rename line -> lines and sample -> samples since they are repeated fields. [#712](https://github.com/open-telemetry/opentelemetry-proto/pull/712)
