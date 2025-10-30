@@ -42,4 +42,21 @@ message Resource {
   //
   // Status: [Development]
   repeated opentelemetry.proto.common.v1.EntityRef entity_refs = 3;
+
+  // Set of attributes that describe the resource.
+  // Key and Value combination MUST be unique.
+  //
+  // Note: This is currently used exclusively in the Profiling signal.
+  //
+  // Status: [Development]
+  repeated StringKeyValue = 4;
+}
+
+// Represents a reference based key-value pair that is used to store attributes.
+message StringKeyValue {
+  // Reference to the key name of the pair in ProfilesDictionary(?).string_table.
+  int32 key_index = 1;
+
+  // Reference to the value of the pair in ProfilesDictionary(?).string_table.
+  int32 value_index = 2;
 }
