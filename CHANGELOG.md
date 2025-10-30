@@ -4,15 +4,22 @@ The full list of changes can be found in the compare view for the respective rel
 
 ## Unreleased
 
+### Added
+
 ### Changed
 
-- profiles: drop field profile.comment_strindices. [#729](https://github.com/open-telemetry/opentelemetry-proto/pull/729)
-- profiles: clarify the original payload field comments. [#722](https://github.com/open-telemetry/opentelemetry-proto/pull/722)
+### Removed
+
+## 1.9.0 - 2025-11-01
+
+### Added
+
 - profiles: add a note about cardinality implications for attribute values. [#713](https://github.com/open-telemetry/opentelemetry-proto/pull/713)
-- profiles: rename line -> lines and sample -> samples since they are repeated fields. [#712](https://github.com/open-telemetry/opentelemetry-proto/pull/712)
 
 ### Changed
 
+- profiles: clarify the original payload field comments. [#722](https://github.com/open-telemetry/opentelemetry-proto/pull/722)
+- profiles: rename line -> lines and sample -> samples since they are repeated fields. [#712](https://github.com/open-telemetry/opentelemetry-proto/pull/712)
 - all: drop attribute values restrictions. [#707](https://github.com/open-telemetry/opentelemetry-proto/pull/707)<br>
   ⚠️ **IMPORTANT**: OTLP consumers are expected to accept attribute values that were previously considered invalid.
   All attributes can now contain:
@@ -23,6 +30,7 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Removed
 
+- profiles: drop field profile.comment_strindices. [#729](https://github.com/open-telemetry/opentelemetry-proto/pull/729)
 - profiles: remove aggregation temporality enum and field. [#710](https://github.com/open-telemetry/opentelemetry-proto/pull/710)
 
 ## 1.8.0 - 2025-09-02
