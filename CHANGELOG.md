@@ -18,8 +18,10 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Changed
 
+- all: Fix schema_url comments to include scope field coverage. [#727](https://github.com/open-telemetry/opentelemetry-proto/pull/727)
 - profiles: clarify the original payload field comments. [#722](https://github.com/open-telemetry/opentelemetry-proto/pull/722)
 - profiles: rename line -> lines and sample -> samples since they are repeated fields. [#712](https://github.com/open-telemetry/opentelemetry-proto/pull/712)
+- profiles: Document more explicitly the dictionary zero element requirement. [#711](https://github.com/open-telemetry/opentelemetry-proto/pull/711)
 - all: drop attribute values restrictions. [#707](https://github.com/open-telemetry/opentelemetry-proto/pull/707)<br>
   ⚠️ **IMPORTANT**: OTLP consumers are expected to accept attribute values that were previously considered invalid.
   All attributes can now contain:
