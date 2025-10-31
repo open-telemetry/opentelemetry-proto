@@ -12,14 +12,17 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Removed
 
-## 1.9.0 - 2025-11-01
+## 1.9.0 - 2025-10-31
 
 ### Added
 
+- profiles: drop field profile.comment_strindices. [#729](https://github.com/open-telemetry/opentelemetry-proto/pull/729)
+- profiles: clarify the original payload field comments. [#722](https://github.com/open-telemetry/opentelemetry-proto/pull/722)
 - profiles: add a note about cardinality implications for attribute values. [#713](https://github.com/open-telemetry/opentelemetry-proto/pull/713)
 
 ### Changed
 
+- profiles: clarify dictionary guidelines: duplicates and other restrictions. [#732](https://github.com/open-telemetry/opentelemetry-proto/pull/732)
 - profiles: clarify the original payload field comments. [#722](https://github.com/open-telemetry/opentelemetry-proto/pull/722)
 - profiles: rename line -> lines and sample -> samples since they are repeated fields. [#712](https://github.com/open-telemetry/opentelemetry-proto/pull/712)
 - profiles: Document more explicitly the dictionary zero element requirement. [#711](https://github.com/open-telemetry/opentelemetry-proto/pull/711)
