@@ -8,6 +8,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Changed
 
+### Fixed
+
 ### Removed
 
 ## 1.9.0 - 2025-11-01
@@ -18,7 +20,6 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Changed
 
-- all: Fix schema_url comments to include scope field coverage. [#727](https://github.com/open-telemetry/opentelemetry-proto/pull/727)
 - profiles: clarify the original payload field comments. [#722](https://github.com/open-telemetry/opentelemetry-proto/pull/722)
 - profiles: rename line -> lines and sample -> samples since they are repeated fields. [#712](https://github.com/open-telemetry/opentelemetry-proto/pull/712)
 - profiles: Document more explicitly the dictionary zero element requirement. [#711](https://github.com/open-telemetry/opentelemetry-proto/pull/711)
@@ -29,6 +30,11 @@ The full list of changes can be found in the compare view for the respective rel
   - bytes values,
   - array values different than array of string values, bool values, int values, double values,
   - kvlist values.
+
+### Fixed
+
+- all: Fix schema_url comments to include scope field coverage. [#727](https://github.com/open-telemetry/opentelemetry-proto/pull/727)
+- all: add missing field comments [#717](https://github.com/open-telemetry/opentelemetry-proto/pull/717)
 
 ### Removed
 
