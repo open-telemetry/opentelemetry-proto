@@ -54,7 +54,7 @@ message Resource {
 
 // Represents a reference based key-value pair that is used to store attributes.
 message StringKeyValue {
-  // Reference to the key name of the pair in ProfilesDictionary(?).string_table.
+  // Reference to the key name of the pair in ProfilesDictionary.string_table.
   int32 key_index = 1;
 
   // Reference to the value of the pair in ProfilesDictionary(?).string_table.
