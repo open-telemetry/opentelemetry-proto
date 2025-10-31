@@ -49,7 +49,7 @@ message Resource {
   // Note: This is currently used exclusively in the Profiling signal.
   //
   // Status: [Development]
-  repeated StringKeyValue = 4;
+  repeated StringKeyValue dict_attributes = 4;
 }
 
 // Represents a reference based key-value pair that is used to store attributes.
