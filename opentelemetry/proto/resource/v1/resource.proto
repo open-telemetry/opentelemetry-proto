@@ -57,6 +57,6 @@ message StringKeyValue {
   // Reference to the key name of the pair in ProfilesDictionary.string_table.
   int32 key_index = 1;
 
-  // Reference to the value of the pair in ProfilesDictionary(?).string_table.
+  // Reference to the value of the pair in ProfilesDictionary.string_table.
   int32 value_index = 2;
 }
