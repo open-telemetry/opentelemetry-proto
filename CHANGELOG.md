@@ -10,6 +10,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Fixed
 
+- logs: `SEVERITY_NUMBER_UNSPECIFIED` can be used as as the `severity_number` field is optional.
+
 ### Removed
 
 ## 1.9.0 - 2025-10-31
