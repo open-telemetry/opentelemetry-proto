@@ -97,12 +97,29 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 //
 
 // ProfilesDictionary represents the profiles data shared across the
-// entire message being sent.
+// entire message being sent. The following applies to all fields in this
+// message:
 //
-// Note that all fields in this message MUST have a zero value encoded as the first element.
-// This allows for _index fields pointing into the dictionary to use a 0 pointer value
-// to indicate 'null' / 'not set'. Unless otherwise defined, a 'zero value' message value
-// is one with all default field values, so as to minimize wire encoded size.
+// - A dictionary is an array of dictionary items. Users of the dictionary
+//   compactly reference the items using the index within the array.
+//
+// - A dictionary MUST have a zero value encoded as the first element. This
+//   allows for _index fields pointing into the dictionary to use a 0 pointer
+//   value to indicate 'null' / 'not set'. Unless otherwise defined, a 'zero
+//   value' message value is one with all default field values, so as to
+//   minimize wire encoded size.
+//
+// - There SHOULD NOT be dupes in a dictionary. The identity of dictionary
+//   items is based on their value, recursively as needed. If a particular
+//   implementation does emit duplicated items, it MUST NOT attempt to give them
+//   meaning based on the index or order. A profile processor may remove
+//   duplicate items and this MUST NOT have any observable effects for
+//   consumers.
+//
+// - There SHOULD NOT be orphaned (unreferenced) items in a dictionary. A
+//   profile processor may remove ("garbage-collect") orphaned items and this
+//   MUST NOT have any observable effects for consumers.
+//
 message ProfilesDictionary {
   // Mappings from address ranges to the image/binary/library mapped
   // into that address range referenced by locations via Location.mapping_index.
