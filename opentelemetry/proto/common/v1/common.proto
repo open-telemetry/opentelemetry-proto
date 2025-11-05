@@ -37,12 +37,11 @@ message AnyValue {
     KeyValueList kvlist_value = 6;
     bytes bytes_value = 7;
     // Reference to the string value in ProfilesDictionary.string_table.
-    // string_value MUST NOT be set if string_ref is used.
     //
     // Note: This is currently used exclusively in the Profiling signal.
     //
     // Status: [Development]
-    int32 string_ref = 8;
+    int32 strindex = 8;
   }
 }
 
