@@ -49,14 +49,5 @@ message Resource {
   // Note: This is currently used exclusively in the Profiling signal.
   //
   // Status: [Development]
-  repeated RefKeyValue dict_attributes = 4;
-}
-
-// Represents a reference based key-value pair that is used to store attributes.
-message RefKeyValue {
-  // Reference to the key name of the pair in ProfilesDictionary.string_table.
-  int32 key_strindex = 1;
-
-  // The value of the pair.
-  opentelemetry.proto.common.v1.AnyValue value = 2;
+  repeated opentelemetry.proto.common.v1.KeyRefValue dict_attributes = 4;
 }
