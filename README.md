@@ -37,7 +37,7 @@ To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently
 components as indicated by the Maturity table below.
 
 | Component | Binary Protobuf Maturity | JSON Maturity |
-| --------- |--------------- | ------------- |
+| --------- | --------------- | ------------- |
 | common/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
 | resource/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
 | metrics/\*<br>collector/metrics/* | Stable | [Stable](docs/specification.md#json-protobuf-encoding) |
