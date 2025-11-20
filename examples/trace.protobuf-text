@@ -1,0 +1,56 @@
+# proto-file: opentelemetry/proto/collector/trace/v1/trace_service.proto
+# proto-message: ExportTraceServiceRequest
+# this message can be compiled to a binary message file with:
+#    cat examples/trace.protobuf-text | protoc --encode=opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest opentelemetry/proto/collector/trace/v1/trace_service.proto > examples/trace.protobuf-bin
+# and then delivered via cURL with:
+#    curl -X POST --data-binary @trace.protobuf-bin -H "Content-Type: application/x-protobuf" localhost:4318/opentelemetry.proto.collector.trace.v1.TraceService/Export
+
+resource_spans: [
+  {
+    resource: {
+      attributes: [
+        {
+          key: "service.name",
+          value: {
+            string_value: "my.service"
+          }
+        }
+      ]
+    },
+    scope_spans: [
+      {
+        scope: {
+          name: "my.library",
+          version: "1.0.0",
+          attributes: [
+            {
+              key: "my.scope.attribute",
+              value: {
+                string_value: "some scope attribute"
+              }
+            }
+          ]
+        },
+        spans: [
+          {
+            trace_id: "\x5B\x8E\xFF\xF7\x98\x03\x81\x03\xD2\x69\xB6\x33\x81\x3F\xC6\x0C",
+            span_id: "\xEE\xE1\x9B\x7E\xC3\xC1\xB1\x74",
+            parent_span_id: "\xEE\xE1\x9B\x7E\xC3\xC1\xB1\x73",
+            name: "I'm a server span",
+            start_time_unix_nano: 1544712660000000000,
+            end_time_unix_nano: 1544712661000000000,
+            kind: 2,
+            attributes: [
+              {
+                key: "my.span.attr",
+                value: {
+                  string_value: "some value"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
