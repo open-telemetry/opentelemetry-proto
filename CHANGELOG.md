@@ -10,6 +10,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Fixed
 
+- logs: `SEVERITY_NUMBER_UNSPECIFIED` can be used as the `severity_number` field is optional. [#736](https://github.com/open-telemetry/opentelemetry-proto/pull/736)
+
 ### Removed
 
 ## 1.9.0 - 2025-10-31
