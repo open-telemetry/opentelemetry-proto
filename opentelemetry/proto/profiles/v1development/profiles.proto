@@ -284,9 +284,14 @@ message Profile {
   // The following fields 3-12 are informational, do not affect
   // interpretation of results.
 
-  // Time of collection (UTC) represented as nanoseconds past the epoch.
+  // Time of collection. Value is UNIX Epoch time in nanoseconds since 00:00:00
+  // UTC on 1 January 1970.
   fixed64 time_unix_nano = 3;
-  // Duration of the profile, if a duration makes sense.
+  // Duration of the profile. For instant profiles like live heap snapshot, the
+  // duration can be zero but it may be preferable to set time_unix_nano to the
+  // process start time and duration_nano to the relative time when the profile
+  // was gathered. This ensures Sample.timestamps_unix_nano values such as
+  // allocation timestamp fall into the profile time range.
   uint64 duration_nano = 4;
   // The kind of events between sampled occurrences.
   // e.g [ "cpu","cycles" ] or [ "heap","bytes" ]
@@ -401,8 +406,10 @@ message Sample {
 
   // The type and unit of each value is defined by Profile.sample_type.
   repeated int64 values = 4;
-  // Timestamps associated with Sample represented in nanoseconds. These
-  // timestamps should fall within the Profile's time range.
+  // Timestamps associated with Sample. Value is UNIX Epoch time in nanoseconds
+  // since 00:00:00 UTC on 1 January 1970. The timestamps should fall within the
+  // [Profile.time_unix_nano, Profile.time_unix_nano + Profile.duration_nano)
+  // time range.
   repeated fixed64 timestamps_unix_nano = 5;
 }
 
