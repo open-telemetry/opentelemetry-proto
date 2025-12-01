@@ -368,7 +368,7 @@ message ValueType {
 // as having a shared identity and an associated collection of per-observation data points.
 // Samples having the same identity SHOULD be combined by inserting timestamps and values to the data arrays.
 //
-// Examples of different ways of representing a sample with the total value of 10:
+// Examples of different ways ('shapes') of representing a sample with the total value of 10:
 //
 // Report of a stacktrace at 10 timestamps (consumers must assume the value is 1 for each point):
 //    values: []
@@ -381,6 +381,10 @@ message ValueType {
 // Report of a stacktrace at 4 timestamps where each point records a specific value:
 //    values: [2, 2, 3, 3]
 //    timestamps_unix_nano: [1, 2, 3, 4]
+//
+// All Samples for a Profile SHOULD have the same shape, i.e. all data observation series should consistently
+// adopt the same data recording style.
+//
 message Sample {
 
   // A Sample's identity (i.e. 'primary key') is the tuple of {stack_index, set_of(attribute_indices), link_index}
