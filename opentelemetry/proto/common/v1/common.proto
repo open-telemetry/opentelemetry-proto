@@ -36,11 +36,6 @@ message AnyValue {
     ArrayValue array_value = 5;
     KeyValueList kvlist_value = 6;
     bytes bytes_value = 7;
-
-    // Reference to the string value in ProfilesDictionary.string_table.
-    // Can be used only for Profiles signal. Not valid to use for other signals.
-    // Status: [Development]
-    int32 string_ref = 8;
   }
 }
 
@@ -69,18 +64,8 @@ message KeyValueList {
 // Represents a key-value pair that is used to store Span attributes, Link
 // attributes, etc.
 message KeyValue {
-  // Either "key" or "key_ref" field defines the key of the key/value pair.
-  
-  // The key, specified directly.
-  // key_ref MUST NOT be set if key is used.
+  // The key name of the pair.
   string key = 1;
-
-  // Reference to string in ProfilesDictionary.string_table. This defines the
-  // key, specified indirectly, via a reference.
-  // Can be used only for Profiles signal. Not valid to use for other signals.
-  // key MUST NOT be set if key_ref is used.
-  // Status: [Development]
-  int32 key_ref = 3;
 
   // The value of the pair.
   AnyValue value = 2;
