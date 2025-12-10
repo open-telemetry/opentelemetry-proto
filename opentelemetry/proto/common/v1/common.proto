@@ -51,7 +51,7 @@ message AnyRefValue {
   // in which case this AnyRefValue is considered to be "empty".
   oneof value {
     // Reference to the string value in ProfilesDictionary.string_table.
-    int32 string_value_ref = 8;
+    int32 string_value_ref = 1;
     bool bool_value = 2;
     int64 int_value = 3;
     double double_value = 4;
