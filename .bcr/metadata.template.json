@@ -1,0 +1,16 @@
+{
+  "homepage": "https://github.com/open-telemetry/opentelemetry-proto",
+  "maintainers": [
+    {
+      "name": "Keith Smiley",
+      "email": "keithbsmiley@gmail.com",
+      "github": "keith",
+      "github_user_id": 283886
+    }
+  ],
+  "repository": [
+    "github:open-telemetry/opentelemetry-proto"
+  ],
+  "versions": [],
+  "yanked_versions": {}
+}
