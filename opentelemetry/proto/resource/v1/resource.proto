@@ -30,7 +30,6 @@ message Resource {
   // Attribute keys MUST be unique (it is not allowed to have more than one
   // attribute with the same key).
   // The behavior of software that receives duplicated keys can be unpredictable.
-  // dict_attributes MUST NOT be used if attributes is used.
   repeated opentelemetry.proto.common.v1.KeyValue attributes = 1;
 
   // The number of dropped attributes. If the value is 0, then
