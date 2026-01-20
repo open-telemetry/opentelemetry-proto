@@ -43,15 +43,4 @@ message Resource {
   //
   // Status: [Development]
   repeated opentelemetry.proto.common.v1.EntityRef entity_refs = 3;
-
-  // Set of reference based attributes that describe the resource.
-  // Attribute keys MUST be unique (it is not allowed to have more than one
-  // attribute with the same key).
-  // The behavior of software that receives duplicated keys can be unpredictable.
-  // attributes MUST NOT be used if dict_attributes is used.
-  //
-  // Note: This is currently used exclusively in the Profiling signal.
-  //
-  // Status: [Development]
-  repeated opentelemetry.proto.common.v1.KeyRefValue dict_attributes = 4;
 }
