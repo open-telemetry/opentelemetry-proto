@@ -1,6 +1,6 @@
 matrix:
   platform: ["debian10", "ubuntu2004"]
-  bazel: ["7.x", "8.x", "9.*"]
+  bazel: ["7.x", "8.x", "9.x"]
 tasks:
   verify_targets:
     platform: ${{ platform }}
