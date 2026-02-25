@@ -6,6 +6,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Added
 
+- profiles: introduce reference based attributes [#733](https://github.com/open-telemetry/opentelemetry-proto/pull/733)
+
 ### Changed
 
 - profiles: clarify Sample message usage guidance docs. [#742](https://github.com/open-telemetry/opentelemetry-proto/pull/742)
