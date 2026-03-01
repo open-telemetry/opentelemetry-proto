@@ -81,9 +81,9 @@
                   {
                     "startTimeUnixNano": "1544712660300000000",
                     "timeUnixNano": "1544712660300000000",
-                    "count": 2,
+                    "count": "2",
                     "sum": 2,
-                    "bucketCounts": [1,1],
+                    "bucketCounts": ["1","1"],
                     "explicitBounds": [1],
                     "min": 0,
                     "max": 2,
@@ -109,13 +109,13 @@
                   {
                     "startTimeUnixNano": "1544712660300000000",
                     "timeUnixNano": "1544712660300000000",
-                    "count": 3,
+                    "count": "3",
                     "sum": 10,
                     "scale": 0,
-                    "zeroCount": 1,
+                    "zeroCount": "1",
                     "positive": {
                       "offset": 1,
-                      "bucketCounts": [0,2]
+                      "bucketCounts": ["0","2"]
                     },
                     "min": 0,
                     "max": 5,
