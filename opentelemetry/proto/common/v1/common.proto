@@ -46,7 +46,7 @@ message AnyValue {
     // empty, ignoring its semantic content for the non-Profiling signal.
     //
     // Status: [Development]
-    int32 string_value_ref = 8;
+    int32 string_value_strindex = 8;
   }
 }
 
@@ -83,7 +83,7 @@ message KeyValue {
   AnyValue value = 2;
 
   // Reference to the string key in ProfilesDictionary.string_table.
-  // key MUST NOT be set if key_ref is used.
+  // key MUST NOT be set if key_strindex is used.
   //
   // Note: This is currently used exclusively in the Profiling signal.
   // Implementers of OTLP receivers for signals other than Profiling should
@@ -93,7 +93,7 @@ message KeyValue {
   // empty, ignoring its semantic content for the non-Profiling signal.
   //
   // Status: [Development]
-  int32 key_ref = 3;
+  int32 key_strindex = 3;
 }
 
 // InstrumentationScope is a message representing the instrumentation scope information

@@ -13,6 +13,7 @@ The full list of changes can be found in the compare view for the respective rel
 - profiles: clarify Sample message usage guidance docs. [#742](https://github.com/open-telemetry/opentelemetry-proto/pull/742)
 - profiles: improve Sample message clarity and usage documentation. [#724](https://github.com/open-telemetry/opentelemetry-proto/pull/724)
 - profiles: clarify the profile and sample timestamps relationship. [#744](https://github.com/open-telemetry/opentelemetry-proto/pull/744)
+- common: rename _ref suffix to _strindex [#768](https://github.com/open-telemetry/opentelemetry-proto/pull/768)
 
 ### Fixed
 
