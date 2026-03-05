@@ -88,15 +88,22 @@ before and after the change interoperate.
 ### New Experimental Components  
 
 Sometimes we need to experiment with new components, for example to add a
-completely new signal to OpenTelemetry. In this case, to define new experimental
-components we recommend placing new proto files in a "development" sub-directory.
+completely new signal to OpenTelemetry. When designing a new signal, we
+recommend a "development" package to be used. This package will be used 
+throughout development until reaching release candidate, in which case a 
+"release" package must be created and used.
+
 Such isolated experimental components are excluded from
 above [stability requirements](#stability-definition).
 
 We recommend using
 `Development`, `Alpha`, `Beta`, `Release Candidate`
 [levels](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/0232-maturity-of-otel.md#maturity-levels)
-to communicate different grades of readiness of new components.
+to communicate different grades of readiness of new components. These levels
+MUST be communicated in the documentation of a message, field, etc. when the
+level does not match the stability of the package. For example, if a field is
+marked as `Development` but the package is `Stable`, the documentation MUST
+indicate that the field is experimental.
 
 Experimental components may be removed completely at the end of the experiment,
 provided that they are not referenced from any `Stable` component.
@@ -108,9 +115,20 @@ Experiments which succeed, require a review to be marked `Stable`. Once marked
 
 New experimental fields or messages may be added in `Development` state to `Stable`
 components. The experimental fields and messages within `Stable components` are subject
-to the full [stability requirements](#stability-definition), and in addition, they must be
-clearly labeled as `Development` (or as any other non-`Stable` level) in the .proto file
-source code.
+to the full [stability requirements](#stability-definition).
+
+When the stability of a *portion* of the protocol doesn't match the expectations of the
+package, there MUST be a stability annotation in the docs. For example:
+
+```protobuf
+// A reference to an Entity.
+// Entity represents an object of interest associated with produced telemetry: e.g spans, metrics, profiles, or logs.
+//
+// Status: [Development]
+message EntityRef {
+  // ...
+}
+```
 
 If an experiment concludes and the previously added field or message is not needed
 anymore, the field/message must stay, but it may be declared "deprecated". During all
