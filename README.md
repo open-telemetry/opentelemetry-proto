@@ -101,9 +101,9 @@ We recommend using
 [levels](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/0232-maturity-of-otel.md#maturity-levels)
 to communicate different grades of readiness of new components. These levels
 MUST be communicated in the documentation of a message, field, etc. when the
-level does not match the stability of the package. For example, if a field is
-marked as `Development` but the package is `Stable`, the documentation MUST
-indicate that the field is experimental.
+level does not match the stability of the package. For example, if a package is
+`Stable` but a field is not, the documentation MUST indicate that the field is
+experimental with the appropriate level (e.g. `Alpha`, `Beta`, etc).
 
 Experimental components may be removed completely at the end of the experiment,
 provided that they are not referenced from any `Stable` component.
