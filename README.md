@@ -90,8 +90,9 @@ before and after the change interoperate.
 Sometimes we need to experiment with new components, for example to add a
 completely new signal to OpenTelemetry. When designing a new signal, we
 recommend a "development" package to be used. This package will be used 
-throughout development until reaching release candidate, in which case a 
-"release" package must be created and used.
+throughout development until reaching release candidate, in which case the 
+`development` suffix is removed (e.g. `v1` instead of `v1development`), 
+creating a stable release package.
 
 Such isolated experimental components are excluded from
 above [stability requirements](#stability-definition).
@@ -103,7 +104,9 @@ to communicate different grades of readiness of new components. These levels
 MUST be communicated in the documentation of a message, field, etc. when the
 level does not match the stability of the package. For example, if a package is
 `Stable` but a field is not, the documentation MUST indicate that the field is
-experimental with the appropriate level (e.g. `Alpha`, `Beta`, etc).
+experimental with the appropriate level (e.g. `Alpha`, `Beta`, etc). 
+Conversely, individual `Status` annotations are not required if a component
+is the same maturity level as the package it is defined in.
 
 Experimental components may be removed completely at the end of the experiment,
 provided that they are not referenced from any `Stable` component.
