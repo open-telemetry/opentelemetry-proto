@@ -6,10 +6,21 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## 1.10.0 - 2026-03-09
+
+### Added
+
 - profiles: introduce reference based attributes [#733](https://github.com/open-telemetry/opentelemetry-proto/pull/733)
 
 ### Changed
 
+- docs: Add more clarity to experiments. [#771](https://github.com/open-telemetry/opentelemetry-proto/pull/771)
 - profiles: clarify Sample message usage guidance docs. [#742](https://github.com/open-telemetry/opentelemetry-proto/pull/742)
 - profiles: improve Sample message clarity and usage documentation. [#724](https://github.com/open-telemetry/opentelemetry-proto/pull/724)
 - profiles: clarify the profile and sample timestamps relationship. [#744](https://github.com/open-telemetry/opentelemetry-proto/pull/744)
@@ -17,9 +28,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Fixed
 
+- examples: Represent uint64 and fixed64 fields as strings in metrics.json. [#748](https://github.com/open-telemetry/opentelemetry-proto/pull/748)
 - logs: `SEVERITY_NUMBER_UNSPECIFIED` can be used as the `severity_number` field is optional. [#736](https://github.com/open-telemetry/opentelemetry-proto/pull/736)
-
-### Removed
 
 ## 1.9.0 - 2025-10-31
 
