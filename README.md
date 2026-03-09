@@ -89,9 +89,9 @@ before and after the change interoperate.
 
 Sometimes we need to experiment with new components, for example to add a
 completely new signal to OpenTelemetry. When designing a new signal, we
-recommend a "development" package to be used. This package will be used 
-throughout development until reaching release candidate, in which case the 
-`development` suffix is removed (e.g. `v1` instead of `v1development`), 
+recommend a "development" package to be used. This package will be used
+throughout development until reaching release candidate, in which case the
+`development` suffix is removed (e.g. `v1` instead of `v1development`),
 creating a stable release package.
 
 Such isolated experimental components are excluded from
@@ -104,7 +104,7 @@ to communicate different grades of readiness of new components. These levels
 MUST be communicated in the documentation of a message, field, etc. when the
 level does not match the stability of the package. For example, if a package is
 `Stable` but a field is not, the documentation MUST indicate that the field is
-experimental with the appropriate level (e.g. `Alpha`, `Beta`, etc). 
+experimental with the appropriate level (e.g. `Alpha`, `Beta`, etc).
 Conversely, individual `Status` annotations are not required if a component
 is the same maturity level as the package it is defined in.
 
@@ -138,7 +138,7 @@ anymore, the field/message must stay, but it may be declared "deprecated". Durin
 phases of experimentation it must be clearly specified that the field or message may be
 deprecated. Typically, deprecated fields are left empty by the senders and the recipients
 that participate in experiments must expect during all experimental phases (including
-_after_ the experiment is concluded) that the experimental field or message has an
+*after* the experiment is concluded) that the experimental field or message has an
 empty value.
 
 Experiments which succeed, require a review before the field or the message is marked
