@@ -45,7 +45,7 @@ message AnyValue {
     // Profiling signal and process the data as if this value were absent or
     // empty, ignoring its semantic content for the non-Profiling signal.
     //
-    // Status: [Development]
+    // Status: [Alpha]
     int32 string_value_strindex = 8;
   }
 }
@@ -92,7 +92,7 @@ message KeyValue {
   // Profiling signal and process the data as if this value were absent or
   // empty, ignoring its semantic content for the non-Profiling signal.
   //
-  // Status: [Development]
+  // Status: [Alpha]
   int32 key_strindex = 3;
 }
 
