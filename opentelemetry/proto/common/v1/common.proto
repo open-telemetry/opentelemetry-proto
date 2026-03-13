@@ -76,7 +76,7 @@ message KeyValueList {
 // attributes, etc.
 message KeyValue {
   // The key name of the pair.
-  // key_ref MUST NOT be set if key is used.
+  // key_strindex MUST NOT be set if key is used.
   string key = 1;
 
   // The value of the pair.
