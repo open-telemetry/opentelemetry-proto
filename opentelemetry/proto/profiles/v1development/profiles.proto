@@ -120,6 +120,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 //   profile processor may remove ("garbage-collect") orphaned items and this
 //   MUST NOT have any observable effects for consumers.
 //
+// Status: [Alpha]
 message ProfilesDictionary {
   // Mappings from address ranges to the image/binary/library mapped
   // into that address range referenced by locations via Location.mapping_index.
@@ -185,6 +186,8 @@ message ProfilesDictionary {
 //
 // When new fields are added into this message, the OTLP request MUST be updated
 // as well.
+//
+// Status: [Alpha]
 message ProfilesData {
   // An array of ResourceProfiles.
   // For data coming from an SDK profiler, this array will typically contain one
@@ -203,6 +206,8 @@ message ProfilesData {
 
 
 // A collection of ScopeProfiles from a Resource.
+//
+// Status: [Alpha]
 message ResourceProfiles {
   reserved 1000;
 
@@ -223,6 +228,8 @@ message ResourceProfiles {
 }
 
 // A collection of Profiles produced by an InstrumentationScope.
+//
+// Status: [Alpha]
 message ScopeProfiles {
   // The instrumentation scope information for the profiles in this message.
   // Semantically when InstrumentationScope isn't set, it is equivalent with
@@ -271,6 +278,8 @@ message ScopeProfiles {
 // Note that whilst fields in this message retain the name and field id from pprof in most cases
 // for ease of understanding data migration, it is not intended that pprof:Profile and
 // OpenTelemetry:Profile encoding be wire compatible.
+//
+// Status: [Alpha]
 message Profile {
   // The type and unit of all Sample.values in this profile.
   // For a cpu or off-cpu profile this might be:
@@ -342,6 +351,8 @@ message Profile {
 
 // A pointer from a profile Sample to a trace Span.
 // Connects a profile sample to a trace span, identified by unique trace and span IDs.
+//
+// Status: [Alpha]
 message Link {
   // A unique identifier of a trace that this linked span is part of. The ID is a
   // 16-byte array.
@@ -352,6 +363,8 @@ message Link {
 }
 
 // ValueType describes the type and units of a value.
+//
+// Status: [Alpha]
 message ValueType {
   // Index into ProfilesDictionary.string_table.
   int32 type_strindex = 1;
@@ -390,6 +403,7 @@ message ValueType {
 // All Samples for a Profile SHOULD have the same shape, i.e. all data observation series should consistently
 // adopt the same data recording style.
 //
+// Status: [Alpha]
 message Sample {
 
   // A Sample's identity (i.e. 'primary key') is the tuple of {stack_index, set_of(attribute_indices), link_index}
@@ -415,6 +429,8 @@ message Sample {
 
 // Describes the mapping of a binary in memory, including its address range,
 // file offset, and metadata like build ID
+//
+// Status: [Alpha]
 message Mapping {
   // Address at which the binary (or DLL) is loaded into memory.
   uint64 memory_start = 1;
@@ -431,6 +447,8 @@ message Mapping {
 }
 
 // A Stack represents a stack trace as a list of locations.
+//
+// Status: [Alpha]
 message Stack {
   // References to locations in ProfilesDictionary.location_table.
   // The first location is the leaf frame.
@@ -438,6 +456,8 @@ message Stack {
 }
 
 // Describes function and line table debug information.
+//
+// Status: [Alpha]
 message Location {
   // Reference to mapping in ProfilesDictionary.mapping_table.
   // It can be unset / set to 0 if the mapping is unknown or not applicable for
@@ -462,6 +482,8 @@ message Location {
 }
 
 // Details a specific line in a source code, linked to a function.
+//
+// Status: [Alpha]
 message Line {
   // Reference to function in ProfilesDictionary.function_table.
   int32 function_index = 1;
@@ -473,6 +495,8 @@ message Line {
 
 // Describes a function, including its human-readable name, system name,
 // source file, and starting line number in the source.
+//
+// Status: [Alpha]
 message Function {
   // The function name. Empty string if not available.
   int32 name_strindex = 1;
@@ -488,6 +512,8 @@ message Function {
 // A custom 'dictionary native' style of encoding attributes which is more convenient
 // for profiles than opentelemetry.proto.common.v1.KeyValue
 // Specifically, uses the string table for keys and allows optional unit information.
+//
+// Status: [Alpha]
 message KeyValueAndUnit {
   // The index into the string table for the attribute's key.
   int32 key_strindex  = 1;
