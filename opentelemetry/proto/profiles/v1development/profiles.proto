@@ -67,17 +67,17 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 //   │                                n-1
 //   │ 1-n         ┌───────────────────────────────────────┐
 //   ▼             │                                       ▽
-// ┌──────────────────┐   1-n   ┌─────────────────┐   ┌──────────┐
+// ┌──────────────────┐   n-n   ┌─────────────────┐   ┌──────────┐
 // │      Sample      │ ──────▷ │ KeyValueAndUnit │   │   Link   │
 // └──────────────────┘         └─────────────────┘   └──────────┘
 //   │                              △      △
-//   │ n-1                          │      │ 1-n
+//   │ n-1                          │      │ n-n
 //   ▽                              │      │
 // ┌──────────────────┐             │      │
 // │      Stack       │             │      │
 // └──────────────────┘             │      │
-//   │                     1-n      │      │
-//   │ 1-n         ┌────────────────┘      │
+//   │                     n-n      │      │
+//   │ n-n         ┌────────────────┘      │
 //   ▽             │                       │
 // ┌──────────────────┐   n-1   ┌─────────────┐
 // │     Location     │ ──────▷ │   Mapping   │
@@ -150,10 +150,10 @@ message ProfilesDictionary {
 
   // A common table for attributes referenced by the Profile, Sample, Mapping
   // and Location messages below through attribute_indices field. Each entry is
-  // a key/value pair with an optional unit. Since this is a dictionary table,
-  // multiple entries with the same key may be present, unlike direct attribute
-  // tables like Resource.attributes. The referencing attribute_indices fields,
-  // though, do maintain the key uniqueness requirement.
+  // a key/value pair with an optional unit in UCUM format. Since this is a
+  // dictionary table, multiple entries with the same key may be present,
+  // unlike direct attribute tables like Resource.attributes. The referencing
+  // attribute_indices fields, though, do maintain the key uniqueness requirement.
   //
   // It's recommended to use attributes for variables with bounded cardinality,
   // such as categorical variables
@@ -196,11 +196,11 @@ message ProfilesData {
   // from non-containerized processes.
   // Other resource groupings are possible as well and clarified via
   // Resource.attributes and semantic conventions.
-  // Tools that visualize profiles should prefer displaying
+  // Tools that visualize profiles SHOULD prefer displaying
   // resources_profiles[0].scope_profiles[0].profiles[0] by default.
   repeated ResourceProfiles resource_profiles = 1;
 
-  // One instance of ProfilesDictionary
+  // One instance of ProfilesDictionary shared across the entire message
   ProfilesDictionary dictionary = 2;
 }
 
@@ -254,10 +254,11 @@ message ScopeProfiles {
 // following conventions:
 //
 // - Consumers should treat unset optional fields as if they had been
-//   set with their default value.
+//   set with their default value. We discourage using the protobuf
+//   presence semantics, even if available in the protobuf generated API.
 //
-// - When possible, measurements should be stored in "unsampled" form
-//   that is most useful to humans.  There should be enough
+// - When possible, measurements SHOULD be stored in "unsampled" form
+//   that is most useful to humans. There should be enough
 //   information present to determine the original sampled values.
 //
 // - The profile is represented as a set of samples, where each sample
@@ -274,10 +275,6 @@ message ScopeProfiles {
 // binaries, stacks, locations, functions, string table, and additional
 // metadata. It modifies and annotates pprof Profile with OpenTelemetry
 // specific fields.
-//
-// Note that whilst fields in this message retain the name and field id from pprof in most cases
-// for ease of understanding data migration, it is not intended that pprof:Profile and
-// OpenTelemetry:Profile encoding be wire compatible.
 //
 // Status: [Alpha]
 message Profile {
@@ -321,8 +318,8 @@ message Profile {
   // attributes. If this value is 0, then no attributes were dropped.
   uint32 dropped_attributes_count = 8;
 
-  // The original payload format. See also original_payload. Optional, but the
-  // format and the bytes must be set or unset together.
+  // The original payload format. See also original_payload. It MUST be set
+  // together with original_payload or both left unset [optional].
   //
   // The allowed values for the format string are defined by the OpenTelemetry
   // specification. Some examples are "jfr", "pprof", "linux_perf".
@@ -341,8 +338,8 @@ message Profile {
   // payload should be configurable by the profiler or collector options. The
   // default behavior should be to not include the original payload.
   string original_payload_format = 9;
-  // The original payload bytes. See also original_payload_format. Optional, but
-  // format and the bytes must be set or unset together.
+  // The original payload bytes. See also original_payload_format. It MUST be set
+  // together with original_payload_format or both left unset [optional].
   bytes original_payload = 10;
 
   // References to attributes in attribute_table. [optional]
@@ -446,7 +443,11 @@ message Mapping {
   repeated int32 attribute_indices = 5;
 }
 
-// A Stack represents a stack trace as a list of locations.
+// A Stack represents a stack trace as a list of locations (leaf first).
+// For example, the stack trace resulting from the call stack
+// main -> foo -> bar would be encoded into the location_indices list
+// [2, 1, 0] which references the locations in location_table as:
+// [Location{"main"}, Location{"foo"}, Location{"bar"}].
 //
 // Status: [Alpha]
 message Stack {
@@ -487,14 +488,15 @@ message Location {
 message Line {
   // Reference to function in ProfilesDictionary.function_table.
   int32 function_index = 1;
-  // Line number in source code. 0 means unset.
+  // Line number in source code. 1-based, 0 means unset.
   int64 line = 2;
-  // Column number in source code. 0 means unset.
+  // Column number in source code. 1-based, 0 means unset.
   int64 column = 3;
 }
 
 // Describes a function, including its human-readable name, system name,
-// source file, and starting line number in the source.
+// source file, and starting line number in the source.  At least one of
+// {name_strindex, system_name_strindex, filename_strindex} MUST be present.
 //
 // Status: [Alpha]
 message Function {
@@ -505,13 +507,14 @@ message Function {
   int32 system_name_strindex = 2;
   // Source file containing the function. Empty string if not available.
   int32 filename_strindex = 3;
-  // Line number in source file. 0 means unset.
+  // Line number in source file. 1-based, 0 means unset.
   int64 start_line = 4;
 }
 
 // A custom 'dictionary native' style of encoding attributes which is more convenient
 // for profiles than opentelemetry.proto.common.v1.KeyValue
-// Specifically, uses the string table for keys and allows optional unit information.
+// Specifically, uses the ProfilesDictionary.string_table for keys
+// and allows optional unit information.
 //
 // Status: [Alpha]
 message KeyValueAndUnit {
@@ -521,5 +524,6 @@ message KeyValueAndUnit {
   opentelemetry.proto.common.v1.AnyValue value = 2;
   // The index into the string table for the attribute's unit.
   // zero indicates implicit (by semconv) or non-defined unit.
+  // If present, the unit string SHOULD be in UCUM format.
   int32 unit_strindex = 3;
 }
