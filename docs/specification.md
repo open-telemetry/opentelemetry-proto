@@ -164,7 +164,8 @@ the specific message to use in the [Full Success](#full-success),
 The client MUST limit the size of the response body when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
 misconfigured or malicious server. It is RECOMMENDED to limit the response body
-to 32 KiB.
+to 32 KiB. If the limit is exceeded, the client MUST treat the response as a
+non-retryable error and SHOULD record the fact that the response was discarded.
 
 ##### Full Success
 
@@ -487,7 +488,8 @@ below for the specific message to use in the [Full Success](#full-success-1),
 The client MUST limit the size of the response body when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
 misconfigured or malicious server. It is RECOMMENDED to limit the response body
-to 32 KiB.
+to 32 KiB. If the limit is exceeded, the client MUST treat the response as a
+non-retryable error and SHOULD record the fact that the response was discarded.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
