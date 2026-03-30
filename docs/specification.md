@@ -161,6 +161,11 @@ The response MUST be the appropriate message (see below for
 the specific message to use in the [Full Success](#full-success),
 [Partial Success](#partial-success) and [Failure](#failures) cases).
 
+The client MUST limit the size of the response body when parsing it, including
+after decompression, to mitigate possible excessive memory usage caused by a
+misconfigured or malicious server. It is RECOMMENDED to limit the response body
+to 32 KiB.
+
 ##### Full Success
 
 The success response indicates telemetry data is successfully accepted by the
@@ -478,6 +483,11 @@ sides.
 The response body MUST be the appropriate serialized Protobuf message (see
 below for the specific message to use in the [Full Success](#full-success-1),
 [Partial Success](#partial-success-1) and [Failure](#failures-1) cases).
+
+The client MUST limit the size of the response body when parsing it, including
+after decompression, to mitigate possible excessive memory usage caused by a
+misconfigured or malicious server. It is RECOMMENDED to limit the response body
+to 32 KiB.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
