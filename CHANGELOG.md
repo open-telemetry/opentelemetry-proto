@@ -6,6 +6,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Added
 
+- docs: add response body size limitation. [#781](https://github.com/open-telemetry/opentelemetry-proto/pull/781)
+
 ### Changed
 
 ### Fixed
