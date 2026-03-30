@@ -164,9 +164,9 @@ the specific message to use in the [Full Success](#full-success),
 The client MUST enforce a message size limit when receiving the response to
 mitigate possible excessive memory usage caused by a misconfigured or malicious
 server. gRPC client implementations typically enforce a default incoming message
-size limit of 4 MiB, which is acceptable to use.
-If the limit is exceeded, the client MUST treat the response as a
-not-retryable error (typically by returning `RESOURCE_EXHAUSTED` code).
+size limit of 4 MiB, which is acceptable to use. If the limit is exceeded, the
+client MUST treat the response as a not-retryable error (typically by returning
+`RESOURCE_EXHAUSTED` code).
 
 ##### Full Success
 
