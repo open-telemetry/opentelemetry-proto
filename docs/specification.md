@@ -161,11 +161,13 @@ The response MUST be the appropriate message (see below for
 the specific message to use in the [Full Success](#full-success),
 [Partial Success](#partial-success) and [Failure](#failures) cases).
 
-The client MUST limit the size of the response body when parsing it, including
-after decompression, to mitigate possible excessive memory usage caused by a
-misconfigured or malicious server. It is RECOMMENDED to limit the response body
-to 32 KiB. If the limit is exceeded, the client MUST treat the response as a
-not-retryable error and SHOULD record the fact that the response was discarded.
+The client MUST enforce a message size limit when receiving the response to
+mitigate possible excessive memory usage caused by a misconfigured or malicious
+server. gRPC client implementations typically enforce a default incoming message
+size limit of 4 MiB, which is acceptable to use. Implementations MAY apply a
+tighter limit (e.g. 32 KiB) since OTLP response messages are expected to be
+small. If the limit is exceeded, the client MUST treat the response as a
+not-retryable error (typically by returning `RESOURCE_EXHAUSTED` code).
 
 ##### Full Success
 
