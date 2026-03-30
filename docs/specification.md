@@ -165,7 +165,7 @@ The client MUST limit the size of the response body when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
 misconfigured or malicious server. It is RECOMMENDED to limit the response body
 to 32 KiB. If the limit is exceeded, the client MUST treat the response as a
-non-retryable error and SHOULD record the fact that the response was discarded.
+not-retryable error and SHOULD record the fact that the response was discarded.
 
 ##### Full Success
 
@@ -305,7 +305,7 @@ This is signaled by the server by returning
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
 In this case the behavior of the server and the client is exactly as described in
 [OTLP/gRPC Throttling](#otlpgrpc-throttling) section. If no such status is returned,
-then the `RESOURCE_EXHAUSTED` code SHOULD be treated as non-retryable.
+then the `RESOURCE_EXHAUSTED` code SHOULD be treated as not-retryable.
 
 #### OTLP/gRPC Throttling
 
@@ -489,7 +489,7 @@ The client MUST limit the size of the response body when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
 misconfigured or malicious server. It is RECOMMENDED to limit the response body
 to 32 KiB. If the limit is exceeded, the client MUST treat the response as a
-non-retryable error and SHOULD record the fact that the response was discarded.
+not-retryable error and SHOULD record the fact that the response was discarded.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
