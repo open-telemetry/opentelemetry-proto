@@ -6,6 +6,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Added
 
+- docs: add request body size limitation.
+
 ### Changed
 
 ### Fixed

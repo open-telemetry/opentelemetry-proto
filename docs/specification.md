@@ -32,6 +32,7 @@ nodes such as collectors and telemetry backends.
 
 - [Protocol Details](#protocol-details)
   * [OTLP/gRPC](#otlpgrpc)
+    + [OTLP/gRPC Request](#otlpgrpc-request)
     + [OTLP/gRPC Concurrent Requests](#otlpgrpc-concurrent-requests)
     + [OTLP/gRPC Response](#otlpgrpc-response)
       - [Full Success](#full-success)
@@ -112,6 +113,20 @@ delivery guarantees in such systems is outside of the scope of OTLP. The
 acknowledgements described in this protocol happen between a single
 client/server pair and do not span intermediary nodes in multi-hop delivery
 paths._
+
+#### OTLP/gRPC Request
+
+The server MUST limit the size of the request message when parsing it, including
+after decompression, to mitigate possible excessive memory usage caused by a
+misconfigured or malicious client. It is RECOMMENDED to limit the request
+message to 64 MiB. If the limit is exceeded, the server SHOULD return
+`RESOURCE_EXHAUSTED` gRPC status code. In this case the `RESOURCE_EXHAUSTED`
+code MUST NOT be accompanied by a `RetryInfo` status detail so that the client
+treats the error as not-retryable (see [Failures](#failures)).
+
+The client SHOULD limit the size of the request message, including before
+compression, to avoid overwhelming the server. It is RECOMMENDED to limit the
+request message to 64 MiB.
 
 #### OTLP/gRPC Concurrent Requests
 
@@ -472,6 +487,17 @@ The client MAY gzip the content and in that case MUST include
 
 Non-default URL paths for requests MAY be configured on the client and server
 sides.
+
+The server MUST limit the size of the request body when parsing it, including
+after decompression, to mitigate possible excessive memory usage caused by a
+misconfigured or malicious client. It is RECOMMENDED to limit the request body
+to 64 MiB. If the limit is exceeded, the server SHOULD respond with
+`HTTP 413 Content Too Large`. The client MUST NOT retry the request when it
+receives `HTTP 413 Content Too Large` response.
+
+The client SHOULD limit the size of the request body, including before
+compression, to avoid overwhelming the server. It is RECOMMENDED to limit the
+request body to 64 MiB.
 
 #### OTLP/HTTP Response
 
