@@ -116,13 +116,13 @@ paths._
 
 #### OTLP/gRPC Request
 
-The server MUST limit the size of the request message when parsing it, including
-after decompression, to mitigate possible excessive memory usage caused by a
-misconfigured or malicious client. It is RECOMMENDED to limit the request
-message to 4 MiB. If the limit is exceeded, the server SHOULD return
-`RESOURCE_EXHAUSTED` gRPC status code. In this case the `RESOURCE_EXHAUSTED`
-code MUST NOT be accompanied by a `RetryInfo` status detail so that the client
-treats the error as not-retryable (see [Failures](#failures)).
+The server MUST enforce a message size limit when receiving the request to
+mitigate possible excessive memory usage caused by a misconfigured or malicious
+server. The server implementations typically enforce a default incoming message
+size limit of 4 MiB, which is acceptable to use. If the limit is exceeded, the
+client MUST treat the error as not-retryable. Note that in such a scenario,
+the gRPC server implementations return a `RESOURCE_EXHAUSTED` status code
+to the caller.
 
 The client SHOULD limit the size of the request message, including before
 compression, to avoid overwhelming the server. It is RECOMMENDED to limit the
