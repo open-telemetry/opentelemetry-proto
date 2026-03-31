@@ -164,10 +164,10 @@ the specific message to use in the [Full Success](#full-success),
 The client MUST enforce a message size limit when receiving the response to
 mitigate possible excessive memory usage caused by a misconfigured or malicious
 server. gRPC client implementations typically enforce a default incoming message
-size limit of 4 MiB, which is acceptable to use. If the limit is exceeded, the
-client MUST treat the response as a not-retryable error. Note that in such
-scenario, the gRPC client implementations are reporting a `RESOURCE_EXHAUSTED`
-code to the caller.
+size limit of 4 MiB, which is acceptable to use. Implementations MAY allow this
+limit to be configured. If the limit is exceeded, the client MUST treat the
+response as a not-retryable error. Note that in such scenario, the gRPC client
+implementations are reporting a `RESOURCE_EXHAUSTED` code to the caller.
 
 ##### Full Success
 
@@ -489,9 +489,10 @@ below for the specific message to use in the [Full Success](#full-success-1),
 
 The client MUST limit the size of the response body when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
-misconfigured or malicious server. It is RECOMMENDED to limit the response body
-to 4 MiB. If the limit is exceeded, the client MUST treat the response as a
-not-retryable error and SHOULD record the fact that the response was discarded.
+misconfigured or malicious server. It is RECOMMENDED to use 4 MiB
+as the default limit. Implementations MAY allow this limit to be configured. If
+the limit is exceeded, the client MUST treat the response as a not-retryable
+error and SHOULD record the fact that the response was discarded.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
