@@ -119,14 +119,14 @@ paths._
 The server MUST limit the size of the request message when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
 misconfigured or malicious client. It is RECOMMENDED to limit the request
-message to 64 MiB. If the limit is exceeded, the server SHOULD return
+message to 4 MiB. If the limit is exceeded, the server SHOULD return
 `RESOURCE_EXHAUSTED` gRPC status code. In this case the `RESOURCE_EXHAUSTED`
 code MUST NOT be accompanied by a `RetryInfo` status detail so that the client
 treats the error as not-retryable (see [Failures](#failures)).
 
 The client SHOULD limit the size of the request message, including before
 compression, to avoid overwhelming the server. It is RECOMMENDED to limit the
-request message to 64 MiB.
+request message to 4 MiB.
 
 #### OTLP/gRPC Concurrent Requests
 
@@ -491,13 +491,13 @@ sides.
 The server MUST limit the size of the request body when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
 misconfigured or malicious client. It is RECOMMENDED to limit the request body
-to 64 MiB. If the limit is exceeded, the server SHOULD respond with
+to 20 MiB. If the limit is exceeded, the server SHOULD respond with
 `HTTP 413 Content Too Large`. The client MUST NOT retry the request when it
 receives `HTTP 413 Content Too Large` response.
 
 The client SHOULD limit the size of the request body, including before
 compression, to avoid overwhelming the server. It is RECOMMENDED to limit the
-request body to 64 MiB.
+request body to 20 MiB.
 
 #### OTLP/HTTP Response
 
