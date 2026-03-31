@@ -118,11 +118,11 @@ paths._
 
 The server MUST enforce a message size limit when receiving the request to
 mitigate possible excessive memory usage caused by a misconfigured or malicious
-server. The server implementations typically enforce a default incoming message
-size limit of 4 MiB, which is acceptable to use. If the limit is exceeded, the
-client MUST treat the error as not-retryable. Note that in such a scenario,
-the gRPC server implementations return a `RESOURCE_EXHAUSTED` status code
-to the caller.
+client sending an oversized request. The server implementations typically
+enforce a default incoming message size limit of 4 MiB, which is acceptable to
+use. If the limit is exceeded, the client MUST treat the error as not-retryable.
+Note that in such a scenario, the gRPC server implementations return a
+`RESOURCE_EXHAUSTED` status code to the caller.
 
 The client SHOULD limit the size of the request message, including before
 compression, to avoid overwhelming the server. It is RECOMMENDED to use 4 MiB
