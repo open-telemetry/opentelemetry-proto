@@ -6,6 +6,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Added
 
+- processcontext: processcontext: add `ProcessContext` message from OTEP 4719 [#783](https://github.com/open-telemetry/opentelemetry-proto/pull/783)
+
 ### Changed
 
 ### Fixed
