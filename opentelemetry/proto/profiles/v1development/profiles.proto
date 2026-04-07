@@ -174,6 +174,12 @@ message ProfilesDictionary {
   //
   // stack_table[0] must always be zero value (Stack{}) and present.
   repeated Stack stack_table = 7;
+
+  // Where the OpenTelemetry data is a conversion of some other format (e.g. pprof, JFR)
+  // the original file(s) may be included for reference, particularly if the conversion may be lossy.
+  //
+  // original_payload_table[0] must always be a zero-length byte[] i.e. an empty file.
+  repeated bytes original_payload_table = 8;
 }
 
 // ProfilesData represents the profiles data that can be stored in persistent storage,
@@ -340,10 +346,20 @@ message Profile {
   // The original payload can be large in size, so including the original
   // payload should be configurable by the profiler or collector options. The
   // default behavior should be to not include the original payload.
-  string original_payload_format = 9;
-  // The original payload bytes. See also original_payload_format. Optional, but
-  // format and the bytes must be set or unset together.
-  bytes original_payload = 10;
+  // Index into ProfilesDictionary.string_table.
+
+  // during [Alpha] the proto used 'string original_payload_format = 9' and 'bytes original_payload = 10'
+  // These are replaced by original_payload_format_stridx and original_payload_indices
+  reserved 9, 10; // do not reuse.
+
+  // The format(s) of each file referenced by the corresponding original_payload_indices.
+  // Indexes into ProfilesDictionary.string_table.
+  repeated int32 original_payload_format_stridx = 12;
+  // The original payload bytes. See also original_payload_format_stridx.
+  // Optional, but format and the bytes must be set or unset together.
+  // i.e. original_payload_format_stridx and original_payload_indices must be arrays of equal length.
+  // Indexes into ProfilesDictionary.original_payload_table.
+  repeated int32 original_payload_indices = 13;
 
   // References to attributes in attribute_table. [optional]
   repeated int32 attribute_indices = 11;
