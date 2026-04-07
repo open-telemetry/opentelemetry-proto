@@ -166,7 +166,7 @@ mitigate possible excessive memory usage caused by a misconfigured or malicious
 server. gRPC client implementations typically enforce a default incoming message
 size limit of 4 MiB, which is acceptable to use. Implementations MAY allow this
 limit to be configured. If the limit is exceeded, the client MUST treat the
-response as a not-retryable error. Note that in such scenario, the gRPC client
+response as a non-retryable error. Note that in such scenario, the gRPC client
 implementations are reporting a `RESOURCE_EXHAUSTED` code to the caller.
 
 ##### Full Success
@@ -219,14 +219,14 @@ response where the `partial_success` is populated.
 ##### Failures
 
 When the server returns an error, it falls into 2 broad categories:
-retryable and not-retryable:
+retryable and non-retryable:
 
 - Retryable errors indicate that telemetry data processing failed, and the
   client SHOULD record the error and may retry exporting the same data.
   For example, this can happen when the server is temporarily unable to
   process the data.
 
-- Not-retryable errors indicate that telemetry data processing failed, and the
+- Non-retryable errors indicate that telemetry data processing failed, and the
   client MUST NOT retry sending the same telemetry data. The client MUST drop
   the telemetry data.
   For example, this can happen, when the request contains bad data
@@ -252,7 +252,7 @@ Here is a sample Go code to illustrate:
   return st.Err()
 ```
 
-To indicate not-retryable errors, the server is recommended to use code
+To indicate non-retryable errors, the server is recommended to use code
 [InvalidArgument](https://godoc.org/google.golang.org/grpc/codes) and MAY supply
 additional
 [details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
@@ -272,10 +272,10 @@ snippet of sample Go code to illustrate:
   return st.Err()
 ```
 
-The server MAY use other gRPC codes to indicate retryable and not-retryable
+The server MAY use other gRPC codes to indicate retryable and non-retryable
 errors if those other gRPC codes are more appropriate for a particular erroneous
 situation. The client SHOULD interpret gRPC status codes as retryable or
-not-retryable according to the following table:
+non-retryable according to the following table:
 
 |gRPC Code|Retryable?|
 |---------|----------|
@@ -307,7 +307,7 @@ This is signaled by the server by returning
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
 In this case the behavior of the server and the client is exactly as described in
 [OTLP/gRPC Throttling](#otlpgrpc-throttling) section. If no such status is returned,
-then the `RESOURCE_EXHAUSTED` code SHOULD be treated as not-retryable.
+then the `RESOURCE_EXHAUSTED` code SHOULD be treated as non-retryable.
 
 #### OTLP/gRPC Throttling
 
@@ -491,7 +491,7 @@ The client MUST limit the size of the response body when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
 misconfigured or malicious server. It is RECOMMENDED to use 4 MiB
 as the default limit. Implementations MAY allow this limit to be configured. If
-the limit is exceeded, the client MUST treat the response as a not-retryable
+the limit is exceeded, the client MUST treat the response as a non-retryable
 error and SHOULD record the fact that the response was discarded.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
@@ -573,8 +573,8 @@ The server MAY include `Status.details` field with additional details. Read
 below about what this field can contain in each specific failure case.
 
 The server SHOULD use HTTP response status codes to indicate
-retryable and not-retryable errors for a particular erroneous situation. The
-client SHOULD honour HTTP response status codes as retryable or not-retryable.
+retryable and non-retryable errors for a particular erroneous situation. The
+client SHOULD honour HTTP response status codes as retryable or non-retryable.
 
 ##### Retryable Response Codes
 
