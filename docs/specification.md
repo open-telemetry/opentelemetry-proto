@@ -128,7 +128,9 @@ non-retryable error.
 
 The client SHOULD limit the size of the request message, including before
 compression, to avoid overwhelming the server. It is RECOMMENDED to use 32 MiB
-as the default limit. Implementations MAY allow this limit to be configured.
+as the default limit. Implementations MAY allow this limit to be configured. If
+the limit is exceeded, the client MUST NOT make the request and SHOULD record
+the fact that the request was discarded.
 
 #### OTLP/gRPC Concurrent Requests
 
@@ -508,7 +510,9 @@ receives `HTTP 413 Content Too Large` response.
 
 The client SHOULD limit the size of the request body, including before
 compression, to avoid overwhelming the server. It is RECOMMENDED to use 32 MiB
-as the default limit. Implementations MAY allow this limit to be configured.
+as the default limit. Implementations MAY allow this limit to be configured. If
+the limit is exceeded, the client MUST NOT make the request and SHOULD record
+the fact that the request was discarded.
 
 #### OTLP/HTTP Response
 
