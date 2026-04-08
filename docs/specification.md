@@ -161,6 +161,14 @@ The response MUST be the appropriate message (see below for
 the specific message to use in the [Full Success](#full-success),
 [Partial Success](#partial-success) and [Failure](#failures) cases).
 
+The client MUST enforce a message size limit when receiving the response to
+mitigate possible excessive memory usage caused by a misconfigured or malicious
+server. gRPC client implementations typically enforce a default incoming message
+size limit of 4 MiB, which is acceptable to use. Implementations MAY allow this
+limit to be configured. If the limit is exceeded, the client MUST treat the
+response as a not-retryable error. Note that in such scenario, the gRPC client
+implementations are reporting a `RESOURCE_EXHAUSTED` code to the caller.
+
 ##### Full Success
 
 The success response indicates telemetry data is successfully accepted by the
@@ -299,7 +307,7 @@ This is signaled by the server by returning
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
 In this case the behavior of the server and the client is exactly as described in
 [OTLP/gRPC Throttling](#otlpgrpc-throttling) section. If no such status is returned,
-then the `RESOURCE_EXHAUSTED` code SHOULD be treated as non-retryable.
+then the `RESOURCE_EXHAUSTED` code SHOULD be treated as not-retryable.
 
 #### OTLP/gRPC Throttling
 
@@ -478,6 +486,13 @@ sides.
 The response body MUST be the appropriate serialized Protobuf message (see
 below for the specific message to use in the [Full Success](#full-success-1),
 [Partial Success](#partial-success-1) and [Failure](#failures-1) cases).
+
+The client MUST limit the size of the response body when parsing it, including
+after decompression, to mitigate possible excessive memory usage caused by a
+misconfigured or malicious server. It is RECOMMENDED to use 4 MiB
+as the default limit. Implementations MAY allow this limit to be configured. If
+the limit is exceeded, the client MUST treat the response as a not-retryable
+error and SHOULD record the fact that the response was discarded.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
