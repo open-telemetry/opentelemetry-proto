@@ -120,12 +120,14 @@ The server MUST enforce a message size limit when receiving the request,
 including after decompression, to mitigate possible excessive memory usage
 caused by a misconfigured or malicious client sending an oversized request.
 The server implementations typically enforce a default incoming message size
-limit of 4 MiB, which is acceptable to use. If the limit is exceeded, the client
-MUST treat the error as non-retryable. Note that in such a scenario, the gRPC
-server implementations return a `RESOURCE_EXHAUSTED` status code to the caller.
+limit of 4 MiB. However, it is RECOMMENDED to use 32 MiB as the default limit.
+Implementations MAY allow this limit to be configured. If the limit is
+exceeded, the client MUST treat the error as non-retryable. Note that in such a
+scenario, the gRPC server implementations return a `RESOURCE_EXHAUSTED` status
+code to the caller.
 
 The client SHOULD limit the size of the request message, including before
-compression, to avoid overwhelming the server. It is RECOMMENDED to use 4 MiB
+compression, to avoid overwhelming the server. It is RECOMMENDED to use 32 MiB
 as the default limit. Implementations MAY allow this limit to be configured.
 
 #### OTLP/gRPC Concurrent Requests
@@ -498,14 +500,14 @@ sides.
 
 The server MUST limit the size of the request body when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
-misconfigured or malicious client client sending an oversized request. It is
-RECOMMENDED to use 20 MiB as the default limit. Implementations MAY allow this
+misconfigured or malicious client sending an oversized request. It is
+RECOMMENDED to use 32 MiB as the default limit. Implementations MAY allow this
 limit to be configured. If the limit is exceeded, the server SHOULD respond with
 `HTTP 413 Content Too Large`. The client MUST NOT retry the request when it
 receives `HTTP 413 Content Too Large` response.
 
 The client SHOULD limit the size of the request body, including before
-compression, to avoid overwhelming the server. It is RECOMMENDED to use 20 MiB
+compression, to avoid overwhelming the server. It is RECOMMENDED to use 32 MiB
 as the default limit. Implementations MAY allow this limit to be configured.
 
 #### OTLP/HTTP Response
