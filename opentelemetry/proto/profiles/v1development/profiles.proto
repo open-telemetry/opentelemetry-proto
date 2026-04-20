@@ -176,10 +176,10 @@ message ProfilesDictionary {
   repeated Stack stack_table = 7;
 
   // Where the OpenTelemetry data is a conversion of some other format (e.g. pprof, JFR)
-  // the original file(s) may be included for reference, particularly if the conversion may be lossy.
+  // the original source(s) may be included for reference, particularly if the conversion may be lossy.
   //
   // original_payload_table[0] must always be a zero-length byte[] i.e. an empty file.
-  repeated bytes original_payload_table = 8;
+  repeated OriginalDataSource original_data_table = 8;
 }
 
 // ProfilesData represents the profiles data that can be stored in persistent storage,
@@ -538,4 +538,16 @@ message KeyValueAndUnit {
   // The index into the string table for the attribute's unit.
   // zero indicates implicit (by semconv) or non-defined unit.
   int32 unit_strindex = 3;
+}
+
+// Where the Profile content is created by translation from another format
+// the original data may also be transmitted, along with meta-data attributes
+// e.g. a JFR file with its file name.
+//
+// Status: [Alpha]
+message OriginalDataSource {
+  // The file or buffer content
+  bytes content = 1;
+  // References to attributes in ProfilesDictionary.attribute_table. [optional]
+  repeated int32 attribute_indices = 2;
 }
