@@ -162,10 +162,9 @@ gen-ruby:
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/profiles/v1development/profiles_service.proto
 
-# The Profiling protocol is still development. So it is excluded from the breaking-change check.
 .PHONY: breaking-change
 breaking-change:
-	$(BUF) breaking --against $(BUF_AGAINST) --config '{"version":"v1","breaking":{"ignore":["opentelemetry/proto/profiles", "opentelemetry/proto/collector/profiles"]}}' $(BUF_FLAGS)
+	$(BUF) breaking --against $(BUF_AGAINST) $(BUF_FLAGS)
 
 
 ALL_DOCS := $(shell find . -type f -name '*.md' -not -path './.github/*' -not -path './node_modules/*' | sort)
