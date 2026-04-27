@@ -32,6 +32,7 @@ nodes such as collectors and telemetry backends.
 
 - [Protocol Details](#protocol-details)
   * [OTLP/gRPC](#otlpgrpc)
+    + [OTLP/gRPC Request](#otlpgrpc-request)
     + [OTLP/gRPC Concurrent Requests](#otlpgrpc-concurrent-requests)
     + [OTLP/gRPC Response](#otlpgrpc-response)
       - [Full Success](#full-success)
@@ -112,6 +113,24 @@ delivery guarantees in such systems is outside of the scope of OTLP. The
 acknowledgements described in this protocol happen between a single
 client/server pair and do not span intermediary nodes in multi-hop delivery
 paths._
+
+#### OTLP/gRPC Request
+
+The server MUST enforce a message size limit when receiving the request,
+including after decompression, to mitigate possible excessive memory usage
+caused by a misconfigured or malicious client sending an oversized request.
+The server implementations typically enforce a default incoming message size
+limit of 4 MiB. However, it is RECOMMENDED to use 32 MiB as the default limit.
+Implementations MAY allow this limit to be configured. If the limit is
+exceeded, the gRPC server implementations MUST report a
+`RESOURCE_EXHAUSTED` code to the caller which the client MUST treat as a
+non-retryable error.
+
+The client SHOULD limit the size of the request message, including before
+compression, to avoid overwhelming the server. It is RECOMMENDED to use 32 MiB
+as the default limit. Implementations MAY allow this limit to be configured. If
+the limit is exceeded, the client MUST NOT make the request and SHOULD record
+the fact that the request was discarded.
 
 #### OTLP/gRPC Concurrent Requests
 
@@ -480,6 +499,20 @@ The client MAY gzip the content and in that case MUST include
 
 Non-default URL paths for requests MAY be configured on the client and server
 sides.
+
+The server MUST limit the size of the request body when parsing it, including
+after decompression, to mitigate possible excessive memory usage caused by a
+misconfigured or malicious client sending an oversized request. It is
+RECOMMENDED to use 32 MiB as the default limit. Implementations MAY allow this
+limit to be configured. If the limit is exceeded, the server MUST respond with
+`HTTP 413 Content Too Large`. The client MUST NOT retry the request when it
+receives `HTTP 413 Content Too Large` response.
+
+The client SHOULD limit the size of the request body, including before
+compression, to avoid overwhelming the server. It is RECOMMENDED to use 32 MiB
+as the default limit. Implementations MAY allow this limit to be configured. If
+the limit is exceeded, the client MUST NOT make the request and SHOULD record
+the fact that the request was discarded.
 
 #### OTLP/HTTP Response
 
