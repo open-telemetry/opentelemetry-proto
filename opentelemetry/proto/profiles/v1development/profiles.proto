@@ -302,10 +302,23 @@ message Profile {
   // was gathered. This ensures Sample.timestamps_unix_nano values such as
   // allocation timestamp fall into the profile time range.
   uint64 duration_nano = 4;
-  // The kind of events between sampled occurrences.
-  // e.g [ "cpu","cycles" ] or [ "heap","bytes" ]
+  // The type and the unit of the events between sampled occurrences for
+  // periodic sampling profiles. It can be the same as sample_type or it can be
+  // different depending on the case, for example:
+  // - sample_type=(cpu, milliseconds), period_type=(cpu, milliseconds),
+  //   period=10 signals that we sample the program every 10 milliseconds and
+  //   capture samples that each represent that sampling distance.
+  // - sample_type=(off_cpu, nanoseconds), period_type=(context switch, count),
+  //   period=1000 describes a profile where sampling is done every so often in
+  //   terms of context switches, but the recorded metric is the time spent by
+  //   the thread off CPU.
+  // - sample_type=(inuse_space, bytes), period_type=(allocated bytes, bytes),
+  //   period=262144 might represent a heap profile where the recorded sample
+  //   metric is the size of the live heap while the periodic sampling is done
+  //   using the number of cumulatively allocated bytes.
   ValueType period_type = 5;
-  // The number of events between sampled occurrences.
+  // The distance between sampled occurrences for periodic sampling profiles.
+  // The value is of the period_type type and unit.
   int64 period = 6;
 
   // A globally unique identifier for a profile. The ID is a 16-byte array. An ID with
