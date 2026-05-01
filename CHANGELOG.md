@@ -7,6 +7,7 @@ The full list of changes can be found in the compare view for the respective rel
 ### Added
 
 - docs: add response size limitation for HTTP body and gRPC messages. [#781](https://github.com/open-telemetry/opentelemetry-proto/pull/781)
+- processcontext: add `ProcessContext` message from OTEP 4719 [#783](https://github.com/open-telemetry/opentelemetry-proto/pull/783)
 
 ### Changed
 
