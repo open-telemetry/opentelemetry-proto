@@ -140,7 +140,12 @@ message ProfilesDictionary {
 
   // Links referenced by samples via Sample.link_index.
   //
-  // link_table[0] must always be zero value (Link{}) and present.
+  // link_table[0] must always be zero value and present.
+  // Note that whilst Link{trace_id=array[0], span_id=array[0]} and
+  // Link{trace_id=array[16], span_id=array[8]} filled with zero-value bytes
+  // are both appropriate zero/invalid values per the trace.proto:Span definition,
+  // the latter SHOULD be used for link_table[0] for better compatibility with codecs
+  // strictly expecting 16/8 byte array lengths.
   repeated Link link_table = 4;
 
   // A common table for strings referenced by various messages.
