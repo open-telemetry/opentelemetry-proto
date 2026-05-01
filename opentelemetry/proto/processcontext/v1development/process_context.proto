@@ -30,7 +30,8 @@ option go_package = "go.opentelemetry.io/proto/otlp/processcontext/v1development
 // This message is designed to be published by OpenTelemetry SDKs via a memory-mapped
 // region, allowing external readers (such as the OpenTelemetry eBPF Profiler) to
 // discover and read resource attributes from instrumented processes without requiring
-// direct integration or process activity.
+// direct integration or process activity. It is not part of OTLP and is not
+// exchanged via the OpenTelemetry Collector.
 //
 // See OTEP 4719 for details of this mechanism.
 //
