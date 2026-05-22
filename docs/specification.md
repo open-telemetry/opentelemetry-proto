@@ -123,8 +123,7 @@ The server implementations typically enforce a default incoming message size
 limit of 4 MiB. However, it is RECOMMENDED to use 64 MiB as the default limit.
 Implementations SHOULD allow this limit to be configured. If the limit is
 exceeded, the gRPC server implementations MUST report a
-`RESOURCE_EXHAUSTED` code to the caller which the client MUST treat as a
-non-retryable error.
+`RESOURCE_EXHAUSTED` code as a non-retryable error.
 
 The client SHOULD limit the size of the request message, including before
 compression, to avoid overwhelming the server. It is RECOMMENDED to use 64 MiB
@@ -505,8 +504,7 @@ after decompression, to mitigate possible excessive memory usage caused by a
 misconfigured or malicious client sending an oversized request. It is
 RECOMMENDED to use 64 MiB as the default limit. Implementations SHOULD allow
 this limit to be configured. If the limit is exceeded, the server MUST respond
-with `HTTP 413 Content Too Large`. The client MUST NOT retry the request when it
-receives `HTTP 413 Content Too Large` response.
+with `HTTP 413 Content Too Large`.
 
 The client SHOULD limit the size of the request body, including before
 compression, to avoid overwhelming the server. It is RECOMMENDED to use 64 MiB
