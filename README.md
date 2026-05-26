@@ -151,12 +151,51 @@ is generated from the .proto files by any particular code generator.
 
 ## Maintainers
 
-- [OpenTelemetry Technical Committee](https://github.com/open-telemetry/community/blob/main/community-members.md#technical-committee)
+- [Bogdan Drutu](https://github.com/bogdandrutu)
+- [Carlos Alberto Cortez](https://github.com/carlosalberto)
+- [Joshua Suereth](https://github.com/jsuereth)
+- [Liudmilla Molkova](https://github.com/lmolkova)
+- [Tigran Najaryan](https://github.com/tigrannajaryan)
+- [Armin Reuch](https://github.com/arminru)
+- [Reiley Yang](https://github.com/reyang)
+- [Jack Berg](https://github.com/jack-berg)
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
 
 ## Approvers
 
-- [OpenTelemetry Specification Sponsors](https://github.com/open-telemetry/community/blob/main/community-members.md#specifications-and-proto)
+- [Juraci Paixão Kröhling](https://github.com/jpkrohling)
+- [Felix Geisendörfer](https://github.com/felixge)
+- [Ted Young](https://github.com/tedsuo)
+- [Tristan Sloughter](https://github.com/tsloughter)
+- [Alex Boten](https://github.com/codeboten)
+- [Dimitry Filimonov](https://github.com/petethepig)
+- [Jonathan Halliday](https://github.com/jhalliday)
+- [Christian Neumüller](https://github.com/Oberon00)
+- [Florian Lehner](https://github.com/florianl)
+- [Alexey Alexandrov](https://github.com/aalexand)
+- [Severin Neumann](https://github.com/svrnm)
+- [Daniel Dyla](https://github.com/dyladan)
+- [David Ashpole](https://github.com/dashpole)
+- [Josh MacDonald](https://github.com/jmacd)
+- [Robert Pająk](https://github.com/pellared)
+- [Cijo Thomas](https://github.com/cijothomas)
+- [Tyler Yahn](https://github.com/MrAlias)
+- [Leighton Chen](https://github.com/lzchen)
+- [Marc Alff](https://github.com/marcalff)
+- [Christos Kalkanis](https://github.com/christos68k)
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
+
+## Emeritus Maintainers
+
+Previously this package was maintained solely by the [OpenTelemetry Technical Committee](https://github.com/open-telemetry/community/blob/main/community-members.md#technical-committee).
+It now has a dedicated maintainer role that is independent of the OpenTelemetry
+specification.
+
+## Emeritus Approvers
+
+Previously the package had the same approvals as the specification, via
+[OpenTelemetry Specification Sponsors](https://github.com/open-telemetry/community/blob/main/community-members.md#specifications-and-proto).
+It now has a dedicated approver role that is independent of the OpenTelemetry
+specification.
