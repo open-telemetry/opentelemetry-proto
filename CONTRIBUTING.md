@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Welcome, and thank you for your interest in contributing to OpenTelemetry's protobuf definitions! Your contributions — big or small — are invaluable in shaping and improving this essential part of the OpenTelemetry ecosystem.
+Welcome, and thank you for your interest in contributing to OpenTelemetry's Protobuf definitions! Your contributions — big or small — are invaluable in shaping and improving this essential part of the OpenTelemetry ecosystem.
 
 Whether you are fixing a small issue, updating documentation, or introducing a major improvement, we appreciate your efforts.
 If you're new to the project, don't hesitate to ask questions and seek guidance from the community.
@@ -23,7 +23,7 @@ implementation by running `make gen-all`.
 
 ## Style-Guide
 
-OpenTelemetry follows the [protobuf style guide](https://protobuf.dev/programming-guides/style/) with the following clarifications:
+OpenTelemetry follows the [Protobuf style guide](https://protobuf.dev/programming-guides/style/) with the following clarifications:
 
 - All Messages and fields should be documented via comments.
 - Field comments should document purpose or behavior with active verbs, or

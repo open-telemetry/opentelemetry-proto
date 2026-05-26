@@ -2,7 +2,7 @@
 
 [![Build Check](https://github.com/open-telemetry/opentelemetry-proto/workflows/Build%20Check/badge.svg?branch=main)](https://github.com/open-telemetry/opentelemetry-proto/actions?query=workflow%3A%22Build+Check%22+branch%3Amain)
 
-This repository contains the protocol buffer definitions for [OTLP](#otlp) (the primary OpenTelemetry data delivery protocol),
+This repository contains the Protocol Buffer definitions for [OTLP](#otlp) (the primary OpenTelemetry data delivery protocol),
 and other [Protocols](#protocols) that share its common types and release machinery.
 
 See [contribution guidelines](CONTRIBUTING.md) if you would like to make any changes.
