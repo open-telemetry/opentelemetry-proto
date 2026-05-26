@@ -33,7 +33,8 @@ option go_package = "go.opentelemetry.io/proto/otlp/processcontext/v1development
 // direct integration or process activity. It is not part of OTLP and is not
 // exchanged via the OpenTelemetry Collector.
 //
-// See OTEP 4719 for details of this mechanism.
+// See OTEP 4719 (https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/profiles/4719-process-ctx.md)
+// for details of this mechanism.
 //
 // Status: [Development]
 message ProcessContext {
