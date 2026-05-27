@@ -157,7 +157,6 @@ is generated from the .proto files by any particular code generator.
 - [Liudmilla Molkova](https://github.com/lmolkova)
 - [Tigran Najaryan](https://github.com/tigrannajaryan)
 - [Armin Reuch](https://github.com/arminru)
-- [Reiley Yang](https://github.com/reyang)
 - [Jack Berg](https://github.com/jack-berg)
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
