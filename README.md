@@ -168,7 +168,6 @@ For more information about the maintainer role, see the [community repository](h
 - [Ted Young](https://github.com/tedsuo)
 - [Tristan Sloughter](https://github.com/tsloughter)
 - [Alex Boten](https://github.com/codeboten)
-- [Dimitry Filimonov](https://github.com/petethepig)
 - [Jonathan Halliday](https://github.com/jhalliday)
 - [Christian Neumüller](https://github.com/Oberon00)
 - [Florian Lehner](https://github.com/florianl)
