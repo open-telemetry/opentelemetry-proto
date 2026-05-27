@@ -151,37 +151,38 @@ is generated from the .proto files by any particular code generator.
 
 ## Maintainers
 
+- [Armin Reuch](https://github.com/arminru)
 - [Bogdan Drutu](https://github.com/bogdandrutu)
 - [Carlos Alberto Cortez](https://github.com/carlosalberto)
+- [Jack Berg](https://github.com/jack-berg)
 - [Joshua Suereth](https://github.com/jsuereth)
 - [Liudmilla Molkova](https://github.com/lmolkova)
 - [Tigran Najaryan](https://github.com/tigrannajaryan)
-- [Armin Reuch](https://github.com/arminru)
-- [Jack Berg](https://github.com/jack-berg)
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
 
 ## Approvers
 
-- [Juraci Paixão Kröhling](https://github.com/jpkrohling)
-- [Felix Geisendörfer](https://github.com/felixge)
-- [Ted Young](https://github.com/tedsuo)
-- [Tristan Sloughter](https://github.com/tsloughter)
 - [Alex Boten](https://github.com/codeboten)
-- [Jonathan Halliday](https://github.com/jhalliday)
-- [Christian Neumüller](https://github.com/Oberon00)
-- [Florian Lehner](https://github.com/florianl)
 - [Alexey Alexandrov](https://github.com/aalexand)
-- [Severin Neumann](https://github.com/svrnm)
+- [Christian Neumüller](https://github.com/Oberon00)
+- [Christos Kalkanis](https://github.com/christos68k)
+- [Cijo Thomas](https://github.com/cijothomas)
 - [Daniel Dyla](https://github.com/dyladan)
 - [David Ashpole](https://github.com/dashpole)
+- [Felix Geisendörfer](https://github.com/felixge)
+- [Florian Lehner](https://github.com/florianl)
+- [Jonathan Halliday](https://github.com/jhalliday)
 - [Josh MacDonald](https://github.com/jmacd)
-- [Robert Pająk](https://github.com/pellared)
-- [Cijo Thomas](https://github.com/cijothomas)
-- [Tyler Yahn](https://github.com/MrAlias)
+- [Juraci Paixão Kröhling](https://github.com/jpkrohling)
 - [Leighton Chen](https://github.com/lzchen)
 - [Marc Alff](https://github.com/marcalff)
-- [Christos Kalkanis](https://github.com/christos68k)
+- [Reiley Yang](https://github.com/reyang)
+- [Robert Pająk](https://github.com/pellared)
+- [Severin Neumann](https://github.com/svrnm)
+- [Ted Young](https://github.com/tedsuo)
+- [Tristan Sloughter](https://github.com/tsloughter)
+- [Tyler Yahn](https://github.com/MrAlias)
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
 
