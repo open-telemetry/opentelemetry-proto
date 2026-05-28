@@ -155,7 +155,6 @@ is generated from the .proto files by any particular code generator.
 - [Bogdan Drutu](https://github.com/bogdandrutu)
 - [Carlos Alberto Cortez](https://github.com/carlosalberto)
 - [Joshua Suereth](https://github.com/jsuereth)
-- [Liudmilla Molkova](https://github.com/lmolkova)
 - [Tigran Najaryan](https://github.com/tigrannajaryan)
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#maintainer).
