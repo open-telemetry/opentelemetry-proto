@@ -154,7 +154,6 @@ is generated from the .proto files by any particular code generator.
 - [Armin Reuch](https://github.com/arminru)
 - [Bogdan Drutu](https://github.com/bogdandrutu)
 - [Carlos Alberto Cortez](https://github.com/carlosalberto)
-- [Jack Berg](https://github.com/jack-berg)
 - [Joshua Suereth](https://github.com/jsuereth)
 - [Liudmilla Molkova](https://github.com/lmolkova)
 - [Tigran Najaryan](https://github.com/tigrannajaryan)
