@@ -171,6 +171,7 @@ For more information about the maintainer role, see the [community repository](h
 - [David Ashpole](https://github.com/dashpole)
 - [Felix Geisendörfer](https://github.com/felixge)
 - [Florian Lehner](https://github.com/florianl)
+- [Jack Berg](https://github.com/jack-berg)
 - [Jonathan Halliday](https://github.com/jhalliday)
 - [Josh MacDonald](https://github.com/jmacd)
 - [Juraci Paixão Kröhling](https://github.com/jpkrohling)
