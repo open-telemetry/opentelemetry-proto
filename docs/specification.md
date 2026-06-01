@@ -190,8 +190,10 @@ implementations are reporting a `RESOURCE_EXHAUSTED` code to the caller.
 The server MUST limit the size of the response message, including before
 compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
 as the default limit. Implementations MAY allow this limit to be configured. If
-the limit is exceeded, the server MUST NOT send the oversized response message
-and SHOULD record the fact that the response was discarded.
+necessary, the server MUST reduce the response size by shortening
+or omitting optional diagnostic fields, such as `partial_success.error_message`,
+if doing so preserves the response semantics so that the response message does
+not exceed the limit.
 
 ##### Full Success
 
@@ -534,8 +536,10 @@ error and SHOULD record the fact that the response was discarded.
 The server MUST limit the size of the response body, including before
 compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
 as the default limit. Implementations MAY allow this limit to be configured. If
-the limit is exceeded, the server MUST NOT send the oversized response body and
-SHOULD record the fact that the response was discarded.
+necessary, the server MUST reduce the response size by shortening
+or omitting optional diagnostic fields, such as `partial_success.error_message`,
+if doing so preserves the response semantics so that the response body does
+not exceed the limit.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
