@@ -32,6 +32,7 @@ nodes such as collectors and telemetry backends.
 
 - [Protocol Details](#protocol-details)
   * [OTLP/gRPC](#otlpgrpc)
+    + [OTLP/gRPC Request](#otlpgrpc-request)
     + [OTLP/gRPC Concurrent Requests](#otlpgrpc-concurrent-requests)
     + [OTLP/gRPC Response](#otlpgrpc-response)
       - [Full Success](#full-success)
@@ -113,6 +114,23 @@ acknowledgements described in this protocol happen between a single
 client/server pair and do not span intermediary nodes in multi-hop delivery
 paths._
 
+#### OTLP/gRPC Request
+
+The server MUST enforce a message size limit when receiving the request,
+including after decompression, to mitigate possible excessive memory usage
+caused by a misconfigured or malicious client sending an oversized request.
+The server implementations typically enforce a default incoming message size
+limit of 4 MiB. However, it is RECOMMENDED to use 64 MiB as the default limit.
+Implementations SHOULD allow this limit to be configured. If the limit is
+exceeded, the gRPC server implementations MUST report a
+`RESOURCE_EXHAUSTED` code as a non-retryable error.
+
+The client SHOULD limit the size of the request message, including before
+compression, to avoid overwhelming the server. It is RECOMMENDED to use 64 MiB
+as the default limit. Implementations SHOULD allow this limit to be configured.
+If the limit is exceeded, the client MUST NOT make the request and SHOULD record
+the fact that the request was discarded.
+
 #### OTLP/gRPC Concurrent Requests
 
 After sending the request the client MAY wait until the response is received
@@ -160,6 +178,14 @@ was not delivered.
 The response MUST be the appropriate message (see below for
 the specific message to use in the [Full Success](#full-success),
 [Partial Success](#partial-success) and [Failure](#failures) cases).
+
+The client MUST enforce a message size limit when receiving the response to
+mitigate possible excessive memory usage caused by a misconfigured or malicious
+server. gRPC client implementations typically enforce a default incoming message
+size limit of 4 MiB, which is acceptable to use. Implementations MAY allow this
+limit to be configured. If the limit is exceeded, the client MUST treat the
+response as a non-retryable error. Note that in such scenario, the gRPC client
+implementations are reporting a `RESOURCE_EXHAUSTED` code to the caller.
 
 ##### Full Success
 
@@ -211,14 +237,14 @@ response where the `partial_success` is populated.
 ##### Failures
 
 When the server returns an error, it falls into 2 broad categories:
-retryable and not-retryable:
+retryable and non-retryable:
 
 - Retryable errors indicate that telemetry data processing failed, and the
   client SHOULD record the error and may retry exporting the same data.
   For example, this can happen when the server is temporarily unable to
   process the data.
 
-- Not-retryable errors indicate that telemetry data processing failed, and the
+- Non-retryable errors indicate that telemetry data processing failed, and the
   client MUST NOT retry sending the same telemetry data. The client MUST drop
   the telemetry data.
   For example, this can happen, when the request contains bad data
@@ -244,7 +270,7 @@ Here is a sample Go code to illustrate:
   return st.Err()
 ```
 
-To indicate not-retryable errors, the server is recommended to use code
+To indicate non-retryable errors, the server is recommended to use code
 [InvalidArgument](https://godoc.org/google.golang.org/grpc/codes) and MAY supply
 additional
 [details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
@@ -264,10 +290,10 @@ snippet of sample Go code to illustrate:
   return st.Err()
 ```
 
-The server MAY use other gRPC codes to indicate retryable and not-retryable
+The server MAY use other gRPC codes to indicate retryable and non-retryable
 errors if those other gRPC codes are more appropriate for a particular erroneous
 situation. The client SHOULD interpret gRPC status codes as retryable or
-not-retryable according to the following table:
+non-retryable according to the following table:
 
 |gRPC Code|Retryable?|
 |---------|----------|
@@ -473,11 +499,31 @@ The client MAY gzip the content and in that case MUST include
 Non-default URL paths for requests MAY be configured on the client and server
 sides.
 
+The server MUST limit the size of the request body when parsing it, including
+after decompression, to mitigate possible excessive memory usage caused by a
+misconfigured or malicious client sending an oversized request. It is
+RECOMMENDED to use 64 MiB as the default limit. Implementations SHOULD allow
+this limit to be configured. If the limit is exceeded, the server MUST respond
+with `HTTP 413 Content Too Large`.
+
+The client SHOULD limit the size of the request body, including before
+compression, to avoid overwhelming the server. It is RECOMMENDED to use 64 MiB
+as the default limit. Implementations SHOULD allow this limit to be configured.
+If the limit is exceeded, the client MUST NOT make the request and SHOULD record
+the fact that the request was discarded.
+
 #### OTLP/HTTP Response
 
 The response body MUST be the appropriate serialized Protobuf message (see
 below for the specific message to use in the [Full Success](#full-success-1),
 [Partial Success](#partial-success-1) and [Failure](#failures-1) cases).
+
+The client MUST limit the size of the response body when parsing it, including
+after decompression, to mitigate possible excessive memory usage caused by a
+misconfigured or malicious server. It is RECOMMENDED to use 4 MiB
+as the default limit. Implementations MAY allow this limit to be configured. If
+the limit is exceeded, the client MUST treat the response as a non-retryable
+error and SHOULD record the fact that the response was discarded.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
@@ -558,8 +604,8 @@ The server MAY include `Status.details` field with additional details. Read
 below about what this field can contain in each specific failure case.
 
 The server SHOULD use HTTP response status codes to indicate
-retryable and not-retryable errors for a particular erroneous situation. The
-client SHOULD honour HTTP response status codes as retryable or not-retryable.
+retryable and non-retryable errors for a particular erroneous situation. The
+client SHOULD honour HTTP response status codes as retryable or non-retryable.
 
 ##### Retryable Response Codes
 
