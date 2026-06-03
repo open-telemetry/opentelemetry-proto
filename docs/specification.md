@@ -642,8 +642,8 @@ indicate how long the client ought to wait before retrying. Note that the value
 can be either an HTTP-date or a number of seconds to delay after the response is
 received.
 
-The client SHOULD honour the waiting interval specified in the "Retry-After"
-header if it is present. If the client receives a retryable error code (see
+The client SHOULD honour the value specified in the "Retry-After" header if it is
+present. If the client receives a retryable error code (see
 [table above](#retryable-response-codes)) and the "Retry-After" header is
 not present in the response, then the client SHOULD implement an exponential backoff
 strategy between retries.
