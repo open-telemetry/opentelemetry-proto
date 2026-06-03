@@ -9,8 +9,8 @@ and the corresponding Language Independent Interface Types ([.proto files](opent
 
 The proto files can be consumed as GIT submodules or copied and built directly in the consumer project.
 
-OpenTelemetry [language libraries](https://opentelemetry.io/docs/languages/) may 
-publish generated language bindings. Check the documentation of the language 
+OpenTelemetry [language libraries](https://opentelemetry.io/docs/languages/) may
+publish generated language bindings. Check the documentation of the language
 library you are using for more details.
 
 See [contribution guidelines](CONTRIBUTING.md) if you would like to make any changes.
