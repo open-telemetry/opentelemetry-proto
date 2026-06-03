@@ -13,6 +13,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Fixed
 
+- docs: clarify that `Retry-After` header value can be an HTTP-date. [#806](https://github.com/open-telemetry/opentelemetry-proto/pull/806)
+
 ### Removed
 
 ## 1.10.0 - 2026-03-09
