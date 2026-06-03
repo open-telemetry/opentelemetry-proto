@@ -35,16 +35,16 @@ To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently
 * python
 * ruby
 
-### ProcessContext
+### Process Context
 
 A non-OTLP protocol for sharing process-level resource attributes with
 external readers (e.g. the [OpenTelemetry eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler))
 via memory-mapped regions. Not exchanged via gRPC, HTTP, or the
 OpenTelemetry Collector.
 
-- Documentation: [docs/processcontext.md](docs/processcontext.md)
+- Documentation: [docs/process-context/process-context.md](docs/process-context/process-context.md)
 - Proto file: [opentelemetry/proto/processcontext/v1development/process_context.proto](opentelemetry/proto/processcontext/v1development/process_context.proto)
-- Specification: [OTEP 4719](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/profiles/4719-process-ctx.md)
+- Design doc: [OTEP 4719](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/profiles/4719-process-ctx.md)
 
 ## Language Independent Interface Types
 
