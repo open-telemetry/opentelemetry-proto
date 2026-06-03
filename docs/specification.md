@@ -638,7 +638,9 @@ If the server receives more requests than the client is allowed or the server is
 overloaded, the server SHOULD respond with `HTTP 429 Too Many Requests` or
 `HTTP 503 Service Unavailable` and MAY include
 ["Retry-After"](https://tools.ietf.org/html/rfc7231#section-7.1.3) header to
-indicate how long the client ought to wait before retrying.
+indicate how long the client ought to wait before retrying. Note that the value
+can be either an HTTP-date or a number of seconds to delay after the response is
+received.
 
 The client SHOULD honour the waiting interval specified in the "Retry-After"
 header if it is present. If the client receives a retryable error code (see
