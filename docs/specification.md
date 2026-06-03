@@ -190,13 +190,13 @@ reporting a `RESOURCE_EXHAUSTED` code to the caller.
 
 The server MUST limit the size of the response message, including before
 compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
-as the default limit. Implementations MAY allow this limit to be configured. For
-a [Partial Success](#partial-success) response, if necessary, the server MUST
-reduce the response size by shortening or omitting optional diagnostic fields,
-such as `partial_success.error_message`, if doing so preserves the response
-semantics so that the response message does not exceed the limit. If the
-response cannot fit within the limit, the server MUST fail the request with
-the `RESOURCE_EXHAUSTED` code as a non-retryable error.
+as the default limit. Implementations MAY allow this limit to be configured.
+For a [Partial Success](#partial-success) response that would otherwise exceed
+the limit, the server MUST reduce the response size without changing response
+semantics. To do so, the server MAY decrease the verbosity of optional
+diagnostic fields, such as `partial_success.error_message`, or omit optional
+diagnostic fields. If the response cannot fit within the limit, the server MUST
+fail the request with the `RESOURCE_EXHAUSTED` code as a non-retryable error.
 
 ##### Full Success
 
@@ -538,13 +538,13 @@ error and SHOULD record the fact that the response was discarded.
 
 The server MUST limit the size of the response body, including before
 compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
-as the default limit. Implementations MAY allow this limit to be configured. For
-a [Partial Success](#partial-success-1) response, if necessary, the server MUST
-reduce the response size by shortening or omitting optional diagnostic fields,
-such as `partial_success.error_message`, if doing so preserves the response
-semantics so that the response body does not exceed the limit. If the response
-cannot fit within the limit, the server MUST fail the request with
-`HTTP 500 Internal Server Error`.
+as the default limit. Implementations MAY allow this limit to be configured.
+For a [Partial Success](#partial-success-1) response that would otherwise exceed
+the limit, the server MUST reduce the response size without changing response
+semantics. To do so, the server MAY decrease the verbosity of optional
+diagnostic fields, such as `partial_success.error_message`, or omit optional
+diagnostic fields. If the response cannot fit within the limit, the server MUST
+fail the request with `HTTP 500 Internal Server Error`.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
