@@ -162,7 +162,7 @@ gen-ruby:
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
 	$(PROTOC) --ruby_out=./$(PROTO_GEN_RUBY_DIR) --grpc-ruby_out=./$(PROTO_GEN_RUBY_DIR) opentelemetry/proto/collector/profiles/v1development/profiles_service.proto
 
-# The Profiling and ProcessContext protocols are still development. So they are excluded from the breaking-change check.
+# The Profiling and Process Context Sharing protos are still development. So they are excluded from the breaking-change check.
 .PHONY: breaking-change
 breaking-change:
 	$(BUF) breaking --against $(BUF_AGAINST) --config '{"version":"v1","breaking":{"ignore":["opentelemetry/proto/profiles", "opentelemetry/proto/collector/profiles", "opentelemetry/proto/processcontext"]}}' $(BUF_FLAGS)

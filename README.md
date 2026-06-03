@@ -35,7 +35,7 @@ To generate the raw gRPC client libraries, use `make gen-${LANGUAGE}`. Currently
 * python
 * ruby
 
-### Process Context
+### Process Context Sharing
 
 A non-OTLP protocol for sharing process-level resource attributes with
 external readers (e.g. the [OpenTelemetry eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler))
@@ -57,15 +57,15 @@ The compiled files are published to central repositories (Maven, ...) from OpenT
 1.0.0 and newer releases from this repository may contain unstable (alpha or beta)
 components as indicated by the Maturity table below.
 
-| Protocol       | Component                           | Binary Protobuf Maturity | JSON Maturity                                               |
-| -------------- | ----------------------------------- | ------------------------ | ----------------------------------------------------------- |
-| OTLP           | common/*                            | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
-| OTLP           | resource/*                          | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
-| OTLP           | metrics/\*<br>collector/metrics/*   | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
-| OTLP           | trace/\*<br>collector/trace/*       | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
-| OTLP           | logs/\*<br>collector/logs/*         | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
-| OTLP           | profiles/\*<br>collector/profiles/* | Development              | [Development](docs/specification.md#json-protobuf-encoding) |
-| ProcessContext | processcontext/*                    | Development              | N/A                                                         |
+| Protocol                | Component                           | Binary Protobuf Maturity | JSON Maturity                                               |
+| ----------------------- | ----------------------------------- | ------------------------ | ----------------------------------------------------------- |
+| OTLP                    | common/*                            | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
+| OTLP                    | resource/*                          | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
+| OTLP                    | metrics/\*<br>collector/metrics/*   | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
+| OTLP                    | trace/\*<br>collector/trace/*       | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
+| OTLP                    | logs/\*<br>collector/logs/*         | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
+| OTLP                    | profiles/\*<br>collector/profiles/* | Development              | [Development](docs/specification.md#json-protobuf-encoding) |
+| Process Context Sharing | processcontext/*                    | Development              | N/A                                                         |
 
 (See [Versioning and Stability](https://github.com/open-telemetry/opentelemetry-specification/blob/a08d1f92f62acd4aafe4dfaa04ae7bf28600d49e/specification/versioning-and-stability.md)
 for definition of maturity levels).
