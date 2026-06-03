@@ -6,8 +6,7 @@ ProcessContext is a non-OTLP protocol for sharing process-level OpenTelemetry
 resource attributes with external readers (e.g. the
 [OpenTelemetry eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler)).
 
-This page is a quick orientation; the normative specification lives in
-[OTEP 4719][otep].
+This protocol is work-in-progress, see [OTEP 4719][otep] for details on the current design.
 
 ## Relationship to OTLP
 
