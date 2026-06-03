@@ -179,13 +179,14 @@ The response MUST be the appropriate message (see below for
 the specific message to use in the [Full Success](#full-success),
 [Partial Success](#partial-success) and [Failure](#failures) cases).
 
-The client MUST enforce a message size limit when receiving the response to
-mitigate possible excessive memory usage caused by a misconfigured or malicious
-server. gRPC client implementations typically enforce a default incoming message
-size limit of 4 MiB, which is acceptable to use. Implementations MAY allow this
-limit to be configured. If the limit is exceeded, the client MUST treat the
-response as a non-retryable error. Note that in such scenario, the gRPC client
-implementations are reporting a `RESOURCE_EXHAUSTED` code to the caller.
+The client MUST enforce a message size limit when receiving the response,
+including after decompression, to mitigate possible excessive memory usage
+caused by a misconfigured or malicious server. gRPC client implementations
+typically enforce a default incoming message size limit of 4 MiB, which is
+acceptable to use. Implementations SHOULD allow this limit to be configured.
+If the limit is exceeded, the client MUST treat the response as a non-retryable
+error. Note that in such scenario, the gRPC client implementations are
+reporting a `RESOURCE_EXHAUSTED` code to the caller.
 
 The server MUST limit the size of the response message, including before
 compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
@@ -531,8 +532,8 @@ below for the specific message to use in the [Full Success](#full-success-1),
 The client MUST limit the size of the response body when parsing it, including
 after decompression, to mitigate possible excessive memory usage caused by a
 misconfigured or malicious server. It is RECOMMENDED to use 4 MiB
-as the default limit. Implementations MAY allow this limit to be configured. If
-the limit is exceeded, the client MUST treat the response as a non-retryable
+as the default limit. Implementations SHOULD allow this limit to be configured.
+If the limit is exceeded, the client MUST treat the response as a non-retryable
 error and SHOULD record the fact that the response was discarded.
 
 The server MUST limit the size of the response body, including before
