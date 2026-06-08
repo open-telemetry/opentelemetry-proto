@@ -6,12 +6,15 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Added
 
-- docs: add response size limitation for HTTP body and gRPC messages. [#781](https://github.com/open-telemetry/opentelemetry-proto/pull/781)
+- docs: add request size limitation for HTTP body and gRPC messages. [#782](https://github.com/open-telemetry/opentelemetry-proto/pull/782)
+- docs: add response size limitation for HTTP body and gRPC messages. [#781](https://github.com/open-telemetry/opentelemetry-proto/pull/781), [#800](https://github.com/open-telemetry/opentelemetry-proto/pull/800), [#802](https://github.com/open-telemetry/opentelemetry-proto/pull/802)
 - processcontext: add `ProcessContext` message described in [OTEP 4719](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/profiles/4719-process-ctx.md). [#783](https://github.com/open-telemetry/opentelemetry-proto/pull/783)
 
 ### Changed
 
 ### Fixed
+
+- docs: clarify that `Retry-After` header value can be an HTTP-date. [#806](https://github.com/open-telemetry/opentelemetry-proto/pull/806)
 
 ### Removed
 
