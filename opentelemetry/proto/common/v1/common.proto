@@ -151,4 +151,10 @@ message EntityRef {
   // These attribute keys are not part of entity's identity.
   // These keys MUST exist in the containing {message}.attributes.
   repeated string description_keys = 4;
+
+  // Type of the entity that establishes the context within which this entity's ID is unique.
+  // For entities with globally unique IDs, this field MUST be empty.
+  // For entities with locally unique IDs, this field SHOULD contain the type of the context
+  // entity present on the same Resource. It MAY be empty when the context is unknown.
+  string id_context_type = 5;
 }
