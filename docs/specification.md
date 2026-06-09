@@ -193,10 +193,11 @@ compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
 as the default limit. Implementations MAY allow this limit to be configured.
 For a [Partial Success](#partial-success) response that would otherwise exceed
 the limit, the server MUST reduce the response size without changing response
-semantics. To do so, the server MAY decrease the verbosity of optional
-diagnostic fields, such as `partial_success.error_message`, or omit optional
-diagnostic fields. If the response cannot fit within the limit, the server MUST
-fail the request with the `RESOURCE_EXHAUSTED` code as a non-retryable error.
+semantics if it is possible. To do so, the server MAY decrease the verbosity of
+optional diagnostic fields, such as `partial_success.error_message`, or omit
+optional diagnostic fields. If the response cannot fit within the limit, the
+server MUST fail the request with the `RESOURCE_EXHAUSTED` code as a
+non-retryable error.
 
 ##### Full Success
 
@@ -541,10 +542,10 @@ compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
 as the default limit. Implementations MAY allow this limit to be configured.
 For a [Partial Success](#partial-success-1) response that would otherwise exceed
 the limit, the server MUST reduce the response size without changing response
-semantics. To do so, the server MAY decrease the verbosity of optional
-diagnostic fields, such as `partial_success.error_message`, or omit optional
-diagnostic fields. If the response cannot fit within the limit, the server MUST
-fail the request with `HTTP 500 Internal Server Error`.
+semantics if it is possible. To do so, the server MAY decrease the verbosity of
+optional diagnostic fields, such as `partial_success.error_message`, or omit
+optional diagnostic fields. If the response cannot fit within the limit, the
+server MUST fail the request with `HTTP 500 Internal Server Error`.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
