@@ -190,7 +190,7 @@ reporting a `RESOURCE_EXHAUSTED` code to the caller.
 
 The server MUST limit the size of the response message, including before
 compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
-as the default limit. Implementations MAY allow this limit to be configured.
+as the default limit. Implementations SHOULD allow this limit to be configured.
 For a [Partial Success](#partial-success) response that would otherwise exceed
 the limit, the server MUST reduce the response size without changing response
 semantics if it is possible. To do so, the server MAY decrease the verbosity of
@@ -540,7 +540,7 @@ error and SHOULD record the fact that the response was discarded.
 
 The server MUST limit the size of the response body, including before
 compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
-as the default limit. Implementations MAY allow this limit to be configured.
+as the default limit. Implementations SHOULD allow this limit to be configured.
 For a [Partial Success](#partial-success-1) response that would otherwise exceed
 the limit, the server MUST reduce the response size without changing response
 semantics if it is possible. To do so, the server MAY decrease the verbosity of
