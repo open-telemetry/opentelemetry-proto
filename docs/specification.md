@@ -28,7 +28,7 @@ nodes such as collectors and telemetry backends.
 <details>
 <summary>Table of Contents</summary>
 
-<!-- toc -->
+<!-- START doctoc -->
 
 - [Protocol Details](#protocol-details)
   * [OTLP/gRPC](#otlpgrpc)
@@ -64,7 +64,7 @@ nodes such as collectors and telemetry backends.
 - [Glossary](#glossary)
 - [References](#references)
 
-<!-- tocstop -->
+<!-- END doctoc -->
 
 </details>
 

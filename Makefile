@@ -191,3 +191,13 @@ markdownlint:
 			$(MARKDOWNLINTIMAGE) \
 			--config .markdownlint.yaml $$f || exit 1; \
 	done
+
+.PHONY: markdown-toc
+markdown-toc:
+	@if ! npm ls doctoc; then npm ci; fi
+	npx --no -- doctoc . --update-only --mintocitems 1 --toc-pragma-style compact --notitle --entryprefix='-,*,+' || exit 1;
+
+.PHONY: markdown-toc-check
+markdown-toc-check:
+	@if ! npm ls doctoc; then npm ci; fi
+	npx --no -- doctoc . --update-only --mintocitems 1 --toc-pragma-style compact --notitle --entryprefix='-,*,+' --dryrun || exit 1;
