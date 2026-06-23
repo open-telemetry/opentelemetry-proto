@@ -195,9 +195,10 @@ For a [Partial Success](#partial-success) response that would otherwise exceed
 the limit, the server MUST reduce the response size without changing response
 semantics if it is possible. To do so, the server MAY decrease the verbosity of
 optional diagnostic fields, such as `partial_success.error_message`, or omit
-optional diagnostic fields. If the response cannot fit within the limit, the
-server MUST fail the request with the `RESOURCE_EXHAUSTED` code as a
-non-retryable error.
+optional diagnostic fields. If the response still cannot fit within the limit,
+the server MUST fail the request with the `RESOURCE_EXHAUSTED` code as a
+non-retryable error and MUST NOT partially accept telemetry data from the
+request.
 
 ##### Full Success
 
@@ -544,8 +545,9 @@ For a [Partial Success](#partial-success-1) response that would otherwise exceed
 the limit, the server MUST reduce the response size without changing response
 semantics if it is possible. To do so, the server MAY decrease the verbosity of
 optional diagnostic fields, such as `partial_success.error_message`, or omit
-optional diagnostic fields. If the response cannot fit within the limit, the
-server MUST fail the request with `HTTP 500 Internal Server Error`.
+optional diagnostic fields. If the response still cannot fit within the limit,
+the server MUST fail the request with `HTTP 500 Internal Server Error` and MUST
+NOT partially accept telemetry data from the request.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
