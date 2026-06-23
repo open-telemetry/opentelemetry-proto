@@ -14,7 +14,7 @@ $(1)
 endef
 
 .PHONY: all
-all: gen-all markdown-link-check markdownlint
+all: gen-all markdown-link-check markdownlint markdown-toc
 
 # Generate all implementations
 .PHONY: gen-all
