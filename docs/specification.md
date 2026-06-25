@@ -197,8 +197,8 @@ semantics if it is possible. To do so, the server MAY decrease the verbosity of
 optional diagnostic fields, such as `partial_success.error_message`, or omit
 optional diagnostic fields. If the response still cannot fit within the limit,
 the server MUST fail the request with the `RESOURCE_EXHAUSTED` code as a
-non-retryable error and MUST NOT partially accept telemetry data from the
-request.
+non-retryable error. After such a failure, whether any telemetry data from the
+request was accepted is unspecified.
 
 ##### Full Success
 
@@ -546,8 +546,9 @@ the limit, the server MUST reduce the response size without changing response
 semantics if it is possible. To do so, the server MAY decrease the verbosity of
 optional diagnostic fields, such as `partial_success.error_message`, or omit
 optional diagnostic fields. If the response still cannot fit within the limit,
-the server MUST fail the request with `HTTP 500 Internal Server Error` and MUST
-NOT partially accept telemetry data from the request.
+the server MUST fail the request with `HTTP 500 Internal Server Error`. After
+such a failure, whether any telemetry data from the request was accepted is
+unspecified.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
