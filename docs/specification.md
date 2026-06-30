@@ -192,8 +192,8 @@ The server MUST limit the size of the response message, including before
 compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
 as the default limit. Implementations SHOULD allow this limit to be configured.
 For a [Partial Success](#partial-success) response that would otherwise exceed
-the limit, the server MUST reduce the response size without changing response
-semantics if it is possible. To do so, the server MAY decrease the verbosity of
+the limit, the server SHOULD reduce the response size without changing response
+semantics if it is possible and practical. To do so, the server MAY decrease the verbosity of
 optional diagnostic fields, such as `partial_success.error_message`, or omit
 optional diagnostic fields. If the response still cannot fit within the limit,
 the server MUST fail the request with the `RESOURCE_EXHAUSTED` code as a
@@ -542,8 +542,8 @@ The server MUST limit the size of the response body, including before
 compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
 as the default limit. Implementations SHOULD allow this limit to be configured.
 For a [Partial Success](#partial-success-1) response that would otherwise exceed
-the limit, the server MUST reduce the response size without changing response
-semantics if it is possible. To do so, the server MAY decrease the verbosity of
+the limit, the server SHOULD reduce the response size without changing response
+semantics if it is possible and practical. To do so, the server MAY decrease the verbosity of
 optional diagnostic fields, such as `partial_success.error_message`, or omit
 optional diagnostic fields. If the response still cannot fit within the limit,
 the server MUST fail the request with `HTTP 500 Internal Server Error`. After
