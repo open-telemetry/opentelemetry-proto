@@ -28,7 +28,7 @@ nodes such as collectors and telemetry backends.
 <details>
 <summary>Table of Contents</summary>
 
-<!-- toc -->
+<!-- START doctoc -->
 
 - [Protocol Details](#protocol-details)
   * [OTLP/gRPC](#otlpgrpc)
@@ -49,6 +49,7 @@ nodes such as collectors and telemetry backends.
       - [Full Success](#full-success-1)
       - [Partial Success](#partial-success-1)
       - [Failures](#failures-1)
+      - [Retryable Response Codes](#retryable-response-codes)
       - [Bad Data](#bad-data)
       - [OTLP/HTTP Throttling](#otlphttp-throttling)
       - [All Other Responses](#all-other-responses)
@@ -57,6 +58,7 @@ nodes such as collectors and telemetry backends.
     + [OTLP/HTTP Default Port](#otlphttp-default-port)
 - [Implementation Recommendations](#implementation-recommendations)
   * [Multi-Destination Exporting](#multi-destination-exporting)
+  * [Empty Telemetry Envelopes](#empty-telemetry-envelopes)
 - [Known Limitations](#known-limitations)
   * [Request Acknowledgements](#request-acknowledgements)
     + [Duplicate Data](#duplicate-data)
@@ -64,7 +66,7 @@ nodes such as collectors and telemetry backends.
 - [Glossary](#glossary)
 - [References](#references)
 
-<!-- tocstop -->
+<!-- END doctoc -->
 
 </details>
 
