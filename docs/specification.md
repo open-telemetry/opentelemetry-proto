@@ -188,6 +188,19 @@ If the limit is exceeded, the client MUST treat the response as a non-retryable
 error. Note that in such scenario, the gRPC client implementations are
 reporting a `RESOURCE_EXHAUSTED` code to the caller.
 
+The server MUST limit the size of the response message, including before
+compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
+as the default limit. Implementations SHOULD allow this limit to be configured.
+For a [Partial Success](#partial-success) response that would otherwise exceed
+the limit, the server SHOULD reduce the response size without changing response
+semantics if it is possible and practical. To do so, the server MAY decrease the
+verbosity of optional diagnostic fields, such as
+`partial_success.error_message`, or omit optional diagnostic fields. If the
+response still cannot fit within the limit, the server MUST fail the request
+with the `RESOURCE_EXHAUSTED` code as a non-retryable error. After such a
+failure, whether any telemetry data from the request was accepted is
+unspecified.
+
 ##### Full Success
 
 The success response indicates telemetry data is successfully accepted by the
@@ -525,6 +538,18 @@ misconfigured or malicious server. It is RECOMMENDED to use 4 MiB
 as the default limit. Implementations SHOULD allow this limit to be configured.
 If the limit is exceeded, the client MUST treat the response as a non-retryable
 error and SHOULD record the fact that the response was discarded.
+
+The server MUST limit the size of the response body, including before
+compression, to avoid overwhelming the client. It is RECOMMENDED to use 4 MiB
+as the default limit. Implementations SHOULD allow this limit to be configured.
+For a [Partial Success](#partial-success-1) response that would otherwise exceed
+the limit, the server SHOULD reduce the response size without changing response
+semantics if it is possible and practical. To do so, the server MAY decrease the
+verbosity of optional diagnostic fields, such as
+`partial_success.error_message`, or omit optional diagnostic fields. If the
+response still cannot fit within the limit, the server MUST fail the request
+with `HTTP 500 Internal Server Error`. After such a failure, whether any
+telemetry data from the request was accepted is unspecified.
 
 The server MUST set "Content-Type: application/x-protobuf" header if the
 response body is binary-encoded Protobuf payload. The server MUST set
