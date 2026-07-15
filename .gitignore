@@ -22,3 +22,6 @@
 /gen/
 
 node_modules
+
+# Agent state
+.agents/triage/
