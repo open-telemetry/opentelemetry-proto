@@ -14,7 +14,7 @@ description: This project skill defines a systematic workflow to harvest, catego
     - **GitHub CLI**: `gh issue list --state open --limit 100 --json number,title,body,labels,comments,createdAt,updatedAt,author`
     - **GitHub REST/GraphQL API**: Query the endpoint directly, filtering by state = open.
     - **Local File System**: If a local data backup exists, parse it directly using standard library parsers.
-    - Using the Github MCP tool1
+    - Using the Github MCP tool
   - Mandatory dataset properties: Issue number, title, body markdown, tags/labels, comments count, creation date, and author username.
 
 ### Phase 2: Semantic Similarity Clustering
