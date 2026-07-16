@@ -1,1 +1,17 @@
 * text=auto eol=lf
+
+# Export substitution for release archive version identification (#434)
+VERSION export-subst
+
+# Exclude spurious internal tooling and CI files from release tar archives (#604)
+.agents/ export-ignore
+.bcr/ export-ignore
+.github/ export-ignore
+.vscode/ export-ignore
+.gitignore export-ignore
+.lychee.toml export-ignore
+.markdownlint.yaml export-ignore
+buf.yaml export-ignore
+dependencies.Dockerfile export-ignore
+package.json export-ignore
+package-lock.json export-ignore
