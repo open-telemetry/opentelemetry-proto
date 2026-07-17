@@ -173,6 +173,13 @@ Experiments which succeed, require a review before the field or the message is m
 No guarantees are provided whatsoever about the stability of the code that
 is generated from the .proto files by any particular code generator.
 
+## Bazel Central Registry (BCR)
+
+This repository maintains **minimal support** for Bazel bzlmod (`MODULE.bazel` and `BUILD.bazel`), declaring only raw `proto_library` targets and automating pull requests to the [Bazel Central Registry](https://github.com/bazelbuild/bazel-central-registry) upon each release.
+
+- **Language Overlays**: Upstream does not define language-specific compilation rules (`cc_proto_library`, `go_proto_library`, etc.). The BCR community manages language compilation targets via BCR overlays.
+- **Reporting Issues**: Bugs or feature requests regarding language-specific Bazel compilation rules should be filed directly in the [bazelbuild/bazel-central-registry](https://github.com/bazelbuild/bazel-central-registry) repository.
+
 ## Maintainers
 
 - [Armin Reuch](https://github.com/arminru)

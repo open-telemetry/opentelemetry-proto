@@ -21,6 +21,12 @@ for general information about the project.
 After making any changes to .proto files make sure to generate all
 implementation by running `make gen-all`.
 
+## Bazel & Bazel Central Registry (BCR)
+
+- This repository provides minimal support for Bazel bzlmod (`MODULE.bazel` and `BUILD.bazel`) focused strictly on `proto_library` definitions and automated publishing to the Bazel Central Registry.
+- This repository does not define language compilation rules (`cc_proto_library`, `go_proto_library`, etc.). The BCR community manages language compilation targets via BCR overlays.
+- Issues or Pull Requests regarding language-specific Bazel compilation rules should be raised in the [bazelbuild/bazel-central-registry](https://github.com/bazelbuild/bazel-central-registry) repository.
+
 ## Style-Guide
 
 OpenTelemetry follows the [Protobuf style guide](https://protobuf.dev/programming-guides/style/) with the following clarifications:

@@ -20,3 +20,12 @@ In addition, you can refer to [CHANGELOG.md](CHANGELOG.md) for a list of major c
 Our tags follow the naming convention of `v1.<minor>.<patch>`. Increment `minor` by 1
 and use `patch` value of 0 for new minor version releases. For patch releases keep `minor`
 unchanged and increment the `patch`.
+
+## Bazel Central Registry (BCR) Publishing
+
+- `opentelemetry-proto` provides minimal Bazel support consisting only of `proto_library` definitions and automated BCR pull request generation upon release.
+- When a GitHub release is published, the `.github/workflows/publish-to-bcr.yml` workflow automatically runs and submits a Pull Request to the [Bazel Central Registry](https://github.com/bazelbuild/bazel-central-registry) containing the updated `MODULE.bazel` entry.
+- Language-specific rules or bindings (`cc_proto_library`, `go_proto_library`, etc.) are maintained by the BCR community via overlays rather than in this repository.
+- Failures in this process do not constitute a release failure. The BCR
+  community is responsible for keeping the opentelemetry-proto module
+  working and up-to-date in BCR.  This workflow is a convenience for them.

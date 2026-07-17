@@ -1,0 +1,8 @@
+module(
+    name = "opentelemetry-proto",
+    version = "{VERSION}",
+    bazel_compatibility = [">=7.2.1"],
+)
+
+bazel_dep(name = "protobuf", version = "29.3", repo_name = "com_google_protobuf")
+bazel_dep(name = "rules_proto", version = "7.1.0")

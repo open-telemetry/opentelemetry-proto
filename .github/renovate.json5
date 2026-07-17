@@ -4,6 +4,13 @@
     "config:best-practices",
     "helpers:pinGitHubActionDigestsToSemver"
   ],
+  "bazel-module": {
+    "enabled": true,
+    "fileMatch": [
+      "(^|/)MODULE\\.bazel$",
+      "(^|/)\\.bcr/MODULE\\.bazel\\.template$"
+    ]
+  },
   "packageRules": [
     {
       "groupName": "all patch versions",

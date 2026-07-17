@@ -1,0 +1,115 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+package(default_visibility = ["//visibility:public"])
+
+proto_library(
+    name = "common_proto",
+    srcs = [
+        "opentelemetry/proto/common/v1/common.proto",
+    ],
+)
+
+proto_library(
+    name = "resource_proto",
+    srcs = [
+        "opentelemetry/proto/resource/v1/resource.proto",
+    ],
+    deps = [
+        ":common_proto",
+    ],
+)
+
+proto_library(
+    name = "logs_proto",
+    srcs = [
+        "opentelemetry/proto/logs/v1/logs.proto",
+    ],
+    deps = [
+        ":common_proto",
+        ":resource_proto",
+    ],
+)
+
+proto_library(
+    name = "logs_service_proto",
+    srcs = [
+        "opentelemetry/proto/collector/logs/v1/logs_service.proto",
+    ],
+    deps = [
+        ":logs_proto",
+    ],
+)
+
+proto_library(
+    name = "metrics_proto",
+    srcs = [
+        "opentelemetry/proto/metrics/v1/metrics.proto",
+    ],
+    deps = [
+        ":common_proto",
+        ":resource_proto",
+    ],
+)
+
+proto_library(
+    name = "metrics_service_proto",
+    srcs = [
+        "opentelemetry/proto/collector/metrics/v1/metrics_service.proto",
+    ],
+    deps = [
+        ":metrics_proto",
+    ],
+)
+
+proto_library(
+    name = "trace_proto",
+    srcs = [
+        "opentelemetry/proto/trace/v1/trace.proto",
+    ],
+    deps = [
+        ":common_proto",
+        ":resource_proto",
+    ],
+)
+
+proto_library(
+    name = "trace_service_proto",
+    srcs = [
+        "opentelemetry/proto/collector/trace/v1/trace_service.proto",
+    ],
+    deps = [
+        ":trace_proto",
+    ],
+)
+
+proto_library(
+    name = "profiles_proto",
+    srcs = [
+        "opentelemetry/proto/profiles/v1development/profiles.proto",
+    ],
+    deps = [
+        ":common_proto",
+        ":resource_proto",
+    ],
+)
+
+proto_library(
+    name = "profiles_service_proto",
+    srcs = [
+        "opentelemetry/proto/collector/profiles/v1development/profiles_service.proto",
+    ],
+    deps = [
+        ":profiles_proto",
+    ],
+)
+
+proto_library(
+    name = "processcontext_proto",
+    srcs = [
+        "opentelemetry/proto/processcontext/v1development/process_context.proto",
+    ],
+    deps = [
+        ":common_proto",
+        ":resource_proto",
+    ],
+)

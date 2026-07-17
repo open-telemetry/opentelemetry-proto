@@ -18,6 +18,23 @@ jobs:
       - name: Run docker pull
         run: make docker-pull
 
+  bazel-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Setup Bazel
+        uses: bazel-contrib/setup-bazel@0.8.5
+        with:
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+      - name: Prepare minimal Bazel workspace from .bcr templates
+        run: |
+          cp .bcr/BUILD.bazel BUILD.bazel
+          sed 's/{VERSION}/0.0.0-test/' .bcr/MODULE.bazel.template > MODULE.bazel
+      - name: Build all minimal Bazel proto_library targets
+        run: bazel build //...
+
   gen-cpp:
     needs: docker-pull
     runs-on: ubuntu-latest
