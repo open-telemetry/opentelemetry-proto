@@ -268,9 +268,9 @@ retryable and non-retryable:
   SHOULD maintain a counter of such dropped data.
 
 The server SHOULD indicate retryable errors using code
-[Unavailable](https://godoc.org/google.golang.org/grpc/codes) and MAY supply
+[Unavailable](https://pkg.go.dev/google.golang.org/grpc/codes) and MAY supply
 additional
-[details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
+[details via status](https://pkg.go.dev/google.golang.org/grpc/internal/status#Status.WithDetails)
 using
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
 Here is a sample Go code to illustrate:
@@ -287,9 +287,9 @@ Here is a sample Go code to illustrate:
 ```
 
 To indicate non-retryable errors, the server is recommended to use code
-[InvalidArgument](https://godoc.org/google.golang.org/grpc/codes) and MAY supply
+[InvalidArgument](https://pkg.go.dev/google.golang.org/grpc/codes) and MAY supply
 additional
-[details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
+[details via status](https://pkg.go.dev/google.golang.org/grpc/internal/status#Status.WithDetails)
 using
 [BadRequest](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L119).
 If more appropriate, another gRPC status code may be used. Here is a
@@ -337,7 +337,7 @@ explicit instructions about retrying interval.
 The client SHOULD interpret `RESOURCE_EXHAUSTED` code as retryable only if the
 server signals that the recovery from resource exhaustion is possible.
 This is signaled by the server by returning
-[a status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails) containing
+[a status](https://pkg.go.dev/google.golang.org/grpc/internal/status#Status.WithDetails) containing
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
 In this case the behavior of the server and the client is exactly as described in
 [OTLP/gRPC Throttling](#otlpgrpc-throttling) section. If no such status is returned,
@@ -352,9 +352,9 @@ client then it SHOULD signal that fact to the client. The client MUST then
 throttle itself to avoid overwhelming the server.
 
 To signal backpressure when using gRPC transport, the server SHOULD return an
-error with code [Unavailable](https://godoc.org/google.golang.org/grpc/codes)
+error with code [Unavailable](https://pkg.go.dev/google.golang.org/grpc/codes)
 and MAY supply additional
-[details via status](https://godoc.org/google.golang.org/grpc/status#Status.WithDetails)
+[details via status](https://pkg.go.dev/google.golang.org/grpc/internal/status#Status.WithDetails)
 using
 [RetryInfo](https://github.com/googleapis/googleapis/blob/6a8c7914d1b79bd832b5157a09a9332e8cbd16d4/google/rpc/error_details.proto#L40).
 Here is a snippet of sample Go code to illustrate:
@@ -618,7 +618,7 @@ specific failure cases and HTTP status codes that should be used.
 
 The response body for all `HTTP 4xx` and `HTTP 5xx` responses MUST be a
 Protobuf-encoded
-[Status](https://godoc.org/google.golang.org/genproto/googleapis/rpc/status#Status)
+[Status](https://pkg.go.dev/google.golang.org/genproto/googleapis/rpc/status#Status)
 message that describes the problem.
 
 This specification does not use `Status.code` field and the server MAY omit
