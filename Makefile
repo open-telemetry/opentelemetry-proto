@@ -21,9 +21,8 @@ all: gen-all markdown-link-check markdownlint markdown-toc
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-php gen-python gen-ruby
 
 DEPENDENCIES_DOCKERFILE=./dependencies.Dockerfile
-
-OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:latest
-BUF_DOCKER ?= bufbuild/buf:1.7.0
+OTEL_DOCKER_PROTOBUF := $(shell awk '$$4=="build-protobuf" {print $$2}' $(DEPENDENCIES_DOCKERFILE))
+BUF_DOCKER := $(shell awk '$$4=="bufbuild" {print $$2}' $(DEPENDENCIES_DOCKERFILE))
 
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 BUF := docker run --rm -v "${PWD}:/workspace" -w /workspace ${BUF_DOCKER}
