@@ -21,9 +21,8 @@ all: gen-all markdown-link-check markdownlint markdown-toc
 gen-all: gen-cpp gen-csharp gen-go gen-java gen-kotlin gen-objc gen-openapi gen-php gen-python gen-ruby
 
 DEPENDENCIES_DOCKERFILE=./dependencies.Dockerfile
-
-OTEL_DOCKER_PROTOBUF ?= otel/build-protobuf:0.9.0
-BUF_DOCKER ?= bufbuild/buf:1.7.0
+OTEL_DOCKER_PROTOBUF ?= $(shell awk '$$4=="build-protobuf" {print $$2}' $(DEPENDENCIES_DOCKERFILE))
+BUF_DOCKER ?= $(shell awk '$$4=="bufbuild" {print $$2}' $(DEPENDENCIES_DOCKERFILE))
 
 PROTOC := docker run --rm -u ${shell id -u} -v${PWD}:${PWD} -w${PWD} ${OTEL_DOCKER_PROTOBUF} --proto_path=${PWD}
 BUF := docker run --rm -v "${PWD}:/workspace" -w /workspace ${BUF_DOCKER}
@@ -77,7 +76,7 @@ gen-csharp:
 gen-go:
 	rm -rf ./$(PROTO_GEN_GO_DIR)
 	mkdir -p ./$(PROTO_GEN_GO_DIR)
-	$(foreach file,$(PROTO_FILES),$(call exec-command,$(PROTOC) --go_out=plugins=grpc:./$(PROTO_GEN_GO_DIR) $(file)))
+	$(foreach file,$(PROTO_FILES),$(call exec-command,$(PROTOC) --go_out=./$(PROTO_GEN_GO_DIR) --go-grpc_out=./$(PROTO_GEN_GO_DIR) $(file)))
 	$(PROTOC) --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:./$(PROTO_GEN_GO_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
 	$(PROTOC) --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:./$(PROTO_GEN_GO_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
 	$(PROTOC) --grpc-gateway_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/logs/v1/logs_service_http.yaml:./$(PROTO_GEN_GO_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
