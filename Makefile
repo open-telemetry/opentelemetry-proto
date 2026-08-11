@@ -123,10 +123,10 @@ gen-objc:
 .PHONY: gen-openapi
 gen-openapi:
 	mkdir -p $(PROTO_GEN_OPENAPI_DIR)
-	$(PROTOC) --openapiv2_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
-	$(PROTOC) --openapiv2_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
-	$(PROTOC) --openapiv2_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/logs/v1/logs_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
-	$(PROTOC) --openapiv2_out=logtostderr=true,grpc_api_configuration=opentelemetry/proto/collector/profiles/v1development/profiles_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/profiles/v1development/profiles_service.proto
+	$(PROTOC) --openapiv2_out=logtostderr=true,enums_as_ints=true,grpc_api_configuration=opentelemetry/proto/collector/trace/v1/trace_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/trace/v1/trace_service.proto
+	$(PROTOC) --openapiv2_out=logtostderr=true,enums_as_ints=true,grpc_api_configuration=opentelemetry/proto/collector/metrics/v1/metrics_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
+	$(PROTOC) --openapiv2_out=logtostderr=true,enums_as_ints=true,grpc_api_configuration=opentelemetry/proto/collector/logs/v1/logs_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
+	$(PROTOC) --openapiv2_out=logtostderr=true,enums_as_ints=true,grpc_api_configuration=opentelemetry/proto/collector/profiles/v1development/profiles_service_http.yaml:$(PROTO_GEN_OPENAPI_DIR) opentelemetry/proto/collector/profiles/v1development/profiles_service.proto
 
 # Generate gRPC/Protobuf implementation for PhP.
 .PHONY: gen-php
