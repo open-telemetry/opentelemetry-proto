@@ -10,6 +10,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Fixed
 
+- openapi: Update OpenAPI generation to use integer-based enums. [#841](https://github.com/open-telemetry/opentelemetry-proto/pull/841)
+
 ### Removed
 
 ## 1.11.0 - 2026-07-21
