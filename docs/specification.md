@@ -59,6 +59,7 @@ nodes such as collectors and telemetry backends.
 - [Implementation Recommendations](#implementation-recommendations)
   * [Multi-Destination Exporting](#multi-destination-exporting)
   * [Empty Telemetry Envelopes](#empty-telemetry-envelopes)
+    + [UTF-8 String Handling](#utf-8-string-handling)
 - [Known Limitations](#known-limitations)
   * [Request Acknowledgements](#request-acknowledgements)
     + [Duplicate Data](#duplicate-data)
