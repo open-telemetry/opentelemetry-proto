@@ -746,6 +746,34 @@ payloads that contain zero spans, zero metric points or zero log records),
 receivers MAY ignore empty envelopes, and implementations that receive and send
 (forward) OTLP payloads MAY drop empty envelopes.
 
+#### UTF-8 String Handling
+
+While, by specification, all protocol buffer implementations are required to
+send UTF-8 or ASCII-7 strings, in practice many implementations allow native
+byte strings and perform no validation prior to serialization, and sometimes
+deserialization.
+
+This is because validating UTF-8 can be relatively expensive (e.g. requires
+iterating through all bytes, even for an intermediary server, requires
+deserializing the entirety of the protobuf when otherwise just looking at
+outer headers may be acceptable). Many implementations view the correctness
+benefit not worth the performance hit.
+
+Consequently:
+
+* Intermediary nodes (such as the OpenTelemetry Collector) are not required
+  to perform in-line UTF-8 validation on `string` fields and MAY pass them
+  them through without inspection.
+* Implementations should be aware that many Protobuf runtimes are permissive and
+  allow non-compliant strings to be serialized, which may cause downstream nodes
+  using stricter Protobuf runtimes to fail deserialization. Implementations
+  which do NOT provide valid UTF-8 are not specification compliant, and this is
+  considered a bug within OpenTelemetry.
+* Intermediary components MAY provide optional, configurable validation or
+  sanitization.
+* We recommend replacing invalid UTF-8 with the unicode replacement character
+  (`U+FFFD`) when interacting with an invalid string.
+
 ## Known Limitations
 
 ### Request Acknowledgements
