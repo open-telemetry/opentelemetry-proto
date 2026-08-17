@@ -774,7 +774,7 @@ Consequently:
   sanitization.
 * Implementations SHOULD replace invalid UTF-8 sequences (code units) with
   the Unicode replacement character (`U+FFFD`) when interacting with invalid
-  Unicode strings. 
+  Unicode strings.
 
 ## Known Limitations
 
