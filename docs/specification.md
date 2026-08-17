@@ -772,8 +772,9 @@ Consequently:
   considered a bug within OpenTelemetry.
 * Intermediary components MAY provide optional, configurable validation or
   sanitization.
-* We recommend replacing invalid UTF-8 with the unicode replacement character
-  (`U+FFFD`) when interacting with an invalid string.
+* Implementations SHOULD replace invalid UTF-8 sequences (code units) with
+  the Unicode replacement character (`U+FFFD`) when interacting with invalid
+  Unicode strings. 
 
 ## Known Limitations
 
