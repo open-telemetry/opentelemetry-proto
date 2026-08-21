@@ -59,7 +59,7 @@ nodes such as collectors and telemetry backends.
 - [Implementation Recommendations](#implementation-recommendations)
   * [Multi-Destination Exporting](#multi-destination-exporting)
   * [Empty Telemetry Envelopes](#empty-telemetry-envelopes)
-    + [UTF-8 String Handling](#utf-8-string-handling)
+  * [UTF-8 String Handling](#utf-8-string-handling)
 - [Known Limitations](#known-limitations)
   * [Request Acknowledgements](#request-acknowledgements)
     + [Duplicate Data](#duplicate-data)
@@ -747,7 +747,7 @@ payloads that contain zero spans, zero metric points or zero log records),
 receivers MAY ignore empty envelopes, and implementations that receive and send
 (forward) OTLP payloads MAY drop empty envelopes.
 
-#### UTF-8 String Handling
+### UTF-8 String Handling
 
 While, by specification, all protocol buffer implementations are required to
 send UTF-8 or ASCII-7 strings, in practice many implementations allow native
@@ -762,19 +762,17 @@ benefit not worth the performance hit.
 
 Consequently:
 
+* Encoders SHOULD ensure `string` fields contain valid UTF-8. Producing
+  invalid UTF-8 is not specification compliant and is considered a bug within
+  OpenTelemetry.
+* Decoders SHOULD be prepared to receive non-compliant strings from permissive
+  runtimes and SHOULD replace invalid UTF-8 sequences (code units) with the
+  Unicode replacement character (`U+FFFD`).
 * Intermediary nodes (such as the OpenTelemetry Collector) are not required
   to perform in-line UTF-8 validation on `string` fields and MAY pass them
-  them through without inspection.
-* Implementations should be aware that many Protobuf runtimes are permissive and
-  allow non-compliant strings to be serialized, which may cause downstream nodes
-  using stricter Protobuf runtimes to fail deserialization. Implementations
-  which do NOT provide valid UTF-8 are not specification compliant, and this is
-  considered a bug within OpenTelemetry.
+  through without inspection.
 * Intermediary components MAY provide optional, configurable validation or
   sanitization.
-* Implementations SHOULD replace invalid UTF-8 sequences (code units) with
-  the Unicode replacement character (`U+FFFD`) when interacting with invalid
-  Unicode strings.
 
 ## Known Limitations
 
