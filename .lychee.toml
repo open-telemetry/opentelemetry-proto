@@ -2,7 +2,9 @@ include_fragments = true
 
 exclude = [
     # excluding links to pull requests and issues is done for performance
-    "^https://github.com/open-telemetry/opentelemetry-proto/(pull|issue)/\\d+$"
+    "^https://github.com/open-telemetry/opentelemetry-proto/(pull|issue)/\\d+$",
+    # Slack links can return 403 or fail due to bot protection
+    "^https://.*\\.slack\\.com/.*"
 ]
 
 # better to be safe and avoid failures
