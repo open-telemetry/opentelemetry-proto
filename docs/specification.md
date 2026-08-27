@@ -59,6 +59,7 @@ nodes such as collectors and telemetry backends.
 - [Implementation Recommendations](#implementation-recommendations)
   * [Multi-Destination Exporting](#multi-destination-exporting)
   * [Empty Telemetry Envelopes](#empty-telemetry-envelopes)
+  * [UTF-8 String Handling](#utf-8-string-handling)
 - [Known Limitations](#known-limitations)
   * [Request Acknowledgements](#request-acknowledgements)
     + [Duplicate Data](#duplicate-data)
@@ -745,6 +746,33 @@ implementations. Given that, senders SHOULD NOT create empty envelopes (OTLP
 payloads that contain zero spans, zero metric points or zero log records),
 receivers MAY ignore empty envelopes, and implementations that receive and send
 (forward) OTLP payloads MAY drop empty envelopes.
+
+### UTF-8 String Handling
+
+While, by specification, all protocol buffer implementations are required to
+send UTF-8 or ASCII-7 strings, in practice many implementations allow native
+byte strings and perform no validation prior to serialization, and sometimes
+deserialization.
+
+This is because validating UTF-8 can be relatively expensive (e.g. requires
+iterating through all bytes, even for an intermediary server, requires
+deserializing the entirety of the protobuf when otherwise just looking at
+outer headers may be acceptable). Many implementations view the correctness
+benefit not worth the performance hit.
+
+Consequently:
+
+* Encoders SHOULD ensure `string` fields contain valid UTF-8. Producing
+  invalid UTF-8 is not specification compliant and is considered a bug within
+  OpenTelemetry.
+* Decoders SHOULD be prepared to receive non-compliant strings from permissive
+  runtimes and SHOULD replace invalid UTF-8 sequences (code units) with the
+  Unicode replacement character (`U+FFFD`).
+* Intermediary nodes (such as the OpenTelemetry Collector) are not required
+  to perform in-line UTF-8 validation on `string` fields and MAY pass them
+  through without inspection.
+* Intermediary components MAY provide optional, configurable validation or
+  sanitization.
 
 ## Known Limitations
 
