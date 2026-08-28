@@ -480,8 +480,13 @@ for mapping between Protobuf and JSON, with the following deviations from that m
 
 Note that according to [Protobuf specs](
 https://developers.google.com/protocol-buffers/docs/proto3#json) 64-bit integer
-numbers in JSON-encoded payloads are encoded as decimal strings, and either
-numbers or strings are accepted when decoding.
+numbers (`int64`, `sint64`, `uint64`, `fixed64`, `sfixed64`) in JSON-encoded
+payloads are encoded as decimal strings, and either numbers or strings are accepted
+when decoding. Because timestamp fields in OTLP (such as `timeUnixNano`,
+`startTimeUnixNano`, `endTimeUnixNano`, and `observedTimeUnixNano`) are defined as
+`fixed64` (representing nanoseconds since the Unix epoch) rather than the
+`google.protobuf.Timestamp` well-known type, they are encoded as decimal strings
+(e.g., `"timeUnixNano": "1544712660300000000"`), not as RFC 3339 formatted strings.
 
 The client and the server MUST set "Content-Type: application/json" request and
 response headers when sending JSON Protobuf encoded payload.
