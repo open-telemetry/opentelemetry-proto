@@ -19,10 +19,12 @@ for general information about the project.
 ## Making Changes to the .proto Files
 
 When proposing schema changes or additions:
+
 1. Ensure all new messages, enums, enum values, and fields include a `// [Since next]` annotation in their leading doc comment (see [Version Annotations](#version-annotations-since-labels)).
 2. Follow the [Schema Evolution and Compatibility](#schema-evolution-and-compatibility) and [Style Guide](#style-guide) rules.
 3. Run `make gen-all` to regenerate implementation stubs across all supported target languages.
 4. Validate schema linting and backward compatibility before opening a pull request:
+
    ```bash
    make check
    ```
@@ -41,12 +43,14 @@ OpenTelemetry protocol definitions are the foundation of the OTLP ecosystem and 
 OpenTelemetry follows the [Protobuf style guide](https://protobuf.dev/programming-guides/style/) with the following clarifications:
 
 ### Naming Conventions
+
 - **Fields**: Use `snake_case` (e.g. `trace_id`, `dropped_attributes_count`).
 - **Messages & Enums**: Use `PascalCase` (e.g. `ResourceMetrics`, `SpanFlags`).
 - **Enum Values**: Use `UPPER_SNAKE_CASE` prefixed with the enum name (e.g. `SPAN_FLAGS_TRACE_FLAGS_MASK`).
 - **Service RPCs**: Use `PascalCase` for RPC methods (e.g. `Export`).
 
 ### Documentation Comments
+
 - All messages, enums, enum values, and fields MUST be documented via comments.
 - Field comments should document purpose or behavior with active verbs, or a simple definition noun phrase (similar to a dictionary entry).
   - valid: "Represents ..."
@@ -58,7 +62,7 @@ OpenTelemetry follows the [Protobuf style guide](https://protobuf.dev/programmin
 
 ### Version Annotations ("Since" Labels)
 
-To assist downstream OTLP implementors in identifying when schema capabilities were introduced post v1.0, any element added MUST include a `[Since ...]` annotation in its doc comment (see [docs/specification.md#capability-versioning--schema-comments](docs/specification.md#capability-versioning--schema-comments)):
+To assist downstream OTLP implementors in identifying when schema capabilities were introduced post v1.0, any element added MUST include a `[Since ...]` annotation in its doc comment (see [docs/specification.md#future-versions-and-interoperability](docs/specification.md#future-versions-and-interoperability)):
 
 Prior to release - use the placeholder `// [Since next]`. During the release process, maintainers will automatically convert this placeholder to the released version tag (e.g. `// [Since v1.11.0]`).
 

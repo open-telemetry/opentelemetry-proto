@@ -6,11 +6,13 @@ _Instruction for Maintainers only._
 [this PR](https://github.com/open-telemetry/opentelemetry-proto/pull/537).
 
 - Update any `// [Since next]` annotations in `.proto` files to the new release version tag (e.g. `// [Since v1.11.0]`):
+
   ```bash
   sed -i 's/\[Since next\]/\[Since v1.11.0\]/g' $(find opentelemetry/proto -name "*.proto")
   make gen-all
   ```
-Merge the PR. From this point on no new PRs can be merged until the release is complete.
+
+  Merge the PR. From this point on no new PRs can be merged until the release is complete.
 
 - Go to Github [release page](https://github.com/open-telemetry/opentelemetry-proto/releases),
 click `Draft a new release`.
