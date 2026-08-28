@@ -38,7 +38,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/processcontext/v1development
 //
 // Status: [Development]
 //
-// [Since next]
+// [Since v1.11.0]
 message ProcessContext {
   // The resource for this process.
   // If this field is not set then no resource info is known.

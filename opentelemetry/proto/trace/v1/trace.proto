@@ -359,9 +359,9 @@ enum SpanFlags {
   // Bit 8 (`HAS_IS_REMOTE`) indicates whether the value is known.
   // Bit 9 (`IS_REMOTE`) indicates whether the span or link is remote.
   //
-  // [Since v1.5.0]
+  // [Since v1.2.0]
   SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x00000100;
-  // [Since v1.5.0]
+  // [Since v1.2.0]
   SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK = 0x00000200;
 
   // Bits 10-31 are reserved for future use.
