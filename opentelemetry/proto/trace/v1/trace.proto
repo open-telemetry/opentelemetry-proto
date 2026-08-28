@@ -200,12 +200,12 @@ message Span {
   fixed64 end_time_unix_nano = 8;
 
   // A collection of key/value pairs. Note, global attributes
-  // like server name can be set using the resource API. Examples of attributes:
+  // like service name can be set using the resource API. Examples of attributes:
   //
-  //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
-  //     "/http/server_latency": 300
-  //     "example.com/myattribute": true
-  //     "example.com/score": 10.239
+  //     "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+  //     "http.response.status_code": 200
+  //     "com.example.myattribute": true
+  //     "com.example.score": 10.239
   //
   // Attribute keys MUST be unique (it is not allowed to have more than one
   // attribute with the same key).

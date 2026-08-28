@@ -170,8 +170,8 @@ message ProfilesDictionary {
   // impractically increasing the profile size.
   //
   // Examples of attributes:
-  //     "/http/user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
-  //     "abc.com/myattribute": true
+  //     "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+  //     "com.example.myattribute": true
   //     "allocation_size": 128 bytes
   //
   // attribute_table[0] MUST be the zero value (KeyValueAndUnit{}) and present.
