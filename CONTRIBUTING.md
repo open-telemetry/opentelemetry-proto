@@ -22,11 +22,10 @@ When proposing schema changes or additions:
 
 1. Ensure all new messages, enums, enum values, and fields include a `// [Since next]` annotation in their leading doc comment (see [Version Annotations](#version-annotations-since-labels)).
 2. Follow the [Schema Evolution and Compatibility](#schema-evolution-and-compatibility) and [Style Guide](#style-guide) rules.
-3. Run `make gen-all` to regenerate implementation stubs across all supported target languages.
-4. Validate schema linting and backward compatibility before opening a pull request:
+3. Run `make all` to regenerate all language bindings and update documentation:
 
    ```bash
-   make check
+   make all
    ```
 
 ## Schema Evolution and Compatibility
