@@ -41,6 +41,12 @@ option java_package = "io.opentelemetry.proto.profiles.v1development";
 option java_outer_classname = "ProfilesProto";
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 
+// Current OTLP Profiles development version: 1.
+//
+// Increment this value by one when an incompatible Profiles schema change
+// requires a new development version. See
+// docs/specification.md#profiles-development-version.
+
 //                Relationships Diagram
 //
 // ┌──────────────────┐                      LEGEND
