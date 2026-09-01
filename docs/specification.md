@@ -480,8 +480,10 @@ for mapping between Protobuf and JSON, with the following deviations from that m
 
 Note that according to [Protobuf specs](
 https://developers.google.com/protocol-buffers/docs/proto3#json) 64-bit integer
-numbers in JSON-encoded payloads are encoded as decimal strings, and either
-numbers or strings are accepted when decoding.
+numbers (`int64`, `sint64`, `uint64`, `fixed64`, `sfixed64`) in JSON-encoded
+payloads are encoded as decimal strings, and either numbers or strings are accepted
+when decoding. This also applies to timestamp fields (such as `timeUnixNano`,
+`startTimeUnixNano`, `endTimeUnixNano`, and `observedTimeUnixNano`) that are defined as `fixed64`.
 
 The client and the server MUST set "Content-Type: application/json" request and
 response headers when sending JSON Protobuf encoded payload.
