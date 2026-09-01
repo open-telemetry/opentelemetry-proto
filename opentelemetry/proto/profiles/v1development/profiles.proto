@@ -301,11 +301,13 @@ message Profile {
 
   // Time of collection (UTC) as nanoseconds since the UNIX epoch.
   fixed64 time_unix_nano = 3;
-  // Duration of the profile in nanoseconds. For instant profiles like
-  // live heap snapshot, the duration can be zero but it may be preferable
-  // to set time_unix_nano to the process start time and duration_nano to
-  // the relative time when the profile was gathered so that Sample.timestamps_unix_nano
-  // values fall within the profile time range.
+  // Duration of the profile in nanoseconds. For instant profiles like live
+  // heap snapshot, the duration can be zero but it may be preferable to set
+  // time_unix_nano to the process start time and duration_nano to the relative
+  // time when the profile was gathered so that Sample.timestamps_unix_nano
+  // values fall within the profile time range. If duration is larger than
+  // zero, then the samples describe a delta of occurrences in the
+  // [ time_unix_nano, time_unix_nano + duration_nano ) window.
   uint64 duration_nano = 4;
   // The type and the unit of the events between sampled occurrences for
   // periodic sampling profiles. It can be the same as sample_type or it can be
