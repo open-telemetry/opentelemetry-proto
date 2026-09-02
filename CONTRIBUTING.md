@@ -16,24 +16,63 @@ for general information about the project.
 
 - `Docker`
 
-## Making changes to the .proto files
+## Making Changes to the .proto Files
 
-After making any changes to .proto files make sure to generate all
-implementation by running `make gen-all`.
+When proposing schema changes or additions:
 
-## Style-Guide
+1. Ensure all new messages, enums, enum values, and fields include a `// [Since next]` annotation in their leading doc comment (see [Version Annotations](#version-annotations-since-labels)).
+2. Follow the [Schema Evolution and Compatibility](#schema-evolution-and-compatibility) and [Style Guide](#style-guide) rules.
+3. Run `make all` to regenerate all language bindings and update documentation:
+
+   ```bash
+   make all
+   ```
+
+## Schema Evolution and Compatibility
+
+OpenTelemetry protocol definitions are the foundation of the OTLP ecosystem and demand strict backward compatibility (see [docs/specification.md#future-versions-and-interoperability](docs/specification.md#future-versions-and-interoperability)):
+
+- **Preserve Field Numbers and Types**: Never change the field tag number or data type of an existing field.
+- **Deprecation over Deletion**: Never delete active fields. Mark obsolete fields with `[deprecated = true]`, or explicitly reserve removed field numbers and names using `reserved N;` and `reserved "field_name";`.
+- **Enum Defaults and Unspecified Values**: The zero value of an enum MUST represent the default or unspecified state (`<ENUM_NAME>_UNSPECIFIED = 0;`).
+- **Experimental vs Stable Packages**: New experimental signals and capabilities MUST reside in a `v1development` package (e.g. `profiles/v1development`, `processcontext/v1development`) until they reach maturity and are promoted to `v1`.
+
+## Style Guide
 
 OpenTelemetry follows the [Protobuf style guide](https://protobuf.dev/programming-guides/style/) with the following clarifications:
 
-- All Messages and fields should be documented via comments.
-- Field comments should document purpose or behavior with active verbs, or
-  a simple definition noun phrase (similar to a dictionary entry).
+### Naming Conventions
+
+- **Fields**: Use `snake_case` (e.g. `trace_id`, `dropped_attributes_count`).
+- **Messages & Enums**: Use `PascalCase` (e.g. `ResourceMetrics`, `SpanFlags`).
+- **Enum Values**: Use `UPPER_SNAKE_CASE` prefixed with the enum name (e.g. `SPAN_FLAGS_TRACE_FLAGS_MASK`).
+- **Service RPCs**: Use `PascalCase` for RPC methods (e.g. `Export`).
+
+### Documentation Comments
+
+- All messages, enums, enum values, and fields MUST be documented via comments.
+- Field comments should document purpose or behavior with active verbs, or a simple definition noun phrase (similar to a dictionary entry).
   - valid: "Represents ..."
     valid: "Additional attributes that describe the scope."
   - not-valid: "used to represent..."
 - Message and field comments may reference the field or message by name.
   - valid: "AnyValue ..."
   - valid: "The value ..."
+
+### Version Annotations ("Since" Labels)
+
+To assist downstream OTLP implementors in identifying when schema capabilities were introduced post v1.0, any element added MUST include a `[Since ...]` annotation in its doc comment (see [docs/specification.md#future-versions-and-interoperability](docs/specification.md#future-versions-and-interoperability)):
+
+Prior to release - use the placeholder `// [Since next]`. During the release process, maintainers will automatically convert this placeholder to the released version tag (e.g. `// [Since v1.11.0]`).
+
+Place the annotation on its own line within or directly below the element's doc comment block. Example:
+
+```protobuf
+// Additional metadata attributes that describe the metric. [Optional].
+//
+// [Since next]
+repeated opentelemetry.proto.common.v1.KeyValue metadata = 12;
+```
 
 ## Further Help
 

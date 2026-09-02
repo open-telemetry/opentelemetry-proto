@@ -217,6 +217,8 @@ message Metric {
   // Attribute keys MUST be unique (it is not allowed to have more than one
   // attribute with the same key).
   // The behavior of software that receives duplicated keys can be unpredictable.
+  //
+  // [Since v1.2.0]
   repeated opentelemetry.proto.common.v1.KeyValue metadata = 12;
 }
 

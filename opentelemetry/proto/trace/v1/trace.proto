@@ -133,6 +133,8 @@ message Span {
   // Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
   //
   // [Optional].
+  //
+  // [Since v1.1.0]
   fixed32 flags = 16;
 
   // A description of the span's operation.
@@ -287,6 +289,8 @@ message Span {
     // When creating new spans, bits 10-31 (most-significant 22-bits) MUST be zero.
     //
     // [Optional].
+    //
+    // [Since v1.1.0]
     fixed32 flags = 6;
   }
 
@@ -341,6 +345,8 @@ message Status {
 // OpenTelemetry protocol.  Older Span producers do not set this
 // field, consequently consumers should not rely on the absence of a
 // particular flag bit to indicate the presence of a particular feature.
+//
+// [Since v1.1.0]
 enum SpanFlags {
   // The zero value for the enum. Should not be used for comparisons.
   // Instead use bitwise "and" with the appropriate mask as shown above.
@@ -352,7 +358,10 @@ enum SpanFlags {
   // Bits 8 and 9 are used to indicate that the parent span or link span is remote.
   // Bit 8 (`HAS_IS_REMOTE`) indicates whether the value is known.
   // Bit 9 (`IS_REMOTE`) indicates whether the span or link is remote.
+  //
+  // [Since v1.2.0]
   SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 0x00000100;
+  // [Since v1.2.0]
   SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK = 0x00000200;
 
   // Bits 10-31 are reserved for future use.
