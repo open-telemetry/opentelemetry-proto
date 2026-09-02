@@ -43,10 +43,8 @@ option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 
 // Current OTLP Profiles development version: 1.
 //
-// During release preparation, increment this value by one if the release
-// contains one or more incompatible Profiles schema changes since the preceding
-// release. Increment it at most once per release. See
-// docs/specification.md#profiles-development-version.
+// Increment this value by one for each incompatible Profiles schema change.
+// See docs/specification.md#profiles-development-version.
 
 //                Relationships Diagram
 //
