@@ -1,0 +1,298 @@
+// Copyright 2026, OpenTelemetry Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package opentelemetry.proto.policies.v1development;
+
+import "opentelemetry/proto/policies/v1development/common.proto";
+
+option csharp_namespace = "OpenTelemetry.Proto.Policies.V1Development";
+option java_multiple_files = true;
+option java_package = "io.opentelemetry.proto.policies.v1development";
+option java_outer_classname = "PoliciesTracesProto";
+option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
+
+// TraceSamplingPolicy samples a span by probability.
+//
+// The policy follows the OpenTelemetry probability sampling specification. A
+// consumer compares a 56-bit randomness value R against a rejection threshold
+// T and keeps the span when R is greater than or equal to T. The percentage
+// sets the threshold: T = (1 - percentage / 100) * 2^56.
+//
+// A consumer evaluates each span on its own and does not reassemble a trace. A
+// dropped span therefore leaves its children behind, with a parent span id
+// that names a span no longer in the stream.
+//
+// A span that no sampling policy matches passes through. When several sampling
+// policies match one span, the most restrictive one applies, which is the one
+// with the highest threshold. A percentage of 0 drops every matching span, and
+// a percentage of 100 keeps every matching span, so one policy type covers a
+// deterministic drop and a deterministic keep as well as a probability.
+//
+// Status: [Development]
+//
+// [Since next]
+message TraceSamplingPolicy {
+  // Conditions that a span MUST satisfy.
+  //
+  // A consumer combines the matchers with AND: every matcher MUST report true
+  // before the sampling applies. A policy MUST carry at least one matcher.
+  //
+  // [Since next]
+  repeated TraceMatcher matches = 1;
+
+  // How to sample a span that satisfies every matcher.
+  //
+  // [Since next]
+  SamplingConfig sampling = 2;
+}
+
+// SamplingConfig sets the probability and the method of a sampling decision.
+//
+// Status: [Development]
+//
+// [Since next]
+message SamplingConfig {
+  // The share of matching spans to keep, from 0 to 100.
+  //
+  // A value of 0 drops every matching span. A value of 100 or more keeps every
+  // matching span. A value outside the range 0 to 100 is invalid.
+  //
+  // [Since next]
+  float percentage = 1;
+
+  // How to reach the sampling decision. The default is
+  // SAMPLING_MODE_HASH_SEED.
+  //
+  // [Since next]
+  optional SamplingMode mode = 2;
+
+  // The number of hexadecimal digits that encode the threshold in the
+  // tracestate, from 1 to 14. The default is 4.
+  //
+  // A higher value encodes a finer probability. A consumer removes trailing
+  // zeros from the encoded threshold.
+  //
+  // [Since next]
+  optional uint32 sampling_precision = 3;
+
+  // The seed of the hash that SAMPLING_MODE_HASH_SEED applies to the trace id.
+  // The default is 0.
+  //
+  // Every consumer in one tier, for example every collector behind one load
+  // balancer, SHOULD share a seed so that the tier reaches the same decision
+  // for the same trace id.
+  //
+  // [Since next]
+  optional uint32 hash_seed = 4;
+
+  // Whether a sampling error drops the span. The default is true.
+  //
+  // When fail_closed is true, a consumer drops a span whose sampling raises an
+  // error. When fail_closed is false, a consumer keeps that span.
+  //
+  // [Since next]
+  optional bool fail_closed = 5;
+}
+
+// TraceMatcher evaluates one predicate against one span target.
+//
+// Status: [Development]
+//
+// [Since next]
+message TraceMatcher {
+  // The field, the attribute, or the metadata to inspect.
+  //
+  // [Since next]
+  TraceFieldSelector target = 1;
+
+  // How to compare the value that target selects.
+  //
+  // [Since next]
+  Predicate predicate = 2;
+
+  // Inverts the result of the predicate.
+  //
+  // [Since next]
+  bool negate = 3;
+}
+
+// TraceFieldSelector names one span target. Exactly one variant MUST be set.
+//
+// Status: [Development]
+//
+// [Since next]
+message TraceFieldSelector {
+  // The target. Exactly one variant MUST be set.
+  //
+  // [Since next]
+  oneof target {
+    // A first-class field of a span.
+    //
+    // [Since next]
+    SpanRecordField record_field = 1;
+
+    // A span attribute, for example ["http.route"].
+    //
+    // [Since next]
+    AttributePath span_attribute = 2;
+
+    // A resource attribute, for example ["service.name"].
+    //
+    // [Since next]
+    AttributePath resource_attribute = 3;
+
+    // An instrumentation scope attribute.
+    //
+    // [Since next]
+    AttributePath scope_attribute = 4;
+
+    // A first-class field of the instrumentation scope.
+    //
+    // [Since next]
+    ScopeField scope_field = 5;
+
+    // An attribute of a span event.
+    //
+    // The matcher reports true when any event of the span carries an attribute
+    // at this path that satisfies the predicate. A span with no event does not
+    // match.
+    //
+    // [Since next]
+    AttributePath event_attribute = 6;
+  }
+}
+
+// SpanRecordField identifies a first-class field of a span.
+//
+// These fields carry no presence information in the OpenTelemetry data model.
+// The exists predicate therefore reports true when the field holds a
+// non-default value.
+//
+// Status: [Development]
+//
+// [Since next]
+enum SpanRecordField {
+  // The field is not set. A selector with an unset field is invalid.
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_UNSPECIFIED = 0;
+
+  // The name of the span, for example "GET /users".
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_NAME = 1;
+
+  // The trace id of the span.
+  //
+  // A predicate reads the canonical 32-character lowercase hexadecimal text,
+  // as the W3C Trace Context specification defines it.
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_TRACE_ID = 2;
+
+  // The span id.
+  //
+  // A predicate reads the canonical 16-character lowercase hexadecimal text,
+  // as the W3C Trace Context specification defines it.
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_SPAN_ID = 3;
+
+  // The parent span id.
+  //
+  // A root span carries no parent span id, so the exists predicate reports
+  // false for a root span, and a string predicate reads the empty text. Pair
+  // exists with negate to select a root span. A child span reads the canonical
+  // 16-character lowercase hexadecimal text.
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_PARENT_SPAN_ID = 4;
+
+  // The W3C tracestate of the span.
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_TRACE_STATE = 5;
+
+  // The status message of the span.
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_STATUS_MESSAGE = 6;
+
+  // The kind of the span.
+  //
+  // A predicate reads the uppercase name without the "SPAN_KIND_" prefix:
+  // "INTERNAL", "SERVER", "CLIENT", "PRODUCER", or "CONSUMER". A span whose
+  // kind is unset reads "INTERNAL", which the OpenTelemetry specification
+  // names as the default.
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_KIND = 7;
+
+  // The status code of the span.
+  //
+  // A predicate reads the uppercase name without the "STATUS_CODE_" prefix:
+  // "UNSET", "OK", or "ERROR".
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_STATUS_CODE = 8;
+
+  // The name of a span event.
+  //
+  // The matcher reports true when the name of any event of the span satisfies
+  // the predicate. A span with no event does not match.
+  //
+  // [Since next]
+  SPAN_RECORD_FIELD_EVENT_NAME = 9;
+}
+
+// SamplingMode states how a consumer reaches a sampling decision.
+//
+// Status: [Development]
+//
+// [Since next]
+enum SamplingMode {
+  // The mode is not set. A consumer applies SAMPLING_MODE_HASH_SEED.
+  //
+  // [Since next]
+  SAMPLING_MODE_UNSPECIFIED = 0;
+
+  // Hashes the trace id together with hash_seed to reach a deterministic
+  // decision.
+  //
+  // Every consumer with the same seed reaches the same decision for the same
+  // trace id, so a tier of consumers stays consistent.
+  //
+  // [Since next]
+  SAMPLING_MODE_HASH_SEED = 1;
+
+  // Multiplies the arriving probability by the configured percentage.
+  //
+  // The mode reduces traffic by a fixed factor whatever the arriving
+  // threshold. When spans arrive at 50 percent and the percentage is 10, the
+  // output probability is 5 percent.
+  //
+  // [Since next]
+  SAMPLING_MODE_PROPORTIONAL = 2;
+
+  // Raises every span to one common threshold.
+  //
+  // When the arriving threshold is already more restrictive than the target,
+  // the span keeps its arriving threshold. Otherwise the consumer applies the
+  // target threshold. The mode keeps a rare span and caps an over-sampled one.
+  //
+  // [Since next]
+  SAMPLING_MODE_EQUALIZING = 3;
+}
