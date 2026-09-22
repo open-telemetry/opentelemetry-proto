@@ -735,12 +735,11 @@ Version `1` is the first Profiles development version. The current version is
 documented in
 [`profiles.proto`](../opentelemetry/proto/profiles/v1development/profiles.proto).
 
-The Profiles development version MUST be incremented by one for each
-incompatible Profiles schema change. A schema change is incompatible when it
-could cause a server supporting the current version to fail to decode the
-request, lose information, or interpret the request incorrectly. Each increment
-MUST update the version documented in
-[`profiles.proto`](../opentelemetry/proto/profiles/v1development/profiles.proto).
+For each incompatible Profiles schema change, the development version documented
+in [`profiles.proto`](../opentelemetry/proto/profiles/v1development/profiles.proto)
+MUST be incremented by one. A schema change is incompatible when it could cause a
+server supporting the current version to fail to decode the request, lose
+information, or interpret the request incorrectly.
 Compatible changes MUST retain the current version. Changing the Profiles
 maturity level without an incompatible change MUST NOT change the version.
 Between `opentelemetry-proto` releases, the development version may increase
