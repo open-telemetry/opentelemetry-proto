@@ -752,7 +752,7 @@ Export request.
 An intermediary that forwards an Export request without decoding and re-encoding
 its payload MUST preserve the Profiles development version metadata. If the
 metadata is removed, a request using a later version will be treated as version
-`1` and may be decoded incorrectly.
+`1` and may be rejected or decoded incorrectly.
 
 A server MAY support one or more Profiles development versions. It MUST handle
 the metadata as follows:
