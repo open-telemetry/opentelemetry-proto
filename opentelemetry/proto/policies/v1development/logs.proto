@@ -1,0 +1,299 @@
+// Copyright 2026, OpenTelemetry Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package opentelemetry.proto.policies.v1development;
+
+import "opentelemetry/proto/policies/v1development/common.proto";
+
+option csharp_namespace = "OpenTelemetry.Proto.Policies.V1Development";
+option java_multiple_files = true;
+option java_package = "io.opentelemetry.proto.policies.v1development";
+option java_outer_classname = "PoliciesLogsProto";
+option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
+
+// LogFilterPolicy keeps or drops a log record.
+//
+// A consumer evaluates each log record on its own. A log record that no filter
+// policy matches passes through. When several filter policies match one log
+// record, ACTION_KEEP overrides ACTION_DROP.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogFilterPolicy {
+  // Conditions that a log record MUST satisfy.
+  //
+  // A consumer combines the matchers with AND: every matcher MUST report true
+  // before the action applies. A policy MUST carry at least one matcher.
+  //
+  // [Since next]
+  repeated LogMatcher matches = 1;
+
+  // What happens to a log record that satisfies every matcher.
+  //
+  // The field is optional so that a consumer tells an unset action from
+  // ACTION_UNSPECIFIED. A policy with an unset action is invalid.
+  //
+  // [Since next]
+  optional Action action = 2;
+}
+
+// LogTransformPolicy modifies a log record that survives the filter stage.
+//
+// A consumer applies the operations in one fixed order: remove, then redact,
+// then rename, then add. A consumer MUST NOT reorder the operations.
+//
+// A policy MUST carry at least one operation.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogTransformPolicy {
+  // Conditions that a log record MUST satisfy.
+  //
+  // A consumer combines the matchers with AND. A policy MUST carry at least
+  // one matcher.
+  //
+  // [Since next]
+  repeated LogMatcher matches = 1;
+
+  // Fields to delete. A field that is absent yields no change.
+  //
+  // [Since next]
+  repeated LogRemove remove = 2;
+
+  // Field values to mask.
+  //
+  // [Since next]
+  repeated LogRedact redact = 3;
+
+  // Fields to rename.
+  //
+  // [Since next]
+  repeated LogRename rename = 4;
+
+  // Fields to insert.
+  //
+  // [Since next]
+  repeated LogAdd add = 5;
+}
+
+// LogMatcher evaluates one predicate against one log target.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogMatcher {
+  // The field, the attribute, or the metadata to inspect.
+  //
+  // [Since next]
+  LogFieldSelector target = 1;
+
+  // How to compare the value that target selects.
+  //
+  // [Since next]
+  Predicate predicate = 2;
+
+  // Inverts the result of the predicate.
+  //
+  // [Since next]
+  bool negate = 3;
+}
+
+// LogFieldSelector names one log target. Exactly one variant MUST be set.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogFieldSelector {
+  // The target. Exactly one variant MUST be set.
+  //
+  // [Since next]
+  oneof target {
+    // A first-class field of a log record.
+    //
+    // [Since next]
+    LogRecordField record_field = 1;
+
+    // A log record attribute, for example ["http.route"].
+    //
+    // [Since next]
+    AttributePath log_attribute = 2;
+
+    // A resource attribute, for example ["service.name"].
+    //
+    // [Since next]
+    AttributePath resource_attribute = 3;
+
+    // An instrumentation scope attribute.
+    //
+    // [Since next]
+    AttributePath scope_attribute = 4;
+
+    // A first-class field of the instrumentation scope.
+    //
+    // [Since next]
+    ScopeField scope_field = 5;
+  }
+}
+
+// LogRemove deletes one field from a log record.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogRemove {
+  // The field to delete.
+  //
+  // [Since next]
+  LogFieldSelector target = 1;
+}
+
+// LogRedact masks a field value, or a part of a field value.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogRedact {
+  // The field to mask.
+  //
+  // [Since next]
+  LogFieldSelector target = 1;
+
+  // The text that replaces the matched range. The default is "[REDACTED]".
+  //
+  // When regex is set, the text is a template. A consumer MUST expand "$0" to
+  // the full match, "$1" through "$99" and "${1}" through "${99}" to a
+  // numbered capture group, "${name}" to a named capture group, and "$$" to a
+  // literal dollar sign. A reference to an absent capture group expands to the
+  // empty string.
+  //
+  // [Since next]
+  string replacement = 2;
+
+  // An optional RE2 expression that narrows the replacement.
+  //
+  // When regex is unset, the whole field value is replaced. When regex is set
+  // and the expression matches, every non-overlapping full match is replaced.
+  // A capture group supplies text for the template but does not widen or
+  // narrow the replaced range. When the expression does not match, or when the
+  // field value is not a string, the operation yields no change.
+  //
+  // [Since next]
+  optional string regex = 3;
+}
+
+// LogRename changes the key of one field.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogRename {
+  // The field to rename. A field that is absent yields no change.
+  //
+  // [Since next]
+  LogFieldSelector from = 1;
+
+  // The new key. An empty key is invalid.
+  //
+  // [Since next]
+  string to = 2;
+
+  // Overwrites the destination field when it already holds a value. When
+  // upsert is false and the destination already exists, the operation yields
+  // no change.
+  //
+  // [Since next]
+  bool upsert = 3;
+}
+
+// LogAdd inserts one field into a log record.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogAdd {
+  // The field to insert.
+  //
+  // [Since next]
+  LogFieldSelector target = 1;
+
+  // The value to set.
+  //
+  // [Since next]
+  Value value = 2;
+
+  // Overwrites the field when it already holds a value. When upsert is false
+  // and the field already exists, the operation yields no change.
+  //
+  // [Since next]
+  bool upsert = 3;
+}
+
+// LogRecordField identifies a first-class field of a log record.
+//
+// These fields carry no presence information in the OpenTelemetry data model.
+// The exists predicate therefore reports true when the field holds a
+// non-default value.
+//
+// Status: [Development]
+//
+// [Since next]
+enum LogRecordField {
+  // The field is not set. A selector with an unset field is invalid.
+  //
+  // [Since next]
+  LOG_RECORD_FIELD_UNSPECIFIED = 0;
+
+  // The body of the log record.
+  //
+  // [Since next]
+  LOG_RECORD_FIELD_BODY = 1;
+
+  // The severity of the log record as text, for example "INFO" or "ERROR".
+  //
+  // [Since next]
+  LOG_RECORD_FIELD_SEVERITY_TEXT = 2;
+
+  // The severity of the log record as a number from 1 to 24.
+  //
+  // The equals predicate and the comparison predicates read the number. The
+  // regex predicate reads the canonical base-10 text, for example "17".
+  //
+  // [Since next]
+  LOG_RECORD_FIELD_SEVERITY_NUMBER = 3;
+
+  // The trace id of the log record.
+  //
+  // A predicate reads the canonical 32-character lowercase hexadecimal text,
+  // as the W3C Trace Context specification defines it.
+  //
+  // [Since next]
+  LOG_RECORD_FIELD_TRACE_ID = 4;
+
+  // The span id of the log record.
+  //
+  // A predicate reads the canonical 16-character lowercase hexadecimal text,
+  // as the W3C Trace Context specification defines it.
+  //
+  // [Since next]
+  LOG_RECORD_FIELD_SPAN_ID = 5;
+
+  // The event name of the log record.
+  //
+  // [Since next]
+  LOG_RECORD_FIELD_EVENT_NAME = 6;
+}
