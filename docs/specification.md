@@ -740,8 +740,7 @@ in [`profiles.proto`](../opentelemetry/proto/profiles/v1development/profiles.pro
 MUST be incremented by one. A schema change is incompatible when it could cause a
 server supporting the current version to fail to decode the request, lose
 information, or interpret the request incorrectly.
-Compatible changes MUST retain the current version. Changing the Profiles
-maturity level without an incompatible change MUST NOT change the version.
+Compatible changes MUST retain the current version.
 Between `opentelemetry-proto` releases, the development version may increase
 by more than one, and gaps in the version sequence may occur.
 
