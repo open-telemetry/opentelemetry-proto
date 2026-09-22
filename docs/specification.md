@@ -754,6 +754,12 @@ its payload MUST preserve the Profiles development version metadata. If the
 metadata is removed, a request using a later version will be treated as version
 `1` and may be rejected or decoded incorrectly.
 
+An intermediary that decodes and re-encodes Profiles data, such as the OpenTelemetry
+Collector, acts as a server when receiving requests and as a client when exporting
+them. It validates the incoming version before deserialization and uses the version
+corresponding to the format it serializes for outgoing requests. It does not need
+to preserve incoming version metadata through its pipeline.
+
 A server MAY support one or more Profiles development versions. It MUST handle
 the metadata as follows:
 
