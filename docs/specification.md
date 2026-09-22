@@ -768,7 +768,7 @@ before deserializing it. A server MUST NOT substitute a different version or
 partially process an unsupported request. Rejections required by this section
 MUST use `INVALID_ARGUMENT` for OTLP/gRPC or `HTTP 400 Bad Request` for
 OTLP/HTTP. The client MUST NOT retry the same payload without the metadata or
-with a different version.
+with a version that does not match the payload's format.
 
 Servers that predate this mechanism may ignore the metadata and attempt to
 process a request using an incompatible schema.
