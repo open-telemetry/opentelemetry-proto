@@ -719,9 +719,10 @@ The default network port for OTLP/HTTP is 4318.
 ## Profiles Development Version
 
 The Profiles signal uses the `v1development` package and service while
-incompatible changes to its Protobuf schema remain possible. To let a server
-identify the Profiles development format before deserializing a request, clients
-use temporary request metadata called the Profiles development version.
+incompatible changes to its Protobuf schema remain possible. The Profiles
+development version identifies the formats of an Export request and its
+corresponding response. Clients carry this version in request metadata
+so a server can identify the request format before deserializing it.
 
 This mechanism applies only to the
 `opentelemetry.proto.collector.profiles.v1development.ProfilesService` service
@@ -739,17 +740,21 @@ documented in
 
 For each incompatible Profiles schema change, the development version documented
 in [`profiles.proto`](../opentelemetry/proto/profiles/v1development/profiles.proto)
-MUST be incremented by one. A schema change is incompatible when it could cause a
-server supporting the current version to fail to decode the request, lose
-information, or interpret the request incorrectly.
+MUST be incremented by one. A schema change is incompatible if it breaks wire
+compatibility or prevents correct interpretation of requests or responses
+exchanged between implementations using the existing and changed schemas.
 Compatible changes MUST retain the current version.
 Between `opentelemetry-proto` releases, the development version may increase
 by more than one, and gaps in the version sequence may occur.
 
-A client that serializes version `1` MAY omit the metadata; a client that
-serializes any later version MUST send it. When sent, the metadata MUST contain
-exactly one value assigned to that format. The value applies to the entire
-Export request.
+A client using development version `1` MAY omit the metadata; a client using any
+later version MUST send it. When sent, the metadata MUST contain exactly one value
+corresponding to the request format it serializes and the response format it
+expects. The value applies to the entire Export request and its corresponding
+response.
+
+When returning an `ExportProfilesServiceResponse`, the server MUST use a response
+format compatible with the development version identified in the request.
 
 An intermediary that forwards an Export request without decoding and re-encoding
 its payload MUST preserve the Profiles development version metadata. If the
@@ -759,8 +764,9 @@ metadata is removed, a request using a later version will be treated as version
 An intermediary that decodes and re-encodes Profiles data, such as the OpenTelemetry
 Collector, acts as a server when receiving requests and as a client when exporting
 them. It validates the incoming version before deserialization and uses the version
-corresponding to the format it serializes for outgoing requests. It does not need
-to preserve incoming version metadata through its pipeline.
+corresponding to the request format it serializes and the response format it
+expects when exporting. It does not need to preserve incoming version metadata
+through its pipeline.
 
 A server MAY support one or more Profiles development versions. It MUST handle
 the metadata as follows:
