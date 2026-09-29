@@ -787,9 +787,10 @@ the same telemetry data and MUST drop it.
 Servers that predate this mechanism may ignore the metadata and attempt to
 process a request using an incompatible schema.
 
-The Profiles development version metadata MUST be removed when the Profiles
-signal becomes Stable and moves to the `v1` package, service, and HTTP endpoint.
-Clients and servers MUST NOT use this metadata with the stable Profiles service.
+The Profiles development version metadata MUST be removed when switching from
+`v1development` to `v1`. The `v1` package and service are introduced at
+[Release Candidate](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/0232-maturity-of-otel.md#release-candidate).
+Clients and servers MUST NOT use this metadata with the `v1` Profiles service.
 
 ## Implementation Recommendations
 
