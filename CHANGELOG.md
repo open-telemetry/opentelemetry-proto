@@ -8,6 +8,14 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Changed
 
+### Fixed
+
+### Removed
+
+## 1.11.1 - 2026-09-25
+
+### Changed
+
 - docs: clarify UTF-8 handling requirements. [#845](https://github.com/open-telemetry/opentelemetry-proto/pull/845)
 - examples: update attribute examples to use the latest semantic conventions. [#853](https://github.com/open-telemetry/opentelemetry-proto/pull/853)
 - all: document the version in which every protobuf field was introduced and require `since <version>` comments for new fields. [#854](https://github.com/open-telemetry/opentelemetry-proto/pull/854)
@@ -16,8 +24,6 @@ The full list of changes can be found in the compare view for the respective rel
 
 - openapi: Update OpenAPI generation to use integer-based enums. [#841](https://github.com/open-telemetry/opentelemetry-proto/pull/841)
 - docs: clarify that OTLP JSON timestamps are integer values and not RFC 3339 strings. [#855](https://github.com/open-telemetry/opentelemetry-proto/pull/855)
-
-### Removed
 
 ## 1.11.0 - 2026-07-21
 
