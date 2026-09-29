@@ -725,7 +725,9 @@ use temporary request metadata called the Profiles development version.
 
 This mechanism applies only to the
 `opentelemetry.proto.collector.profiles.v1development.ProfilesService` service
-and the `/v1development/profiles` HTTP endpoint. The version is carried as:
+and OTLP/HTTP endpoints serving `v1development` Profiles Export requests,
+including the default `/v1development/profiles` path and configured non-default
+paths. The version is carried as:
 
 * `otlp-profiles-development-version` request metadata for OTLP/gRPC.
 * The `OTLP-Profiles-Development-Version` request header for OTLP/HTTP.
