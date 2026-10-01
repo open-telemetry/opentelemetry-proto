@@ -85,7 +85,7 @@ message KeyValue {
   AnyValue value = 2;
 
   // Reference to the string key in ProfilesDictionary.string_table.
-  // key MUST NOT be set if key_strindex is used.
+  // key MUST be zero if key_strindex is used.
   //
   // Note: This is currently used exclusively in the Profiling signal.
   // Implementers of OTLP receivers for signals other than Profiling should
