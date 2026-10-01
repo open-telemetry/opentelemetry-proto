@@ -78,14 +78,15 @@ message KeyValueList {
 // attributes, etc.
 message KeyValue {
   // The key name of the pair.
-  // key_strindex MUST NOT be set if key is used.
+  // key_strindex MUST be zero if key is used, see the details below.
   string key = 1;
 
   // The value of the pair.
   AnyValue value = 2;
 
   // Reference to the string key in ProfilesDictionary.string_table.
-  // key MUST be zero if key_strindex is used.
+  // key MUST be zero if key_strindex is used, following the Profiles semantics
+  // for the unset integer fields.
   //
   // Note: This is currently used exclusively in the Profiling signal.
   // Implementers of OTLP receivers for signals other than Profiling should
