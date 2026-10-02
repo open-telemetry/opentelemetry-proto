@@ -77,16 +77,15 @@ message KeyValueList {
 // Represents a key-value pair that is used to store Span attributes, Link
 // attributes, etc.
 message KeyValue {
-  // The key name of the pair. Mutually exclusive with key_strindex, see below.
+  // The key name of the pair.
+  // key_strindex MUST be zero if key is non-empty.
   string key = 1;
 
   // The value of the pair.
   AnyValue value = 2;
 
   // Reference to the string key in ProfilesDictionary.string_table.
-  // Exactly one of key and key_strindex fields MUST be set. The unset value for
-  // the key field is empty string. The unset value for key_strindex field is
-  // zero, following the Profiles semantics for the unset integer fields.
+  // key MUST be empty if key_strindex is non-zero.
   //
   // Note: This is currently used exclusively in the Profiling signal.
   // Implementers of OTLP receivers for signals other than Profiling should
