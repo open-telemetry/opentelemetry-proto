@@ -1,0 +1,246 @@
+// Copyright 2026, OpenTelemetry Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package opentelemetry.proto.policies.v1development;
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "OpenTelemetry.Proto.Policies.V1Development";
+option java_multiple_files = true;
+option java_package = "io.opentelemetry.proto.policies.v1development";
+option java_outer_classname = "PoliciesCommonProto";
+option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
+
+// AttributePath locates an attribute value by a sequence of path segments.
+//
+// A single segment selects a flat attribute, for example ["http.route"].
+// Multiple segments traverse nested maps, for example ["http", "request",
+// "method"]. A segment that is a non-negative base-10 integer indexes into an
+// array value, for example ["items", "0", "id"]. An empty path is invalid.
+//
+// Status: [Development]
+//
+// [Since next]
+message AttributePath {
+  // Path segments, applied left to right.
+  //
+  // [Since next]
+  repeated string path = 1;
+}
+
+// Value carries one typed scalar for the equals and contains predicates.
+//
+// Status: [Development]
+//
+// [Since next]
+message Value {
+  // The scalar. Exactly one variant MUST be set.
+  //
+  // [Since next]
+  oneof value {
+    // A UTF-8 string.
+    //
+    // [Since next]
+    string string_value = 1;
+
+    // A 64-bit signed integer.
+    //
+    // [Since next]
+    int64 int_value = 2;
+
+    // A boolean.
+    //
+    // [Since next]
+    bool bool_value = 3;
+
+    // A 64-bit floating point number.
+    //
+    // [Since next]
+    double double_value = 4;
+
+    // A raw byte sequence, encoded as base64 in Protobuf JSON.
+    //
+    // Identifier fields such as a trace id or a span id are matched as their
+    // canonical lowercase hexadecimal string. Use string_value for those
+    // fields. Use bytes_value only for an attribute that carries raw bytes.
+    //
+    // [Since next]
+    bytes bytes_value = 5;
+  }
+}
+
+// NumericValue carries one typed number for the ordered comparison predicates
+// gt, gte, lt, and lte.
+//
+// The type admits only a number, so a comparison against a boolean, a string,
+// or a byte sequence is unrepresentable rather than rejected at compile time.
+// int_value holds full 64-bit precision for a large integer field, such as a
+// nanosecond timestamp, that a double cannot hold exactly.
+//
+// Status: [Development]
+//
+// [Since next]
+message NumericValue {
+  // The number. Exactly one variant MUST be set.
+  //
+  // [Since next]
+  oneof value {
+    // A 64-bit signed integer.
+    //
+    // [Since next]
+    int64 int_value = 1;
+
+    // A 64-bit floating point number.
+    //
+    // [Since next]
+    double double_value = 2;
+  }
+}
+
+// Predicate states how a matcher compares the value that its target selects.
+//
+// The same predicate set applies to every signal, so a matcher differs between
+// signals only in the target it selects. A predicate never raises an error: a
+// value of the wrong type simply does not match.
+//
+// Status: [Development]
+//
+// [Since next]
+message Predicate {
+  // The comparison. Exactly one variant MUST be set.
+  //
+  // [Since next]
+  oneof predicate {
+    // Matches when the target is present.
+    //
+    // For an attribute, the target is present when the key exists. For a
+    // first-class field that carries no presence information in the
+    // OpenTelemetry data model, the target is present when the field holds a
+    // non-default value. Pair exists with negate to test for absence.
+    //
+    // [Since next]
+    google.protobuf.Empty exists = 1;
+
+    // Matches when the target value equals this typed scalar.
+    //
+    // An integer and a double are compared in one numeric domain, so an
+    // int_value MAY match a double target with an equal numeric value, and the
+    // reverse. Every other pairing of types does not match.
+    //
+    // [Since next]
+    Value equals = 2;
+
+    // Matches when the target string value satisfies this RE2 expression.
+    //
+    // The expression is an unanchored partial match. Add the anchors "^" and
+    // "$" for a full match. Add the flag "(?i)" for a case-insensitive match.
+    // The predicate applies only to a string target value.
+    //
+    // [Since next]
+    string regex = 3;
+
+    // Matches when the target numeric value is greater than this number.
+    //
+    // [Since next]
+    NumericValue gt = 4;
+
+    // Matches when the target numeric value is greater than or equal to this
+    // number.
+    //
+    // [Since next]
+    NumericValue gte = 5;
+
+    // Matches when the target numeric value is less than this number.
+    //
+    // [Since next]
+    NumericValue lt = 6;
+
+    // Matches when the target numeric value is less than or equal to this
+    // number.
+    //
+    // [Since next]
+    NumericValue lte = 7;
+
+    // Matches when the target value contains this typed scalar.
+    //
+    // For an array target value, the predicate matches when any element equals
+    // the scalar. For a string target value, the predicate matches when the
+    // string holds string_value as a substring. For a bytes target value, the
+    // predicate matches when the bytes hold bytes_value as a subsequence.
+    //
+    // [Since next]
+    Value contains = 8;
+  }
+}
+
+// Action states what happens to a telemetry record that satisfies every
+// matcher of a filter policy.
+//
+// Telemetry passes through when no policy matches it. ACTION_KEEP overrides
+// ACTION_DROP, so a keep policy is an exemption rather than an allowlist. To
+// build an allowlist, write ACTION_DROP with negate set to true.
+//
+// Status: [Development]
+//
+// [Since next]
+enum Action {
+  // The action is not set. A policy with an unset action is invalid.
+  //
+  // [Since next]
+  ACTION_UNSPECIFIED = 0;
+
+  // Keep the matching record and exempt it from every drop policy.
+  //
+  // [Since next]
+  ACTION_KEEP = 1;
+
+  // Drop the matching record.
+  //
+  // [Since next]
+  ACTION_DROP = 2;
+}
+
+// ScopeField identifies a first-class field of an InstrumentationScope.
+//
+// These fields carry no presence information in the OpenTelemetry data model.
+// The exists predicate therefore reports true when the field holds a non-empty
+// value.
+//
+// Status: [Development]
+//
+// [Since next]
+enum ScopeField {
+  // The scope field is not set. A selector with an unset scope field is
+  // invalid.
+  //
+  // [Since next]
+  SCOPE_FIELD_UNSPECIFIED = 0;
+
+  // The name of the instrumentation scope, such as a library name.
+  //
+  // [Since next]
+  SCOPE_FIELD_NAME = 1;
+
+  // The version of the instrumentation scope.
+  //
+  // [Since next]
+  SCOPE_FIELD_VERSION = 2;
+
+  // The schema URL of the instrumentation scope.
+  //
+  // [Since next]
+  SCOPE_FIELD_SCHEMA_URL = 3;
+}

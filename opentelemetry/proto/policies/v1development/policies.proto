@@ -1,0 +1,111 @@
+// Copyright 2026, OpenTelemetry Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package opentelemetry.proto.policies.v1development;
+
+import "opentelemetry/proto/common/v1/common.proto";
+import "opentelemetry/proto/policies/v1development/logs.proto";
+import "opentelemetry/proto/policies/v1development/metrics.proto";
+import "opentelemetry/proto/policies/v1development/traces.proto";
+
+option csharp_namespace = "OpenTelemetry.Proto.Policies.V1Development";
+option java_multiple_files = true;
+option java_package = "io.opentelemetry.proto.policies.v1development";
+option java_outer_classname = "PoliciesProto";
+option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
+
+// Policy carries one policy definition together with the metadata that a
+// control plane and an operator need.
+//
+// The envelope is optional. A transport that already supplies an identity and
+// a lifecycle, such as an xDS resource or an OpAMP custom message, MAY carry a
+// bare policy message instead.
+//
+// Status: [Development]
+//
+// [Since next]
+message Policy {
+  // The identifier of the policy, unique within its configuration scope.
+  //
+  // [Since next]
+  string id = 1;
+
+  // A short name for an operator to read.
+  //
+  // [Since next]
+  string name = 2;
+
+  // An explanation of the purpose of the policy.
+  //
+  // [Since next]
+  string description = 3;
+
+  // Whether a consumer evaluates the policy. The default is true.
+  //
+  // A consumer MUST treat a policy with enabled set to false as absent.
+  //
+  // [Since next]
+  optional bool enabled = 4;
+
+  // Labels for an operator to route and organize policies. A consumer does not
+  // interpret them.
+  //
+  // [Since next]
+  repeated opentelemetry.proto.common.v1.KeyValue labels = 5;
+
+  // The definition of the policy. Exactly one variant MUST be set.
+  //
+  // [Since next]
+  oneof definition {
+    // A policy that keeps or drops a log record.
+    //
+    // [Since next]
+    LogFilterPolicy log_filter = 10;
+
+    // A policy that modifies a log record.
+    //
+    // [Since next]
+    LogTransformPolicy log_transform = 11;
+
+    // A policy that keeps or drops a metric or a data point.
+    //
+    // [Since next]
+    MetricFilterPolicy metric_filter = 12;
+
+    // A policy that samples a span by probability.
+    //
+    // [Since next]
+    TraceSamplingPolicy trace_sampling = 13;
+  }
+}
+
+// PolicySet carries the complete set of policies that a consumer applies.
+//
+// A consumer replaces its whole set when it receives a new one. The order of
+// the list carries no meaning for a filter decision or a sampling decision,
+// because those decisions are commutative. A consumer that has to break a tie
+// between two transform operations on one field MUST break it in a stable
+// order, for example by policy identifier.
+//
+// Status: [Development]
+//
+// [Since next]
+message PolicySet {
+  // The policies of the set.
+  //
+  // [Since next]
+  repeated Policy policies = 1;
+}
