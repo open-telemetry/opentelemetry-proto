@@ -56,6 +56,7 @@ nodes such as collectors and telemetry backends.
     + [OTLP/HTTP Connection](#otlphttp-connection)
     + [OTLP/HTTP Concurrent Requests](#otlphttp-concurrent-requests)
     + [OTLP/HTTP Default Port](#otlphttp-default-port)
+- [Profiles Development Version](#profiles-development-version)
 - [Implementation Recommendations](#implementation-recommendations)
   * [Multi-Destination Exporting](#multi-destination-exporting)
   * [Empty Telemetry Envelopes](#empty-telemetry-envelopes)
@@ -714,6 +715,82 @@ connections SHOULD be configurable.
 #### OTLP/HTTP Default Port
 
 The default network port for OTLP/HTTP is 4318.
+
+## Profiles Development Version
+
+The Profiles signal uses the `v1development` package and service while
+incompatible changes to its Protobuf schema remain possible. The Profiles
+development version identifies the formats of an Export request and its
+corresponding response. Clients carry this version in request metadata
+so a server can identify the request format before deserializing it.
+
+This mechanism applies only to the
+`opentelemetry.proto.collector.profiles.v1development.ProfilesService` service
+and OTLP/HTTP endpoints serving `v1development` Profiles Export requests,
+including the default `/v1development/profiles` path and configured non-default
+paths. The version is carried as:
+
+* `otlp-profiles-development-version` request metadata for OTLP/gRPC.
+* The `OTLP-Profiles-Development-Version` request header for OTLP/HTTP.
+
+The version value MUST be a positive base-10 integer without leading zeros.
+Version `1` is the first Profiles development version. The current version is
+documented in
+[`profiles.proto`](../opentelemetry/proto/profiles/v1development/profiles.proto).
+
+For each incompatible Profiles schema change, the development version documented
+in [`profiles.proto`](../opentelemetry/proto/profiles/v1development/profiles.proto)
+MUST be incremented by one. A schema change is incompatible if it breaks wire
+compatibility or prevents correct interpretation of requests or responses
+exchanged between implementations using the existing and changed schemas.
+Compatible changes MUST retain the current version.
+Between `opentelemetry-proto` releases, the development version may increase
+by more than one, and gaps in the version sequence may occur.
+
+A client using development version `1` MAY omit the metadata; a client using any
+later version MUST send it. When sent, the metadata MUST contain exactly one value
+corresponding to the request format it serializes and the response format it
+expects. The value applies to the entire Export request and its corresponding
+response.
+
+When returning an `ExportProfilesServiceResponse`, the server MUST use a response
+format compatible with the development version identified in the request.
+
+An intermediary that forwards an Export request without decoding and re-encoding
+its payload MUST preserve the Profiles development version metadata. If the
+metadata is removed, a request using a later version will be treated as version
+`1` and may be rejected or decoded incorrectly.
+
+An intermediary that decodes and re-encodes Profiles data, such as the OpenTelemetry
+Collector, acts as a server when receiving requests and as a client when exporting
+them. It validates the incoming version before deserialization and uses the version
+corresponding to the request format it serializes and the response format it
+expects when exporting. It does not need to preserve incoming version metadata
+through its pipeline.
+
+A server MAY support one or more Profiles development versions. It MUST handle
+the metadata as follows:
+
+| Request metadata | Server behavior |
+| --- | --- |
+| Absent | Treat the request as version `1` |
+| Exactly one well-formed value | Use the value as the request version |
+| Malformed or repeated value | Reject the request before deserializing it |
+
+If the identified version is unsupported, the server MUST reject the request
+before deserializing it. A server MUST NOT substitute a different version or
+partially process an unsupported request. Rejections required by this section
+MUST use `INVALID_ARGUMENT` for OTLP/gRPC or `HTTP 400 Bad Request` for
+OTLP/HTTP. These rejections are non-retryable. The client MUST NOT retry sending
+the same telemetry data and MUST drop it.
+
+Servers that predate this mechanism may ignore the metadata and attempt to
+process a request using an incompatible schema.
+
+The Profiles development version metadata MUST be removed when switching from
+`v1development` to `v1`. The `v1` package and service are introduced at
+[Release Candidate](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/0232-maturity-of-otel.md#release-candidate).
+Clients and servers MUST NOT use this metadata with the `v1` Profiles service.
 
 ## Implementation Recommendations
 
