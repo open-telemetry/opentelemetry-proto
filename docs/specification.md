@@ -724,6 +724,9 @@ development version identifies the formats of an Export request and its
 corresponding response. Clients carry this version in request metadata
 so a server can identify the request format before deserializing it.
 
+For background and design tradeoffs, see
+[Versioning OTLP Profiles](https://github.com/open-telemetry/sig-profiling/blob/2b1781f8d2d67427b6accbe108946a2786097ad4/docs/versioning-otlp-profiles.md).
+
 This mechanism applies only to the
 `opentelemetry.proto.collector.profiles.v1development.ProfilesService` service
 and OTLP/HTTP endpoints serving `v1development` Profiles Export requests,
