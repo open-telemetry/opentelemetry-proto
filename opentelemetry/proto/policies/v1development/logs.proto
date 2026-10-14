@@ -150,31 +150,93 @@ message LogFieldSelector {
     //
     // [Since next]
     ScopeField scope_field = 5;
+
+    // A nested field inside a structured (KeyValueList) log record body, for
+    // example ["user", "id"].
+    //
+    // When the log record body is not a KeyValueList map, or when the path
+    // does not resolve inside it, the target is treated as absent.
+    //
+    // [Since next]
+    AttributePath body_field = 6;
   }
 }
 
-// LogRemove deletes one field from a log record.
+// LogTargetSelector names one mutable field or attribute owned by a log
+// record. Exactly one variant MUST be set.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogTargetSelector {
+  // The mutable log record target. Exactly one variant MUST be set.
+  //
+  // [Since next]
+  oneof target {
+    // A first-class field of the log record.
+    //
+    // [Since next]
+    LogRecordField record_field = 1;
+
+    // A log record attribute, for example ["http.route"].
+    //
+    // [Since next]
+    AttributePath log_attribute = 2;
+
+    // A nested field inside a structured (KeyValueList) log record body, for
+    // example ["user", "id"].
+    //
+    // [Since next]
+    AttributePath body_field = 3;
+  }
+}
+
+// LogAttributeSelector names one attribute or structured body path owned by a
+// log record. Exactly one variant MUST be set.
+//
+// Status: [Development]
+//
+// [Since next]
+message LogAttributeSelector {
+  // The attribute path target. Exactly one variant MUST be set.
+  //
+  // [Since next]
+  oneof target {
+    // A log record attribute, for example ["http.route"].
+    //
+    // [Since next]
+    AttributePath log_attribute = 1;
+
+    // A nested field inside a structured (KeyValueList) log record body, for
+    // example ["user", "id"].
+    //
+    // [Since next]
+    AttributePath body_field = 2;
+  }
+}
+
+// LogRemove deletes one field or attribute from a log record.
 //
 // Status: [Development]
 //
 // [Since next]
 message LogRemove {
-  // The field to delete.
+  // The log record field or attribute to delete.
   //
   // [Since next]
-  LogFieldSelector target = 1;
+  LogTargetSelector target = 1;
 }
 
-// LogRedact masks a field value, or a part of a field value.
+// LogRedact masks a field value, or a part of a field value, on a log record.
 //
 // Status: [Development]
 //
 // [Since next]
 message LogRedact {
-  // The field to mask.
+  // The log record field or attribute to mask.
   //
   // [Since next]
-  LogFieldSelector target = 1;
+  LogTargetSelector target = 1;
 
   // The text that replaces the matched range. The default is "[REDACTED]".
   //
@@ -189,52 +251,60 @@ message LogRedact {
 
   // An optional RE2 expression that narrows the replacement.
   //
-  // When regex is unset, the whole field value is replaced. When regex is set
-  // and the expression matches, every non-overlapping full match is replaced.
-  // A capture group supplies text for the template but does not widen or
-  // narrow the replaced range. When the expression does not match, or when the
-  // field value is not a string, the operation yields no change.
+  // When regex is unset, the whole field value is replaced with replacement on
+  // string fields (LOG_RECORD_FIELD_SEVERITY_TEXT, LOG_RECORD_FIELD_EVENT_NAME)
+  // and AnyValue targets (LOG_RECORD_FIELD_BODY, log_attribute, body_field);
+  // targeting a non-string typed record field (LOG_RECORD_FIELD_SEVERITY_NUMBER,
+  // LOG_RECORD_FIELD_TRACE_ID, LOG_RECORD_FIELD_SPAN_ID) yields no change.
+  // When regex is set and the expression matches, every non-overlapping full
+  // match is replaced. A capture group supplies text for the template but does
+  // not widen or narrow the replaced range. When the expression does not
+  // match, or when the field value is not a string, the operation yields no
+  // change.
   //
   // [Since next]
   optional string regex = 3;
 }
 
-// LogRename changes the key of one field.
+// LogRename moves an attribute or structured body field to a new key path on a
+// log record.
 //
 // Status: [Development]
 //
 // [Since next]
 message LogRename {
-  // The field to rename. A field that is absent yields no change.
+  // The source attribute or structured body path to rename. A source that is
+  // absent yields no change.
   //
   // [Since next]
-  LogFieldSelector from = 1;
+  LogAttributeSelector from = 1;
 
-  // The new key. An empty key is invalid.
+  // The destination attribute or structured body path.
   //
   // [Since next]
-  string to = 2;
+  LogAttributeSelector to = 2;
 
   // Overwrites the destination field when it already holds a value. When
   // upsert is false and the destination already exists, the operation yields
-  // no change.
+  // no change and the source field is preserved.
   //
   // [Since next]
   bool upsert = 3;
 }
 
-// LogAdd inserts one field into a log record.
+// LogAdd inserts or overwrites one field or attribute on a log record.
 //
 // Status: [Development]
 //
 // [Since next]
 message LogAdd {
-  // The field to insert.
+  // The log record field or attribute to insert.
   //
   // [Since next]
-  LogFieldSelector target = 1;
+  LogTargetSelector target = 1;
 
-  // The value to set.
+  // The value to set. Setting a value whose type is incompatible with a
+  // fixed-type record_field yields no change.
   //
   // [Since next]
   ScalarValue value = 2;

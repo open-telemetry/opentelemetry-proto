@@ -25,6 +25,7 @@
   - [Log Selectors](#log-selectors)
 - [Log Transform Policy](#log-transform-policy)
   - [Execution Order](#execution-order)
+  - [Mutation Selectors](#mutation-selectors)
   - [Rename](#rename)
   - [Add](#add)
   - [Remove](#remove)
@@ -64,7 +65,7 @@
   - [`regex` is an unanchored partial match](#regex-is-an-unanchored-partial-match)
   - [Identifier fields are matched as hexadecimal text](#identifier-fields-are-matched-as-hexadecimal-text)
   - [`contains` is typed and covers arrays](#contains-is-typed-and-covers-arrays)
-  - [An attribute path, with array indices](#an-attribute-path-with-array-indices)
+  - [An attribute path](#an-attribute-path)
   - [Metric granularity follows the matchers](#metric-granularity-follows-the-matchers)
   - [Scope fields are shared, resource schema URL is removed](#scope-fields-are-shared-resource-schema-url-is-removed)
   - [Span events use an "any" quantifier, links are deferred](#span-events-use-an-any-quantifier-links-are-deferred)
@@ -220,12 +221,14 @@ variants. See the section for that signal.
 
 ### AttributePath
 
-An `AttributePath` locates an attribute by a list of segments.
+An `AttributePath` locates an attribute or structured body field by a sequence
+of map keys.
 
-- One segment selects a flat attribute: `["http.route"]`.
-- Several segments traverse nested maps: `["http", "request", "method"]`.
-- A segment that is a non-negative base-10 integer indexes an array value:
-  `["items", "0", "id"]`.
+- One segment selects a top-level key: `["http.route"]`.
+- Several segments traverse nested maps (`KeyValueList`):
+  `["http", "request", "method"]`.
+- Every segment is treated as a map key (if an intermediate value along the
+  path is not a `KeyValueList` map, the target is treated as absent).
 - An empty path is invalid.
 
 The protobuf wraps the list in an `AttributePath` message:
@@ -378,13 +381,20 @@ A policy with an unset action, or with `ACTION_UNSPECIFIED`, is invalid.
 
 ### Log Selectors
 
-| Variant              | Type             |
-| -------------------- | ---------------- |
-| `record_field`       | `LogRecordField` |
-| `log_attribute`      | `AttributePath`  |
-| `resource_attribute` | `AttributePath`  |
-| `scope_attribute`    | `AttributePath`  |
-| `scope_field`        | `ScopeField`     |
+`LogFieldSelector` (used by `LogMatcher`) selects any field or attribute in
+scope for a log record:
+
+| Variant              | Type             | Description                                                 |
+| -------------------- | ---------------- | ----------------------------------------------------------- |
+| `record_field`       | `LogRecordField` | A first-class field of the log record.                      |
+| `log_attribute`      | `AttributePath`  | A log record attribute.                                     |
+| `resource_attribute` | `AttributePath`  | A resource attribute.                                       |
+| `scope_attribute`    | `AttributePath`  | An instrumentation scope attribute.                         |
+| `scope_field`        | `ScopeField`     | A first-class field of the instrumentation scope.           |
+| `body_field`         | `AttributePath`  | A nested field inside a structured (`KeyValueList`) `body`. |
+
+When `body_field` is selected and `LogRecord.body` is not a `KeyValueList` map
+(or the path does not resolve inside it), the target is treated as absent.
 
 `LogRecordField` values:
 
@@ -426,65 +436,103 @@ Within each of the four operation stages, operations across all matching
 `LogTransformPolicy` rules MUST execute in ascending lexicographical (UTF-8
 byte) order of `Policy.id`, and in list order within each policy.
 
+### Mutation Selectors
+
+- `LogTargetSelector` (used by `LogRemove`, `LogRedact`, and `LogAdd`) selects
+  `record_field`, `log_attribute`, or `body_field`.
+- `LogAttributeSelector` (used by `LogRename.from` and `LogRename.to`) selects
+  `log_attribute` or `body_field`.
+
+When a write operation (`LogRename.to` or `LogAdd.target`) targets a
+multi-segment `log_attribute` or `body_field` path:
+
+- Missing intermediate segments are created as `KeyValueList` maps (if
+  `body_field` is targeted and `LogRecord.body` is unset, `body` is initialized
+  as a `KeyValueList` map).
+- If an existing intermediate value along the path (or `LogRecord.body` itself
+  when targeting `body_field`) is not a `KeyValueList` map, the operation yields
+  no change (fail-open).
+
 ### Rename
 
 ```
 LogRename {
-  from:   LogFieldSelector  // REQUIRED
-  to:     string            // REQUIRED, non-empty
-  upsert: bool              // OPTIONAL, defaults to false
+  from:   LogAttributeSelector  // REQUIRED
+  to:     LogAttributeSelector  // REQUIRED
+  upsert: bool                  // OPTIONAL, defaults to false
 }
 ```
 
-A source that is absent yields no change. When `upsert` is `false` and the
-destination already holds a value, the operation yields no change. When `upsert`
-is `true`, the consumer overwrites the destination.
+A source that is absent yields no change. When `from` and `to` resolve to the
+same target, the operation yields no change. When `upsert` is `false` and the
+destination already holds a value, the operation yields no change and the source
+entry is preserved. When `upsert` is `true`, the consumer moves the value from
+`from` to `to`, overwriting any existing value at `to` and removing the source
+entry at `from`.
 
 ### Add
 
 ```
 LogAdd {
-  target: LogFieldSelector  // REQUIRED
-  value:  Value             // REQUIRED
-  upsert: bool              // OPTIONAL, defaults to false
+  target: LogTargetSelector  // REQUIRED
+  value:  ScalarValue        // REQUIRED
+  upsert: bool               // OPTIONAL, defaults to false
 }
 ```
 
-When `upsert` is `false` and the field already holds a value, the operation
-yields no change. When `upsert` is `true`, the consumer overwrites the field.
+When `upsert` is `false` and the target already holds a value, the operation
+yields no change. When `upsert` is `true`, the consumer overwrites the target.
+
+When `target` selects a `record_field`, `value` MUST match the field's data
+model type or the operation yields no change (fail-open):
+
+- `LOG_RECORD_FIELD_BODY`: any `ScalarValue` variant (sets `LogRecord.body`).
+- `LOG_RECORD_FIELD_SEVERITY_TEXT` and `LOG_RECORD_FIELD_EVENT_NAME`:
+  `string_value` only.
+- `LOG_RECORD_FIELD_SEVERITY_NUMBER`: `int_value` in the range `1` to `24` only.
+- `LOG_RECORD_FIELD_TRACE_ID`: 32-character lowercase hexadecimal `string_value`
+  (decoded to 16 bytes).
+- `LOG_RECORD_FIELD_SPAN_ID`: 16-character lowercase hexadecimal `string_value`
+  (decoded to 8 bytes).
 
 ### Remove
 
 ```
-LogRemove { target: LogFieldSelector }  // REQUIRED
+LogRemove { target: LogTargetSelector }  // REQUIRED
 ```
 
-A target that is absent yields no change.
+A target that is absent yields no change. Removing a `record_field` clears the
+field to its default empty value.
 
 ### Redact
 
 ```
 LogRedact {
-  target:      LogFieldSelector  // REQUIRED
-  replacement: string            // OPTIONAL, defaults to "[REDACTED]"
-  regex:       string            // OPTIONAL
+  target:      LogTargetSelector  // REQUIRED
+  replacement: string             // OPTIONAL, defaults to "[REDACTED]"
+  regex:       string             // OPTIONAL
 }
 ```
 
 A target that is absent yields no change.
 
-When `regex` is unset, the consumer replaces the whole field value with
-`replacement`.
+When `regex` is unset, the consumer replaces the whole target value with the
+string `replacement` on string record fields (`LOG_RECORD_FIELD_SEVERITY_TEXT`,
+`LOG_RECORD_FIELD_EVENT_NAME`) and `AnyValue` targets (`LOG_RECORD_FIELD_BODY`,
+`log_attribute`, `body_field`). Targeting a non-string typed record field
+(`LOG_RECORD_FIELD_SEVERITY_NUMBER`, `LOG_RECORD_FIELD_TRACE_ID`,
+`LOG_RECORD_FIELD_SPAN_ID`) yields no change.
 
 When `regex` is set, the consumer evaluates the RE2 expression against the
-current string value of the field:
+current string value of the target:
 
 - An expression that does not match yields no change.
 - An expression that matches replaces **every** non-overlapping full match, not
   only the first one.
 - A capture group supplies text for the template. A capture group MUST NOT widen
   or narrow the replaced range.
-- A field value that is not a string yields no change.
+- A target value that is not a string (including `LOG_RECORD_FIELD_TRACE_ID`
+  and `LOG_RECORD_FIELD_SPAN_ID`) yields no change.
 
 When `regex` is set, `replacement` is a template. A consumer MUST support:
 
@@ -497,33 +545,6 @@ When `regex` is set, `replacement` is a template. A consumer MUST support:
 | `$$`             | A literal dollar sign.    |
 
 A reference to an absent capture group MUST expand to the empty string.
-
-### Rename
-
-```
-LogRename {
-  from:   LogFieldSelector  // REQUIRED
-  to:     string            // REQUIRED, non-empty
-  upsert: bool              // OPTIONAL, defaults to false
-}
-```
-
-A source that is absent yields no change. When `upsert` is `false` and the
-destination already holds a value, the operation yields no change. When `upsert`
-is `true`, the consumer overwrites the destination.
-
-### Add
-
-```
-LogAdd {
-  target: LogFieldSelector  // REQUIRED
-  value:  ScalarValue       // REQUIRED
-  upsert: bool              // OPTIONAL, defaults to false
-}
-```
-
-When `upsert` is `false` and the field already holds a value, the operation
-yields no change. When `upsert` is `true`, the consumer overwrites the field.
 
 ## Metric Filter Policy
 
@@ -826,7 +847,7 @@ telemetry. A policy is invalid when any of these hold:
 | A filter policy has an unset action.                        | `action` absent                            |
 | A sampling configuration is out of range.                   | `percentage: 150`, `sampling_precision: 0` |
 | A transform policy carries no operation.                    | no `rename`, `add`, `remove`, or `redact`  |
-| A `rename` has an empty `to`.                               | `to: ""`                                   |
+| A transform target or `rename` selector is unset.           | an empty `target`, `from`, or `to` oneof   |
 
 A consumer:
 
@@ -1128,9 +1149,9 @@ as new signals arrive.
 `oneof` on the matcher itself.
 
 **Tradeoff.** Another level of nesting. In exchange `LogRemove`, `LogRedact`,
-`LogRename`, and `LogAdd` all reuse `LogFieldSelector` instead of repeating the
-same five-variant `oneof`. That removes five copies of the selector and the
-"keep these in sync" hazard that comes with them.
+and `LogAdd` share `LogTargetSelector` and `LogRename` reuses
+`LogAttributeSelector` for both `from` and `to` rather than repeating inline
+`oneof` definitions across every message.
 
 ### The target never carries the expected value
 
@@ -1202,16 +1223,15 @@ substring, and bytes subsequence, according to the type of the target.
 exchange a policy can match an element of an array attribute, which no
 string-only form can express, and the predicate set gains no extra variant.
 
-### An attribute path, with array indices
+### An attribute path
 
-**Decision.** Every attribute selector takes an `AttributePath`. A segment that
-is a non-negative integer indexes an array value.
+**Decision.** Every attribute and structured body selector takes an
+`AttributePath`.
 
 **Tradeoff.** A path costs a list allocation where a flat string key would not,
 and the overwhelming majority of OpenTelemetry attributes are flat keys. A
 consumer can specialize the single-segment case, whereas a flat string would
-have made a nested map or an array element unreachable without a later breaking
-change.
+have made a nested map unreachable without a later breaking change.
 
 ### Metric granularity follows the matchers
 
@@ -1295,6 +1315,7 @@ change to the types defined here.
 | Log rate limiting            | A rate configuration on `LogSamplingPolicy`.                    |
 | Consistent sampling key      | A selector field on `LogSamplingPolicy`.                        |
 | Metric rate adjustment       | A `MetricRatePolicy`, reusing `MetricMatcher`.                  |
+| Resource transformation      | A `ResourceTransformPolicy` with optional signal selection.     |
 | Metric transformation        | A `MetricTransformPolicy`, reusing `MetricFieldSelector`.       |
 | Trace transformation         | A `TraceTransformPolicy`, reusing `TraceFieldSelector`.         |
 | Span link matching           | A `link_trace_id` variant on `TraceFieldSelector`.              |
