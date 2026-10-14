@@ -147,15 +147,6 @@ message TraceFieldSelector {
     //
     // [Since next]
     ScopeField scope_field = 5;
-
-    // An attribute of a span event.
-    //
-    // The matcher reports true when any event of the span carries an attribute
-    // at this path that satisfies the predicate. A span with no event does not
-    // match.
-    //
-    // [Since next]
-    AttributePath event_attribute = 6;
   }
 }
 
@@ -210,11 +201,6 @@ enum SpanRecordField {
   // [Since next]
   SPAN_RECORD_FIELD_TRACE_STATE = 5;
 
-  // The status message of the span.
-  //
-  // [Since next]
-  SPAN_RECORD_FIELD_STATUS_MESSAGE = 6;
-
   // The kind of the span.
   //
   // A predicate reads the uppercase name without the "SPAN_KIND_" prefix:
@@ -223,23 +209,7 @@ enum SpanRecordField {
   // names as the default.
   //
   // [Since next]
-  SPAN_RECORD_FIELD_KIND = 7;
-
-  // The status code of the span.
-  //
-  // A predicate reads the uppercase name without the "STATUS_CODE_" prefix:
-  // "UNSET", "OK", or "ERROR".
-  //
-  // [Since next]
-  SPAN_RECORD_FIELD_STATUS_CODE = 8;
-
-  // The name of a span event.
-  //
-  // The matcher reports true when the name of any event of the span satisfies
-  // the predicate. A span with no event does not match.
-  //
-  // [Since next]
-  SPAN_RECORD_FIELD_EVENT_NAME = 9;
+  SPAN_RECORD_FIELD_KIND = 6;
 }
 
 // SamplingMode states how a consumer reaches a sampling decision.
