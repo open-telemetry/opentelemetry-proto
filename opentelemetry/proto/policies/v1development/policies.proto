@@ -96,9 +96,9 @@ message Policy {
 //
 // A consumer replaces its whole set when it receives a new one. The order of
 // the list carries no meaning for a filter decision or a sampling decision,
-// because those decisions are commutative. A consumer that has to break a tie
-// between two transform operations on one field MUST break it in a stable
-// order, for example by policy identifier.
+// because those decisions are commutative. Within each operation stage of
+// LogTransformPolicy evaluation, operations across matching policies run in
+// ascending lexicographical (UTF-8 byte) order of Policy.id.
 //
 // Status: [Development]
 //

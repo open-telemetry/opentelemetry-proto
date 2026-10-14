@@ -53,8 +53,11 @@ message LogFilterPolicy {
 
 // LogTransformPolicy modifies a log record that survives the filter stage.
 //
-// A consumer applies the operations in one fixed order: remove, then redact,
-// then rename, then add. A consumer MUST NOT reorder the operations.
+// A consumer applies the operations in one fixed order: rename, then add,
+// then remove, then redact. Within each operation stage, operations across
+// all matching LogTransformPolicy rules run in ascending lexicographical
+// (UTF-8 byte) order of Policy.id, and in list order within each policy. A
+// consumer MUST NOT reorder the operations.
 //
 // A policy MUST carry at least one operation.
 //
@@ -70,25 +73,25 @@ message LogTransformPolicy {
   // [Since next]
   repeated LogMatcher matches = 1;
 
-  // Fields to delete. A field that is absent yields no change.
-  //
-  // [Since next]
-  repeated LogRemove remove = 2;
-
-  // Field values to mask.
-  //
-  // [Since next]
-  repeated LogRedact redact = 3;
-
   // Fields to rename.
   //
   // [Since next]
-  repeated LogRename rename = 4;
+  repeated LogRename rename = 2;
 
   // Fields to insert.
   //
   // [Since next]
-  repeated LogAdd add = 5;
+  repeated LogAdd add = 3;
+
+  // Fields to delete. A field that is absent yields no change.
+  //
+  // [Since next]
+  repeated LogRemove remove = 4;
+
+  // Field values to mask.
+  //
+  // [Since next]
+  repeated LogRedact redact = 5;
 }
 
 // LogMatcher evaluates one predicate against one log target.

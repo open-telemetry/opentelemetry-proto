@@ -25,10 +25,10 @@
   - [Log Selectors](#log-selectors)
 - [Log Transform Policy](#log-transform-policy)
   - [Execution Order](#execution-order)
-  - [Remove](#remove)
-  - [Redact](#redact)
   - [Rename](#rename)
   - [Add](#add)
+  - [Remove](#remove)
+  - [Redact](#redact)
 - [Metric Filter Policy](#metric-filter-policy)
   - [Granularity](#granularity)
   - [Metric Selectors](#metric-selectors)
@@ -416,10 +416,10 @@ A policy with an unset action, or with `ACTION_UNSPECIFIED`, is invalid.
 ```
 LogTransformPolicy {
   matches: LogMatcher[]  // REQUIRED, at least one
-  remove:  LogRemove[]   // OPTIONAL
-  redact:  LogRedact[]   // OPTIONAL
   rename:  LogRename[]   // OPTIONAL
   add:     LogAdd[]      // OPTIONAL
+  remove:  LogRemove[]   // OPTIONAL
+  redact:  LogRedact[]   // OPTIONAL
 }
 ```
 
@@ -429,10 +429,41 @@ A policy MUST carry at least one operation.
 
 A consumer MUST apply the operations in this order and MUST NOT reorder them:
 
-1. **Remove.** Delete the field.
-2. **Redact.** Mask the field value.
-3. **Rename.** Change the field key.
-4. **Add.** Insert the field.
+1. **Rename.** Change the field key.
+2. **Add.** Insert the field.
+3. **Remove.** Delete the field.
+4. **Redact.** Mask the field value.
+
+Within each of the four operation stages, operations across all matching
+`LogTransformPolicy` rules MUST execute in ascending lexicographical (UTF-8
+byte) order of `Policy.id`, and in list order within each policy.
+
+### Rename
+
+```
+LogRename {
+  from:   LogFieldSelector  // REQUIRED
+  to:     string            // REQUIRED, non-empty
+  upsert: bool              // OPTIONAL, defaults to false
+}
+```
+
+A source that is absent yields no change. When `upsert` is `false` and the
+destination already holds a value, the operation yields no change. When `upsert`
+is `true`, the consumer overwrites the destination.
+
+### Add
+
+```
+LogAdd {
+  target: LogFieldSelector  // REQUIRED
+  value:  Value             // REQUIRED
+  upsert: bool              // OPTIONAL, defaults to false
+}
+```
+
+When `upsert` is `false` and the field already holds a value, the operation
+yields no change. When `upsert` is `true`, the consumer overwrites the field.
 
 ### Remove
 
@@ -478,33 +509,6 @@ When `regex` is set, `replacement` is a template. A consumer MUST support:
 | `$$`             | A literal dollar sign.    |
 
 A reference to an absent capture group MUST expand to the empty string.
-
-### Rename
-
-```
-LogRename {
-  from:   LogFieldSelector  // REQUIRED
-  to:     string            // REQUIRED, non-empty
-  upsert: bool              // OPTIONAL, defaults to false
-}
-```
-
-A source that is absent yields no change. When `upsert` is `false` and the
-destination already holds a value, the operation yields no change. When `upsert`
-is `true`, the consumer overwrites the destination.
-
-### Add
-
-```
-LogAdd {
-  target: LogFieldSelector  // REQUIRED
-  value:  Value             // REQUIRED
-  upsert: bool              // OPTIONAL, defaults to false
-}
-```
-
-When `upsert` is `false` and the field already holds a value, the operation
-yields no change. When `upsert` is `true`, the consumer overwrites the field.
 
 ## Metric Filter Policy
 
@@ -695,14 +699,13 @@ an intent to keep, but a policy with a lower percentage still wins, because a
 higher percentage has no sound claim over a lower one.
 
 **Transform stage.** Every matching transform policy contributes its operations.
-The operations run in the order `remove`, `redact`, `rename`, `add` across the
-union of all matching policies. When two policies target one field within one
-operation type, the result is implementation-defined but MUST be deterministic.
-A consumer MUST break the tie in a stable order, for example by policy
-identifier.
+The operations run in the order `rename`, `add`, `remove`, `redact` across the
+union of all matching policies. Within each operation stage, operations across
+matching policies MUST execute in ascending lexicographical (UTF-8 byte) order
+of `Policy.id`, and in list order within each policy's operation list.
 
-This rule set is commutative: the outcome does not depend on the order of the
-policy set.
+This rule set is commutative with respect to policy batch order: the outcome
+does not depend on the order in which policies arrive on the wire.
 
 ### Match Tracking
 
@@ -807,7 +810,7 @@ telemetry. A policy is invalid when any of these hold:
 | A typed value is unset.                                     | an empty `Value`                           |
 | A filter policy has an unset action.                        | `action` absent                            |
 | A sampling configuration is out of range.                   | `percentage: 150`, `sampling_precision: 0` |
-| A transform policy carries no operation.                    | no `remove`, `redact`, `rename`, or `add`  |
+| A transform policy carries no operation.                    | no `rename`, `add`, `remove`, or `redact`  |
 | A `rename` has an empty `to`.                               | `to: ""`                                   |
 
 A consumer:
@@ -949,8 +952,8 @@ A consumer conforms to this specification when it:
    semantics.
 3. Applies the [precedence](#precedence) rules across the filter, sampling, and
    transform stages.
-4. Runs the transform operations in the order `remove`, `redact`, `rename`,
-   `add`.
+4. Runs the transform operations in the order `rename`, `add`, `remove`,
+   `redact`, ordered by ascending `Policy.id` within each operation stage.
 5. Stays fail-open for every error condition.
 6. Honors the `enabled` field.
 7. Validates a policy per the [compilation error](#compilation-errors) rules,
