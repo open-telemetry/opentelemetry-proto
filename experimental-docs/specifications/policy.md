@@ -41,7 +41,7 @@
 - [Evaluation Model](#evaluation-model)
   - [Stages](#stages)
   - [Precedence](#precedence)
-  - [Match Tracking](#match-tracking)
+  - [Match Outcome Semantics](#match-outcome-semantics)
 - [Validation and Error Handling](#validation-and-error-handling)
   - [Parse Errors](#parse-errors)
   - [Compilation Errors](#compilation-errors)
@@ -738,81 +738,31 @@ of `Policy.id`, and in list order within each policy's operation list.
 This rule set is commutative with respect to policy batch order: the outcome
 does not depend on the order in which policies arrive on the wire.
 
-### Match Tracking
+### Match Outcome Semantics
 
-A consumer SHOULD report two counters, so that an operator can see how much
-telemetry a policy set saw and whether each policy has the effect it intends.
+When a consumer tracks policy evaluation and match outcomes for observability or
+diagnostics, each policy that matches a telemetry datum (one log record, one
+metric data point, or one span) produces one of two outcomes under the
+[precedence](#precedence) rules above:
 
-| Counter                  | Counts                                     |
-| ------------------------ | ------------------------------------------ |
-| `policy.consumed.items`  | Every datum that enters policy evaluation. |
-| `policy.evaluated.items` | Every datum that a policy matched.         |
+- **`hit`**: The final decision for the stage honored the intent of the matching
+  policy.
+- **`miss`**: Another matching policy in the same stage overrode the intent of
+  the policy.
 
-Both counters are monotonic integer sums with the unit `{item}`. A consumer
-increments a counter once per telemetry datum, where a datum is one log record,
-one metric data point, or one span. A metric data point is the unit for metrics,
-not a metric stream.
-
-Both counters carry attributes rather than encode a dimension in the name:
-
-| Attribute   | On                       | Values                      |
-| ----------- | ------------------------ | --------------------------- |
-| `signal`    | Both counters            | `logs`, `metrics`, `traces` |
-| `policy.id` | `policy.evaluated.items` | The `id` of the policy.     |
-| `outcome`   | `policy.evaluated.items` | `hit`, `miss`               |
-
-This specification names the counters and the attributes. It does not fix a
-prefix, because a policy runs in an SDK as well as in a Collector. An
-implementation SHOULD map these names onto the convention of its host. A
-Collector, for example, emits `otelcol.policy.consumed.items`.
-
-**`policy.consumed.items`.** A consumer MUST increment this counter when a datum
-enters policy evaluation, before the filter, sampling, and transform stages run.
-A dropped datum, a sampled-out datum, and a redacted datum therefore all count,
-in the shape in which they arrived. A consumer MUST also count a datum that no
-policy matched, and a datum of a signal for which it holds no policy at all. The
-counter is the denominator that `policy.evaluated.items` needs: without it, an
-operator cannot tell whether a policy that reports 400 matches saw 500 records
-or 5 million.
-
-**`policy.evaluated.items`.** A consumer MUST increment this counter only for a
-policy whose matchers report true. The `outcome` attribute records whether the
-final result honored the intent of that policy:
-
-- `hit` when the final outcome honors the intent of the policy.
-- `miss` when another policy overrides that intent.
-
-Under the precedence rules above:
-
-| Situation                                              | `outcome = hit`                 | `outcome = miss`                      |
+| Stage & Situation                                      | `hit`                           | `miss`                                |
 | ------------------------------------------------------ | ------------------------------- | ------------------------------------- |
-| A keep policy and a drop policy match. Record is kept. | The keep policy.                | The drop policy.                      |
-| Only drop policies match. Record is dropped.           | Every drop policy.              | None.                                 |
-| A sampling decision keeps the span.                    | Every matching sampling policy. | None.                                 |
-| A sampling decision drops the span.                    | The most restrictive policy.    | Every other matching sampling policy. |
+| Filter: keep and drop policies match; record is kept.  | Every matching keep policy.     | Every matching drop policy.           |
+| Filter: only keep policies match; record is kept.      | Every matching keep policy.     | None.                                 |
+| Filter: only drop policies match; record is dropped.   | Every matching drop policy.     | None.                                 |
+| Sampling: decision does not drop the span.             | Every matching sampling policy. | None.                                 |
+| Sampling: decision drops the span.                     | The most restrictive policy.    | Every other matching sampling policy. |
+| Transform: record survives filter and policy matches.  | Every matching transform policy.| None.                                 |
 
-Because both counters share one unit, the match rate of a policy is one division
-within one metric family:
+A transform policy is not evaluated against a record that was dropped in the
+filter stage.
 
-```
-sum(policy.evaluated.items{policy.id = P})
-  / sum(policy.consumed.items{signal = S})
-```
-
-**Absent is not zero.** Tracking is optional, and each counter is optional on
-its own. A consumer that does not track a counter MUST omit it rather than
-report it as `0`. A reader MUST NOT read a missing counter as an observation of
-no telemetry.
-
-**Draining a counter.** A transport that drains these counters rather than reads
-them cumulatively MUST drain `policy.consumed.items` for a signal together with
-every `policy.evaluated.items` series for that signal. Keeping one side of the
-ratio while discarding the other skews the result. Such a transport MUST NOT
-replay a drained counter, because a duplicate read counts the same telemetry
-twice. A drained counter is therefore a lower bound on the telemetry a consumer
-observed, not an exact total.
-
-How a consumer reports these counters is outside the scope of this document.
+How a consumer reports these outcomes is outside the scope of this document.
 
 ## Validation and Error Handling
 
@@ -994,13 +944,8 @@ A consumer conforms to this specification when it:
 7. Validates a policy per the [compilation error](#compilation-errors) rules,
    keeps an invalid policy inert, and does not abort a valid policy in the same
    batch.
-8. Counts any counter it chooses to report per the
-   [match tracking](#match-tracking) semantics, carries the stated attributes,
-   and omits a counter it does not track rather than report it as `0`.
-
 A consumer MAY support a subset of the policy types. A consumer MUST document
-every policy type and every feature it does not support. Tracking a counter is
-optional, and each counter is optional on its own.
+every policy type and every feature it does not support.
 
 ## Implementation Notes
 
@@ -1292,11 +1237,10 @@ guess the intended type from the text.
 semantics. It does not define how a consumer receives a policy set or how it
 reports the results.
 
-**Tradeoff.** A conformant consumer still needs a transport binding, and
-[Match Tracking](#match-tracking) defines counters with no channel to report
-them on. Binding the schema to one transport, whether xDS, OpAMP, or a dedicated
-sync protocol, would have blocked the others. The schema is transport-agnostic,
-so each binding can land on its own.
+**Tradeoff.** A conformant consumer still needs a transport binding. Binding the
+schema to one transport, whether xDS, OpAMP, or a dedicated sync protocol, would
+have blocked the others. The schema is transport-agnostic, so each binding can
+land on its own.
 
 ## Deferred Features
 
@@ -1316,6 +1260,7 @@ change to the types defined here.
 | Span link matching           | A `link_trace_id` variant on `TraceFieldSelector`.              |
 | Metric value thresholds      | A data point value target on `MetricFieldSelector`.             |
 | Boolean expression trees     | Out of scope. Write several policies for OR semantics.          |
+| Self-observability metrics   | Metric and attribute definitions in `semantic-conventions`.     |
 | Transport binding            | A separate document per transport.                              |
 | Policy provenance timestamps | Control plane metadata, outside the policy schema.              |
 
