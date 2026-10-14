@@ -170,7 +170,7 @@ target never carries an expected value, and a predicate never names a field:
 ```yaml
 # Read the span kind, then compare it to "SERVER".
 - target: { record_field: SPAN_RECORD_FIELD_KIND }
-  predicate: { equals: SERVER }
+  predicate: { equals: { string_value: SERVER } }
 ```
 
 Because the value lives in the predicate, every predicate works against every
@@ -191,12 +191,12 @@ in its target. These three matchers read a log record, a metric data point, and
 a span, and the predicate is identical in all three:
 
 ```yaml
-- target: { log_attribute: ["http.response.status_code"] }
-  predicate: { gte: 500 }
-- target: { datapoint_attribute: ["http.response.status_code"] }
-  predicate: { gte: 500 }
-- target: { span_attribute: ["http.response.status_code"] }
-  predicate: { gte: 500 }
+- target: { log_attribute: { path: ["http.response.status_code"] } }
+  predicate: { gte: { int_value: 500 } }
+- target: { datapoint_attribute: { path: ["http.response.status_code"] } }
+  predicate: { gte: { int_value: 500 } }
+- target: { span_attribute: { path: ["http.response.status_code"] } }
+  predicate: { gte: { int_value: 500 } }
 ```
 
 ### Field Selection
@@ -228,23 +228,12 @@ An `AttributePath` locates an attribute by a list of segments.
   `["items", "0", "id"]`.
 - An empty path is invalid.
 
-The protobuf wraps the list in a message because proto3 forbids a `repeated`
-field inside a `oneof`. When a consumer reads YAML or JSON it MUST accept all
-three forms below:
+The protobuf wraps the list in an `AttributePath` message:
 
 ```yaml
-# Canonical
 log_attribute:
   path: ["http", "method"]
-
-# Array shorthand
-log_attribute: ["http", "method"]
-
-# String shorthand, single segment only
-log_attribute: "user_id"
 ```
-
-When a consumer writes YAML or JSON it SHOULD emit the array shorthand.
 
 ### Predicates
 
@@ -253,13 +242,13 @@ A matcher MUST set exactly one predicate.
 | Predicate  | Argument       | Matches when                                          |
 | ---------- | -------------- | ----------------------------------------------------- |
 | `exists`   | `Empty`        | The target is present.                                |
-| `equals`   | `Value`        | The target value equals the scalar.                   |
+| `equals`   | `ScalarValue`  | The target value equals the scalar.                   |
 | `regex`    | string         | The target string value satisfies the RE2 expression. |
 | `gt`       | `NumericValue` | The target number is greater than the argument.       |
 | `gte`      | `NumericValue` | The target number is greater than or equal to it.     |
 | `lt`       | `NumericValue` | The target number is less than the argument.          |
 | `lte`      | `NumericValue` | The target number is less than or equal to it.        |
-| `contains` | `Value`        | The target value holds the scalar. See below.         |
+| `contains` | `ScalarValue`  | The target value holds the scalar. See below.         |
 
 #### **`exists`**
 
@@ -304,10 +293,10 @@ because of a type mismatch.
 
 ### Typed Values
 
-`Value` holds one scalar. `NumericValue` holds one number.
+`ScalarValue` holds one scalar. `NumericValue` holds one number.
 
 ```
-Value {
+ScalarValue {
   // exactly one of:
   string_value: string
   int_value:    int64
@@ -333,18 +322,17 @@ boolean, a string, or a byte sequence is unrepresentable rather than rejected at
 compile time. `int_value` holds full 64-bit precision for a large integer field,
 such as a nanosecond timestamp, that a double cannot hold exactly.
 
-When a consumer reads YAML or JSON it MUST accept scalar shorthand. The type of
-the literal selects the variant:
+Examples:
 
 ```yaml
-- log_attribute: ["http.response.status_code"]
-  gte: 500 # int_value
-- log_attribute: ["sampling.ratio"]
-  lt: 0.5 # double_value
-- log_attribute: ["cache.hit"]
-  equals: true # bool_value
-- resource_attribute: ["service.name"]
-  equals: checkout-api # string_value
+- target: { log_attribute: { path: ["http.response.status_code"] } }
+  predicate: { gte: { int_value: 500 } }
+- target: { log_attribute: { path: ["sampling.ratio"] } }
+  predicate: { lt: { double_value: 0.5 } }
+- target: { log_attribute: { path: ["cache.hit"] } }
+  predicate: { equals: { bool_value: true } }
+- target: { resource_attribute: { path: ["service.name"] } }
+  predicate: { equals: { string_value: checkout-api } }
 ```
 
 ### Identifier Fields
@@ -358,8 +346,8 @@ span id and a parent span id. This is how an identifier appears in the W3C
 An author therefore writes `equals` with a `string_value`:
 
 ```yaml
-- record_field: SPAN_RECORD_FIELD_TRACE_ID
-  equals: "4bf92f3577b34da6a3ce929d0e0e4736"
+- target: { record_field: SPAN_RECORD_FIELD_TRACE_ID }
+  predicate: { equals: { string_value: "4bf92f3577b34da6a3ce929d0e0e4736" } }
 ```
 
 A consumer SHOULD decode the literal to raw bytes once, when it compiles the
@@ -498,7 +486,7 @@ is `true`, the consumer overwrites the destination.
 ```
 LogAdd {
   target: LogFieldSelector  // REQUIRED
-  value:  Value             // REQUIRED
+  value:  ScalarValue       // REQUIRED
   upsert: bool              // OPTIONAL, defaults to false
 }
 ```
@@ -623,8 +611,8 @@ span. The quantifier is **any**: the matcher reports true when at least one
 event satisfies the predicate. A span with no event does not match.
 
 `negate` inverts the whole matcher, not the quantifier. A matcher with
-`event_name`, `equals: "exception"`, and `negate: true` therefore reports true
-for a span that carries no exception event.
+`event_name`, `equals: { string_value: "exception" }`, and `negate: true`
+therefore reports true for a span that carries no exception event.
 
 ### Sampling Modes
 
@@ -804,7 +792,7 @@ telemetry. A policy is invalid when any of these hold:
 | A selector names an unspecified enum value.                 | `LOG_RECORD_FIELD_UNSPECIFIED`             |
 | An attribute path is empty.                                 | `log_attribute: []`                        |
 | A `regex` predicate or a `redact` pattern is not valid RE2. | `regex: "([a-z"`                           |
-| A typed value is unset.                                     | an empty `Value`                           |
+| A typed value is unset.                                     | an empty `ScalarValue`                     |
 | A filter policy has an unset action.                        | `action` absent                            |
 | A sampling configuration is out of range.                   | `percentage: 150`, `sampling_precision: 0` |
 | A transform policy carries no operation.                    | no `remove`, `redact`, `rename`, or `add`  |
@@ -842,10 +830,10 @@ id: drop-checkout-debug-logs
 name: Drop checkout debug logs
 log_filter:
   matches:
-    - target: { resource_attribute: ["service.name"] }
-      predicate: { equals: checkout-api }
+    - target: { resource_attribute: { path: ["service.name"] } }
+      predicate: { equals: { string_value: checkout-api } }
     - target: { record_field: LOG_RECORD_FIELD_SEVERITY_TEXT }
-      predicate: { equals: DEBUG }
+      predicate: { equals: { string_value: DEBUG } }
   action: ACTION_DROP
 ```
 
@@ -857,7 +845,7 @@ name: Keep error logs
 log_filter:
   matches:
     - target: { record_field: LOG_RECORD_FIELD_SEVERITY_NUMBER }
-      predicate: { gte: 17 }
+      predicate: { gte: { int_value: 17 } }
   action: ACTION_KEEP
 ```
 
@@ -868,10 +856,14 @@ id: redact-http-auth-header
 name: Redact HTTP authorization headers
 log_transform:
   matches:
-    - target: { log_attribute: ["http", "request", "headers", "authorization"] }
+    - target:
+        log_attribute:
+          path: ["http", "request", "headers", "authorization"]
       predicate: { exists: {} }
   redact:
-    - target: { log_attribute: ["http", "request", "headers", "authorization"] }
+    - target:
+        log_attribute:
+          path: ["http", "request", "headers", "authorization"]
       regex: '(?i)^(bearer\s+).+$'
       replacement: "$1[REDACTED]"
 ```
@@ -883,8 +875,8 @@ id: drop-ok-status-datapoints
 name: Drop 200-status data points
 metric_filter:
   matches:
-    - target: { datapoint_attribute: ["http.response.status_code"] }
-      predicate: { equals: 200 }
+    - target: { datapoint_attribute: { path: ["http.response.status_code"] } }
+      predicate: { equals: { int_value: 200 } }
   action: ACTION_DROP
 ```
 
@@ -907,7 +899,7 @@ id: drop-health-check-spans
 name: Drop health check spans
 trace_sampling:
   matches:
-    - target: { span_attribute: ["http.route"] }
+    - target: { span_attribute: { path: ["http.route"] } }
       predicate: { regex: "^/(healthz|readyz)$" }
   sampling:
     percentage: 0.0
@@ -921,7 +913,7 @@ name: Keep spans with exception events
 trace_sampling:
   matches:
     - target: { record_field: SPAN_RECORD_FIELD_EVENT_NAME }
-      predicate: { equals: exception }
+      predicate: { equals: { string_value: exception } }
   sampling:
     percentage: 100.0
 ```
@@ -933,7 +925,7 @@ id: sample-database-spans
 name: Sample database spans at 5 percent
 trace_sampling:
   matches:
-    - target: { span_attribute: ["db.system.name"] }
+    - target: { span_attribute: { path: ["db.system.name"] } }
       predicate: { exists: {} }
   sampling:
     percentage: 5.0
@@ -1116,8 +1108,9 @@ same five-variant `oneof`. That removes five copies of the selector and the
 span kind, and a span status code are all first-class **fields** on the
 selector, read by a normal predicate against their canonical uppercase name.
 
-**Tradeoff.** `descriptor_field: TYPE` with `equals: "HISTOGRAM"` is longer to
-write than `metric_type: HISTOGRAM`, and it trades an enum for a string, so a
+**Tradeoff.** `descriptor_field: TYPE` with
+`equals: { string_value: "HISTOGRAM" }` is longer to write than
+`metric_type: HISTOGRAM`, and it trades an enum for a string, so a
 typo is caught at evaluation time rather than at compile time. In exchange the
 predicate set stays universal, a matcher never needs a dummy predicate, and one
 matcher can span several values with `regex: "HISTOGRAM|GAUGE"`. Placing the
@@ -1172,7 +1165,7 @@ has to know whether a given field is bytes or a string.
 
 ### `contains` is typed and covers arrays
 
-**Decision.** `contains` takes a `Value`. It tests array membership, string
+**Decision.** `contains` takes a `ScalarValue`. It tests array membership, string
 substring, and bytes subsequence, according to the type of the target.
 
 **Tradeoff.** One name now carries three meanings, which a reader must learn. In
@@ -1185,10 +1178,10 @@ string-only form can express, and the predicate set gains no extra variant.
 is a non-negative integer indexes an array value.
 
 **Tradeoff.** A path costs a list allocation where a flat string key would not,
-and the overwhelming majority of OpenTelemetry attributes are flat keys. The
-YAML shorthand hides the cost at authoring time, and a consumer can specialize
-the single-segment case. A flat string would have made a nested map or an array
-element unreachable without a later breaking change.
+and the overwhelming majority of OpenTelemetry attributes are flat keys. A
+consumer can specialize the single-segment case, whereas a flat string would
+have made a nested map or an array element unreachable without a later breaking
+change.
 
 ### Metric granularity follows the matchers
 
@@ -1242,7 +1235,7 @@ any type defined here. See [Deferred Features](#deferred-features).
 
 ### A transform inserts a typed value
 
-**Decision.** `LogAdd.value` is a `Value`, not a string.
+**Decision.** `LogAdd.value` is a `ScalarValue`, not a string.
 
 **Tradeoff.** Slightly more to write for the common case of a string. In
 exchange a policy can insert a boolean or a number without forcing a consumer to
