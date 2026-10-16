@@ -48,7 +48,8 @@ message TraceSamplingPolicy {
   // Conditions that a span MUST satisfy.
   //
   // A consumer combines the matchers with AND: every matcher MUST report true
-  // before the sampling applies. A policy MUST carry at least one matcher.
+  // before the sampling applies. When matches is empty, the policy matches
+  // every span.
   //
   // [Since next]
   repeated TraceMatcher matches = 1;

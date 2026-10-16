@@ -67,8 +67,9 @@ message LogFilterPolicy {
 message LogTransformPolicy {
   // Conditions that a log record MUST satisfy.
   //
-  // A consumer combines the matchers with AND. A policy MUST carry at least
-  // one matcher.
+  // A consumer combines the matchers with AND: every matcher MUST report true
+  // before the transform applies. When matches is empty, the policy matches
+  // every log record.
   //
   // [Since next]
   repeated LogMatcher matches = 1;

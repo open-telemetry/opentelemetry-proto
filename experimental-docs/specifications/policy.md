@@ -152,9 +152,11 @@ policy MUST NOT match, keep, drop, sample, or transform any telemetry.
 Every policy type carries a `matches` list. A consumer combines the matchers
 with AND: every matcher MUST report true before the policy applies.
 
-A policy MUST carry at least one matcher. A consumer MUST reject a policy with
-an empty `matches` list. This rule prevents a drop policy from matching every
-record by accident.
+A filter policy (`LogFilterPolicy`, `MetricFilterPolicy`) MUST carry at least
+one matcher; a consumer MUST reject a filter policy with an empty `matches`
+list so that a filter policy cannot drop or keep every record by accident. On
+`LogTransformPolicy` and `TraceSamplingPolicy`, `matches` MAY be empty, in
+which case the policy matches every log record or span.
 
 A matcher has three parts:
 
@@ -403,7 +405,7 @@ A policy with an unset action, or with `ACTION_UNSPECIFIED`, is invalid.
 
 ```
 LogTransformPolicy {
-  matches: LogMatcher[]  // REQUIRED, at least one
+  matches: LogMatcher[]  // OPTIONAL; if empty, matches all log records
   rename:  LogRename[]   // OPTIONAL
   add:     LogAdd[]      // OPTIONAL
   remove:  LogRemove[]   // OPTIONAL
@@ -580,7 +582,7 @@ the prune leaves empty.
 
 ```
 TraceSamplingPolicy {
-  matches:  TraceMatcher[]  // REQUIRED, at least one
+  matches:  TraceMatcher[]  // OPTIONAL; if empty, matches all spans
   sampling: SamplingConfig  // REQUIRED
 }
 
@@ -816,7 +818,7 @@ telemetry. A policy is invalid when any of these hold:
 
 | Condition                                                   | Example                                    |
 | ----------------------------------------------------------- | ------------------------------------------ |
-| The `matches` list is empty.                                | `matches: []`                              |
+| A filter policy has an empty `matches` list.                | `matches: []` on a filter policy           |
 | A matcher sets no target.                                   | an empty `target` oneof                    |
 | A matcher sets no predicate.                                | an empty `predicate` oneof                 |
 | A selector names an unspecified enum value.                 | `LOG_RECORD_FIELD_UNSPECIFIED`             |
