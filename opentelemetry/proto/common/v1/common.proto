@@ -158,7 +158,8 @@ message EntityRef {
   // These keys MUST exist in the containing {message}.attributes.
   repeated string description_keys = 4;
 
-  // ScopeKind defines the scope within which an entity's ID is unique.
+  // IdUniqueness states whether an entity's ID is unique on its own or only within
+  // another entity.
   //
   // Consumers MUST be able to determine this from the entity alone. Consumers MUST NOT be
   // required to consult semantic conventions in order to interpret an entity's identity,
@@ -166,40 +167,40 @@ message EntityRef {
   // producer used is not knowable from the data.
   //
   // [Since next]
-  enum ScopeKind {
-    // The producer did not state the scope of the ID. Consumers MUST treat the entity's
+  enum IdUniqueness {
+    // The producer did not state how the ID is unique. Consumers MUST treat the entity's
     // identity as unresolved and MUST NOT assume the ID is unique outside the Resource
     // that carries it.
-    SCOPE_KIND_UNSPECIFIED = 0;
+    ID_UNIQUENESS_UNSPECIFIED = 0;
 
     // The ID is unique on its own, because it comes from a scheme that mints identifiers
-    // unique across all systems, such as a UUID. id_context_type MUST be empty.
-    SCOPE_KIND_GLOBAL = 1;
+    // unique across all systems, such as a UUID. id_unique_within_type MUST be empty.
+    ID_UNIQUENESS_GLOBAL = 1;
 
-    // The ID is unique only within another entity, named by id_context_type.
-    SCOPE_KIND_LOCAL = 2;
+    // The ID is unique only within one other entity, named by id_unique_within_type.
+    ID_UNIQUENESS_LOCAL = 2;
   }
 
-  // The scope within which this entity's ID is unique.
-  // The producer of the entity MUST set this field. A producer that cannot determine the
-  // scope of an ID it minted SHOULD leave this field SCOPE_KIND_UNSPECIFIED rather than
-  // guess, so that consumers do not treat a scoped ID as globally unique.
+  // Whether this entity's ID is unique on its own or only within another entity.
+  // The producer of the entity MUST set this field. A producer that cannot determine how
+  // an ID it minted is unique SHOULD leave this field ID_UNIQUENESS_UNSPECIFIED rather
+  // than guess, so that consumers do not treat a locally unique ID as globally unique.
   // A component MUST NOT set or modify this field on an entity it did not produce.
   //
   // [Since next]
-  ScopeKind scope_kind = 5;
+  IdUniqueness id_uniqueness = 5;
 
   // Type of the entity within which this entity's ID is unique.
-  // Only meaningful when scope_kind is SCOPE_KIND_LOCAL, and MUST be empty otherwise.
+  // Only meaningful when id_uniqueness is ID_UNIQUENESS_LOCAL, and MUST be empty otherwise.
   //
-  // This describes the kind of boundary the ID was minted within. It is not a reference to a
-  // specific entity. A Resource carries at most one entity of a given type, so a consumer
-  // resolves the context entity by matching this type against the entities on the same
-  // Resource. The context entity is not required to be present: when it is absent, the
+  // This describes the entity's own ID rather than referring to a specific entity: it states
+  // what kind of boundary the ID was minted within. A Resource carries at most one entity of
+  // a given type, so a consumer finds that entity by matching this type against the entities
+  // on the same Resource. That entity is not required to be present: when it is absent, the
   // entity's identity is unresolved.
   //
   // A component MUST NOT set or modify this field on an entity it did not produce.
   //
   // [Since next]
-  string id_context_type = 6;
+  string id_unique_within_type = 6;
 }

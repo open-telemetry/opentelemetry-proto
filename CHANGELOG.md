@@ -7,7 +7,7 @@ The full list of changes can be found in the compare view for the respective rel
 ### Added
 
 - profiles: add temporary OTLP Profiles development version metadata. [#857](https://github.com/open-telemetry/opentelemetry-proto/pull/857)
-- common: add `scope_kind` and `id_context_type` to `EntityRef`. [#810](https://github.com/open-telemetry/opentelemetry-proto/pull/810)
+- common: add `id_uniqueness` and `id_unique_within_type` to `EntityRef`. [#810](https://github.com/open-telemetry/opentelemetry-proto/pull/810)
 
 ### Changed
 
