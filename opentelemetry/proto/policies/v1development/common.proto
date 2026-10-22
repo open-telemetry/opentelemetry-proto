@@ -24,12 +24,12 @@ option java_package = "io.opentelemetry.proto.policies.v1development";
 option java_outer_classname = "PoliciesCommonProto";
 option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
 
-// AttributePath locates an attribute value by a sequence of path segments.
+// AttributePath locates an attribute value by a sequence of map keys.
 //
 // A single segment selects a flat attribute, for example ["http.route"].
-// Multiple segments traverse nested maps, for example ["http", "request",
-// "method"]. A segment that is a non-negative base-10 integer indexes into an
-// array value, for example ["items", "0", "id"]. An empty path is invalid.
+// Multiple segments traverse nested maps (KeyValueList), for example ["http",
+// "request", "method"]. Every segment is treated as a map key. An empty path
+// is invalid.
 //
 // Status: [Development]
 //
