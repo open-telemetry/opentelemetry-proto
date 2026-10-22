@@ -7,6 +7,8 @@ The full list of changes can be found in the compare view for the respective rel
 ### Added
 
 - profiles: add temporary OTLP Profiles development version metadata. [#857](https://github.com/open-telemetry/opentelemetry-proto/pull/857)
+- trace: add span type. [#](https://github.com/open-telemetry/opentelemetry-proto/pull/)
+
 
 ### Changed
 
