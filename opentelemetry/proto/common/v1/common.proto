@@ -157,4 +157,49 @@ message EntityRef {
   // These attribute keys are not part of entity's identity.
   // These keys MUST exist in the containing {message}.attributes.
   repeated string description_keys = 4;
+
+  // IdScope states whether an entity's ID is unique on its own or only within another
+  // entity.
+  //
+  // Consumers MUST be able to determine this from the entity alone. Consumers MUST NOT be
+  // required to consult semantic conventions to interpret an entity's identity, since
+  // semantic conventions are not available to every consumer and the version a producer
+  // used is not knowable from the data.
+  //
+  // [Since next]
+  enum IdScope {
+    // The producer did not state the scope. Consumers MUST treat the entity's identity as
+    // unresolved and MUST NOT assume the ID is unique outside the Resource that carries it.
+    ID_SCOPE_UNSPECIFIED = 0;
+
+    // The ID is unique on its own, because it comes from a scheme that produces globally
+    // unique values, such as a UUID. id_scope_entity_type MUST be empty.
+    ID_SCOPE_GLOBAL = 1;
+
+    // The ID is unique only within one other entity, named by id_scope_entity_type.
+    ID_SCOPE_LOCAL = 2;
+  }
+
+  // Whether this entity's ID is unique on its own or only within another entity.
+  // The producer of the entity MUST set this field. A producer that cannot tell SHOULD
+  // leave it ID_SCOPE_UNSPECIFIED rather than guess, so that consumers do not treat a
+  // scoped ID as globally unique.
+  // A component MUST NOT set or modify this field on an entity it did not produce.
+  //
+  // [Since next]
+  IdScope id_scope = 5;
+
+  // Type of the entity within which this entity's ID is unique.
+  // Only meaningful when id_scope is ID_SCOPE_LOCAL, and MUST be empty otherwise.
+  //
+  // This describes the entity's own ID: it says what kind of entity the ID is unique
+  // within, not which particular entity. A Resource carries at most one entity of a given
+  // type, so a consumer finds the scoping entity by matching this type against the
+  // entities on the same Resource. The scoping entity is not required to be present: when
+  // it is absent, the entity's identity is unresolved.
+  //
+  // A component MUST NOT set or modify this field on an entity it did not produce.
+  //
+  // [Since next]
+  string id_scope_entity_type = 6;
 }
