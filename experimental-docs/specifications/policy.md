@@ -741,28 +741,36 @@ does not depend on the order in which policies arrive on the wire.
 ### Match Outcome Semantics
 
 When a consumer tracks policy evaluation and match outcomes for observability or
-diagnostics, each policy that matches a telemetry datum (one log record, one
-metric data point, or one span) produces one of two outcomes under the
-[precedence](#precedence) rules above:
+diagnostics, it SHOULD track both:
 
-- **`hit`**: The final decision for the stage honored the intent of the matching
-  policy.
-- **`miss`**: Another matching policy in the same stage overrode the intent of
-  the policy.
+1. **Evaluated data (denominator)**: Every telemetry datum (one log record, one
+   metric data point, or one span) that enters policy evaluation for a signal,
+   before the filter, sampling, and transform stages run. A metric data point is
+   the unit for metrics, not a metric stream. This count includes data that are
+   subsequently dropped, sampled out, or transformed, as well as data that no
+   policy matches, providing the denominator needed to interpret per-policy
+   match counts.
+2. **Per-policy match outcomes**: For each policy that matches a telemetry
+   datum, one of two outcomes under the [precedence](#precedence) rules above:
+   - **`hit`**: The final decision for the stage honored the intent of the
+     matching policy.
+   - **`miss`**: Another matching policy in the same stage overrode the intent
+     of the policy.
 
-| Stage & Situation                                      | `hit`                           | `miss`                                |
-| ------------------------------------------------------ | ------------------------------- | ------------------------------------- |
-| Filter: keep and drop policies match; record is kept.  | Every matching keep policy.     | Every matching drop policy.           |
-| Filter: only keep policies match; record is kept.      | Every matching keep policy.     | None.                                 |
-| Filter: only drop policies match; record is dropped.   | Every matching drop policy.     | None.                                 |
-| Sampling: decision does not drop the span.             | Every matching sampling policy. | None.                                 |
-| Sampling: decision drops the span.                     | The most restrictive policy.    | Every other matching sampling policy. |
-| Transform: record survives filter and policy matches.  | Every matching transform policy.| None.                                 |
+| Stage & Situation                                      | `hit`                            | `miss`                                |
+| ------------------------------------------------------ | -------------------------------- | ------------------------------------- |
+| Filter: keep and drop policies match; record is kept.  | Every matching keep policy.      | Every matching drop policy.           |
+| Filter: only keep policies match; record is kept.      | Every matching keep policy.      | None.                                 |
+| Filter: only drop policies match; record is dropped.   | Every matching drop policy.      | None.                                 |
+| Sampling: decision does not drop the span.             | Every matching sampling policy.  | None.                                 |
+| Sampling: decision drops the span.                     | The most restrictive policy.     | Every other matching sampling policy. |
+| Transform: record survives filter and policy matches.  | Every matching transform policy. | None.                                 |
 
 A transform policy is not evaluated against a record that was dropped in the
 filter stage.
 
-How a consumer reports these outcomes is outside the scope of this document.
+How a consumer reports these counts and outcomes is outside the scope of this
+document.
 
 ## Validation and Error Handling
 
@@ -944,6 +952,7 @@ A consumer conforms to this specification when it:
 7. Validates a policy per the [compilation error](#compilation-errors) rules,
    keeps an invalid policy inert, and does not abort a valid policy in the same
    batch.
+
 A consumer MAY support a subset of the policy types. A consumer MUST document
 every policy type and every feature it does not support.
 
