@@ -606,17 +606,16 @@ TraceSamplingPolicy {
 }
 
 SamplingConfig {
-  percentage:         float  // REQUIRED, 0 to 100
-  mode:               SamplingMode  // OPTIONAL, defaults to hash_seed
-  sampling_precision: uint32 // OPTIONAL, defaults to 4, range 1 to 14
-  hash_seed:          uint32 // OPTIONAL, defaults to 0
-  fail_closed:        bool   // OPTIONAL, defaults to true
+  percentage:         float         // REQUIRED, 0 to 100
+  mode:               SamplingMode  // OPTIONAL, defaults to SAMPLING_MODE_EQUALIZING
+  sampling_precision: uint32        // OPTIONAL, defaults to 4, range 1 to 14
 }
 ```
 
-A consumer compares a 56-bit randomness value R against a rejection threshold T,
-and keeps the span when R is greater than or equal to T. The percentage sets the
-threshold:
+A consumer compares a 56-bit randomness value R (read from the `rv` sub-key of
+the `ot` tracestate entry when present, or else from the least-significant 56
+bits of the `trace_id`) against a rejection threshold T, and keeps the span when
+R is greater than or equal to T. The percentage sets the threshold:
 
 ```
 T = (1 - percentage / 100) * 2^56
@@ -668,14 +667,10 @@ therefore reports true for a span that carries no exception event.
 
 ### Sampling Modes
 
-| Mode                         | Description                                                                                                                                              |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SAMPLING_MODE_HASH_SEED`    | Hashes the trace id with `hash_seed` for a deterministic decision. Every consumer in one tier that shares a seed reaches the same decision. The default. |
-| `SAMPLING_MODE_PROPORTIONAL` | Multiplies the arriving probability by `percentage`. Reduces traffic by a fixed factor whatever the arriving threshold.                                  |
-| `SAMPLING_MODE_EQUALIZING`   | Raises every span to one common threshold. A span whose arriving threshold is already more restrictive keeps that threshold.                             |
-
-`fail_closed` sets the behavior when the sampling raises an error. When it is
-`true`, the consumer drops the span. When it is `false`, the consumer keeps it.
+| Mode                         | Description                                                                                                                               |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `SAMPLING_MODE_EQUALIZING`   | Raises every span to one common threshold. A span whose arriving threshold is already more restrictive keeps that threshold. The default. |
+| `SAMPLING_MODE_PROPORTIONAL` | Multiplies the arriving probability by `percentage`. Reduces traffic by a fixed factor whatever the arriving threshold.                   |
 
 ### Tracestate Handling
 

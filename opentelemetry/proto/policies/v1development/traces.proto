@@ -74,7 +74,7 @@ message SamplingConfig {
   float percentage = 1;
 
   // How to reach the sampling decision. The default is
-  // SAMPLING_MODE_HASH_SEED.
+  // SAMPLING_MODE_EQUALIZING.
   //
   // [Since next]
   optional SamplingMode mode = 2;
@@ -87,24 +87,6 @@ message SamplingConfig {
   //
   // [Since next]
   optional uint32 sampling_precision = 3;
-
-  // The seed of the hash that SAMPLING_MODE_HASH_SEED applies to the trace id.
-  // The default is 0.
-  //
-  // Every consumer in one tier, for example every collector behind one load
-  // balancer, SHOULD share a seed so that the tier reaches the same decision
-  // for the same trace id.
-  //
-  // [Since next]
-  optional uint32 hash_seed = 4;
-
-  // Whether a sampling error drops the span. The default is true.
-  //
-  // When fail_closed is true, a consumer drops a span whose sampling raises an
-  // error. When fail_closed is false, a consumer keeps that span.
-  //
-  // [Since next]
-  optional bool fail_closed = 5;
 }
 
 // TraceMatcher evaluates one predicate against one span target.
@@ -264,19 +246,10 @@ enum SpanRecordField {
 //
 // [Since next]
 enum SamplingMode {
-  // The mode is not set. A consumer applies SAMPLING_MODE_HASH_SEED.
+  // The mode is not set. A consumer applies SAMPLING_MODE_EQUALIZING.
   //
   // [Since next]
   SAMPLING_MODE_UNSPECIFIED = 0;
-
-  // Hashes the trace id together with hash_seed to reach a deterministic
-  // decision.
-  //
-  // Every consumer with the same seed reaches the same decision for the same
-  // trace id, so a tier of consumers stays consistent.
-  //
-  // [Since next]
-  SAMPLING_MODE_HASH_SEED = 1;
 
   // Multiplies the arriving probability by the configured percentage.
   //
@@ -285,7 +258,7 @@ enum SamplingMode {
   // output probability is 5 percent.
   //
   // [Since next]
-  SAMPLING_MODE_PROPORTIONAL = 2;
+  SAMPLING_MODE_PROPORTIONAL = 1;
 
   // Raises every span to one common threshold.
   //
@@ -294,5 +267,5 @@ enum SamplingMode {
   // target threshold. The mode keeps a rare span and caps an over-sampled one.
   //
   // [Since next]
-  SAMPLING_MODE_EQUALIZING = 3;
+  SAMPLING_MODE_EQUALIZING = 2;
 }
