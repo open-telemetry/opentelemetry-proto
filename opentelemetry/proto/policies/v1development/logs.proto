@@ -248,7 +248,7 @@ message LogRedact {
   // empty string.
   //
   // [Since next]
-  string replacement = 2;
+  optional string replacement = 2;
 
   // An optional RE2 expression that narrows the replacement.
   //
@@ -353,7 +353,9 @@ enum LogRecordField {
   // The trace id of the log record.
   //
   // A predicate reads the canonical 32-character lowercase hexadecimal text,
-  // as the W3C Trace Context specification defines it.
+  // as the W3C Trace Context specification defines it. An empty or all-zero
+  // (16 zero bytes) trace id MUST be treated as absent: the exists predicate
+  // reports false, and a string predicate reads the empty text "".
   //
   // [Since next]
   LOG_RECORD_FIELD_TRACE_ID = 4;
@@ -361,7 +363,9 @@ enum LogRecordField {
   // The span id of the log record.
   //
   // A predicate reads the canonical 16-character lowercase hexadecimal text,
-  // as the W3C Trace Context specification defines it.
+  // as the W3C Trace Context specification defines it. An empty or all-zero
+  // (8 zero bytes) span id MUST be treated as absent: the exists predicate
+  // reports false, and a string predicate reads the empty text "".
   //
   // [Since next]
   LOG_RECORD_FIELD_SPAN_ID = 5;

@@ -30,9 +30,9 @@ option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
 // Policy carries one policy definition together with the metadata that a
 // control plane and an operator need.
 //
-// The envelope is optional. A transport that already supplies an identity and
-// a lifecycle, such as an xDS resource or an OpAMP custom message, MAY carry a
-// bare policy message instead.
+// Every policy MUST be transmitted and evaluated in this Policy envelope so
+// that every policy has a canonical id, enabled flag, and metadata across all
+// transports.
 //
 // Status: [Development]
 //

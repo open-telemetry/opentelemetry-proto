@@ -38,8 +38,8 @@ option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
 // A span that no sampling policy matches passes through. When several sampling
 // policies match one span, the most restrictive one applies, which is the one
 // with the highest threshold. A percentage of 0 drops every matching span, and
-// a percentage of 100 keeps every matching span, so one policy type covers a
-// deterministic drop and a deterministic keep as well as a probability.
+// a percentage of 100 does not drop any matching spans, although they may be
+// dropped by a different matching sampling policy.
 //
 // Status: [Development]
 //
@@ -68,11 +68,12 @@ message TraceSamplingPolicy {
 message SamplingConfig {
   // The share of matching spans to keep, from 0 to 100.
   //
-  // A value of 0 drops every matching span. A value of 100 or more keeps every
-  // matching span. A value outside the range 0 to 100 is invalid.
+  // A value of 0 drops every matching span. A value of 100 does not drop any
+  // matching spans, although they may be dropped by a different matching
+  // sampling policy. A value outside the range 0 to 100 is invalid.
   //
   // [Since next]
-  float percentage = 1;
+  optional double percentage = 1;
 
   // How to reach the sampling decision. The default is
   // SAMPLING_MODE_EQUALIZING.

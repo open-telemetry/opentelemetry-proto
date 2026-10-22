@@ -126,12 +126,8 @@ with these additional constraints:
 
 ## Policy Structure
 
-A bare policy message carries only its matchers and its action. A transport that
-supplies its own identity and lifecycle, such as an xDS resource or an OpAMP
-custom message, MAY carry a bare policy message.
-
-A transport that does not supply an identity SHOULD carry the `Policy` envelope,
-which adds operator metadata:
+Every policy MUST be wrapped in the `Policy` envelope, which supplies a unique
+identifier, lifecycle state, and operator metadata across all transports:
 
 | Field         | Type          | Default | Description                              |
 | ------------- | ------------- | ------- | ---------------------------------------- |
@@ -318,14 +314,13 @@ NumericValue {
 ```
 
 `equals` matches when the target value has the same type and the same value as
-the argument. An integer and a double are compared in one numeric domain, so an
-`int_value` argument MAY match a double target with an equal numeric value, and
-the reverse. Every other pairing of types does not match.
-
-`gt`, `gte`, `lt`, and `lte` take a `NumericValue`, so a comparison against a
-boolean, a string, or a byte sequence is unrepresentable rather than rejected at
-compile time. `int_value` holds full 64-bit precision for a large integer field,
-such as a nanosecond timestamp, that a double cannot hold exactly.
+the argument. An integer and a double are compared in one numeric domain by
+exact mathematical value, so across `equals`, `contains`, `gt`, `gte`, `lt`, and
+`lte`, an `int_value` argument MUST be compared against a `double` target (and a
+`double_value` argument against an `int64` target) without losing 64-bit integer
+precision (for example, `int64(2^53 + 1)` MUST NOT match `double(2^53)`). Any
+comparison involving `NaN` evaluates to `false` (before `negate`). Every other
+pairing of types does not match.
 
 Examples:
 
@@ -343,10 +338,13 @@ Examples:
 ### Identifier Fields
 
 A trace id, a span id, and a parent span id are byte sequences in the
-OpenTelemetry data model. Every predicate reads them as their **canonical
-lowercase hexadecimal text**: 32 characters for a trace id, 16 characters for a
-span id and a parent span id. This is how an identifier appears in the W3C
-`traceparent` header and throughout OpenTelemetry.
+OpenTelemetry data model. When present, every predicate reads them as their
+**canonical lowercase hexadecimal text**: 32 characters for a trace id, 16
+characters for a span id and a parent span id. This is how an identifier appears
+in the W3C `traceparent` header and throughout OpenTelemetry. An empty or
+all-zero byte sequence (16 zero bytes for a trace id, 8 zero bytes for a span id
+or a parent span id) MUST be treated as absent: the `exists` predicate evaluates
+to `false`, and a string predicate reads the empty text `""`.
 
 An author therefore writes `equals` with a `string_value`:
 
@@ -566,10 +564,15 @@ The matchers set the granularity:
 
 - **Instrument level.** When every matcher selects `descriptor_field`,
   `resource_attribute`, `scope_attribute`, or `scope_field`, the action applies
-  to the whole metric stream.
+  to every data point in the metric stream.
 - **Data point level.** When any matcher selects `datapoint_attribute`, the
-  action applies to each data point on its own. A drop prunes the matching data
-  points and leaves the rest of the stream in place.
+  action applies to each matching data point on its own. A drop prunes the
+  matching data points and leaves the rest of the stream in place.
+
+Filter precedence (`ACTION_KEEP` overrides `ACTION_DROP`) resolves per data
+point across both instrument-level and data-point-level policies. When no
+data-point-level `ACTION_KEEP` policy can match a stream, a consumer MAY
+short-circuit and drop the entire stream at the instrument level.
 
 A consumer that prunes every data point of a metric stream MUST drop the empty
 metric. A consumer MUST also drop a `ScopeMetrics` or a `ResourceMetrics` that
@@ -623,10 +626,9 @@ R is greater than or equal to T. The percentage sets the threshold:
 T = (1 - percentage / 100) * 2^56
 ```
 
-A `percentage` of 0 drops every matching span. A `percentage` of 100 or more
-keeps every matching span. A value outside the range 0 to 100 is invalid. One
-policy type therefore covers a deterministic drop and a deterministic keep as
-well as a probability.
+A `percentage` of 0 drops every matching span. A `percentage` of 100 does not
+drop any matching spans, although they may be dropped by a different matching
+sampling policy. A value outside the range 0 to 100 is invalid.
 
 A consumer evaluates each span on its own and MUST NOT reassemble a trace. A
 dropped span therefore leaves its children behind, with a parent span id that
@@ -800,6 +802,7 @@ telemetry. A policy is invalid when any of these hold:
 | A `regex` predicate or a `redact` pattern is not valid RE2. | `regex: "([a-z"`                           |
 | A typed value is unset.                                     | an empty `ScalarValue`                     |
 | A filter policy has an unset action.                        | `action` absent                            |
+| A sampling policy has an unset `sampling` or `percentage`.  | `percentage` absent                        |
 | A sampling configuration is out of range.                   | `percentage: 150`, `sampling_precision: 0` |
 | A transform policy carries no operation.                    | no `rename`, `add`, `remove`, or `redact`  |
 | A transform target or `rename` selector is unset.           | an empty `target`, `from`, or `to` oneof   |
@@ -826,8 +829,13 @@ A type mismatch is not a runtime error. It is a non-match. See
 
 ## YAML Representation
 
-Protocol Buffers is the canonical format. A YAML representation MUST map
-directly onto the protobuf schema.
+Protocol Buffers (binary and canonical Protobuf JSON) is the wire format, so
+consumers (such as SDKs) are NOT required to support YAML. When a policy server,
+CLI, or documentation represents a policy in YAML (as in the examples below), the
+YAML representation MUST use the [YAML 1.2 Core Schema](https://yaml.org/spec/1.2.2/#103-core-schema)
+and map 1:1 onto the canonical Protobuf JSON schema (matching how
+[OpenTelemetry Declarative Configuration](https://opentelemetry.io/docs/specs/otel/configuration/data-model/)
+maps YAML 1.2 files onto its JSON Schema).
 
 **Drop debug logs from one service.**
 
@@ -909,19 +917,6 @@ trace_sampling:
       predicate: { regex: "^/(healthz|readyz)$" }
   sampling:
     percentage: 0.0
-```
-
-**Keep every span that carries an exception event.**
-
-```yaml
-id: keep-spans-with-exceptions
-name: Keep spans with exception events
-trace_sampling:
-  matches:
-    - target: { record_field: SPAN_RECORD_FIELD_EVENT_NAME }
-      predicate: { equals: { string_value: exception } }
-  sampling:
-    percentage: 100.0
 ```
 
 **Sample database spans at 5 percent.**
@@ -1031,16 +1026,18 @@ matcher list is duplicated between them. In exchange, each policy stays small,
 its validity is decidable on its own, and a new intent lands as a new type
 rather than as a new mode inside an existing one.
 
-### The envelope is optional
+### The `Policy` envelope is mandatory
 
-**Decision.** `Policy` carries `id`, `name`, `description`, `enabled`, and
-`labels`, plus a `oneof` over the four policy types. A transport that already
-supplies identity and lifecycle MAY carry a bare policy message instead.
+**Decision.** Every policy is carried inside the `Policy` envelope (`id`,
+`name`, `description`, `enabled`, `labels`, and a `oneof definition` over the
+policy types). Bare policy messages without the envelope are not used on the
+wire.
 
-**Tradeoff.** Two valid shapes on the wire, so a consumer must handle both. In
-exchange, `enabled` survives, which no envelope-free design can express, and a
-transport such as xDS that wraps a policy in `google.protobuf.Any` binds without
-a redundant identity layer.
+**Tradeoff.** A transport such as xDS or OpAMP that already has an outer
+resource identifier still carries `Policy.id` inside the payload. In exchange,
+consumers only ever decode one canonical envelope type, `enabled` is always
+available, and `Policy.id` is guaranteed to exist for deterministic transform
+ordering and observability.
 
 ### A typed action, not a polymorphic keep string
 

@@ -140,9 +140,11 @@ message Predicate {
 
     // Matches when the target value equals this typed scalar.
     //
-    // An integer and a double are compared in one numeric domain, so an
-    // int_value MAY match a double target with an equal numeric value, and the
-    // reverse. Every other pairing of types does not match.
+    // An integer and a double are compared in one numeric domain by exact
+    // mathematical value, so an int_value MUST match a double target with an
+    // equal numeric value, and the reverse, preserving full 64-bit integer
+    // precision. A comparison with NaN always evaluates to false. Every other
+    // pairing of types does not match.
     //
     // [Since next]
     ScalarValue equals = 2;
