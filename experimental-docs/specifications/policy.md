@@ -611,7 +611,7 @@ TraceSamplingPolicy {
 }
 
 SamplingConfig {
-  percentage:         float         // REQUIRED, 0 to 100
+  percentage:         double        // REQUIRED, 0 to 100
   mode:               SamplingMode  // OPTIONAL, defaults to SAMPLING_MODE_EQUALIZING
   sampling_precision: uint32        // OPTIONAL, defaults to 4, range 1 to 14
 }
@@ -794,6 +794,8 @@ telemetry. A policy is invalid when any of these hold:
 
 | Condition                                                   | Example                                    |
 | ----------------------------------------------------------- | ------------------------------------------ |
+| The policy `id` is empty or duplicated within a batch.      | `id: ""`                                   |
+| The policy `definition` is unset.                           | an empty `definition` oneof                |
 | A filter policy has an empty `matches` list.                | `matches: []` on a filter policy           |
 | A matcher sets no target.                                   | an empty `target` oneof                    |
 | A matcher sets no predicate.                                | an empty `predicate` oneof                 |
@@ -1249,6 +1251,7 @@ reports the results.
 schema to one transport, whether xDS, OpAMP, or a dedicated sync protocol, would
 have blocked the others. The schema is transport-agnostic, so each binding can
 land on its own.
+<!-- TODO: Link to the policy specification in opentelemetry-specification once it exists. -->
 
 ## Deferred Features
 
