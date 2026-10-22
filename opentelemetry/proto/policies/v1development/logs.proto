@@ -234,7 +234,7 @@ message LogAdd {
   // The value to set.
   //
   // [Since next]
-  Value value = 2;
+  ScalarValue value = 2;
 
   // Overwrites the field when it already holds a value. When upsert is false
   // and the field already exists, the operation yields no change.

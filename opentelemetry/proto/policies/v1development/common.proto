@@ -41,12 +41,16 @@ message AttributePath {
   repeated string path = 1;
 }
 
-// Value carries one typed scalar for the equals and contains predicates.
+// ScalarValue carries one typed scalar for the equals and contains predicates
+// and for LogAdd.
+//
+// The type admits only a scalar so that comparisons against an array or a map
+// are unrepresentable in the schema.
 //
 // Status: [Development]
 //
 // [Since next]
-message Value {
+message ScalarValue {
   // The scalar. Exactly one variant MUST be set.
   //
   // [Since next]
@@ -141,7 +145,7 @@ message Predicate {
     // reverse. Every other pairing of types does not match.
     //
     // [Since next]
-    Value equals = 2;
+    ScalarValue equals = 2;
 
     // Matches when the target string value satisfies this RE2 expression.
     //
@@ -182,7 +186,7 @@ message Predicate {
     // predicate matches when the bytes hold bytes_value as a subsequence.
     //
     // [Since next]
-    Value contains = 8;
+    ScalarValue contains = 8;
   }
 }
 
