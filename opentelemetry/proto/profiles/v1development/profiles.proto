@@ -41,7 +41,8 @@ option java_package = "io.opentelemetry.proto.profiles.v1development";
 option java_outer_classname = "ProfilesProto";
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 
-// Current OTLP Profiles development version: 1.
+// Current OTLP Profiles development version: 2.
+//   History: 1->2 : adds OriginalDataSource, updating ProfilesDictionary and Profile accordingly.
 //
 // Increment this value by one for each incompatible Profiles schema change.
 // See docs/specification.md#profiles-development-version.
@@ -202,6 +203,13 @@ message ProfilesDictionary {
   //
   // [Since v1.8.0]
   repeated Stack stack_table = 7;
+
+  // Where the OpenTelemetry data is a conversion of some other format (e.g. pprof, JFR)
+  // the original source(s) may be included for reference, particularly if the conversion may be lossy.
+  // original_datasource_table[0] must always be an unused empty message.
+  //
+  // [Since v1.12.0]
+  repeated OriginalDataSource original_datasource_table = 8;
 }
 
 // ProfilesData represents the profiles data that can be stored in persistent storage,
@@ -400,30 +408,26 @@ message Profile {
   // [Since v1.9.0]
   uint32 dropped_attributes_count = 8;
 
-  // The original payload format. See also original_payload. It MUST be set
-  // together with original_payload or both left unset [optional].
-  //
-  // The allowed values for the format string are defined by the OpenTelemetry
-  // specification. Some examples are "jfr", "pprof", "linux_perf".
-  //
-  // The original_payload MAY be used when converting from a source format (e.g. JFR)
-  // that carries information which cannot be losslessly represented in the
-  // Profiles format. Including the original data allows receivers to store or
-  // reexport the data without loss. Because the original payload can be large,
-  // its inclusion is optional.
-  //
-  // [Since v1.9.0]
-  string original_payload_format = 9;
-  // The original payload bytes. See also original_payload_format. It MUST be set
-  // together with original_payload_format or both left unset [optional].
-  //
-  // [Since v1.9.0]
-  bytes original_payload = 10;
+  // during [Alpha] the proto used 'string original_payload_format = 9' and 'bytes original_payload = 10'
+  // These are replaced by original_datasource_indices.
+  reserved 9, 10; // do not reuse.
 
   // References to attributes in attribute_table. [optional]
   //
   // [Since v1.9.0]
   repeated int32 attribute_indices = 11;
+
+  // The original data capture, if done by a profiler that is not 'OpenTelemetry-native'.
+  // Indexes into ProfilesDictionary.original_datasource_table.
+  //
+  // The original data MAY be sent when converting from a source format (e.g. JFR)
+  // that carries information which cannot be losslessly represented in the
+  // Profiles format. Including the original data allows receivers to store or
+  // reexport the data without loss. Because the original data can be large,
+  // its inclusion is optional.
+  //
+  // [Since v1.12.0]
+  repeated int32 original_datasource_indices = 12;
 }
 
 // A pointer from a profile Sample to a trace Span.
@@ -677,4 +681,27 @@ message KeyValueAndUnit {
   //
   // [Since v1.8.0]
   int32 unit_strindex = 3;
+}
+
+// The data and optional metadata for a foreign (i.e. non-OpenTelemetry) profile capture,
+// such as a JFR file. Whilst the translated OpenTelemetry format is preferred, the
+// conversion of some original formats may be lossy and original data MAY be sent
+// in this message to allow validation or retranslation.
+//
+// Status: [Alpha]
+//
+// [Since v1.12.0]
+message OriginalDataSource {
+  // The file or buffer content
+  //
+  // [Since v1.12.0]
+  bytes content = 1;
+  // References to attributes in ProfilesDictionary.attribute_table. [optional]
+  // Where the data source is a file, use File Attribute semantic conventions for
+  // e.g. file.name and file.extension
+  // Where the data format is not clear from the file naming, use e.g. "data.format":"jfr"
+  // Note that as of [Alpha], profiling does not yet have defined semantic conventions for this.
+  //
+  // [Since v1.12.0]
+  repeated int32 attribute_indices = 2;
 }
