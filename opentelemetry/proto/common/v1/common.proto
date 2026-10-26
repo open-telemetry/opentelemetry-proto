@@ -176,7 +176,8 @@ message EntityRef {
     // unique values, such as a UUID. id_scope_entity_type MUST be empty.
     ID_SCOPE_GLOBAL = 1;
 
-    // The ID is unique only within one other entity, named by id_scope_entity_type.
+    // The ID is unique only within one other entity, named by id_scope_entity_type, which
+    // MUST be set.
     ID_SCOPE_LOCAL = 2;
   }
 
@@ -190,7 +191,7 @@ message EntityRef {
   IdScope id_scope = 5;
 
   // Type of the entity within which this entity's ID is unique.
-  // Only meaningful when id_scope is ID_SCOPE_LOCAL, and MUST be empty otherwise.
+  // MUST be set when id_scope is ID_SCOPE_LOCAL, and MUST be empty otherwise.
   //
   // This describes the entity's own ID: it says what kind of entity the ID is unique
   // within, not which particular entity. A Resource carries at most one entity of a given
