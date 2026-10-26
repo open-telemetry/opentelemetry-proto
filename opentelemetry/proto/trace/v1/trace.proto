@@ -311,6 +311,12 @@ message Span {
   // Unlike name, type is low-cardinality and stable across instances.
   // An empty value means the span does not follow a known definition or
   // the instrumentation does not yet populate it.
+  //
+  // [Optional].
+  //
+  // Status: [Development]
+  //
+  // [Since next]
   string type = 17;
 }
 
