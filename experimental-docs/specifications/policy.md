@@ -475,10 +475,15 @@ entry at `from`.
 ```
 LogAdd {
   target: LogTargetSelector  // REQUIRED
-  value:  ScalarValue        // REQUIRED
+  // source (REQUIRED, exactly one of):
+  value:  ScalarValue        // literal scalar value
   upsert: bool               // OPTIONAL, defaults to false
 }
 ```
+
+`LogAdd` wraps `value` in a `source` oneof so future value sources (such as
+copying from another field) can be added as new variants without breaking
+generated code. An operation with an unset `source` oneof is invalid.
 
 When `upsert` is `false` and the target already holds a value, the operation
 yields no change. When `upsert` is `true`, the consumer overwrites the target.
@@ -509,15 +514,23 @@ field to its default empty value.
 ```
 LogRedact {
   target:      LogTargetSelector  // REQUIRED
-  replacement: string             // OPTIONAL, defaults to "[REDACTED]"
-  regex:       string             // OPTIONAL
+  // mask (OPTIONAL; defaults to literal "[REDACTED]" when unset):
+  replacement: string
+  // pattern (OPTIONAL; masks the whole field value when unset):
+  regex:       string
 }
 ```
 
+`LogRedact` wraps `replacement` in an optional `mask` oneof and `regex` in an
+optional `pattern` oneof so future masking strategies (such as cryptographic
+hashing) and pattern matchers (such as built-in PII detectors) can be added as
+new variants without breaking generated code.
+
 A target that is absent yields no change.
 
-When `regex` is unset, the consumer replaces the whole target value with the
-string `replacement` on string record fields (`LOG_RECORD_FIELD_SEVERITY_TEXT`,
+When `pattern` (`regex`) is unset, the consumer replaces the whole target value
+with the string `replacement` (defaulting to `"[REDACTED]"` when `mask` is
+unset) on string record fields (`LOG_RECORD_FIELD_SEVERITY_TEXT`,
 `LOG_RECORD_FIELD_EVENT_NAME`) and `AnyValue` targets (`LOG_RECORD_FIELD_BODY`,
 `log_attribute`, `body_field`). Targeting a non-string typed record field
 (`LOG_RECORD_FIELD_SEVERITY_NUMBER`, `LOG_RECORD_FIELD_TRACE_ID`,
@@ -792,22 +805,22 @@ The consumer MUST continue to parse and run every other policy.
 A consumer validates each policy independently before it applies the policy to
 telemetry. A policy is invalid when any of these hold:
 
-| Condition                                                   | Example                                    |
-| ----------------------------------------------------------- | ------------------------------------------ |
-| The policy `id` is empty or duplicated within a batch.      | `id: ""`                                   |
-| The policy `definition` is unset.                           | an empty `definition` oneof                |
-| A filter policy has an empty `matches` list.                | `matches: []` on a filter policy           |
-| A matcher sets no target.                                   | an empty `target` oneof                    |
-| A matcher sets no predicate.                                | an empty `predicate` oneof                 |
-| A selector names an unspecified enum value.                 | `LOG_RECORD_FIELD_UNSPECIFIED`             |
-| An attribute path is empty.                                 | `log_attribute: []`                        |
-| A `regex` predicate or a `redact` pattern is not valid RE2. | `regex: "([a-z"`                           |
-| A typed value is unset.                                     | an empty `ScalarValue`                     |
-| A filter policy has an unset action.                        | `action` absent                            |
-| A sampling policy has an unset `sampling` or `percentage`.  | `percentage` absent                        |
-| A sampling configuration is out of range.                   | `percentage: 150`, `sampling_precision: 0` |
-| A transform policy carries no operation.                    | no `rename`, `add`, `remove`, or `redact`  |
-| A transform target or `rename` selector is unset.           | an empty `target`, `from`, or `to` oneof   |
+| Condition                                                        | Example                                            |
+| ---------------------------------------------------------------- | -------------------------------------------------- |
+| The policy `id` is empty or duplicated within a batch.           | `id: ""`                                           |
+| The policy `definition` is unset.                                | an empty `definition` oneof                        |
+| A filter policy has an empty `matches` list.                     | `matches: []` on a filter policy                   |
+| A matcher sets no target.                                        | an empty `target` oneof                            |
+| A matcher sets no predicate.                                     | an empty `predicate` oneof                         |
+| A selector names an unspecified enum value.                      | `LOG_RECORD_FIELD_UNSPECIFIED`                     |
+| An attribute path is empty.                                      | `log_attribute: []`                                |
+| A `regex` predicate or a `redact` pattern is not valid RE2.      | `regex: "([a-z"`                                   |
+| A typed value is unset.                                          | an empty `ScalarValue`                             |
+| A filter policy has an unset action.                             | `action` absent                                    |
+| A sampling policy has an unset `sampling` or `percentage`.       | `percentage` absent                                |
+| A sampling configuration is out of range.                        | `percentage: 150`, `sampling_precision: 0`         |
+| A transform policy carries no operation.                         | no `rename`, `add`, `remove`, or `redact`          |
+| A transform target, `rename` selector, or `add` source is unset. | an empty `target`, `from`, `to`, or `source` oneof |
 
 A consumer:
 
@@ -1235,11 +1248,17 @@ any type defined here. See [Deferred Features](#deferred-features).
 
 ### A transform inserts a typed value
 
-**Decision.** `LogAdd.value` is a `ScalarValue`, not a string.
+**Decision.** `LogAdd` wraps `ScalarValue value` in `oneof source` rather than
+taking a bare string, and `LogRedact` wraps `replacement` in `oneof mask` and
+`regex` in `oneof pattern`.
 
-**Tradeoff.** Slightly more to write for the common case of a string. In
-exchange a policy can insert a boolean or a number without forcing a consumer to
-guess the intended type from the text.
+**Tradeoff.** Slightly more to write for the common case of inserting a string,
+and one extra `oneof` wrapper in generated code. In exchange, a policy can
+insert a boolean or a number without forcing a consumer to guess the intended
+type from text, and future `LogAdd` value sources (such as copying from another
+field), `LogRedact` masking strategies (such as cryptographic hashing), or
+pattern matchers (such as built-in PII detectors) can be added as new `oneof`
+variants without a source-breaking change in generated language stubs.
 
 ### The transport is out of scope
 

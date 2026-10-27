@@ -239,32 +239,46 @@ message LogRedact {
   // [Since next]
   LogTargetSelector target = 1;
 
-  // The text that replaces the matched range. The default is "[REDACTED]".
-  //
-  // When regex is set, the text is a template. A consumer MUST expand "$0" to
-  // the full match, "$1" through "$99" and "${1}" through "${99}" to a
-  // numbered capture group, "${name}" to a named capture group, and "$$" to a
-  // literal dollar sign. A reference to an absent capture group expands to the
-  // empty string.
+  // How to mask the matched range. When unset, the consumer replaces the
+  // matched range with the literal text "[REDACTED]".
   //
   // [Since next]
-  optional string replacement = 2;
+  oneof mask {
+    // The text that replaces the matched range. The default when mask is unset
+    // is "[REDACTED]".
+    //
+    // When regex is set, the text is a template. A consumer MUST expand "$0"
+    // to the full match, "$1" through "$99" and "${1}" through "${99}" to a
+    // numbered capture group, "${name}" to a named capture group, and "$$" to
+    // a literal dollar sign. A reference to an absent capture group expands to
+    // the empty string.
+    //
+    // [Since next]
+    string replacement = 2;
+  }
 
-  // An optional RE2 expression that narrows the replacement.
-  //
-  // When regex is unset, the whole field value is replaced with replacement on
-  // string fields (LOG_RECORD_FIELD_SEVERITY_TEXT, LOG_RECORD_FIELD_EVENT_NAME)
-  // and AnyValue targets (LOG_RECORD_FIELD_BODY, log_attribute, body_field);
-  // targeting a non-string typed record field (LOG_RECORD_FIELD_SEVERITY_NUMBER,
-  // LOG_RECORD_FIELD_TRACE_ID, LOG_RECORD_FIELD_SPAN_ID) yields no change.
-  // When regex is set and the expression matches, every non-overlapping full
-  // match is replaced. A capture group supplies text for the template but does
-  // not widen or narrow the replaced range. When the expression does not
-  // match, or when the field value is not a string, the operation yields no
-  // change.
+  // An optional pattern that narrows the replacement within a string value.
+  // When unset, the whole field value is masked.
   //
   // [Since next]
-  optional string regex = 3;
+  oneof pattern {
+    // An RE2 expression that narrows the replacement.
+    //
+    // When pattern is unset, the whole field value is replaced with
+    // replacement on string fields (LOG_RECORD_FIELD_SEVERITY_TEXT,
+    // LOG_RECORD_FIELD_EVENT_NAME) and AnyValue targets
+    // (LOG_RECORD_FIELD_BODY, log_attribute, body_field); targeting a
+    // non-string typed record field (LOG_RECORD_FIELD_SEVERITY_NUMBER,
+    // LOG_RECORD_FIELD_TRACE_ID, LOG_RECORD_FIELD_SPAN_ID) yields no change.
+    // When regex is set and the expression matches, every non-overlapping full
+    // match is replaced. A capture group supplies text for the template but
+    // does not widen or narrow the replaced range. When the expression does
+    // not match, or when the field value is not a string, the operation yields
+    // no change.
+    //
+    // [Since next]
+    string regex = 3;
+  }
 }
 
 // LogRename moves an attribute or structured body field to a new key path on a
@@ -304,11 +318,16 @@ message LogAdd {
   // [Since next]
   LogTargetSelector target = 1;
 
-  // The value to set. Setting a value whose type is incompatible with a
-  // fixed-type record_field yields no change.
+  // The source of the value to set. Exactly one variant MUST be set.
   //
   // [Since next]
-  ScalarValue value = 2;
+  oneof source {
+    // A literal scalar value to set. Setting a value whose type is
+    // incompatible with a fixed-type record_field yields no change.
+    //
+    // [Since next]
+    ScalarValue value = 2;
+  }
 
   // Overwrites the field when it already holds a value. When upsert is false
   // and the field already exists, the operation yields no change.
