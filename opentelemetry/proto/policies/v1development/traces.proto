@@ -24,7 +24,7 @@ option java_package = "io.opentelemetry.proto.policies.v1development";
 option java_outer_classname = "PoliciesTracesProto";
 option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
 
-// TraceSamplingPolicy samples a span by probability.
+// TraceHeadSamplingPolicy samples a span by probability.
 //
 // The policy follows the OpenTelemetry probability sampling specification. A
 // consumer compares a 56-bit randomness value R against a rejection threshold
@@ -44,7 +44,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
 // Status: [Development]
 //
 // [Since next]
-message TraceSamplingPolicy {
+message TraceHeadSamplingPolicy {
   // Conditions that a span MUST satisfy.
   //
   // A consumer combines the matchers with AND: every matcher MUST report true

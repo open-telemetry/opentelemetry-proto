@@ -15,61 +15,64 @@
 - [Design Principles](#design-principles)
 - [Policy Structure](#policy-structure)
 - [Matching](#matching)
-  - [Field Selection](#field-selection)
-  - [AttributePath](#attributepath)
-  - [Predicates](#predicates)
-  - [Typed Values](#typed-values)
-  - [Identifier Fields](#identifier-fields)
-  - [Negation](#negation)
+  * [Field Selection](#field-selection)
+  * [AttributePath](#attributepath)
+  * [Predicates](#predicates)
+    + [**`exists`**](#exists)
+    + [**`regex`**](#regex)
+    + [**`contains`**](#contains)
+  * [Typed Values](#typed-values)
+  * [Identifier Fields](#identifier-fields)
+  * [Negation](#negation)
 - [Log Filter Policy](#log-filter-policy)
-  - [Log Selectors](#log-selectors)
+  * [Log Selectors](#log-selectors)
 - [Log Transform Policy](#log-transform-policy)
-  - [Execution Order](#execution-order)
-  - [Mutation Selectors](#mutation-selectors)
-  - [Rename](#rename)
-  - [Add](#add)
-  - [Remove](#remove)
-  - [Redact](#redact)
+  * [Execution Order](#execution-order)
+  * [Mutation Selectors](#mutation-selectors)
+  * [Rename](#rename)
+  * [Add](#add)
+  * [Remove](#remove)
+  * [Redact](#redact)
 - [Metric Filter Policy](#metric-filter-policy)
-  - [Granularity](#granularity)
-  - [Metric Selectors](#metric-selectors)
-- [Trace Sampling Policy](#trace-sampling-policy)
-  - [Trace Selectors](#trace-selectors)
-  - [Sampling Modes](#sampling-modes)
-  - [Tracestate Handling](#tracestate-handling)
+  * [Granularity](#granularity)
+  * [Metric Selectors](#metric-selectors)
+- [Trace Head Sampling Policy](#trace-head-sampling-policy)
+  * [Trace Selectors](#trace-selectors)
+  * [Sampling Modes](#sampling-modes)
+  * [Tracestate Handling](#tracestate-handling)
 - [Evaluation Model](#evaluation-model)
-  - [Stages](#stages)
-  - [Precedence](#precedence)
-  - [Match Outcome Semantics](#match-outcome-semantics)
+  * [Stages](#stages)
+  * [Precedence](#precedence)
+  * [Match Outcome Semantics](#match-outcome-semantics)
 - [Validation and Error Handling](#validation-and-error-handling)
-  - [Parse Errors](#parse-errors)
-  - [Compilation Errors](#compilation-errors)
-  - [Runtime Errors](#runtime-errors)
+  * [Parse Errors](#parse-errors)
+  * [Compilation Errors](#compilation-errors)
+  * [Runtime Errors](#runtime-errors)
 - [YAML Representation](#yaml-representation)
 - [Conformance](#conformance)
 - [Implementation Notes](#implementation-notes)
-  - [Choosing a Regular Expression Engine](#choosing-a-regular-expression-engine)
-  - [Identifier Comparison](#identifier-comparison)
+  * [Choosing a Regular Expression Engine](#choosing-a-regular-expression-engine)
+  * [Identifier Comparison](#identifier-comparison)
 - [Design Decisions and Tradeoffs](#design-decisions-and-tradeoffs)
-  - [One atomic policy type per intent](#one-atomic-policy-type-per-intent)
-  - [The envelope is optional](#the-envelope-is-optional)
-  - [A typed action, not a polymorphic keep string](#a-typed-action-not-a-polymorphic-keep-string)
-  - [Keep overrides drop, most restrictive within sampling](#keep-overrides-drop-most-restrictive-within-sampling)
-  - [Traces carry sampling only](#traces-carry-sampling-only)
-  - [One shared predicate message](#one-shared-predicate-message)
-  - [The target is a message, not an inline oneof](#the-target-is-a-message-not-an-inline-oneof)
-  - [The target never carries the expected value](#the-target-never-carries-the-expected-value)
-  - [`exists` is `google.protobuf.Empty`](#exists-is-googleprotobufempty)
-  - [A small predicate set](#a-small-predicate-set)
-  - [`regex` is an unanchored partial match](#regex-is-an-unanchored-partial-match)
-  - [Identifier fields are matched as hexadecimal text](#identifier-fields-are-matched-as-hexadecimal-text)
-  - [`contains` is typed and covers arrays](#contains-is-typed-and-covers-arrays)
-  - [An attribute path](#an-attribute-path)
-  - [Metric granularity follows the matchers](#metric-granularity-follows-the-matchers)
-  - [Scope fields are shared, resource schema URL is removed](#scope-fields-are-shared-resource-schema-url-is-removed)
-  - [Log sampling and rate limiting are deferred](#log-sampling-and-rate-limiting-are-deferred)
-  - [A transform inserts a typed value](#a-transform-inserts-a-typed-value)
-  - [The transport is out of scope](#the-transport-is-out-of-scope)
+  * [One atomic policy type per intent](#one-atomic-policy-type-per-intent)
+  * [The `Policy` envelope is mandatory](#the-policy-envelope-is-mandatory)
+  * [A typed action, not a polymorphic keep string](#a-typed-action-not-a-polymorphic-keep-string)
+  * [Keep overrides drop, most restrictive within sampling](#keep-overrides-drop-most-restrictive-within-sampling)
+  * [Traces carry sampling only](#traces-carry-sampling-only)
+  * [One shared predicate message](#one-shared-predicate-message)
+  * [The target is a message, not an inline oneof](#the-target-is-a-message-not-an-inline-oneof)
+  * [The target never carries the expected value](#the-target-never-carries-the-expected-value)
+  * [`exists` is `google.protobuf.Empty`](#exists-is-googleprotobufempty)
+  * [A small predicate set](#a-small-predicate-set)
+  * [`regex` is an unanchored partial match](#regex-is-an-unanchored-partial-match)
+  * [Identifier fields are matched as hexadecimal text](#identifier-fields-are-matched-as-hexadecimal-text)
+  * [`contains` is typed and covers arrays](#contains-is-typed-and-covers-arrays)
+  * [An attribute path](#an-attribute-path)
+  * [Metric granularity follows the matchers](#metric-granularity-follows-the-matchers)
+  * [Scope fields are shared, resource schema URL is removed](#scope-fields-are-shared-resource-schema-url-is-removed)
+  * [Log sampling and rate limiting are deferred](#log-sampling-and-rate-limiting-are-deferred)
+  * [A transform inserts a typed value](#a-transform-inserts-a-typed-value)
+  * [The transport is out of scope](#the-transport-is-out-of-scope)
 - [Deferred Features](#deferred-features)
 - [References](#references)
 
@@ -98,12 +101,12 @@ consumer evaluate a large policy set in parallel without coordination.
 
 This document defines four policy types:
 
-| Policy                | Signal  | Effect                                 |
-| --------------------- | ------- | -------------------------------------- |
-| `LogFilterPolicy`     | Logs    | Keeps or drops a log record.           |
-| `LogTransformPolicy`  | Logs    | Modifies a surviving log record.       |
-| `MetricFilterPolicy`  | Metrics | Keeps or drops a metric or data point. |
-| `TraceSamplingPolicy` | Traces  | Samples a span by probability.         |
+| Policy                    | Signal  | Effect                                 |
+| ------------------------- | ------- | -------------------------------------- |
+| `LogFilterPolicy`         | Logs    | Keeps or drops a log record.           |
+| `LogTransformPolicy`      | Logs    | Modifies a surviving log record.       |
+| `MetricFilterPolicy`      | Metrics | Keeps or drops a metric or data point. |
+| `TraceHeadSamplingPolicy` | Traces  | Samples a span by probability.         |
 
 ## Design Principles
 
@@ -150,7 +153,7 @@ with AND: every matcher MUST report true before the policy applies.
 A filter policy (`LogFilterPolicy`, `MetricFilterPolicy`) MUST carry at least
 one matcher; a consumer MUST reject a filter policy with an empty `matches`
 list so that a filter policy cannot drop or keep every record by accident. On
-`LogTransformPolicy` and `TraceSamplingPolicy`, `matches` MAY be empty, in
+`LogTransformPolicy` and `TraceHeadSamplingPolicy`, `matches` MAY be empty, in
 which case the policy matches every log record or span.
 
 A matcher has three parts:
@@ -610,13 +613,13 @@ the prune leaves empty.
 | `METRIC_DESCRIPTOR_FIELD_AGGREGATION_TEMPORALITY` | `"DELTA"` or `"CUMULATIVE"`. A type that carries no temporality does not match.         |
 | `METRIC_DESCRIPTOR_FIELD_IS_MONOTONIC`            | A boolean. `regex` reads `"true"` or `"false"`. A type other than a Sum does not match. |
 
-## Trace Sampling Policy
+## Trace Head Sampling Policy
 
-`TraceSamplingPolicy` samples a span by probability. It follows the
+`TraceHeadSamplingPolicy` samples a span by probability. It follows the
 [OpenTelemetry probability sampling specification](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/).
 
 ```
-TraceSamplingPolicy {
+TraceHeadSamplingPolicy {
   matches:  TraceMatcher[]  // OPTIONAL; if empty, matches all spans
   sampling: SamplingConfig  // REQUIRED
 }
@@ -910,7 +913,7 @@ metric_filter:
 ```yaml
 id: drop-health-check-spans
 name: Drop health check spans
-trace_sampling:
+trace_head_sampling:
   matches:
     - target: { span_attribute: { path: ["http.route"] } }
       predicate: { regex: "^/(healthz|readyz)$" }
@@ -923,7 +926,7 @@ trace_sampling:
 ```yaml
 id: sample-database-spans
 name: Sample database spans at 5 percent
-trace_sampling:
+trace_head_sampling:
   matches:
     - target: { span_attribute: { path: ["db.system.name"] } }
       predicate: { exists: {} }
@@ -1016,7 +1019,7 @@ designs, together with what the decision costs.
 ### One atomic policy type per intent
 
 **Decision.** Each intent gets its own top-level message: `LogFilterPolicy`,
-`LogTransformPolicy`, `MetricFilterPolicy`, and `TraceSamplingPolicy`. A policy
+`LogTransformPolicy`, `MetricFilterPolicy`, and `TraceHeadSamplingPolicy`. A policy
 carries one matcher list and one action.
 
 **Tradeoff.** Four wire types instead of one per signal. A single record that
@@ -1068,7 +1071,7 @@ one.
 
 ### Traces carry sampling only
 
-**Decision.** Traces have one policy type, `TraceSamplingPolicy`. A `percentage`
+**Decision.** Traces have one policy type, `TraceHeadSamplingPolicy`. A `percentage`
 of 0 expresses a deterministic drop and a `percentage` of 100 expresses a
 deterministic keep.
 
