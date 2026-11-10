@@ -10,6 +10,8 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Changed
 
+- treat HTTP 408 Request Timeout as retryable in OTLP/HTTP. [#891](https://github.com/open-telemetry/opentelemetry-proto/pull/891)
+
 ### Fixed
 
 ### Removed
