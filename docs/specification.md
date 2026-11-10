@@ -647,6 +647,7 @@ All other `4xx` or `5xx` response status codes MUST NOT be retried.
 
 |HTTP response status code|
 |---------|
+|408 Request Timeout|
 |429 Too Many Requests|
 |502 Bad Gateway|
 |503 Service Unavailable|
