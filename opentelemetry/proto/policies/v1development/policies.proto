@@ -88,7 +88,7 @@ message Policy {
     // A policy that samples a span by probability.
     //
     // [Since next]
-    TraceHeadSamplingPolicy trace_head_sampling = 13;
+    SpanSamplingPolicy span_sampling = 13;
   }
 }
 

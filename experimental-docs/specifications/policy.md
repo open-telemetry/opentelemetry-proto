@@ -36,8 +36,8 @@
 - [Metric Filter Policy](#metric-filter-policy)
   * [Granularity](#granularity)
   * [Metric Selectors](#metric-selectors)
-- [Trace Head Sampling Policy](#trace-head-sampling-policy)
-  * [Trace Selectors](#trace-selectors)
+- [Span Sampling Policy](#span-sampling-policy)
+  * [Span Selectors](#span-selectors)
   * [Sampling Modes](#sampling-modes)
   * [Tracestate Handling](#tracestate-handling)
 - [Evaluation Model](#evaluation-model)
@@ -101,12 +101,12 @@ consumer evaluate a large policy set in parallel without coordination.
 
 This document defines four policy types:
 
-| Policy                    | Signal  | Effect                                 |
-| ------------------------- | ------- | -------------------------------------- |
-| `LogFilterPolicy`         | Logs    | Keeps or drops a log record.           |
-| `LogTransformPolicy`      | Logs    | Modifies a surviving log record.       |
-| `MetricFilterPolicy`      | Metrics | Keeps or drops a metric or data point. |
-| `TraceHeadSamplingPolicy` | Traces  | Samples a span by probability.         |
+| Policy               | Signal  | Effect                                 |
+| -------------------- | ------- | -------------------------------------- |
+| `LogFilterPolicy`    | Logs    | Keeps or drops a log record.           |
+| `LogTransformPolicy` | Logs    | Modifies a surviving log record.       |
+| `MetricFilterPolicy` | Metrics | Keeps or drops a metric or data point. |
+| `SpanSamplingPolicy` | Traces  | Samples a span by probability.         |
 
 ## Design Principles
 
@@ -153,7 +153,7 @@ with AND: every matcher MUST report true before the policy applies.
 A filter policy (`LogFilterPolicy`, `MetricFilterPolicy`) MUST carry at least
 one matcher; a consumer MUST reject a filter policy with an empty `matches`
 list so that a filter policy cannot drop or keep every record by accident. On
-`LogTransformPolicy` and `TraceHeadSamplingPolicy`, `matches` MAY be empty, in
+`LogTransformPolicy` and `SpanSamplingPolicy`, `matches` MAY be empty, in
 which case the policy matches every log record or span.
 
 A matcher has three parts:
@@ -613,14 +613,14 @@ the prune leaves empty.
 | `METRIC_DESCRIPTOR_FIELD_AGGREGATION_TEMPORALITY` | `"DELTA"` or `"CUMULATIVE"`. A type that carries no temporality does not match.         |
 | `METRIC_DESCRIPTOR_FIELD_IS_MONOTONIC`            | A boolean. `regex` reads `"true"` or `"false"`. A type other than a Sum does not match. |
 
-## Trace Head Sampling Policy
+## Span Sampling Policy
 
-`TraceHeadSamplingPolicy` samples a span by probability. It follows the
+`SpanSamplingPolicy` samples a span by probability. It follows the
 [OpenTelemetry probability sampling specification](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/).
 
 ```
-TraceHeadSamplingPolicy {
-  matches:  TraceMatcher[]  // OPTIONAL; if empty, matches all spans
+SpanSamplingPolicy {
+  matches:  SpanMatcher[]   // OPTIONAL; if empty, matches all spans
   sampling: SamplingConfig  // REQUIRED
 }
 
@@ -648,7 +648,7 @@ A consumer evaluates each span on its own and MUST NOT reassemble a trace. A
 dropped span therefore leaves its children behind, with a parent span id that
 names a span no longer in the stream. A consumer SHOULD document this effect.
 
-### Trace Selectors
+### Span Selectors
 
 | Variant              | Type              |
 | -------------------- | ----------------- |
@@ -913,7 +913,7 @@ metric_filter:
 ```yaml
 id: drop-health-check-spans
 name: Drop health check spans
-trace_head_sampling:
+span_sampling:
   matches:
     - target: { span_attribute: { path: ["http.route"] } }
       predicate: { regex: "^/(healthz|readyz)$" }
@@ -926,7 +926,7 @@ trace_head_sampling:
 ```yaml
 id: sample-database-spans
 name: Sample database spans at 5 percent
-trace_head_sampling:
+span_sampling:
   matches:
     - target: { span_attribute: { path: ["db.system.name"] } }
       predicate: { exists: {} }
@@ -1019,7 +1019,7 @@ designs, together with what the decision costs.
 ### One atomic policy type per intent
 
 **Decision.** Each intent gets its own top-level message: `LogFilterPolicy`,
-`LogTransformPolicy`, `MetricFilterPolicy`, and `TraceHeadSamplingPolicy`. A policy
+`LogTransformPolicy`, `MetricFilterPolicy`, and `SpanSamplingPolicy`. A policy
 carries one matcher list and one action.
 
 **Tradeoff.** Four wire types instead of one per signal. A single record that
@@ -1071,7 +1071,7 @@ one.
 
 ### Traces carry sampling only
 
-**Decision.** Traces have one policy type, `TraceHeadSamplingPolicy`. A `percentage`
+**Decision.** Traces have one policy type, `SpanSamplingPolicy`. A `percentage`
 of 0 expresses a deterministic drop and a `percentage` of 100 expresses a
 deterministic keep.
 
@@ -1086,7 +1086,7 @@ need for the exemption appears. See [Deferred Features](#deferred-features).
 ### One shared predicate message
 
 **Decision.** `Predicate` is defined once in `common.proto` and reused by
-`LogMatcher`, `MetricMatcher`, and `TraceMatcher`.
+`LogMatcher`, `MetricMatcher`, and `SpanMatcher`.
 
 **Tradeoff.** One extra level of message nesting on the wire, and one more
 allocation per matcher in a naive decoder. In exchange the eight predicate
@@ -1253,15 +1253,16 @@ change to the types defined here.
 
 | Feature                      | How it returns                                                                                  |
 | ---------------------------- | ----------------------------------------------------------------------------------------------- |
-| Deterministic span filtering | A `TraceFilterPolicy` with an `Action` and post-completion span fields (status, events, links). |
+| Deterministic span filtering | A `SpanFilterPolicy` with an `Action` and post-completion span fields (status, events, links).  |
+| Tail-based trace sampling    | A `TraceSamplingPolicy` operating on a trace.                                                   |
 | Log percentage sampling      | A `LogSamplingPolicy` with a sampling configuration.                                            |
 | Log rate limiting            | A rate configuration on `LogSamplingPolicy`.                                                    |
 | Consistent sampling key      | A selector field on `LogSamplingPolicy`.                                                        |
 | Metric rate adjustment       | A `MetricRatePolicy`, reusing `MetricMatcher`.                                                  |
 | Resource transformation      | A `ResourceTransformPolicy` with optional signal selection.                                     |
 | Metric transformation        | A `MetricTransformPolicy`, reusing `MetricFieldSelector`.                                       |
-| Trace transformation         | A `TraceTransformPolicy`, reusing `TraceFieldSelector`.                                         |
-| Span link matching           | A `link_trace_id` variant on `TraceFieldSelector`.                                              |
+| Span transformation          | A `SpanTransformPolicy`, reusing `SpanFieldSelector`.                                           |
+| Span link matching           | A `link_trace_id` variant on `SpanFieldSelector`.                                               |
 | Metric value thresholds      | A data point value target on `MetricFieldSelector`.                                             |
 | Boolean expression trees     | Out of scope. Write several policies for OR semantics.                                          |
 | Self-observability metrics   | Metric and attribute definitions in `semantic-conventions`.                                     |

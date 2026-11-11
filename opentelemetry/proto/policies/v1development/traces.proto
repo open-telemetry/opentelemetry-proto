@@ -24,7 +24,7 @@ option java_package = "io.opentelemetry.proto.policies.v1development";
 option java_outer_classname = "PoliciesTracesProto";
 option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
 
-// TraceHeadSamplingPolicy samples a span by probability.
+// SpanSamplingPolicy samples a span by probability.
 //
 // The policy follows the OpenTelemetry probability sampling specification. A
 // consumer compares a 56-bit randomness value R against a rejection threshold
@@ -44,7 +44,7 @@ option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
 // Status: [Development]
 //
 // [Since next]
-message TraceHeadSamplingPolicy {
+message SpanSamplingPolicy {
   // Conditions that a span MUST satisfy.
   //
   // A consumer combines the matchers with AND: every matcher MUST report true
@@ -52,7 +52,7 @@ message TraceHeadSamplingPolicy {
   // every span.
   //
   // [Since next]
-  repeated TraceMatcher matches = 1;
+  repeated SpanMatcher matches = 1;
 
   // How to sample a span that satisfies every matcher.
   //
@@ -91,16 +91,16 @@ message SamplingConfig {
   optional uint32 sampling_precision = 3;
 }
 
-// TraceMatcher evaluates one predicate against one span target.
+// SpanMatcher evaluates one predicate against one span target.
 //
 // Status: [Development]
 //
 // [Since next]
-message TraceMatcher {
+message SpanMatcher {
   // The field, the attribute, or the metadata to inspect.
   //
   // [Since next]
-  TraceFieldSelector target = 1;
+  SpanFieldSelector target = 1;
 
   // How to compare the value that target selects.
   //
@@ -113,12 +113,12 @@ message TraceMatcher {
   bool negate = 3;
 }
 
-// TraceFieldSelector names one span target. Exactly one variant MUST be set.
+// SpanFieldSelector names one span target. Exactly one variant MUST be set.
 //
 // Status: [Development]
 //
 // [Since next]
-message TraceFieldSelector {
+message SpanFieldSelector {
   // The target. Exactly one variant MUST be set.
   //
   // [Since next]
