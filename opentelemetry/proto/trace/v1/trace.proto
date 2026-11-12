@@ -85,7 +85,7 @@ message ScopeSpans {
 
 // A Span represents a single operation performed by a single component of the system.
 //
-// The next available field id is 17.
+// The next available field id is 18.
 message Span {
   // A unique identifier for a trace. All spans from the same trace share
   // the same `trace_id`. The ID is a 16-byte array. An ID with all zeroes OR
@@ -305,6 +305,19 @@ message Span {
   // An optional final status for this span. Semantically when Status isn't set, it means
   // span's status code is unset, i.e. assume STATUS_CODE_UNSET (code = 0).
   Status status = 15;
+
+  // type identifies the semantic convention definition this span follows,
+  // for example "http.client.request" or "gen_ai.client.inference".
+  // Unlike name, type is low-cardinality and stable across instances.
+  // An empty value means the span does not follow a known definition or
+  // the instrumentation does not yet populate it.
+  //
+  // [Optional].
+  //
+  // Status: [Development]
+  //
+  // [Since next]
+  string type = 17;
 }
 
 // The Status type defines a logical error model that is suitable for different
