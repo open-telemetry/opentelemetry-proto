@@ -648,6 +648,13 @@ A consumer evaluates each span on its own and MUST NOT reassemble a trace. A
 dropped span therefore leaves its children behind, with a parent span id that
 names a span no longer in the stream. A consumer SHOULD document this effect.
 
+`SpanSamplingPolicy` restricts its selectors to fields available at span
+creation (head) so SDKs can evaluate it at `StartSpan` and propagate the
+updated `tracestate` to downstream spans. Post-creation enforcement (such as in a
+Collector) cannot propagate downstream and may leave child spans orphaned;
+post-completion fields (status, events, links) are deferred to
+`SpanFilterPolicy`.
+
 ### Span Selectors
 
 | Variant              | Type              |

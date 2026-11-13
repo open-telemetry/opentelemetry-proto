@@ -35,6 +35,11 @@ option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
 // dropped span therefore leaves its children behind, with a parent span id
 // that names a span no longer in the stream.
 //
+// SpanSamplingPolicy restricts its selectors to fields available at span
+// creation (head) so SDKs can evaluate it at span start and propagate the
+// updated tracestate to downstream spans. Post-creation enforcement (such as in
+// a Collector) cannot propagate downstream and may leave child spans orphaned.
+//
 // A span that no sampling policy matches passes through. When several sampling
 // policies match one span, the most restrictive one applies, which is the one
 // with the highest threshold. A percentage of 0 drops every matching span, and
