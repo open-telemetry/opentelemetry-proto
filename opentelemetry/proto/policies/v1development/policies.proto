@@ -89,7 +89,7 @@ message Policy {
     // A policy that samples a span by probability.
     //
     // [Since next]
-    TraceSamplingPolicy trace_sampling = 13;
+    SpanSamplingPolicy span_sampling = 13;
 
     // A custom or experimental policy definition not standardized in this
     // package, packed as a google.protobuf.Any message whose type_url uniquely
