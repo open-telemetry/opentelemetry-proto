@@ -42,7 +42,7 @@ option java_outer_classname = "ProfilesProto";
 option go_package = "go.opentelemetry.io/proto/otlp/profiles/v1development";
 
 // Current OTLP Profiles development version: 2.
-//   History: 1->2 : adds OriginalDataSource, updating ProfilesDictionary and Profile accordingly.
+//   History: 1->2 : adds OriginalPayload, see changelog for more detail.
 //
 // Increment this value by one for each incompatible Profiles schema change.
 // See docs/specification.md#profiles-development-version.
@@ -206,10 +206,10 @@ message ProfilesDictionary {
 
   // Where the OpenTelemetry data is a conversion of some other format (e.g. pprof, JFR)
   // the original source(s) may be included for reference, particularly if the conversion may be lossy.
-  // original_datasource_table[0] must always be an unused empty message.
+  // original_payload_table[0] MUST be the zero value (OriginalPayload{}).
   //
   // [Since v1.12.0]
-  repeated OriginalDataSource original_datasource_table = 8;
+  repeated OriginalPayload original_payload_table = 8;
 }
 
 // ProfilesData represents the profiles data that can be stored in persistent storage,
@@ -409,7 +409,8 @@ message Profile {
   uint32 dropped_attributes_count = 8;
 
   // during [Alpha] the proto used 'string original_payload_format = 9' and 'bytes original_payload = 10'
-  // These are replaced by original_datasource_indices.
+  // These are replaced by original_payload_indices.
+  // [Since v1.12.0]
   reserved 9, 10; // do not reuse.
 
   // References to attributes in attribute_table. [optional]
@@ -417,8 +418,9 @@ message Profile {
   // [Since v1.9.0]
   repeated int32 attribute_indices = 11;
 
-  // The original data capture, if done by a profiler that is not 'OpenTelemetry-native'.
-  // Indexes into ProfilesDictionary.original_datasource_table.
+  // The original data capture, if the initial data is captured by a profiler that
+  // does not natively produce OpenTelemetry Profiles.
+  // Indexes into ProfilesDictionary.original_payload_table.
   //
   // The original data MAY be sent when converting from a source format (e.g. JFR)
   // that carries information which cannot be losslessly represented in the
@@ -427,7 +429,7 @@ message Profile {
   // its inclusion is optional.
   //
   // [Since v1.12.0]
-  repeated int32 original_datasource_indices = 12;
+  repeated int32 original_payload_indices = 12;
 }
 
 // A pointer from a profile Sample to a trace Span.
@@ -691,7 +693,7 @@ message KeyValueAndUnit {
 // Status: [Alpha]
 //
 // [Since v1.12.0]
-message OriginalDataSource {
+message OriginalPayload {
   // The file or buffer content
   //
   // [Since v1.12.0]
@@ -699,9 +701,12 @@ message OriginalDataSource {
   // References to attributes in ProfilesDictionary.attribute_table. [optional]
   // Where the data source is a file, use File Attribute semantic conventions for
   // e.g. file.name and file.extension
-  // Where the data format is not clear from the file naming, use e.g. "data.format":"jfr"
-  // Note that as of [Alpha], profiling does not yet have defined semantic conventions for this.
   //
   // [Since v1.12.0]
   repeated int32 attribute_indices = 2;
+  // The format of content. The known values are defined by the
+  // OpenTelemetry specification, e.g. "jfr", "pprof", "linux_perf".
+  //
+  // [Since v1.12.0]
+  int32 format_strindex = 3;
 }
