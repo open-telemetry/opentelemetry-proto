@@ -316,7 +316,7 @@ message Span {
   //
   // Status: [Development]
   //
-  // [Since next]
+  // [Since v1.12.0]
   string type = 17;
 }
 
