@@ -149,14 +149,17 @@ message Predicate {
     // [Since next]
     ScalarValue equals = 2;
 
-    // Matches when the target string value satisfies this RE2 expression.
+    // Matches when the target string value satisfies this wildcard pattern.
     //
-    // The expression is an unanchored partial match. Add the anchors "^" and
-    // "$" for a full match. Add the flag "(?i)" for a case-insensitive match.
+    // Matching is a case-sensitive full-string match where "*" matches any
+    // number of characters including none and "?" matches any single
+    // character. This matches the wildcard syntax used by IncludeExclude in
+    // OpenTelemetry Declarative Configuration
+    // (https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema/common.yaml).
     // The predicate applies only to a string target value.
     //
     // [Since next]
-    string regex = 3;
+    string glob = 3;
 
     // Matches when the target numeric value is greater than this number.
     //
@@ -189,6 +192,19 @@ message Predicate {
     //
     // [Since next]
     ScalarValue contains = 8;
+
+    // Matches when the target string value satisfies this RE2 expression.
+    //
+    // The expression is an unanchored partial match. Add the anchors "^" and
+    // "$" for a full match. Add the flag "(?i)" for a case-insensitive match.
+    // The predicate applies only to a string target value.
+    //
+    // Implementation support for regex is RECOMMENDED (optional for
+    // conformance). A consumer that does not support regex MUST reject any
+    // policy that uses it as a compilation error.
+    //
+    // [Since next]
+    string regex = 9;
   }
 }
 

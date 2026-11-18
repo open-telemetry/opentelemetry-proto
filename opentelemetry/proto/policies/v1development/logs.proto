@@ -276,6 +276,11 @@ message LogRedact {
     // not match, or when the field value is not a string, the operation yields
     // no change.
     //
+    // Implementation support for regex is RECOMMENDED (optional for
+    // conformance). A consumer that does not support regex MUST still support
+    // whole-field redaction (pattern unset) and MUST reject any policy that
+    // sets regex as a compilation error.
+    //
     // [Since next]
     string regex = 3;
   }
@@ -363,8 +368,7 @@ enum LogRecordField {
 
   // The severity of the log record as a number from 1 to 24.
   //
-  // The equals predicate and the comparison predicates read the number. The
-  // regex predicate reads the canonical base-10 text, for example "17".
+  // The equals predicate and the comparison predicates read the number.
   //
   // [Since next]
   LOG_RECORD_FIELD_SEVERITY_NUMBER = 3;

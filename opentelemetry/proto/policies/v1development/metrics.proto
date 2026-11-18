@@ -171,8 +171,8 @@ enum MetricDescriptorField {
 
   // Whether a Sum is monotonic.
   //
-  // The equals predicate reads the boolean. The regex predicate reads the text
-  // "true" or "false". A metric type other than a Sum does not match.
+  // The equals predicate reads the boolean. A metric type other than a Sum
+  // does not match.
   //
   // [Since next]
   METRIC_DESCRIPTOR_FIELD_IS_MONOTONIC = 6;
