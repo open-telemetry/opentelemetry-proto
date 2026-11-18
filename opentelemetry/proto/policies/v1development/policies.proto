@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package opentelemetry.proto.policies.v1development;
 
+import "google/protobuf/any.proto";
 import "opentelemetry/proto/common/v1/common.proto";
 import "opentelemetry/proto/policies/v1development/logs.proto";
 import "opentelemetry/proto/policies/v1development/metrics.proto";
@@ -89,6 +90,17 @@ message Policy {
     //
     // [Since next]
     SpanSamplingPolicy span_sampling = 13;
+
+    // A custom or experimental policy definition not standardized in this
+    // package, packed as a google.protobuf.Any message whose type_url uniquely
+    // identifies the custom policy schema.
+    //
+    // A consumer that does not recognize or support custom_policy.type_url MUST
+    // treat the policy as an unsupported policy type and keep it inert
+    // (fail-open).
+    //
+    // [Since next]
+    google.protobuf.Any custom_policy = 100;
   }
 }
 

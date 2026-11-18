@@ -99,7 +99,7 @@ policy is an independent unit. A policy MUST NOT reference another policy, and a
 policy MUST NOT depend on its position in a list. This independence lets a
 consumer evaluate a large policy set in parallel without coordination.
 
-This document defines four policy types:
+This document defines four standard policy types:
 
 | Policy               | Signal  | Effect                                 |
 | -------------------- | ------- | -------------------------------------- |
@@ -107,6 +107,10 @@ This document defines four policy types:
 | `LogTransformPolicy` | Logs    | Modifies a surviving log record.       |
 | `MetricFilterPolicy` | Metrics | Keeps or drops a metric or data point. |
 | `SpanSamplingPolicy` | Traces  | Samples a span by probability.         |
+
+In addition, the `Policy` envelope includes a `custom_policy`
+(`google.protobuf.Any`) extension point so implementations and distributions can
+define custom or experimental policy types without modifying the base schema.
 
 ## Design Principles
 
@@ -130,14 +134,18 @@ with these additional constraints:
 Every policy MUST be wrapped in the `Policy` envelope, which supplies a unique
 identifier, lifecycle state, and operator metadata across all transports:
 
-| Field         | Type          | Default | Description                              |
-| ------------- | ------------- | ------- | ---------------------------------------- |
-| `id`          | string        | -       | REQUIRED. Unique within its scope.       |
-| `name`        | string        | empty   | A short name for an operator to read.    |
-| `description` | string        | empty   | The purpose of the policy.               |
-| `enabled`     | optional bool | `true`  | Whether a consumer evaluates the policy. |
-| `labels`      | `KeyValue[]`  | empty   | Operator metadata. Not interpreted.      |
-| `definition`  | oneof         | -       | REQUIRED. Exactly one policy type.       |
+| Field         | Type          | Default | Description                                                    |
+| ------------- | ------------- | ------- | -------------------------------------------------------------- |
+| `id`          | string        | -       | REQUIRED. Unique within its scope.                             |
+| `name`        | string        | empty   | A short name for an operator to read.                          |
+| `description` | string        | empty   | The purpose of the policy.                                     |
+| `enabled`     | optional bool | `true`  | Whether a consumer evaluates the policy.                       |
+| `labels`      | `KeyValue[]`  | empty   | Operator metadata. Not interpreted.                            |
+| `definition`  | oneof         | -       | REQUIRED. Exactly one standard policy type or `custom_policy`. |
+
+`custom_policy` (`google.protobuf.Any`, field `100`) carries a custom or
+experimental policy payload whose `type_url` (`@type` in Protobuf JSON and
+YAML) uniquely identifies the policy schema.
 
 A consumer MUST treat a policy with `enabled` set to `false` as absent. Such a
 policy MUST NOT match, keep, drop, sample, or transform any telemetry.
@@ -799,22 +807,23 @@ The consumer MUST continue to parse and run every other policy.
 A consumer validates each policy independently before it applies the policy to
 telemetry. A policy is invalid when any of these hold:
 
-| Condition                                                        | Example                                            |
-| ---------------------------------------------------------------- | -------------------------------------------------- |
-| The policy `id` is empty or duplicated within a batch.           | `id: ""`                                           |
-| The policy `definition` is unset.                                | an empty `definition` oneof                        |
-| A filter policy has an empty `matches` list.                     | `matches: []` on a filter policy                   |
-| A matcher sets no target.                                        | an empty `target` oneof                            |
-| A matcher sets no predicate.                                     | an empty `predicate` oneof                         |
-| A selector names an unspecified enum value.                      | `LOG_RECORD_FIELD_UNSPECIFIED`                     |
-| An attribute path is empty.                                      | `log_attribute: []`                                |
-| A `regex` predicate or a `redact` pattern is not valid RE2.      | `regex: "([a-z"`                                   |
-| A typed value is unset.                                          | an empty `ScalarValue`                             |
-| A filter policy has an unset action.                             | `action` absent                                    |
-| A sampling policy has an unset `sampling` or `percentage`.       | `percentage` absent                                |
-| A sampling configuration is out of range.                        | `percentage: 150`, `sampling_precision: 0`         |
-| A transform policy carries no operation.                         | no `rename`, `add`, `remove`, or `redact`          |
-| A transform target, `rename` selector, or `add` source is unset. | an empty `target`, `from`, `to`, or `source` oneof |
+| Condition                                                                                                                                                             | Example                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| The policy `id` is empty or duplicated within a batch.                                                                                                                | `id: ""`                                           |
+| The policy `definition` is unset.                                                                                                                                     | an empty `definition` oneof                        |
+| A policy uses a policy type or `custom_policy` `type_url` that the consumer does not support, `custom_policy` cannot be unpacked, or its unpacked payload is invalid. | an unrecognized `custom_policy` `@type`            |
+| A filter policy has an empty `matches` list.                                                                                                                          | `matches: []` on a filter policy                   |
+| A matcher sets no target.                                                                                                                                             | an empty `target` oneof                            |
+| A matcher sets no predicate.                                                                                                                                          | an empty `predicate` oneof                         |
+| A selector names an unspecified enum value.                                                                                                                           | `LOG_RECORD_FIELD_UNSPECIFIED`                     |
+| An attribute path is empty.                                                                                                                                           | `log_attribute: []`                                |
+| A `regex` predicate or a `redact` pattern is not valid RE2.                                                                                                           | `regex: "([a-z"`                                   |
+| A typed value is unset.                                                                                                                                               | an empty `ScalarValue`                             |
+| A filter policy has an unset action.                                                                                                                                  | `action` absent                                    |
+| A sampling policy has an unset `sampling` or `percentage`.                                                                                                            | `percentage` absent                                |
+| A sampling configuration is out of range.                                                                                                                             | `percentage: 150`, `sampling_precision: 0`         |
+| A transform policy carries no operation.                                                                                                                              | no `rename`, `add`, `remove`, or `redact`          |
+| A transform target, `rename` selector, or `add` source is unset.                                                                                                      | an empty `target`, `from`, `to`, or `source` oneof |
 
 A consumer:
 
@@ -959,8 +968,18 @@ A consumer conforms to this specification when it:
    keeps an invalid policy inert, and does not abort a valid policy in the same
    batch.
 
-A consumer MAY support a subset of the policy types. A consumer MUST document
-every policy type and every feature it does not support.
+A consumer MAY support a subset of the standard policy types defined in this
+document, and MAY also support additional custom or experimental policy types
+via `Policy.custom_policy` (`google.protobuf.Any`). Supporting custom policy
+types does not make a consumer non-conformant, provided that:
+
+- Custom policies obey the [Design Principles](#design-principles), including
+  fail-open error isolation and honoring `Policy.enabled`.
+- A consumer that does not recognize or support a policy type (including an
+  unrecognized `custom_policy.type_url`) keeps that policy inert without
+  affecting other policies in the `PolicySet`.
+- The consumer documents every standard policy type and feature it does not
+  support, as well as any custom policy types it supports.
 
 ## Implementation Notes
 
@@ -1026,14 +1045,19 @@ designs, together with what the decision costs.
 ### One atomic policy type per intent
 
 **Decision.** Each intent gets its own top-level message: `LogFilterPolicy`,
-`LogTransformPolicy`, `MetricFilterPolicy`, and `SpanSamplingPolicy`. A policy
-carries one matcher list and one action.
+`LogTransformPolicy`, `MetricFilterPolicy`, and `SpanSamplingPolicy`, plus a
+`google.protobuf.Any custom_policy = 100` extension point on `Policy.definition`
+for custom or experimental policy types. A standard policy carries one matcher
+list and one action.
 
-**Tradeoff.** Four wire types instead of one per signal. A single record that
-needs both a filter rule and a transform rule now needs two policies, and the
-matcher list is duplicated between them. In exchange, each policy stays small,
-its validity is decidable on its own, and a new intent lands as a new type
-rather than as a new mode inside an existing one.
+**Tradeoff.** Four standard wire types instead of one per signal. A single
+record that needs both a filter rule and a transform rule now needs two
+policies, and the matcher list is duplicated between them. In exchange, each
+policy stays small, its validity is decidable on its own, a new standard intent
+lands as a new `oneof` variant (in the `10..99` range) rather than as a new
+mode inside an existing type, and implementations can experiment with or ship
+custom policy types via `custom_policy` without forking the envelope schema or
+sacrificing conformance.
 
 ### The `Policy` envelope is mandatory
 
