@@ -238,7 +238,7 @@ of map keys.
   `["http", "request", "method"]`.
 - Every segment is treated as a map key (if an intermediate value along the
   path is not a `KeyValueList` map, the target is treated as absent).
-- An empty path is invalid.
+- An empty path, or a path containing an empty segment (`""`), is invalid.
 
 The protobuf wraps the list in an `AttributePath` message:
 
@@ -349,9 +349,11 @@ the argument. An integer and a double are compared in one numeric domain by
 exact mathematical value, so across `equals`, `contains`, `gt`, `gte`, `lt`, and
 `lte`, an `int_value` argument MUST be compared against a `double` target (and a
 `double_value` argument against an `int64` target) without losing 64-bit integer
-precision (for example, `int64(2^53 + 1)` MUST NOT match `double(2^53)`). Any
-comparison involving `NaN` evaluates to `false` (before `negate`). Every other
-pairing of types does not match.
+precision (for example, `int64(2^53 + 1)` MUST NOT match `double(2^53)`). A
+`double_value` in a policy MUST be finite (`NaN`, `+Inf`, and `-Inf` are
+compilation errors); at runtime, any comparison against a `NaN` target value
+evaluates to `false` (before `negate`). Every other pairing of types does not
+match.
 
 Examples:
 
@@ -438,6 +440,11 @@ When `body_field` is selected and `LogRecord.body` is not a `KeyValueList` map
 | `LOG_RECORD_FIELD_SPAN_ID`         | 16-character lowercase hexadecimal text.                         |
 | `LOG_RECORD_FIELD_EVENT_NAME`      | The event name.                                                  |
 
+`SEVERITY_NUMBER_UNSPECIFIED` (`0`) MUST be treated as absent for all
+predicates (not just `exists`), so numeric comparisons such as `lt: 9` evaluate
+to `false` on log records with no severity set. To match records without a
+severity number, pair `exists` with `negate: true`.
+
 ## Log Transform Policy
 
 `LogTransformPolicy` modifies a log record that survives the filter stage.
@@ -463,9 +470,12 @@ A consumer MUST apply the operations in this order and MUST NOT reorder them:
 3. **Remove.** Delete the field.
 4. **Redact.** Mask the field value.
 
-Within each of the four operation stages, operations across all matching
-`LogTransformPolicy` rules MUST execute in ascending lexicographical (UTF-8
-byte) order of `Policy.id`, and in list order within each policy.
+A consumer MUST evaluate every `LogTransformPolicy`'s `matches` once against the
+pre-transform log record before Stage 1 (`rename`) runs, so mutations from one
+policy do not affect which other transform policies match. Within each of the
+four operation stages, operations across all matching `LogTransformPolicy` rules
+MUST execute in ascending lexicographical (UTF-8 byte) order of `Policy.id`, and
+in list order within each policy.
 
 ### Mutation Selectors
 
@@ -478,8 +488,8 @@ When a write operation (`LogRename.to` or `LogAdd.target`) targets a
 multi-segment `log_attribute` or `body_field` path:
 
 - Missing intermediate segments are created as `KeyValueList` maps (if
-  `body_field` is targeted and `LogRecord.body` is unset, `body` is initialized
-  as a `KeyValueList` map).
+  `body_field` is targeted and `LogRecord.body` is absent, i.e. empty `AnyValue`
+  or `""`, `body` is initialized as a `KeyValueList` map).
 - If an existing intermediate value along the path (or `LogRecord.body` itself
   when targeting `body_field`) is not a `KeyValueList` map, the operation yields
   no change (fail-open).
@@ -495,11 +505,14 @@ LogRename {
 ```
 
 A source that is absent yields no change. When `from` and `to` resolve to the
-same target, the operation yields no change. When `upsert` is `false` and the
-destination already holds a value, the operation yields no change and the source
-entry is preserved. When `upsert` is `true`, the consumer moves the value from
-`from` to `to`, overwriting any existing value at `to` and removing the source
-entry at `from`.
+same target, the operation yields no change. When `from` and `to` share the same
+root (`log_attribute` or `body_field`) and one path is a strict prefix
+(ancestor) of the other (for example `["a"]` and `["a", "b"]`), the operation is
+invalid and MUST be rejected as a [compilation error](#compilation-errors). When
+`upsert` is `false` and the destination already holds a value, the operation
+yields no change and the source entry is preserved. When `upsert` is `true`, the
+consumer moves the value from `from` to `to`, overwriting any existing value at
+`to` and removing the source entry at `from`.
 
 ### Add
 
@@ -517,7 +530,11 @@ copying from another field) can be added as new variants without breaking
 generated code. An operation with an unset `source` oneof is invalid.
 
 When `upsert` is `false` and the target already holds a value, the operation
-yields no change. When `upsert` is `true`, the consumer overwrites the target.
+yields no change. For first-class `record_field` targets, default empty values
+(empty `AnyValue` or `""` for `LOG_RECORD_FIELD_BODY`, `""` for
+`LOG_RECORD_FIELD_SEVERITY_TEXT` and `LOG_RECORD_FIELD_EVENT_NAME`, and `0` for
+`LOG_RECORD_FIELD_SEVERITY_NUMBER`) are treated as absent. When `upsert` is
+`true`, the consumer overwrites the target.
 
 When `target` selects a `record_field`, `value` MUST match the field's data
 model type or the operation yields no change (fail-open):
@@ -557,7 +574,11 @@ optional `pattern` oneof so future masking strategies (such as cryptographic
 hashing) and pattern matchers (such as built-in PII detectors) can be added as
 new variants without breaking generated code.
 
-A target that is absent yields no change.
+A target that is absent yields no change. For first-class record fields, an
+unset `LOG_RECORD_FIELD_BODY` (empty `AnyValue` or `""`), empty
+`LOG_RECORD_FIELD_SEVERITY_TEXT` (`""`), or empty `LOG_RECORD_FIELD_EVENT_NAME`
+(`""`) is treated as absent and yields no change rather than being replaced with
+`replacement`.
 
 When `pattern` (`regex`) is unset, the consumer replaces the whole target value
 with the string `replacement` (defaulting to `"[REDACTED]"` when `mask` is
@@ -578,6 +599,8 @@ rather than ignoring the operation or replacing the whole field value.
 
 When `regex` is supported and set:
 
+- A consumer MUST reject an empty `regex` (`""`) as a compilation error; leave
+  `pattern` unset for whole-field redaction.
 - A consumer MUST reject a pattern that RE2 syntax does not accept, such as a
   backreference or a lookaround assertion.
 - Without the flag `(?m)`, `^` matches only at the start of the target value,
@@ -851,16 +874,17 @@ telemetry. A policy is invalid when any of these hold:
 | A matcher sets no target.                                                                                                                                             | an empty `target` oneof                                         |
 | A matcher sets no predicate.                                                                                                                                          | an empty `predicate` oneof                                      |
 | A selector names an unspecified enum value.                                                                                                                           | `LOG_RECORD_FIELD_UNSPECIFIED`                                  |
-| An attribute path is empty.                                                                                                                                           | `log_attribute: []`                                             |
-| A `regex` predicate or a `redact` pattern is not valid RE2.                                                                                                           | `regex: "([a-z"`                                                |
+| An attribute path is empty or contains an empty segment.                                                                                                              | `log_attribute: []`, `log_attribute: [""]`                      |
+| A `regex` predicate or a `redact` pattern is not valid RE2, or `LogRedact.regex` is empty.                                                                            | `regex: "([a-z"`, `redact: [{ regex: "" }]`                     |
 | A policy uses an optional predicate, target, or operation that the consumer does not support.                                                                         | `predicate: { regex: "..." }` on a consumer without RE2 support |
 | A policy or sub-message carries an unrecognized enum value, `oneof` variant, or unknown field.                                                                        | a field from a newer schema version                             |
-| A typed value is unset.                                                                                                                                               | an empty `ScalarValue`                                          |
+| A typed value is unset, or a `double_value` is non-finite (`NaN`, `+Inf`, `-Inf`).                                                                                    | an empty `ScalarValue`, `double_value: NaN`                     |
 | A filter policy has an unset action.                                                                                                                                  | `action` absent                                                 |
 | A sampling policy has an unset `sampling` or `percentage`.                                                                                                            | `percentage` absent                                             |
 | A sampling configuration is out of range.                                                                                                                             | `percentage: 150`, `sampling_precision: 0`                      |
 | A transform policy carries no operation.                                                                                                                              | no `rename`, `add`, `remove`, or `redact`                       |
 | A transform target, `rename` selector, or `add` source is unset.                                                                                                      | an empty `target`, `from`, `to`, or `source` oneof              |
+| A `LogRename` has overlapping ancestor/descendant `from` and `to` paths in the same root.                                                                             | `from: ["a"]`, `to: ["a", "b"]`                                 |
 
 A consumer:
 

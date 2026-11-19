@@ -28,8 +28,8 @@ option go_package = "go.opentelemetry.io/proto/otlp/policies/v1development";
 //
 // A single segment selects a flat attribute, for example ["http.route"].
 // Multiple segments traverse nested maps (KeyValueList), for example ["http",
-// "request", "method"]. Every segment is treated as a map key. An empty path
-// is invalid.
+// "request", "method"]. Every segment is treated as a map key. An empty path,
+// or a path containing an empty segment, is invalid.
 //
 // Status: [Development]
 //
