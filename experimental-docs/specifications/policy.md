@@ -74,6 +74,7 @@
   * [Scope fields are shared, resource schema URL is removed](#scope-fields-are-shared-resource-schema-url-is-removed)
   * [Log sampling and rate limiting are deferred](#log-sampling-and-rate-limiting-are-deferred)
   * [A transform inserts a typed value](#a-transform-inserts-a-typed-value)
+  * [Immutable correlation IDs and compile-time transform target validation](#immutable-correlation-ids-and-compile-time-transform-target-validation)
   * [The transport is out of scope](#the-transport-is-out-of-scope)
 - [Deferred Features](#deferred-features)
 - [References](#references)
@@ -479,10 +480,10 @@ in list order within each policy.
 
 ### Mutation Selectors
 
-- `LogTargetSelector` (used by `LogRemove`, `LogRedact`, and `LogAdd`) selects
+- `LogTargetSelector` (used by `LogAdd` and `LogRedact`) selects a writable
   `record_field`, `log_attribute`, or `body_field`.
-- `LogAttributeSelector` (used by `LogRename.from` and `LogRename.to`) selects
-  `log_attribute` or `body_field`.
+- `LogAttributeSelector` (used by `LogRename.from`, `LogRename.to`, and
+  `LogRemove.target`) selects `log_attribute` or `body_field`.
 
 When a write operation (`LogRename.to` or `LogAdd.target`) targets a
 multi-segment `log_attribute` or `body_field` path:
@@ -536,26 +537,26 @@ yields no change. For first-class `record_field` targets, default empty values
 `LOG_RECORD_FIELD_SEVERITY_NUMBER`) are treated as absent. When `upsert` is
 `true`, the consumer overwrites the target.
 
-When `target` selects a `record_field`, `value` MUST match the field's data
-model type or the operation yields no change (fail-open):
+When `target` selects a `record_field`, `target` and `value` MUST satisfy the
+field's static constraints or the policy MUST be rejected as a
+[compilation error](#compilation-errors):
 
 - `LOG_RECORD_FIELD_BODY`: any `ScalarValue` variant (sets `LogRecord.body`).
 - `LOG_RECORD_FIELD_SEVERITY_TEXT` and `LOG_RECORD_FIELD_EVENT_NAME`:
   `string_value` only.
 - `LOG_RECORD_FIELD_SEVERITY_NUMBER`: `int_value` in the range `1` to `24` only.
-- `LOG_RECORD_FIELD_TRACE_ID`: 32-character lowercase hexadecimal `string_value`
-  (decoded to 16 bytes).
-- `LOG_RECORD_FIELD_SPAN_ID`: 16-character lowercase hexadecimal `string_value`
-  (decoded to 8 bytes).
+- `LOG_RECORD_FIELD_TRACE_ID` and `LOG_RECORD_FIELD_SPAN_ID`: read-only; not
+  valid mutation targets.
 
 ### Remove
 
 ```
-LogRemove { target: LogTargetSelector }  // REQUIRED
+LogRemove { target: LogAttributeSelector }  // REQUIRED
 ```
 
-A target that is absent yields no change. Removing a `record_field` clears the
-field to its default empty value.
+A target that is absent yields no change. `LogRemove` deletes `log_attribute`
+and `body_field` entries only; first-class `record_field` values cannot be
+removed (use `LogRedact` with `replacement: ""` to clear a string record field).
 
 ### Redact
 
@@ -580,13 +581,16 @@ unset `LOG_RECORD_FIELD_BODY` (empty `AnyValue` or `""`), empty
 (`""`) is treated as absent and yields no change rather than being replaced with
 `replacement`.
 
+Targeting a non-string or read-only record field
+(`LOG_RECORD_FIELD_SEVERITY_NUMBER`, `LOG_RECORD_FIELD_TRACE_ID`,
+`LOG_RECORD_FIELD_SPAN_ID`) MUST be rejected as a
+[compilation error](#compilation-errors), whether or not `pattern` is set.
+
 When `pattern` (`regex`) is unset, the consumer replaces the whole target value
 with the string `replacement` (defaulting to `"[REDACTED]"` when `mask` is
 unset) on string record fields (`LOG_RECORD_FIELD_SEVERITY_TEXT`,
 `LOG_RECORD_FIELD_EVENT_NAME`) and `AnyValue` targets (`LOG_RECORD_FIELD_BODY`,
-`log_attribute`, `body_field`). Targeting a non-string typed record field
-(`LOG_RECORD_FIELD_SEVERITY_NUMBER`, `LOG_RECORD_FIELD_TRACE_ID`,
-`LOG_RECORD_FIELD_SPAN_ID`) yields no change.
+`log_attribute`, `body_field`).
 
 When `regex` is set, the consumer evaluates the
 [RE2 expression](https://github.com/google/re2/wiki/Syntax) against the current
@@ -611,8 +615,8 @@ When `regex` is supported and set:
   only the first one.
 - A capture group supplies text for the template. A capture group MUST NOT widen
   or narrow the replaced range.
-- A target value that is not a string (including `LOG_RECORD_FIELD_TRACE_ID`
-  and `LOG_RECORD_FIELD_SPAN_ID`) yields no change.
+- An `AnyValue` target (`LOG_RECORD_FIELD_BODY`, `log_attribute`, or
+  `body_field`) whose runtime value is not a string yields no change.
 
 When `regex` is set, `replacement` is a template. A consumer MUST support:
 
@@ -885,6 +889,7 @@ telemetry. A policy is invalid when any of these hold:
 | A transform policy carries no operation.                                                                                                                              | no `rename`, `add`, `remove`, or `redact`                       |
 | A transform target, `rename` selector, or `add` source is unset.                                                                                                      | an empty `target`, `from`, `to`, or `source` oneof              |
 | A `LogRename` has overlapping ancestor/descendant `from` and `to` paths in the same root.                                                                             | `from: ["a"]`, `to: ["a", "b"]`                                 |
+| A `LogAdd` or `LogRedact` targets a read-only or incompatible `record_field`, or `LogAdd` sets an invalid value type or severity range.                               | `add` with `SEVERITY_NUMBER: 99`, `redact` on `TRACE_ID`        |
 
 A consumer:
 
@@ -1215,10 +1220,10 @@ as new signals arrive.
 **Decision.** A matcher holds a `<Signal>FieldSelector` message rather than a
 `oneof` on the matcher itself.
 
-**Tradeoff.** Another level of nesting. In exchange `LogRemove`, `LogRedact`,
-and `LogAdd` share `LogTargetSelector` and `LogRename` reuses
-`LogAttributeSelector` for both `from` and `to` rather than repeating inline
-`oneof` definitions across every message.
+**Tradeoff.** Another level of nesting. In exchange `LogRedact` and `LogAdd`
+share `LogTargetSelector`, and `LogRename` and `LogRemove` reuse
+`LogAttributeSelector` rather than repeating inline `oneof` definitions across
+every message.
 
 ### The target never carries the expected value
 
@@ -1370,6 +1375,23 @@ type from text, and future `LogAdd` value sources (such as copying from another
 field), `LogRedact` masking strategies (such as cryptographic hashing), or
 pattern matchers (such as built-in PII detectors) can be added as new `oneof`
 variants without a source-breaking change in generated language stubs.
+
+### Immutable correlation IDs and compile-time transform target validation
+
+**Decision.** `LogRemove.target` uses `LogAttributeSelector` rather than
+`LogTargetSelector`. `LOG_RECORD_FIELD_TRACE_ID` and `LOG_RECORD_FIELD_SPAN_ID`
+are read-only for matching and are rejected at compile time in `LogAdd` and
+`LogRedact`. Static `LogAdd` `record_field` type/range mismatches (such as a
+non-string `SEVERITY_TEXT` or out-of-range `SEVERITY_NUMBER`) and `LogRedact`
+targeting `LOG_RECORD_FIELD_SEVERITY_NUMBER` are also rejected at compile time.
+
+**Tradeoff.** Policies cannot clear first-class log record fields via
+`LogRemove` or rewrite trace and span correlation IDs via `LogAdd`. In exchange,
+invalid first-class field deletions become unrepresentable in the protobuf
+schema, distributed trace-to-log correlation cannot be silently corrupted by a
+transform policy, and statically impossible `LogAdd`/`LogRedact` configurations
+surface immediately as compilation errors instead of silently doing nothing at
+runtime.
 
 ### The transport is out of scope
 
