@@ -348,7 +348,7 @@ message Profile {
   // The following fields 3-12 are informational, do not affect
   // interpretation of results.
 
-  // Time of collection (UTC) as nanoseconds since the UNIX epoch.
+  // Start time of the profile, in nanoseconds since the UNIX epoch (UTC).
   //
   // [Since v1.4.0]
   fixed64 time_unix_nano = 3;
