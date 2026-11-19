@@ -11,7 +11,7 @@ The full list of changes can be found in the compare view for the respective rel
 ### Changed
 
 - profiles: clarify that `Profile.time_unix_nano` is the start time of the profile. [#892](https://github.com/open-telemetry/opentelemetry-proto/pull/892)
-- treat HTTP 408 Request Timeout as retryable in OTLP/HTTP. [#891](https://github.com/open-telemetry/opentelemetry-proto/pull/891)
+- docs: treat HTTP 408 Request Timeout as retryable in OTLP/HTTP. [#891](https://github.com/open-telemetry/opentelemetry-proto/pull/891)
 
 ### Fixed
 
