@@ -8,6 +8,7 @@ The full list of changes can be found in the compare view for the respective rel
 
 - profiles: add temporary OTLP Profiles development version metadata. [#857](https://github.com/open-telemetry/opentelemetry-proto/pull/857)
 - trace: add span type. [#884](https://github.com/open-telemetry/opentelemetry-proto/pull/884)
+- common: add `id_scope` and `id_scope_entity_type` to `EntityRef`. [#810](https://github.com/open-telemetry/opentelemetry-proto/pull/810)
 
 ### Changed
 
