@@ -84,7 +84,8 @@ message LogTransformPolicy {
   // [Since next]
   repeated LogAdd add = 3;
 
-  // Fields to delete. A field that is absent yields no change.
+  // Attributes or structured body fields to delete. An absent target yields no
+  // change.
   //
   // [Since next]
   repeated LogRemove remove = 4;
@@ -163,18 +164,26 @@ message LogFieldSelector {
   }
 }
 
-// LogTargetSelector names one mutable field or attribute owned by a log
+// LogTargetSelector names one writable field or attribute owned by a log
 // record. Exactly one variant MUST be set.
 //
 // Status: [Development]
 //
 // [Since next]
 message LogTargetSelector {
-  // The mutable log record target. Exactly one variant MUST be set.
+  // The writable log record target. Exactly one variant MUST be set.
   //
   // [Since next]
   oneof target {
-    // A first-class field of the log record.
+    // A writable first-class field of the log record.
+    //
+    // LOG_RECORD_FIELD_TRACE_ID and LOG_RECORD_FIELD_SPAN_ID are read-only and
+    // are not valid mutation targets. For LogAdd, valid fields are
+    // LOG_RECORD_FIELD_BODY (any ScalarValue), LOG_RECORD_FIELD_SEVERITY_TEXT
+    // (string_value), LOG_RECORD_FIELD_EVENT_NAME (string_value), and
+    // LOG_RECORD_FIELD_SEVERITY_NUMBER (int_value in [1, 24]). For LogRedact,
+    // valid fields are LOG_RECORD_FIELD_BODY, LOG_RECORD_FIELD_SEVERITY_TEXT,
+    // and LOG_RECORD_FIELD_EVENT_NAME.
     //
     // [Since next]
     LogRecordField record_field = 1;
@@ -216,16 +225,16 @@ message LogAttributeSelector {
   }
 }
 
-// LogRemove deletes one field or attribute from a log record.
+// LogRemove deletes one attribute or structured body field from a log record.
 //
 // Status: [Development]
 //
 // [Since next]
 message LogRemove {
-  // The log record field or attribute to delete.
+  // The log record attribute or structured body path to delete.
   //
   // [Since next]
-  LogTargetSelector target = 1;
+  LogAttributeSelector target = 1;
 }
 
 // LogRedact masks a field value, or a part of a field value, on a log record.
@@ -235,6 +244,11 @@ message LogRemove {
 // [Since next]
 message LogRedact {
   // The log record field or attribute to mask.
+  //
+  // Targeting a non-string or read-only record_field
+  // (LOG_RECORD_FIELD_SEVERITY_NUMBER, LOG_RECORD_FIELD_TRACE_ID,
+  // LOG_RECORD_FIELD_SPAN_ID) is a compilation error whether or not pattern is
+  // set.
   //
   // [Since next]
   LogTargetSelector target = 1;
@@ -267,14 +281,12 @@ message LogRedact {
     // When pattern is unset, the whole field value is replaced with
     // replacement on string fields (LOG_RECORD_FIELD_SEVERITY_TEXT,
     // LOG_RECORD_FIELD_EVENT_NAME) and AnyValue targets
-    // (LOG_RECORD_FIELD_BODY, log_attribute, body_field); targeting a
-    // non-string typed record field (LOG_RECORD_FIELD_SEVERITY_NUMBER,
-    // LOG_RECORD_FIELD_TRACE_ID, LOG_RECORD_FIELD_SPAN_ID) yields no change.
-    // When regex is set and the expression matches, every non-overlapping full
-    // match is replaced. A capture group supplies text for the template but
-    // does not widen or narrow the replaced range. When the expression does
-    // not match, or when the field value is not a string, the operation yields
-    // no change.
+    // (LOG_RECORD_FIELD_BODY, log_attribute, body_field). When regex is set
+    // and the expression matches, every non-overlapping full match is
+    // replaced. A capture group supplies text for the template but does not
+    // widen or narrow the replaced range. When the expression does not match,
+    // or when an AnyValue target's runtime value is not a string, the
+    // operation yields no change.
     //
     // Implementation support for regex is RECOMMENDED (optional for
     // conformance). A consumer that does not support regex MUST still support
@@ -328,8 +340,10 @@ message LogAdd {
   //
   // [Since next]
   oneof source {
-    // A literal scalar value to set. Setting a value whose type is
-    // incompatible with a fixed-type record_field yields no change.
+    // A literal scalar value to set. Setting a value whose type or range is
+    // incompatible with a fixed-type record_field, or targeting a read-only
+    // record_field (LOG_RECORD_FIELD_TRACE_ID, LOG_RECORD_FIELD_SPAN_ID), is a
+    // compilation error.
     //
     // [Since next]
     ScalarValue value = 2;
