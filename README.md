@@ -15,7 +15,7 @@ The primary OpenTelemetry data delivery protocol, used to export traces,
 metrics, logs, and profiles via gRPC and HTTP.
 
 - Specification: [docs/specification.md](docs/specification.md)
-- Proto files: everything under [opentelemetry/proto/](opentelemetry/proto/) except `processcontext/`
+- Proto files: everything under [opentelemetry/proto/](opentelemetry/proto/) except `policies/` and `processcontext/`
 
 #### OTLP/JSON
 
@@ -46,6 +46,16 @@ OpenTelemetry Collector.
 - Proto file: [opentelemetry/proto/processcontext/v1development/process_context.proto](opentelemetry/proto/processcontext/v1development/process_context.proto)
 - Design doc: [OTEP 4719](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/profiles/4719-process-ctx.md)
 
+### Telemetry Policies
+
+A non-OTLP, transport-agnostic schema for portable, atomic rules that filter,
+sample, or transform OpenTelemetry logs, metrics, and traces in SDKs,
+Collectors, and other conformant consumers.
+
+- Specification: [experimental-docs/specifications/policy.md](experimental-docs/specifications/policy.md)
+- Proto files: [opentelemetry/proto/policies/v1development/](opentelemetry/proto/policies/v1development/)
+- Design doc: [OTEP 4738](https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/4738-telemetry-policy.md)
+
 ## Language Independent Interface Types
 
 The proto files can be consumed as GIT submodules or copied and built directly in the consumer project.
@@ -68,6 +78,7 @@ components as indicated by the Maturity table below.
 | OTLP                    | logs/\*<br>collector/logs/*         | Stable                   | [Stable](docs/specification.md#json-protobuf-encoding)      |
 | OTLP                    | profiles/\*<br>collector/profiles/* | Development              | [Development](docs/specification.md#json-protobuf-encoding) |
 | Process Context Sharing | processcontext/*                    | Development              | N/A                                                         |
+| Telemetry Policies      | policies/*                          | Development              | Development                                                 |
 
 (See [Versioning and Stability](https://github.com/open-telemetry/opentelemetry-specification/blob/a08d1f92f62acd4aafe4dfaa04ae7bf28600d49e/specification/versioning-and-stability.md)
 for definition of maturity levels).
