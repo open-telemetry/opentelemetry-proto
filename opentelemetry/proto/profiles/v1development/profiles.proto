@@ -352,13 +352,14 @@ message Profile {
   //
   // [Since v1.4.0]
   fixed64 time_unix_nano = 3;
-  // Duration of the profile in nanoseconds. For instant profiles like live
-  // heap snapshot, the duration can be zero but it may be preferable to set
-  // time_unix_nano to the process start time and duration_nano to the relative
-  // time when the profile was gathered so that Sample.timestamps_unix_nano
-  // values fall within the profile time range. If duration is larger than
-  // zero, then the samples describe a delta of occurrences in the
-  // [ time_unix_nano, time_unix_nano + duration_nano ) window.
+  // Duration of the profile in nanoseconds.
+  // If zero, the profile is an instant snapshot, like a live heap snapshot.
+  // Because the [Profile.time_unix_nano, Profile.time_unix_nano +
+  // Profile.duration_nano) interval is then empty, Sample.timestamps_unix_nano
+  // SHOULD NOT be set.
+  // If non-zero, the profile has delta semantics, where Sample.values reflect
+  // occurrences within the [Profile.time_unix_nano, Profile.time_unix_nano +
+  // Profile.duration_nano) interval, not cumulative totals.
   //
   // [Since v1.8.0]
   uint64 duration_nano = 4;
