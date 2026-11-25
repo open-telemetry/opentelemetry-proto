@@ -6,6 +6,9 @@ The full list of changes can be found in the compare view for the respective rel
 
 ### Added
 
+- profiles: more efficient and flexible original_payload handling. [#786](https://github.com/open-telemetry/opentelemetry-proto/pull/786)<br>
+  This is a breaking change to the development version of profiles. A new message, OriginalPayload, is introduced for carrying profile data captured in non-OpenTelemetry format; a dictionary field is added for this type; Profile fields previously carrying the information directly are removed in favor of indirecting through the dictionary for more efficient space usage. Users upgrading their receivers should take note of the version metadata mechanism introduced in profiles: specify OTLP Profiles development version metadata [#857](https://github.com/open-telemetry/opentelemetry-proto/pull/857)
+
 - profiles: add temporary OTLP Profiles development version metadata. [#857](https://github.com/open-telemetry/opentelemetry-proto/pull/857)
 - trace: add span type. [#884](https://github.com/open-telemetry/opentelemetry-proto/pull/884)
 
@@ -16,6 +19,8 @@ The full list of changes can be found in the compare view for the respective rel
 ### Fixed
 
 ### Removed
+
+- profiles: Profile.original_payload_format and Profile.original_payload_format are no longer used, see [#786](https://github.com/open-telemetry/opentelemetry-proto/pull/786) above.
 
 ## 1.11.1 - 2026-09-25
 
