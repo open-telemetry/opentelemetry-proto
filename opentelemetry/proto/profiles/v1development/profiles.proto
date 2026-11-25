@@ -227,7 +227,7 @@ message ProfilesData {
   // Other resource groupings are possible as well and clarified via
   // Resource.attributes and semantic conventions.
   // Tools that visualize profiles SHOULD prefer displaying
-  // resources_profiles[0].scope_profiles[0].profiles[0] by default.
+  // resource_profiles[0].scope_profiles[0].profiles[0] by default.
   //
   // [Since v1.4.0]
   repeated ResourceProfiles resource_profiles = 1;
@@ -320,7 +320,7 @@ message ScopeProfiles {
 //   unique Location with that index.
 //
 // - There is an optional N->1 relationship from locations to
-//   mappings. For every nonzero Location.mapping_id there MUST be a
+//   mappings. For every nonzero Location.mapping_index there MUST be a
 //   unique Mapping with that index.
 
 // Represents a complete profile, including sample types, samples, mappings to
@@ -558,8 +558,8 @@ message Mapping {
 // A Stack represents a stack trace as a list of locations (leaf first).
 // For example, the stack trace resulting from the call stack
 // main -> foo -> bar would be encoded into the location_indices list
-// [2, 1, 0] which references the locations in location_table as:
-// [Location{"main"}, Location{"foo"}, Location{"bar"}].
+// [3, 2, 1] which references the locations in location_table as:
+// [Location{}, Location{"main"}, Location{"foo"}, Location{"bar"}].
 //
 // Status: [Alpha]
 //
